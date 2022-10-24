@@ -30,32 +30,32 @@ public class User extends BaseTimeEntity {
     @Column
     private String picture;
 
-    @Column
-    private String introduction;
-
-    @Column
-    private String univ;
-
-    @Column
-    private String major;
-
-    @Column
-    private int followingNum;
-
-    @Column
-    private int followerNum;
-
-    @Column
-    private String stack;
-
-    @Column
-    private String genre;
-
-    @Column
-    private boolean cert_uni;
-
-    @Column
-    private boolean cert_celeb;
+//    @Column
+//    private String introduction;
+//
+//    @Column
+//    private String univ;
+//
+//    @Column
+//    private String major;
+//
+//    @Column
+//    private int followingNum;
+//
+//    @Column
+//    private int followerNum;
+//
+//    @Column
+//    private String stack;
+//
+//    @Column
+//    private String genre;
+//
+//    @Column
+//    private boolean cert_uni;
+//
+//    @Column
+//    private boolean cert_celeb;
 
     @Column
     private String origin;
