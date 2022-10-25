@@ -33,7 +33,7 @@ dependencies {
 	implementation 'mysql:mysql-connector-java'
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.2.2'
 	implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
-	implementation 'io.springfox:springfox-boot-starter:3.0.0'
+
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	compileOnly 'org.projectlombok:lombok'
 	compileOnly 'org.apache.tomcat.embed:tomcat-embed-jasper'
@@ -41,6 +41,9 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'com.h2database:h2'
+	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
 	testImplementation 'org.springframework.security:spring-security-test'
 }
 
