@@ -2,6 +2,8 @@ package net.sinzak.server.controller;
 
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import net.sinzak.server.config.auth.LoginUser;
+import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.config.dto.respond.GetFollowDto;
 import net.sinzak.server.domain.User;
 import net.sinzak.server.service.UserQueryService;
@@ -24,14 +26,13 @@ public class UserQueryController {
 
     @ApiOperation(value ="유저 프로필 보기")
     @GetMapping(value ="/users/{userId}")
-    public JSONObject getUser(@PathVariable("userId") Long userId, User user){
+    public JSONObject getUser(@PathVariable("userId") Long userId, @LoginUser SessionUser user){
         JSONObject jsonObject = userQueryService.getUserProfile(userId, user);
         return jsonObject;
     }
     @ApiOperation(value ="팔로워리스트")
     @GetMapping(value ="/users/{userId}/followers")
     public ResponseEntity getFollowerList(@PathVariable("userId") Long userId) {
-
         List<GetFollowDto> getFollowDtoList =
                userQueryService.getFollowerDtoList(userId);
         return ResponseEntity.status(HttpStatus.OK)

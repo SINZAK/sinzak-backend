@@ -87,7 +87,7 @@ public class User extends BaseTimeEntity {
         this.picture = picture;
         this.origin = origin;
         this.role = role;
-        this.nickName = name;
+        this.name = name;
     }
 
     public User(String email, String name, String picture) {
@@ -99,8 +99,8 @@ public class User extends BaseTimeEntity {
     protected User() {
     }
 
-    public User update(String nickName, String picture,String introduction){
-        this.nickName =nickName;
+    public User update(String name, String picture,String introduction){
+        this.name =name;
         this.picture = picture;
         this.introduction = introduction;
 

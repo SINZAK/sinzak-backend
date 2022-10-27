@@ -1,7 +1,9 @@
 package net.sinzak.server.service;
 
 
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.config.dto.request.UpdateUserDto;
 import net.sinzak.server.domain.User;
 import net.sinzak.server.error.InstanceNotFoundException;
@@ -17,23 +19,29 @@ public class UserCommandService {
     private final UserRepository userRepository;
 
     @Transactional //실제론 연동로그인이기에 api테스트용
-    public long createUser(User user){
+    public long createUser(SessionUser user){
         Optional<User> findUser =
                 userRepository.findByEmail(user.getEmail());
         if(findUser.isPresent()){
             throw new InstanceNotFoundException("이미 존재하는 이메일입니다");
         }
-        userRepository.save(user);
+        User newUser = sessionUserToUser(user);
+        userRepository.save(newUser);
         return userRepository.findByEmail(user.getEmail()).get().getId();
     }
     @Transactional
-    public boolean updateUser(UpdateUserDto dto,User user){
+    public boolean updateUser(UpdateUserDto dto,SessionUser user){
         User findUser =
                 userRepository
                         .findByEmail(user.getEmail())
                         .orElseThrow(()-> new InstanceNotFoundException("유저가 존재하지 않습니다."));
         findUser.update(dto.getName(),dto.getPicture(),dto.getIntroduction());
         return true;
+    }
+    public User sessionUserToUser(SessionUser user){
+        User newUser = User.builder()
+                .email(user.getEmail()).name(user.getName()).picture(user.getPicture()).build();
+        return newUser;
     }
 //    @Transactional
 //    public void clickFollowButton(FollowDto dto, User user){
@@ -47,5 +55,4 @@ public class UserCommandService {
 //                        .orElseThrow(()-> new InstanceNotFoundException("유저가 존재하지 않습니다."));
 //
 //    }
-    @Transactional\\
 }

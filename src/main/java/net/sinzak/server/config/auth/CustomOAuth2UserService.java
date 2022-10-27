@@ -1,8 +1,8 @@
-package net.sinzak.server.config;
+package net.sinzak.server.config.auth;
 
 import lombok.RequiredArgsConstructor;
-import net.sinzak.server.config.dto.OAuthAttributes;
-import net.sinzak.server.config.dto.request.SessionUser;
+import net.sinzak.server.config.auth.dto.OAuthAttributes;
+import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.domain.User;
 import net.sinzak.server.repository.UserRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -37,11 +37,11 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         User user = saveOrUpdate(attributes);
         httpSession.setAttribute("user", new SessionUser(user)); // SessionUser (직렬화된 dto 클래스 사용)
 
-
         return new DefaultOAuth2User(Collections.singleton(new SimpleGrantedAuthority(user.getRoleKey())),
                 attributes.getAttributes(),
                 attributes.getNameAttributeKey());
     }
+
     // 유저 생성 및 수정 서비스 로직
     private User saveOrUpdate(OAuthAttributes attributes){
 //        User user = userRepository.findByEmail(attributes.getEmail())

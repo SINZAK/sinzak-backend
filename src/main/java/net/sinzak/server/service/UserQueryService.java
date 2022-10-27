@@ -1,6 +1,7 @@
 package net.sinzak.server.service;
 
 import lombok.RequiredArgsConstructor;
+import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.config.dto.respond.GetFollowDto;
 import net.sinzak.server.domain.User;
 import net.sinzak.server.error.InstanceNotFoundException;
@@ -19,9 +20,9 @@ public class UserQueryService {
 
     private final UserRepository userRepository;
 
-    public JSONObject getUserProfile(Long otherUserId, User user) {
+    public JSONObject getUserProfile(Long otherUserId, SessionUser user) {
         JSONObject object = new JSONObject();
-        Optional<User> findUser = userRepository.findById(user.getId());
+        Optional<User> findUser = userRepository.findByEmail(user.getEmail());
         Optional<User> otherUser = userRepository.findById(otherUserId);
         if(findUser.isPresent() && otherUser.isPresent()){
             if(otherUser.get().getEmail().equals(findUser)){//만약 Id가 똑같다면 본인프로파일
@@ -30,8 +31,8 @@ public class UserQueryService {
             else{
                 object.put("myProfile",false);
             }
-            object.put("name",user.getName());
-            object.put("introduction",user.getIntroduction());
+            object.put("name",findUser.get().getName());
+            object.put("introduction",findUser.get().getIntroduction());
             object.put("success",true);
         }
         else{
@@ -39,14 +40,7 @@ public class UserQueryService {
         }
         return object;
     }
-    public List<GetFollowDto> getFollowerDtoList(Long userId){
-        Set<Long> followerList = userRepository.findById(userId).get().getFollowerList();
-        return getGetFollowDtoList(followerList);
-    }
-    public List<GetFollowDto> getFollowingDtoList(Long userId){
-        Set<Long> followingList = userRepository.findById(userId).get().getFollowingList();
-        return getGetFollowDtoList(followingList);
-    }
+    //팔로우,팔로잉 가져오기
     private List<GetFollowDto> getGetFollowDtoList(Set<Long> followList) {
         List<GetFollowDto> getFollowingDtoList = new ArrayList<>();
         for(Long follow : followList){
@@ -58,5 +52,16 @@ public class UserQueryService {
         }
         return getFollowingDtoList;
     }
+    //팔로워가져오기
+    public List<GetFollowDto> getFollowerDtoList(Long userId){
+        Set<Long> followerList = userRepository.findById(userId).get().getFollowerList();
+        return getGetFollowDtoList(followerList);
+    }
+    //팔로잉가져오기
+    public List<GetFollowDto> getFollowingDtoList(Long userId){
+        Set<Long> followingList = userRepository.findById(userId).get().getFollowingList();
+        return getGetFollowDtoList(followingList);
+    }
+
 
 }
