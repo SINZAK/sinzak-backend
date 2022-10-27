@@ -50,6 +50,6 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         Optional<User> optionalUser = userRepository.findByEmail(attributes.getEmail());
         if(optionalUser.isPresent())
             return optionalUser.get();
-        return userRepository.save(optionalUser.map(entity -> entity.update(attributes.getName(), attributes.getPicture())).orElse(attributes.toEntity()));
-    }
+        return userRepository.save(optionalUser.map(entity -> entity.update(attributes.getEmail(),attributes.getName(), attributes.getPicture())).orElse(attributes.toEntity()));
+    }  //53번 코드 -> 테스트 용으로 attribute.getEmail()껴놓음 @LoginUser 얼렁 만들어줘
 }

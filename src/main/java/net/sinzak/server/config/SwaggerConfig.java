@@ -23,8 +23,8 @@ import java.util.Arrays;
 import java.util.List;
 
 
-@Configuration
 @EnableSwagger2
+@Configuration
 public class SwaggerConfig {
 
     private static final String API_NAME = "신작 API";
@@ -51,8 +51,6 @@ public class SwaggerConfig {
                 .description(API_DESCRIPTION)
                 .build();
     }
-
-
     public Docket getDocket(String groupName, Predicate<String> predicate) {
         return new Docket(DocumentationType.SWAGGER_2)
                 .useDefaultResponseMessages(false)

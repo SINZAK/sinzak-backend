@@ -1,0 +1,22 @@
+package net.sinzak.server.config.dto.respond;
+
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@NoArgsConstructor
+public class GetFollowDto {
+    private Long userId;
+    private String name;
+    private String picture;
+
+    @Builder()
+    public GetFollowDto(Long userId, String name, String picture) {
+        this.userId = userId;
+        this.name = name;
+        this.picture = picture;
+    }
+}

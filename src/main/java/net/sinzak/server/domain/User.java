@@ -6,7 +6,9 @@ import net.sinzak.server.BaseTimeEntity;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Entity
@@ -17,6 +19,10 @@ public class User extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "User_SEQ")
     @Column(name = "user_id")
     private Long id;
+
+
+
+
 
     @Column
     private String email;
@@ -30,8 +36,8 @@ public class User extends BaseTimeEntity {
     @Column
     private String picture;
 
-//    @Column
-//    private String introduction;
+    @Column
+    private String introduction;
 //
 //    @Column
 //    private String univ;
@@ -64,6 +70,15 @@ public class User extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @ElementCollection
+    @CollectionTable(name = "FOLLOWING_LIST", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "FOLLOWING_ID")
+    private Set<Long> followingList =new HashSet<>();
+
+    @ElementCollection
+    @CollectionTable(name = "FOLLOWER_LIST", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "FOLLOWER_ID")
+    private Set<Long> followerList =new HashSet<>();
 
     @Builder
     public User(String name, String email, String picture, String origin, Role role) {
@@ -72,15 +87,23 @@ public class User extends BaseTimeEntity {
         this.picture = picture;
         this.origin = origin;
         this.role = role;
-        this.nickName = name;
+        this.name = name;
+    }
+
+    public User(String email, String name, String picture) {
+        this.email = email;
+        this.name = name;
+        this.picture = picture;
     }
 
     protected User() {
     }
 
-    public User update(String name, String picture){
+    public User update(String name, String picture,String introduction){
         this.name =name;
         this.picture = picture;
+        this.introduction = introduction;
+
         return this;
     }
 
