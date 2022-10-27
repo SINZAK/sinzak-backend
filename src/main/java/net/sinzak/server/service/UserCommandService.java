@@ -2,14 +2,11 @@ package net.sinzak.server.service;
 
 
 import lombok.RequiredArgsConstructor;
-import net.sinzak.server.config.dto.FollowDto;
-import net.sinzak.server.config.dto.SessionUser;
-import net.sinzak.server.config.dto.UpdateUserDto;
+import net.sinzak.server.config.dto.request.UpdateUserDto;
 import net.sinzak.server.domain.User;
 import net.sinzak.server.error.InstanceNotFoundException;
 import net.sinzak.server.repository.UserRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.transaction.Transactional;
 import java.util.Optional;
@@ -50,4 +47,5 @@ public class UserCommandService {
 //                        .orElseThrow(()-> new InstanceNotFoundException("유저가 존재하지 않습니다."));
 //
 //    }
+    @Transactional\\
 }

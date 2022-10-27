@@ -1,7 +1,7 @@
 package net.sinzak.server.service;
 
 
-import net.sinzak.server.config.dto.UpdateUserDto;
+import net.sinzak.server.config.dto.request.UpdateUserDto;
 import net.sinzak.server.domain.User;
 import net.sinzak.server.error.InstanceNotFoundException;
 import net.sinzak.server.repository.UserRepository;
@@ -10,15 +10,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
 
 import javax.transaction.Transactional;
-import javax.validation.constraints.AssertTrue;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class UserCommandServiceTest {
