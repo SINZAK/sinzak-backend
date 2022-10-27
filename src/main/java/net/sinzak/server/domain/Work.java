@@ -4,14 +4,16 @@ import lombok.Getter;
 
 import javax.persistence.*;
 
+
 @Getter
 @Entity
 @SequenceGenerator(name = "Product_SEQ_GEN",sequenceName = "Product_SEQ")
-public class Product { /** 작품 **/
+public class Work { /** 외주 **/
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Product_SEQ")
-    @Column(name = "product_id")
+    @Column(name = "work_id")
     private Long id;  //작품 번호
 
     @Column
@@ -31,3 +33,4 @@ public class Product { /** 작품 **/
     private boolean complete;
 
 }
+
