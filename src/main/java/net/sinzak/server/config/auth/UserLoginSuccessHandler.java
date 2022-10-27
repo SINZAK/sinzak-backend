@@ -1,4 +1,4 @@
-package net.sinzak.server.config;
+package net.sinzak.server.config.auth;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;

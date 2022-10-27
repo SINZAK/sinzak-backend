@@ -1,4 +1,4 @@
-package net.sinzak.server.config;
+package net.sinzak.server.config.auth;
 
 
 import lombok.RequiredArgsConstructor;

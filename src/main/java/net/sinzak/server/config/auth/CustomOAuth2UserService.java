@@ -1,8 +1,8 @@
-package net.sinzak.server.config;
+package net.sinzak.server.config.auth;
 
 import lombok.RequiredArgsConstructor;
-import net.sinzak.server.config.dto.OAuthAttributes;
-import net.sinzak.server.config.dto.SessionUser;
+import net.sinzak.server.config.auth.dto.OAuthAttributes;
+import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.domain.User;
 import net.sinzak.server.repository.UserRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
