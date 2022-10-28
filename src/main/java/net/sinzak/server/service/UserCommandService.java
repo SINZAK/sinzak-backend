@@ -8,6 +8,7 @@ import net.sinzak.server.domain.User;
 import net.sinzak.server.error.InstanceNotFoundException;
 import net.sinzak.server.repository.UserRepository;
 import org.json.simple.JSONObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.Optional;
@@ -51,6 +52,21 @@ public class UserCommandService {
         findUser.update(dto.getName(),dto.getPicture(),dto.getIntroduction());
         return PropertyUtil.response(true);
     }
+
+
+
+    @Transactional
+    public JSONObject updateUser2(UpdateUserDto dto, SessionUser user){
+        Optional<User> User = userRepository.findByEmail(user.getEmail());
+        if(User.isPresent()){
+            User findUser = User.get();
+            findUser.update(dto.getName(),dto.getPicture(),dto.getIntroduction());
+            return PropertyUtil.response(true);
+        }
+        return PropertyUtil.responseMessage(HttpStatus.BAD_REQUEST,"이미 가입된 이메일입니다.");
+    }
+
+
     public User sessionUserToUser(SessionUser user){
         User newUser = User.builder()
                 .email(user.getEmail()).name(user.getName()).picture(user.getPicture()).build();
