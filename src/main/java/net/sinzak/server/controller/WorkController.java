@@ -20,15 +20,8 @@ public class WorkController {
 
     private final WorkService workService;
 
-//    @ApiOperation(value = "외주 모집 글 생성")
-//    @PostMapping("/works/build")
-//    public JSONObject makeWorkPost(@LoginUser SessionUser user, @RequestBody WorkPostDto postDto) {
-//        System.out.println(user.getName());
-//        return workService.makeWork(user, postDto);
-//    }
-
     @ApiOperation(value = "외주 모집 글 생성")
-    @PostMapping("/works/build2")
+    @PostMapping("/works/build")
     public JSONObject makeWorkPost(@LoginUser SessionUser user, @RequestBody WorkPostDto postDto) {
         return workService.makeWorkPost(user, postDto);
     }
