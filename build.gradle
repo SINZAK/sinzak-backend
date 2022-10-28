@@ -46,6 +46,11 @@ dependencies {
 	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
 	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
 	testImplementation 'org.springframework.security:spring-security-test'
+
+
+	//이것도 스웨거 관련인데
+	implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
+	implementation 'javax.servlet:jstl'
 }
 tasks.named('test') {
 	useJUnitPlatform()

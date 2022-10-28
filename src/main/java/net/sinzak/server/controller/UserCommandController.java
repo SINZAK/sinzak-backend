@@ -1,6 +1,7 @@
 package net.sinzak.server.controller;
 
 
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
@@ -14,15 +15,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class UserCommandController {
     private final UserCommandService userCommandService;
     //로그인 연동이니 테스트용
     @ApiOperation(value = "유저생성")
     @PostMapping(value = "/users")
-    public JSONObject createUser(@RequestBody SessionUser user) {
+    public JSONObject createUser( @RequestBody SessionUser user) {
         JSONObject obj = new JSONObject();
         try {
             userCommandService.createUser(user);
@@ -35,7 +38,10 @@ public class UserCommandController {
     }
     @ApiOperation(value = "유저 정보변경", notes = "이름,한줄 소개, 학교(보류) ")
     @PutMapping(value = "/users")
-    public JSONObject updateUser(@RequestBody UpdateUserDto dto ,@LoginUser SessionUser user) {
+    public JSONObject updateUser( @RequestBody UpdateUserDto dto , @ApiIgnore @LoginUser SessionUser user) {
+        if(user ==null){
+            throw new InstanceNotFoundException("존재하지 않는 세션의 유저입니다");
+        }
         return userCommandService.updateUser(dto,user);
     }
 }

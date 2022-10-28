@@ -22,10 +22,10 @@ public class UserQueryService {
 
     public JSONObject getUserProfile(Long otherUserId, SessionUser user) {
         JSONObject object = new JSONObject();
-        Optional<User> findUser = userRepository.findByEmail(user.getEmail());
-        Optional<User> otherUser = userRepository.findById(otherUserId);
-        if(findUser.isPresent() && otherUser.isPresent()){
-            if(otherUser.get().getEmail().equals(findUser)){//만약 Id가 똑같다면 본인프로파일
+        Optional<User> User = userRepository.findByEmail(user.getEmail());
+        Optional<User> findUser = userRepository.findById(otherUserId);
+        if(User.isPresent() && findUser.isPresent()){
+            if(findUser.get().equals(User.get())){//만약 Id가 똑같다면 본인프로파일
                 object.put("myProfile",true); //내 프로필임
             }
             else{

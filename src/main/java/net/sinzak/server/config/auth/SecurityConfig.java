@@ -19,7 +19,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .headers().frameOptions().disable() // h2-console 화면을 사용하기 위해 해당 옵션 disable
                 .and()
                 .authorizeRequests()// URL별 권한 권리
-                .antMatchers("/","/css/**","/images/**","/js/**","/h2-console/**").permitAll()
+                .antMatchers(AUTH_WHITELIST).permitAll()
                 .and()
                 .logout()
                 .logoutSuccessUrl("/")
@@ -29,4 +29,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .userInfoEndpoint() // oauth2 로그인 성공 후 가져올 때의 설정들
                 .userService(customOAuth2UserService); // 리소스 서버에서 사용자 정보를 가져온 상태에서 추가로 진행하고자 하는 기능 명시
     }
+    private static final String[] AUTH_WHITELIST ={
+            "/","/css/**","/images/**","/js/**","/h2-console/**","/swagger-ui/**","/swagger-ui.html"
+    };
 }

@@ -17,7 +17,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserCommandService {
     private final UserRepository userRepository;
-
     @Transactional //실제론 연동로그인이기에 api테스트용
     public long createUser(SessionUser user){ //이건 테스트
         Optional<User> findUser =
@@ -34,7 +33,7 @@ public class UserCommandService {
         User findUser =
                 userRepository
                         .findByEmail(user.getEmail())
-                        .orElseThrow(()-> new InstanceNotFoundException("유저가 존재하지 않습니다."));
+                        .orElseThrow(()-> new InstanceNotFoundException("유저가 존재하지 않습니다."+user.getEmail()));
         findUser.update(dto.getName(),dto.getPicture(),dto.getIntroduction());
         return PropertyUtil.response(true);
     }

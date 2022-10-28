@@ -22,8 +22,6 @@ class UserCommandServiceTest {
     private UserCommandService userCommandService;
     @Autowired
     private UserRepository userRepository;
-
-
     @Test
     public void createUserTest(){
         User user1 = new User("유성욱@지메일","유성욱","그림2");
