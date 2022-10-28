@@ -38,15 +38,20 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	compileOnly 'org.apache.tomcat.embed:tomcat-embed-jasper'
 	compileOnly 'javax.servlet:jstl:1.2'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	implementation 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	implementation 'com.h2database:h2'
+	implementation 'com.h2database:h2:1.4.200'
+
 	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
 	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
 	testImplementation 'org.springframework.security:spring-security-test'
-}
 
+
+	//이것도 스웨거 관련인데
+	implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
+	implementation 'javax.servlet:jstl'
+}
 tasks.named('test') {
 	useJUnitPlatform()
 }

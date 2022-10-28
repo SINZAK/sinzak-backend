@@ -1,4 +1,4 @@
-package net.sinzak.server.config.dto.request;
+package net.sinzak.server.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

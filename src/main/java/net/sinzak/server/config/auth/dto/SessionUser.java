@@ -1,5 +1,7 @@
 package net.sinzak.server.config.auth.dto;
 
+import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import net.sinzak.server.domain.User;
@@ -7,6 +9,7 @@ import net.sinzak.server.domain.User;
 import java.io.Serializable;
 
 @Getter
+@AllArgsConstructor
 public class SessionUser implements Serializable {
     private String name;
     private String email;
