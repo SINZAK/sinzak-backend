@@ -21,7 +21,8 @@ public class ProductService {
     private final ProductRepository productRepository;
     @Transactional
     public JSONObject makeProductPost(SessionUser tempUser, ProductPostDto productPost){
-        User user = userRepository.findByEmailFetchWP(tempUser.getEmail()).get(); //해당 유저의 외주 글 리스트까지 fetch해서 가져오기.
+        User user = userRepository.findByEmailFetchPP(tempUser.getEmail()).orElseThrow();
+                            /** 존재 하지 않는 유저면 NullPointer 에러 뜰거고, 핸들러가 처리 할 예정 **/
         Product product = Product.builder()
                     .title(productPost.getTitle())  //제목
                     .content(productPost.getContent()) //내용
