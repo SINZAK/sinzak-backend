@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class GetFollowDto {
     private Long userId;
+
     private String name;
     private String picture;
 

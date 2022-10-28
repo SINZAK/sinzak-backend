@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        header {
+            border: 1px solid black;
+            text-align: center;
+            margin-bottom: 10px;
+            padding: 5px;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        section {
+            border: 1px solid black;
+            padding: 5px;
+            height: 80%;
+        }
+
+        footer {
+            margin-top: 10px;
+            padding: 5px;
+            border: 1px solid black;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<header> 신작
+    <button onclick="location.href='/'"> 로그아웃 </button>
+</header>
+<section>
+    슈팔 보니까 타임리프는 @Controller만 되네 @RestController를 첨 써봐서 몰랐다;
+</section>
+
+<footer>
+    <button th:id="homeButton"> 홈</button>
+    <button th:id="marketButton"> 마켓</button>
+    <button th:id="workButton"> 외주</button>
+    <button th:id="chatButton"> 채팅</button>
+    <button th:id="profileButton"> 프로필</button>
+</footer>
+</body>
+</html>
