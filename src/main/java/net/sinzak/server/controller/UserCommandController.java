@@ -1,7 +1,6 @@
 package net.sinzak.server.controller;
 
 
-import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
@@ -11,11 +10,7 @@ import net.sinzak.server.dto.request.UpdateUserDto;
 import net.sinzak.server.error.InstanceNotFoundException;
 import net.sinzak.server.service.UserCommandService;
 import org.json.simple.JSONObject;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
@@ -37,12 +32,20 @@ public class UserCommandController {
         }
     }
     @ApiOperation(value = "유저 정보변경", notes = "이름,한줄 소개, 학교(보류) ")
-    @PutMapping(value = "/users")
+    @PostMapping(value = "/users/edit")
     public JSONObject updateUser( @RequestBody UpdateUserDto dto , @ApiIgnore @LoginUser SessionUser user) {
-        if(user ==null){
-            throw new InstanceNotFoundException("존재하지 않는 세션의 유저입니다");
-        }
         return userCommandService.updateUser(dto,user);
+    }
+
+    @ApiOperation(value = "팔로우하기")
+    @PostMapping(value = "/users/{userId}/follow")
+    public JSONObject followUser(@PathVariable("userId") Long userId,@ApiIgnore @LoginUser SessionUser user){
+        return userCommandService.follow(userId,user);
+    }
+    @ApiOperation(value = "팔로우하기")
+    @PostMapping(value = "/users/{userId}/unfollow")
+    public JSONObject unFollowUser(@PathVariable("userId") Long userId,@ApiIgnore @LoginUser SessionUser user){
+        return userCommandService.unFollow(userId,user);
     }
 }
 

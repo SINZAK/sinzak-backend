@@ -9,10 +9,8 @@ import net.sinzak.server.error.InstanceNotFoundException;
 import net.sinzak.server.repository.UserRepository;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
-
 import javax.transaction.Transactional;
 import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class UserCommandService {
@@ -42,16 +40,28 @@ public class UserCommandService {
                 .email(user.getEmail()).name(user.getName()).picture(user.getPicture()).build();
         return newUser;
     }
-//    @Transactional
-//    public void clickFollowButton(FollowDto dto, User user){
-//        //프론트엔드 형식이 어케 되는지 모르겠네
-//        if(user.getId().equals(dto.getId())){
-//            throw new IllegalStateException("자신한테는 친구 신청 불가능");
-//        }
-//        User findUser =
-//                userRepository
-//                        .findByEmail(user.getEmail())
-//                        .orElseThrow(()-> new InstanceNotFoundException("유저가 존재하지 않습니다."));
-//
-//    }
+    @Transactional
+    public JSONObject follow(Long userId, SessionUser user){
+        User User = getUserAndCheckIfMe(userId,user);
+        User.getFollowingList().add(userId);
+        return PropertyUtil.response(true);
+    }
+    @Transactional
+    public JSONObject unFollow(Long userId,SessionUser user){
+        User User = getUserAndCheckIfMe(userId,user);
+        User.getFollowerList().remove(userId);
+        return PropertyUtil.response(true);
+    }
+    public User getUserAndCheckIfMe(Long userId, SessionUser user) {
+        User findUser = userRepository
+                .findById(userId)
+                .orElseThrow(()->new InstanceNotFoundException("유저가 존재하지 않습니다"));
+        User User = userRepository
+                .findByEmail(user.getEmail())
+                .orElseThrow(()-> new InstanceNotFoundException("유저가 존재하지 않습니다"));
+        if(user.getEmail().equals(findUser.getEmail())){
+            throw new IllegalStateException("자신한테는 친구 신청 불가능"); //이게 애초에 프론트엔드에서 팔로우 버튼이 안 보이게 해야하긴 함
+        }
+        return User;
+    }
 }
