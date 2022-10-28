@@ -9,10 +9,11 @@ import static javax.persistence.FetchType.LAZY;
 
 @Entity
 @Getter
-public class WorkWish extends BaseTimeEntity {  //다대다 연결 위한 테이블.
+public class ProductWish extends BaseTimeEntity {
 
     @Id
-    @Column(name = "work_wish_id")
+    @GeneratedValue
+    @Column(name = "product_wish_id")
     private Long id;
 
     @ManyToOne(fetch = LAZY)
@@ -20,21 +21,22 @@ public class WorkWish extends BaseTimeEntity {  //다대다 연결 위한 테이
     private User user;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name="work_id")
-    private Work work;
+    @JoinColumn(name="product_id")
+    private Product product;
 
 
-    public WorkWish(User user, Work work) {
+    public ProductWish(User user, Product product) {
         setUser(user);
-        setWork(work);
+        setProduct(product);
     }
 
     private void setUser(User user){
-        user.getWorkWishList().add(this); //스크랩!
+        user.getProductWishList().add(this); //스크랩!
         this.user=user;
     }
 
-    private void setWork(Work work) {  this.work = work; }
+    public void setProduct(Product product) {  this.product = product; }
 
-    protected WorkWish() {}
+    protected ProductWish() {}
+
 }

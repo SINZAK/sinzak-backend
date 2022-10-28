@@ -61,6 +61,9 @@ public class Work { /** 외주 **/
     @JoinColumn(name = "user_id")
     private User user;  //수취인
 
+    @OneToMany(mappedBy = "work", cascade = CascadeType.REMOVE)
+    private List<WorkWish> workWishList = new ArrayList<>();  //프로젝트-회원 엮여있는 리스트  스크랩!!!!
+
     @Builder
     public Work(String title, String content, int pay, boolean suggest, String userName, String univ, String field, String photo, boolean employment) {
         this.title = title;
@@ -79,8 +82,7 @@ public class Work { /** 외주 **/
         this.user = user;
     }
 
-    @OneToMany(mappedBy = "work", cascade = CascadeType.REMOVE)
-    private List<WorkWish> workWishList = new ArrayList<>();  //프로젝트-회원 엮여있는 리스트  스크랩!!!!
+
 
     protected Work() {
     }
