@@ -2,7 +2,7 @@ package net.sinzak.server.service;
 
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.config.auth.dto.SessionUser;
-import net.sinzak.server.config.dto.respond.GetFollowDto;
+import net.sinzak.server.dto.respond.GetFollowDto;
 import net.sinzak.server.domain.User;
 import net.sinzak.server.error.InstanceNotFoundException;
 import net.sinzak.server.repository.UserRepository;

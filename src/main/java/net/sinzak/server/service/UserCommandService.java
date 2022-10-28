@@ -1,13 +1,13 @@
 package net.sinzak.server.service;
 
 
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.config.auth.dto.SessionUser;
-import net.sinzak.server.config.dto.request.UpdateUserDto;
+import net.sinzak.server.dto.request.UpdateUserDto;
 import net.sinzak.server.domain.User;
 import net.sinzak.server.error.InstanceNotFoundException;
 import net.sinzak.server.repository.UserRepository;
+import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -19,7 +19,7 @@ public class UserCommandService {
     private final UserRepository userRepository;
 
     @Transactional //실제론 연동로그인이기에 api테스트용
-    public long createUser(SessionUser user){
+    public long createUser(SessionUser user){ //이건 테스트
         Optional<User> findUser =
                 userRepository.findByEmail(user.getEmail());
         if(findUser.isPresent()){
@@ -30,13 +30,13 @@ public class UserCommandService {
         return userRepository.findByEmail(user.getEmail()).get().getId();
     }
     @Transactional
-    public boolean updateUser(UpdateUserDto dto,SessionUser user){
+    public JSONObject updateUser(UpdateUserDto dto, SessionUser user){
         User findUser =
                 userRepository
                         .findByEmail(user.getEmail())
                         .orElseThrow(()-> new InstanceNotFoundException("유저가 존재하지 않습니다."));
         findUser.update(dto.getName(),dto.getPicture(),dto.getIntroduction());
-        return true;
+        return PropertyUtil.response(true);
     }
     public User sessionUserToUser(SessionUser user){
         User newUser = User.builder()

@@ -4,8 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.config.auth.LoginUser;
 import net.sinzak.server.config.auth.dto.SessionUser;
-import net.sinzak.server.config.dto.respond.GetFollowDto;
-import net.sinzak.server.domain.User;
+import net.sinzak.server.dto.respond.GetFollowDto;
 import net.sinzak.server.service.UserQueryService;
 import org.json.simple.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -14,10 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
-import java.util.Set;
 
 @Controller
 @RequiredArgsConstructor
