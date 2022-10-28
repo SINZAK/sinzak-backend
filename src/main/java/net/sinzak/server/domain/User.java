@@ -62,9 +62,14 @@ public class User extends BaseTimeEntity {
     @Column
     private String origin;
 
-
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<WishWork> wishWorkList = new ArrayList<>();  //프로젝트-회원 엮여있는 리스트  스크랩!!!!
+
+
+
 
     @ElementCollection
     @CollectionTable(name = "FOLLOWING_LIST", joinColumns = @JoinColumn(name = "user_id"))
@@ -78,7 +83,6 @@ public class User extends BaseTimeEntity {
 
     @Builder
     public User(String name, String email, String picture, String origin, Role role) {
-        this.name = name;
         this.email = email;
         this.picture = picture;
         this.origin = origin;
