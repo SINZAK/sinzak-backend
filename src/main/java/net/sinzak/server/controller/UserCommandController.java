@@ -35,7 +35,6 @@ public class UserCommandController {
 //    @ApiOperation(value = "유저생성")
 //    @PostMapping(value = "/users")
 //    public JSONObject createUser2(@RequestBody SessionUser user) {
-//        JSONObject obj = new JSONObject();
 //        return userCommandService.createUser2(user);
 //    }
 
