@@ -1,5 +1,6 @@
 package net.sinzak.server.domain;
 
+import lombok.Builder;
 import lombok.Getter;
 
 import javax.persistence.*;
@@ -12,7 +13,6 @@ import java.util.List;
 @SequenceGenerator(name = "Work_SEQ_GEN",sequenceName = "Work_SEQ")
 public class Work { /** 외주 **/
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Work_SEQ")
     @Column(name = "work_id")
@@ -20,21 +20,66 @@ public class Work { /** 외주 **/
 
     @Column
     private String title;
-    @Column
-    private String name; //아마 닉네임이 들어갈 예정
-    @Column
-    private String univ;
 
     @Column
-    private int views;
+    private String content;
+
     @Column
-    private int wishCnt;
+    private int pay;
+
     @Column
-    private int price;
+    private boolean suggest;
+
     @Column
-    private boolean complete;
+    private String userName; //닉네임
+
+    @Column
+    private String univ="";
+
+    @Column
+    private String field;
+
+    @Column
+    private int views = 2;
+
+    @Column
+    private int wishCnt = 0;
+
+    @Column
+    private boolean complete = false;
+
+    @Column
+    private String photo;
+
+    @Column
+    private boolean employment;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;  //수취인
+
+    @Builder
+    public Work(String title, String content, int pay, boolean suggest, String userName, String univ, String field, String photo, boolean employment) {
+        this.title = title;
+        this.content = content;
+        this.pay = pay;
+        this.suggest = suggest;
+        this.userName = userName;
+        this.univ = univ;
+        this.field = field;
+        this.photo = photo;
+        this.employment = employment;
+    }
+
+    public void setUser(User user) {
+        user.getWorkPostList().add(this);
+        this.user = user;
+    }
 
     @OneToMany(mappedBy = "work", cascade = CascadeType.REMOVE)
-    private List<WishWork> wishWorkList = new ArrayList<>();  //프로젝트-회원 엮여있는 리스트  스크랩!!!!
+    private List<WorkWish> workWishList = new ArrayList<>();  //프로젝트-회원 엮여있는 리스트  스크랩!!!!
+
+    protected Work() {
+    }
 }
 

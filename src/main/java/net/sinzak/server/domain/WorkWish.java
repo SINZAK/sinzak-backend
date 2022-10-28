@@ -9,7 +9,7 @@ import static javax.persistence.FetchType.LAZY;
 
 @Entity
 @Getter
-public class WishWork extends BaseTimeEntity {  //다대다 연결 위한 테이블.
+public class WorkWish extends BaseTimeEntity {  //다대다 연결 위한 테이블.
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "Project_SEQ")
@@ -25,17 +25,17 @@ public class WishWork extends BaseTimeEntity {  //다대다 연결 위한 테이
     private Work work;
 
 
-    public WishWork(User user, Work work) {
+    public WorkWish(User user, Work work) {
         setUser(user);
         setWork(work);
     }
 
     private void setUser(User user){
-        user.getWishWorkList().add(this); //스크랩!
+        user.getWorkWishList().add(this); //스크랩!
         this.user=user;
     }
 
     private void setWork(Work work) {  this.work = work; }
 
-    protected WishWork() {}
+    protected WorkWish() {}
 }

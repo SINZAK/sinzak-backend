@@ -66,7 +66,10 @@ public class User extends BaseTimeEntity {
     private Role role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    private List<WishWork> wishWorkList = new ArrayList<>();  //프로젝트-회원 엮여있는 리스트  스크랩!!!!
+    private List<Work> workPostList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<WorkWish> workWishList = new ArrayList<>();
 
 
 

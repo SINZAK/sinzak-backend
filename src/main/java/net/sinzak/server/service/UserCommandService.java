@@ -31,17 +31,17 @@ public class UserCommandService {
         return userRepository.findByEmail(user.getEmail()).get().getId();
     }
 
-    @Transactional //실제론 연동로그인이기에 api테스트용
-    public JSONObject createUser2(SessionUser user){
-        Optional<User> findUser =
-                userRepository.findByEmail(user.getEmail());
-        if(findUser.isPresent()){
-            return PropertyUtil.responseMessage("이미 존재하는 회원입니다.");
-        }
-        User newUser = sessionUserToUser(user);
-        userRepository.save(newUser);
-        return PropertyUtil.response(true);
-    }
+//    @Transactional //실제론 연동로그인이기에 api테스트용
+//    public JSONObject createUser2(SessionUser user){
+//        Optional<User> findUser =
+//                userRepository.findByEmail(user.getEmail());
+//        if(findUser.isPresent()){
+//            return PropertyUtil.responseMessage("이미 존재하는 회원입니다.");
+//        }
+//        User newUser = sessionUserToUser(user);
+//        userRepository.save(newUser);
+//        return PropertyUtil.response(true);
+//    }
 
 
 

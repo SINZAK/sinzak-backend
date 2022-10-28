@@ -5,7 +5,7 @@ import lombok.Getter;
 import org.json.simple.JSONObject;
 
 @Getter
-public class WorkPost {
+public class WorkPostDto {
     @ApiModelProperty(example = "외주 모집글 제목")
     private String title;    // 프로젝트명
     @ApiModelProperty(example = "외주 모집글 내용")
@@ -20,4 +20,9 @@ public class WorkPost {
     private String photo;
     @ApiModelProperty(example = "true 시 고용자, false 시 피고용자")
     private boolean employment;
+
+    public WorkPostDto(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
 }
