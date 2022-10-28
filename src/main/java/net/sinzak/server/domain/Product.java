@@ -16,18 +16,38 @@ public class Product { /** 작품 **/
 
     @Column
     private String title;
-    @Column
-    private String name; //아마 닉네임이 들어갈 예정
-    @Column
-    private String univ;
 
     @Column
-    private int views;
+    private String content;
+
     @Column
-    private int wishCnt;
+    private String userName; //닉네임
+
     @Column
     private int price;
+
     @Column
-    private boolean complete;
+    private boolean suggest;
+
+    @Column
+    private String univ="";
+
+    @Column
+    private String field;
+
+    @Column
+    private int views = 2;
+
+    @Column
+    private int wishCnt = 0;
+
+    @Column
+    private int chatCnt = 0;
+
+    @Column
+    private String photo;
+
+    @Column
+    private boolean complete = false;
 
 }

@@ -25,13 +25,13 @@ public class Work { /** 외주 **/
     private String content;
 
     @Column
+    private String userName; //닉네임
+
+    @Column
     private int pay;
 
     @Column
     private boolean suggest;
-
-    @Column
-    private String userName; //닉네임
 
     @Column
     private String univ="";
@@ -46,13 +46,16 @@ public class Work { /** 외주 **/
     private int wishCnt = 0;
 
     @Column
-    private boolean complete = false;
+    private int chatCnt = 0;
 
     @Column
     private String photo;
 
     @Column
-    private boolean employment;
+    private boolean employment; //고용글인지 피고용글인지
+
+    @Column
+    private boolean complete = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
