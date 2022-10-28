@@ -8,6 +8,7 @@ import net.sinzak.server.config.dto.request.UpdateUserDto;
 import net.sinzak.server.domain.User;
 import net.sinzak.server.error.InstanceNotFoundException;
 import net.sinzak.server.repository.UserRepository;
+import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -29,6 +30,22 @@ public class UserCommandService {
         userRepository.save(newUser);
         return userRepository.findByEmail(user.getEmail()).get().getId();
     }
+
+    @Transactional //실제론 연동로그인이기에 api테스트용
+    public JSONObject createUser2(SessionUser user){
+        Optional<User> findUser =
+                userRepository.findByEmail(user.getEmail());
+        if(findUser.isPresent()){
+            return PropertyUtil.responseMessage("이미 존재하는 회원입니다.");
+        }
+        User newUser = sessionUserToUser(user);
+        userRepository.save(newUser);
+        return PropertyUtil.response(true);
+    }
+
+
+
+
     @Transactional
     public boolean updateUser(UpdateUserDto dto,SessionUser user){
         User findUser =

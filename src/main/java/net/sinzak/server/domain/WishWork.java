@@ -24,20 +24,18 @@ public class WishWork extends BaseTimeEntity {  //다대다 연결 위한 테이
     @JoinColumn(name="work_id")
     private Work work;
 
-//    public static ProjectConnect createConnect(Post post, User user){  //생성메서드
-//        ProjectConnect connect = new ProjectConnect();
-//        connect.setPost(post);
-//        connect.setUser(user);
-//        return connect;
-//    }
 
+    public WishWork(User user, Work work) {
+        setUser(user);
+        setWork(work);
+    }
 
-
-
-    public void setUser(User user){
+    private void setUser(User user){
         user.getWishWorkList().add(this); //스크랩!
         this.user=user;
     }
 
+    private void setWork(Work work) {  this.work = work; }
 
+    protected WishWork() {}
 }
