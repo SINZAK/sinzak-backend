@@ -48,9 +48,9 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 
 
-	//이것도 스웨거 관련인데
-	implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
-	implementation 'javax.servlet:jstl'
+//	//이것도 스웨거 관련인데
+//	implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
+//	implementation 'javax.servlet:jstl'
 }
 tasks.named('test') {
 	useJUnitPlatform()

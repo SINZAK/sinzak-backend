@@ -53,11 +53,14 @@ public class UserQueryService {
     private List<GetFollowDto> getGetFollowDtoList(Set<Long> followList) {
         List<GetFollowDto> getFollowingDtoList = new ArrayList<>();
         for(Long follow : followList){
-            User findUser = userRepository
-                    .findById(follow)
-                    .orElseThrow(()->new InstanceNotFoundException("유저가 없습니다"));
-            GetFollowDto getFollowDto = GetFollowDto.builder().name(findUser.getName()).picture(findUser.getPicture()).build();
-            getFollowingDtoList.add(getFollowDto);
+            Optional<User> findUser = userRepository.findById(follow);
+            if(findUser.isPresent()){
+                GetFollowDto getFollowDto = GetFollowDto.builder().userId(findUser.get().getId()).name(findUser.get().getName()).picture(findUser.get().getPicture()).build();
+                getFollowingDtoList.add(getFollowDto);
+            }
+            else{
+                followList.remove(follow); //만약 UserRepository에 존재하지 않는다면(유저가 삭제된 거임) 삭제해주기
+            }
         }
         return getFollowingDtoList;
     }
