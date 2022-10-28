@@ -20,10 +20,6 @@ public class User extends BaseTimeEntity {
     @Column(name = "user_id")
     private Long id;
 
-
-
-
-
     @Column
     private String email;
 
@@ -37,38 +33,50 @@ public class User extends BaseTimeEntity {
     private String picture;
 
     @Column
-    private String introduction;
-//
-//    @Column
-//    private String univ;
-//
-//    @Column
-//    private String major;
-//
-//    @Column
-//    private int followingNum;
-//
-//    @Column
-//    private int followerNum;
-//
-//    @Column
-//    private String stack;
-//
-//    @Column
-//    private String genre;
-//
-//    @Column
-//    private boolean cert_uni;
-//
-//    @Column
-//    private boolean cert_celeb;
+    private String introduction; //한 줄 소개
+
+    @Column
+    private String univ;
+
+    @Column
+    private String major;
+
+    @Column
+    private int followingNum;
+
+    @Column
+    private int followerNum;
+
+    @Column
+    private String stack;  //전문 분야
+
+    @Column
+    private String genre;  //관심 장르
+
+    @Column
+    private boolean cert_uni; //대학 인증여부
+
+    @Column
+    private boolean cert_celeb; //인플루언서 인증여부
 
     @Column
     private String origin;
 
-
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<Work> workPostList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<WorkWish> workWishList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<Product> productPostList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<ProductWish> productWishList = new ArrayList<>();
+
 
     @ElementCollection
     @CollectionTable(name = "FOLLOWING_LIST", joinColumns = @JoinColumn(name = "user_id"))
@@ -82,7 +90,6 @@ public class User extends BaseTimeEntity {
 
     @Builder
     public User(String name, String email, String picture, String origin, Role role) {
-        this.name = name;
         this.email = email;
         this.picture = picture;
         this.origin = origin;

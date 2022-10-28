@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.dto.respond.GetFollowDto;
 import net.sinzak.server.domain.User;
+import net.sinzak.server.dto.WorkPostDto;
 import net.sinzak.server.error.InstanceNotFoundException;
 import net.sinzak.server.repository.UserRepository;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +21,13 @@ import java.util.Set;
 public class UserQueryService {
 
     private final UserRepository userRepository;
+
+//    @PostConstruct
+//    public void makeMockData(){
+//        User user = new User("insi2000@naver.com","송인서","그림2");
+//        User saved = userRepository.save(user);
+//        WorkPostDto dto = new WorkPostDto("테스트","내용테스트");
+//    }
 
     public JSONObject getUserProfile(Long otherUserId, SessionUser user) {
         JSONObject object = new JSONObject();
