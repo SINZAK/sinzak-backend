@@ -49,7 +49,7 @@ public class UserCommandController {
     public JSONObject followUser(@PathVariable("userId") Long userId,@ApiIgnore @LoginUser SessionUser user){
         return userCommandService.follow(userId,user);
     }
-    @ApiOperation(value = "팔로우하기")
+    @ApiOperation(value = "언팔로우하기")
     @PostMapping(value = "/users/{userId}/unfollow")
     public JSONObject unFollowUser(@PathVariable("userId") Long userId,@ApiIgnore @LoginUser SessionUser user){
         return userCommandService.unFollow(userId,user);
