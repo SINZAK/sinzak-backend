@@ -7,6 +7,7 @@ import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 
 @Configuration
 @RequiredArgsConstructor
@@ -30,6 +31,13 @@ public class PropertyUtil implements EnvironmentAware {
             obj.put("success",false);
         return obj;
     }
+    public static JSONObject responseMessage(HttpStatus status, String message){ //그냥 json 리턴해줄때 씀
+        JSONObject obj = new JSONObject();
+        obj.put("success", false);
+        obj.put("message", message);
+        return obj;
+    }
+
     public static JSONObject responseMessage(String message){ //그냥 json 리턴해줄때 씀
         JSONObject obj = new JSONObject();
         obj.put("success", false);
