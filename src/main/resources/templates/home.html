@@ -50,13 +50,12 @@
     <button th:id="marketButton"> 마켓</button>
     <button th:id="workButton"> 외주</button>
     <button th:id="chatButton"> 채팅</button>
-    <button th:id="profileButton" onclick = "showUsers(userList)" > 프로필</button>
+    <button th:id="profileButton" onclick = "showUsers(userList)"> 프로필</button>
 </footer>
 <script th:inline = "javascript">
     /*<![CDATA[*/
     let userList = [[ ${ userList }]];
     /*]]*/
-
     var userListDiv = document.querySelector("#userListDiv");
     var newUser;
     function showUsers(userList){
