@@ -1,0 +1,51 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div class="container">
+
+    <div>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>작성자</th>
+                <th>작품명</th>
+                <th>제목</th>
+                <th>설명</th>
+                <th>카테고리</th>
+                <th>대학교</th>
+                <th>가격</th>
+                <th>가격제안여부</th>
+                <th>분야</th>
+                <th>사이즈</th>
+                <th>사진</th>
+                <th>조회수</th>
+                <th>찜개수</th>
+                <th>거래완료여부</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="product : ${products}">
+                <td th:text="${product.userName}"></td>
+                <td th:text="${product.title}"></td>
+                <td th:text="${product.content}"></td>
+                <td th:text="${product.category}"></td>
+                <td th:text="${product.univ}"></td>
+                <td th:text="${product.price}"></td>
+                <td th:text="${product.suggest}"></td>
+                <td th:text="${product.field}"></td>
+                <td th:text="${product.size}"></td>
+                <td th:text="${product.photo}"></td>
+                <td th:text="${product.views}"></td>
+                <td th:text="${product.wishCnt}"></td>
+                <td th:text="${product.chatCnt}"></td>
+                <td th:text="${product.complete}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div> <!-- /container -->
+
+</body>
+</html>

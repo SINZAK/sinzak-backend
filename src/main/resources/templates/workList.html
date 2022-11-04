@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div class="container">
+
+    <div>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>작성자</th>
+                <th>작품명</th>
+                <th>제목</th>
+                <th>설명</th>
+                <th>카테고리</th>
+                <th>대학교</th>
+                <th>페이</th>
+                <th>페이제안여부</th>
+                <th>분야</th>
+                <th>구인글여부</th>
+                <th>사진</th>
+                <th>조회수</th>
+                <th>찜개수</th>
+                <th>구인완료여부</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <tr th:each="work : ${works}">
+                <td th:text="${work.userName}"></td>
+                <td th:text="${work.title}"></td>
+                <td th:text="${work.content}"></td>
+                <td th:text="${work.category}"></td>
+                <td th:text="${work.univ}"></td>
+                <td th:text="${work.pay}"></td>
+                <td th:text="${work.suggest}"></td>
+                <td th:text="${work.field}"></td>
+                <td th:text="${work.employment}"></td>
+                <td th:text="${work.photo}"></td>
+                <td th:text="${work.views}"></td>
+                <td th:text="${work.wishCnt}"></td>
+                <td th:text="${work.chatCnt}"></td>
+                <td th:text="${work.complete}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div> <!-- /container -->
+
+</body>
+</html>
