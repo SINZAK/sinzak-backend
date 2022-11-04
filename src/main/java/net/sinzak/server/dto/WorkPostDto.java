@@ -10,6 +10,8 @@ public class WorkPostDto {
     private String title;    // 프로젝트명
     @ApiModelProperty(example = "외주 모집글 내용")
     private String content; // 프로젝트 내용
+    @ApiModelProperty(example = "외주 카테고리")
+    private String category;
     @ApiModelProperty(example = "페이",notes = "int 값 이상 안들어오게 프론트라인 체크 필수")
     private int pay;
     @ApiModelProperty(example = "외주 모집글 가격 제안 여부 true/false",notes = "true -> 체크 한 사람(제안 받겠다는 사람)")

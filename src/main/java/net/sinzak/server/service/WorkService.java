@@ -3,8 +3,10 @@ package net.sinzak.server.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.config.auth.dto.SessionUser;
+import net.sinzak.server.domain.Product;
 import net.sinzak.server.domain.User;
 import net.sinzak.server.domain.Work;
+import net.sinzak.server.domain.embed.Size;
 import net.sinzak.server.dto.WorkPostDto;
 import net.sinzak.server.repository.UserRepository;
 import net.sinzak.server.repository.WorkRepository;
@@ -30,6 +32,7 @@ public class WorkService {
                 .content(workPost.getContent()) //내용
                 .userName(user.getNickName()) //닉네임
                 .univ(user.getUniv()) // 대학
+                .category(workPost.getCategory())
                 .pay(workPost.getPay()) // 페이
                 .suggest(workPost.isSuggest()) //가격제안여부
                 .field(workPost.getField()) //외주분야

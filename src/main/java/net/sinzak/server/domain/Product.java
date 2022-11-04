@@ -68,9 +68,10 @@ public class Product { /** 작품 **/
     private List<ProductWish> productWishList = new ArrayList<>();  //프로젝트-회원 엮여있는 리스트  스크랩!!!!
 
     @Builder
-    public Product(String title, String content, int price, boolean suggest, String userName, String univ, String field, String photo, Size size) {
+    public Product(String title, String content, String category, int price, boolean suggest, String userName, String univ, String field, String photo, Size size) {
         this.title = title;
         this.content = content;
+        this.category = category;
         this.price = price;
         this.suggest = suggest;
         this.userName = userName;

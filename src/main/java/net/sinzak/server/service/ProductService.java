@@ -26,6 +26,7 @@ public class ProductService {
         Product product = Product.builder()
                     .title(productPost.getTitle())  //제목
                     .content(productPost.getContent()) //내용
+                    .category(productPost.getCategory())
                     .userName(user.getNickName()) //닉네임
                     .univ(user.getUniv()) // 대학
                     .price(productPost.getPrice()) // 페이
@@ -33,7 +34,7 @@ public class ProductService {
                     .field(productPost.getField()) //외주분야
                     .size(new Size(productPost.getWidth(), productPost.getVertical(), productPost.getHeight())) //고용자 or 피고용자
                     .photo(productPost.getPhoto())
-                    .build(); // 사진
+                    .build();
         product.setUser(user); // user 연결 및, user의 외주 글 리스트에 글 추가
         productRepository.save(product);
         return PropertyUtil.response(true);

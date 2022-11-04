@@ -28,6 +28,9 @@ public class Work { /** 외주 **/
     private String userName; //닉네임
 
     @Column
+    private String category; //분류
+
+    @Column
     private int pay;
 
     @Column
@@ -65,9 +68,10 @@ public class Work { /** 외주 **/
     private List<WorkWish> workWishList = new ArrayList<>();  //프로젝트-회원 엮여있는 리스트  스크랩!!!!
 
     @Builder
-    public Work(String title, String content, int pay, boolean suggest, String userName, String univ, String field, String photo, boolean employment) {
+    public Work(String title, String content, String category, int pay, boolean suggest, String userName, String univ, String field, String photo, boolean employment) {
         this.title = title;
         this.content = content;
+        this.category = category;
         this.pay = pay;
         this.suggest = suggest;
         this.userName = userName;
@@ -81,8 +85,6 @@ public class Work { /** 외주 **/
         user.getWorkPostList().add(this);
         this.user = user;
     }
-
-
 
     protected Work() {
     }
