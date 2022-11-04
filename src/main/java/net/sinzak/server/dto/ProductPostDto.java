@@ -2,8 +2,10 @@ package net.sinzak.server.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter //후에 지워야됨
 public class ProductPostDto {
 
     @ApiModelProperty(example = "작품 판매글 제목")

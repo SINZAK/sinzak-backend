@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div class="container">
+
+    <form th:action="@{/products/build}" th:object="${product}" method="post">
+        <div class="form-group">
+            <label th:for="title">작품명</label>
+            <input type="text" th:field="*{title}">
+        </div>
+        <div class="form-group">
+            <label th:for="content">내용</label>
+            <input type="text" th:field="*{content}">
+        </div>
+        <div class="form-group">
+            <label th:for="category">카테고리</label>
+            <input type="text" th:field="*{category}">
+        </div>
+        <div class="form-group">
+            <label th:for="price">가격</label>
+            <input type="text" th:field="*{price}">
+        </div>
+        <div class="form-group">
+            <label th:for="field">분야</label>
+            <input type="text" th:field="*{field}">
+        </div>
+        <div class="form-group">
+            <label th:for="photo">사진</label>
+            <input type="text" th:field="*{photo}">
+        </div>
+        <div class="form-group">
+            <label th:for="width">가로</label>
+            <input type="text" th:field="*{width}">
+        </div>
+        <div class="form-group">
+            <label th:for="vertical">세로</label>
+            <input type="text" th:field="*{vertical}">
+        </div>
+        <div class="form-group">
+            <label th:for="height">높이</label>
+            <input type="text" th:field="*{height}">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    <br/>
+
+</div> <!-- /container -->
+
+
+</body>
+</html>

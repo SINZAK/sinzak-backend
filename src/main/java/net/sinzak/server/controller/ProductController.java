@@ -22,7 +22,7 @@ public class ProductController {
 
     @ApiOperation(value = "작품 판매 글 생성")
     @PostMapping("/products/build")
-    public JSONObject makeProductPost(@LoginUser SessionUser user, @RequestBody ProductPostDto postDto) {
+    public JSONObject makeProductPost(@LoginUser SessionUser user, /*@RequestBody*/ProductPostDto postDto) {
         return productService.makeProductPost(user, postDto); //해당 유저의 작품 글 리스트까지 fetch해서 가져오기.
     }
 

@@ -2,9 +2,11 @@ package net.sinzak.server.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
+import lombok.Setter;
 import org.json.simple.JSONObject;
 
 @Getter
+@Setter
 public class WorkPostDto {
     @ApiModelProperty(example = "외주 모집글 제목")
     private String title;    // 프로젝트명
@@ -26,5 +28,8 @@ public class WorkPostDto {
     public WorkPostDto(String title, String content) {
         this.title = title;
         this.content = content;
+    }
+
+    public WorkPostDto() {
     }
 }

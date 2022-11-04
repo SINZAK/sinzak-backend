@@ -23,7 +23,7 @@ public class WorkController {
 
     @ApiOperation(value = "외주 모집 글 생성")
     @PostMapping("/works/build")
-    public JSONObject makeWorkPost(@LoginUser SessionUser user, @RequestBody WorkPostDto postDto) {
+    public JSONObject makeWorkPost(@LoginUser SessionUser user, /*@RequestBody*/ WorkPostDto postDto) {
         return workService.makeWorkPost(user, postDto);
     }
 
