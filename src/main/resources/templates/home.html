@@ -37,16 +37,37 @@
 <header> 신작
     <button onclick="location.href='/'"> 로그아웃 </button>
 </header>
-<section>
+<section >
+    <div th:id ="userListDiv">
+
+    </div>
     슈팔 보니까 타임리프는 @Controller만 되네 @RestController를 첨 써봐서 몰랐다;
 </section>
+
 
 <footer>
     <button th:id="homeButton"> 홈</button>
     <button th:id="marketButton"> 마켓</button>
     <button th:id="workButton"> 외주</button>
     <button th:id="chatButton"> 채팅</button>
-    <button th:id="profileButton"> 프로필</button>
+    <button th:id="profileButton" onclick = "showUsers(userList)" > 프로필</button>
 </footer>
+<script th:inline = "javascript">
+    /*<![CDATA[*/
+    let userList = [[ ${ userList }]];
+    /*]]*/
+
+    var userListDiv = document.querySelector("#userListDiv");
+    var newUser;
+    function showUsers(userList){
+        console.log(userList);
+        for(let i=0;i<userList.length;i++){
+            console.log(i);
+            newUser = document.createElement("li");
+            newUser.appendChild(document.createTextNode(userList[i].name));
+            userListDiv.appendChild(newUser);
+        }
+    }
+</script>
 </body>
 </html>

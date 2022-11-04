@@ -38,7 +38,6 @@ public class UserCommandController {
 //        JSONObject obj = new JSONObject();
 //        return userCommandService.createUser2(user);
 //    }
-
     @ApiOperation(value = "유저 정보변경", notes = "이름,한줄 소개, 학교(보류) ")
     @PostMapping(value = "/users/edit")
     public JSONObject updateUser( @RequestBody UpdateUserDto dto , @ApiIgnore @LoginUser SessionUser user) {
