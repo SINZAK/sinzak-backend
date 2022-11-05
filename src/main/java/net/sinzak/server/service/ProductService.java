@@ -1,17 +1,29 @@
 package net.sinzak.server.service;
 
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.domain.Product;
+import net.sinzak.server.domain.ProductWish;
 import net.sinzak.server.domain.User;
 import net.sinzak.server.domain.embed.Size;
 import net.sinzak.server.dto.ProductPostDto;
+import net.sinzak.server.dto.WishForm;
+import net.sinzak.server.error.InstanceNotFoundException;
 import net.sinzak.server.repository.ProductRepository;
+import net.sinzak.server.repository.ProductWishRepository;
 import net.sinzak.server.repository.UserRepository;
 import org.json.simple.JSONObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProductService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final ProductWishRepository productWishRepository;
+
     @Transactional
     public JSONObject makeProductPost(SessionUser tempUser, ProductPostDto productPost){
         User user = userRepository.findByEmailFetchPP(tempUser.getEmail()).orElseThrow();
@@ -38,5 +52,49 @@ public class ProductService {
         product.setUser(user); // user 연결 및, user의 외주 글 리스트에 글 추가
         productRepository.save(product);
         return PropertyUtil.response(true);
+    }
+
+    @Transactional
+    public JSONObject wish(SessionUser tempUser, @RequestBody WishForm form){   // 좋아요
+        JSONObject obj = new JSONObject();
+        User user = userRepository.findByEmailFetchPW(tempUser.getEmail()).orElseThrow(); // 작품 찜까지 페치 조인
+        List<ProductWish> wishList = user.getProductWishList(); //wishList == 유저의 찜 리스트
+        boolean isfav=false;
+        Optional<Product> Product = productRepository.findById(form.getId());
+        if(Product.isPresent()){
+            Product product = Product.get();
+            if(wishList.size()!=0){ /** 유저가 찜이 누른 적이 있다면 이미 누른 작품인지 비교 **/
+                for (ProductWish wish : wishList) { //유저의 찜목록과 현재 누른 작품의 찜과 비교
+                    if(product.equals(wish.getProduct())) {  //같으면 이미 찜 누른 항목
+                        isfav = true;
+                        break;
+                    }
+                }
+            }
+
+            if (form.isMode() && !isfav){
+                product.plusWishCnt();
+                ProductWish connect = ProductWish.createConnect(product, user);
+                productWishRepository.save(connect);
+                isfav=true;
+                obj.put("success",true);
+            }
+            else if(!form.isMode() && isfav){
+                product.minusWishCnt();
+                for (ProductWish wish : wishList) { //유저의 찜목록과 현재 누른 작품의 찜과 비교
+                    if(product.equals(wish.getProduct())) {  //같으면 이미 찜 누른 항목
+                        productWishRepository.delete(wish);
+                        isfav = false;
+                        break;
+                    }
+                }
+                obj.put("success",true);
+            }
+            else
+                obj.put("success",false);
+            obj.put("isfav",isfav);
+            return obj;
+        }
+        return PropertyUtil.responseMessage(HttpStatus.NOT_FOUND,"존재하지 않는 글에 요청된 찜");
     }
 }

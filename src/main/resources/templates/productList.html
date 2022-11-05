@@ -8,9 +8,9 @@
         <table class="table table-striped">
             <thead>
             <tr>
+                <th>#</th>
                 <th>작성자</th>
                 <th>작품명</th>
-                <th>제목</th>
                 <th>설명</th>
                 <th>카테고리</th>
                 <th>대학교</th>
@@ -21,11 +21,13 @@
                 <th>사진</th>
                 <th>조회수</th>
                 <th>찜개수</th>
+                <th>채팅수</th>
                 <th>거래완료여부</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="product : ${products}">
+                <td th:text="${product.id}"></td>
                 <td th:text="${product.userName}"></td>
                 <td th:text="${product.title}"></td>
                 <td th:text="${product.content}"></td>

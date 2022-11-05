@@ -8,9 +8,9 @@
         <table class="table table-striped">
             <thead>
             <tr>
+                <th>#</th>
                 <th>작성자</th>
                 <th>작품명</th>
-                <th>제목</th>
                 <th>설명</th>
                 <th>카테고리</th>
                 <th>대학교</th>
@@ -20,6 +20,7 @@
                 <th>구인글여부</th>
                 <th>사진</th>
                 <th>조회수</th>
+                <th>채팅수</th>
                 <th>찜개수</th>
                 <th>구인완료여부</th>
             </tr>
@@ -27,6 +28,7 @@
             <tbody>
 
             <tr th:each="work : ${works}">
+                <td th:text="${work.id}"></td>
                 <td th:text="${work.userName}"></td>
                 <td th:text="${work.title}"></td>
                 <td th:text="${work.content}"></td>

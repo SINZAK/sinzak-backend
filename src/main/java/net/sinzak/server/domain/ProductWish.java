@@ -29,6 +29,12 @@ public class ProductWish extends BaseTimeEntity {
         setUser(user);
         setProduct(product);
     }
+    public static ProductWish createConnect(Product product, User user){  //생성메서드
+        ProductWish connect = new ProductWish();
+        connect.setProduct(product);
+        connect.setUser(user);
+        return connect;
+    }
 
     private void setUser(User user){
         user.getProductWishList().add(this); //스크랩!

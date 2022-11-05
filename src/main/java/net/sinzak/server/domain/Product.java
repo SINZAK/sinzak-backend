@@ -87,7 +87,12 @@ public class Product { /** 작품 **/
     }
 
 
-
+    public void plusWishCnt() {
+        this.wishCnt++;
+    }
+    public void minusWishCnt() {
+        if(wishCnt>0) wishCnt--;
+    }
     protected Product() {
     }
 

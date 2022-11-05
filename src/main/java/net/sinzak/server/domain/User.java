@@ -95,6 +95,7 @@ public class User extends BaseTimeEntity {
         this.origin = origin;
         this.role = role;
         this.name = name;
+        this.nickName = name;
     }
 
     public User(String email, String name, String picture) {
