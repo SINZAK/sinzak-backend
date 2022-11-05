@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
 <body>
-
 <div class="container">
 
     <div>
@@ -42,12 +42,58 @@
                 <td th:text="${product.wishCnt}"></td>
                 <td th:text="${product.chatCnt}"></td>
                 <td th:text="${product.complete}"></td>
+                <td><button th:value="${product.id}" type="button" id="wish1" name="wish1" class="btn btn-default"> 찜 </button></td>
+                <td><button th:value="${product.id}" type="button" id="wish2" name="wish2" class="btn btn-default">찜취소</button></td>
             </tr>
             </tbody>
         </table>
     </div>
 
+
+
 </div> <!-- /container -->
 
 </body>
+<script>
+
+    $('#wish1').on('click', function(){
+        var jsonData = { // Body에 첨부할 json 데이터
+            "mode" : true,
+            "id" : $('#id').val()
+        };
+        $.ajax({
+            url: "products/wish",
+            type: "POST",
+            async: true,
+            contentType: "application/json; charset=UTF-8",
+            dataType : JSON,
+            data: JSON.stringify(jsonData),
+            success: function() {
+                location.reload();
+            }, error: function() {
+                alert('실패');
+            }
+        });
+    });
+
+
+    $('#wish2').click(function() {
+        var jsonData = { // Body에 첨부할 json 데이터
+                "mode" : false,
+                "id" : $('#id').val()
+        };
+        $.ajax({
+            type: "POST",
+            url: "/products/wish",
+            contentType: "application/json; charset=UTF-8",
+            dataType : JSON,
+            data: JSON.stringify(jsonData),
+            success: function() {
+                location.reload();
+            }, error: function() {
+                alert('실패');
+            }
+        });
+    });
+</script>
 </html>

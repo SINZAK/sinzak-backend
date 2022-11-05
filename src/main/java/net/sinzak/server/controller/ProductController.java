@@ -4,17 +4,11 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.config.auth.LoginUser;
 import net.sinzak.server.config.auth.dto.SessionUser;
-import net.sinzak.server.domain.User;
 import net.sinzak.server.dto.ProductPostDto;
 import net.sinzak.server.dto.WishForm;
-import net.sinzak.server.dto.WorkPostDto;
-import net.sinzak.server.error.ErrorResponse;
 import net.sinzak.server.service.ProductService;
 import org.json.simple.JSONObject;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.NoSuchElementException;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,7 +19,7 @@ public class ProductController {
     @ApiOperation(value = "작품 판매 글 생성")
     @PostMapping("/products/build")
     public JSONObject makeProductPost(@LoginUser SessionUser user, /*@RequestBody*/ProductPostDto postDto) {
-        return productService.makeProductPost(user, postDto); //해당 유저의 작품 글 리스트까지 fetch해서 가져오기.
+        return productService.makePost(user, postDto); //해당 유저의 작품 글 리스트까지 fetch해서 가져오기.
     }
 
     @PostMapping("/products/wish")

@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.config.auth.LoginUser;
 import net.sinzak.server.config.auth.dto.SessionUser;
+import net.sinzak.server.dto.WishForm;
 import net.sinzak.server.dto.WorkPostDto;
 import net.sinzak.server.error.ErrorResponse;
 import net.sinzak.server.service.WorkService;
@@ -25,6 +26,12 @@ public class WorkController {
     @PostMapping("/works/build")
     public JSONObject makeWorkPost(@LoginUser SessionUser user, /*@RequestBody*/ WorkPostDto postDto) {
         return workService.makeWorkPost(user, postDto);
+    }
+
+    @PostMapping("/works/wish")
+    @ApiOperation(value = "작품 찜")
+    public JSONObject wish(@LoginUser SessionUser user, @RequestBody WishForm form) {
+        return workService.wish(user, form);
     }
 
 

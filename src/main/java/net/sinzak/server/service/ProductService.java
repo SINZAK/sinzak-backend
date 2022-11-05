@@ -34,7 +34,7 @@ public class ProductService {
     private final ProductWishRepository productWishRepository;
 
     @Transactional
-    public JSONObject makeProductPost(SessionUser tempUser, ProductPostDto productPost){
+    public JSONObject makePost(SessionUser tempUser, ProductPostDto productPost){
         User user = userRepository.findByEmailFetchPP(tempUser.getEmail()).orElseThrow();
                             /** 존재 하지 않는 유저면 NullPointer 에러 뜰거고, 핸들러가 처리 할 예정 **/
         Product product = Product.builder()
@@ -95,6 +95,6 @@ public class ProductService {
             obj.put("isfav",isfav);
             return obj;
         }
-        return PropertyUtil.responseMessage(HttpStatus.NOT_FOUND,"존재하지 않는 글에 요청된 찜");
+        return PropertyUtil.responseMessage(HttpStatus.NOT_FOUND,"존재하지 않는 작품 글에 요청된 찜");
     }
 }

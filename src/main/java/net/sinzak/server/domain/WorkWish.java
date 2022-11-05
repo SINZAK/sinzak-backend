@@ -12,6 +12,7 @@ import static javax.persistence.FetchType.LAZY;
 public class WorkWish extends BaseTimeEntity {  //다대다 연결 위한 테이블.
 
     @Id
+    @GeneratedValue
     @Column(name = "work_wish_id")
     private Long id;
 
@@ -27,6 +28,13 @@ public class WorkWish extends BaseTimeEntity {  //다대다 연결 위한 테이
     public WorkWish(User user, Work work) {
         setUser(user);
         setWork(work);
+    }
+
+    public static WorkWish createConnect(Work work, User user){  //생성메서드
+        WorkWish connect = new WorkWish();
+        connect.setWork(work);
+        connect.setUser(user);
+        return connect;
     }
 
     private void setUser(User user){

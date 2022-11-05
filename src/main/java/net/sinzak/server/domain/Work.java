@@ -86,6 +86,10 @@ public class Work { /** 외주 **/
         this.user = user;
     }
 
+    public void plusWishCnt() { this.wishCnt++; }
+    public void minusWishCnt() {
+        if(wishCnt>0) wishCnt--;
+    }
     protected Work() {
     }
 }
