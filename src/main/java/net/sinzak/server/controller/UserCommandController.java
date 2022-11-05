@@ -42,7 +42,6 @@ public class UserCommandController {
     public JSONObject updateUser( @RequestBody UpdateUserDto dto , @ApiIgnore @LoginUser SessionUser user) {
         return userCommandService.updateUser(dto,user);
     }
-
     @ApiOperation(value = "팔로우하기")
     @PostMapping(value = "/users/{userId}/follow")
     public JSONObject followUser(@PathVariable("userId") Long userId,@ApiIgnore @LoginUser SessionUser user){

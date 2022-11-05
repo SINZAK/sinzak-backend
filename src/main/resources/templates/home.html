@@ -24,7 +24,6 @@
             padding: 5px;
             height: 80%;
         }
-
         footer {
             margin-top: 10px;
             padding: 5px;
@@ -35,19 +34,26 @@
 </head>
 <body>
 <header> 신작
-    <button onclick="location.href='/'"> 로그아웃 </button>
+    <button onclick="location.href='/'"> 로그아웃</button>
 </header>
 <section>
-    슈팔 보니까 타임리프는 @Controller만 되네 @RestController를 첨 써봐서 몰랐다;
+    <div th:id="userListDiv">
+
+    </div>
+
 </section>
+
 
 <footer>
     <button th:id="homeButton"> 홈</button>
     <button th:id="marketButton"> 마켓</button>
     <button th:id="workButton"> 외주</button>
     <button th:id="chatButton"> 채팅</button>
-    <button th:id="profileButton"> 프로필</button>
+    <button th:id="profileButton" th:onclick="'location.href=\' '+@{|/users/${userId}/thymeleaf|}+'\''"> 프로필</button>
 </footer>
+<script th:inline="javascript">
+
+</script>
 <div>
     <button onclick="location.href='/userList'"> 회원 리스트</button>
     <button onclick="location.href='/productList'"> 작품 리스트</button>

@@ -15,9 +15,5 @@ public class HomeController {
     @RequestMapping("/api")
     public String api() { return "redirect:/swagger-ui.html";}
 
-    @GetMapping("home")
-    public String hello(Model model){
-        return "home";
-    }
 
 }
