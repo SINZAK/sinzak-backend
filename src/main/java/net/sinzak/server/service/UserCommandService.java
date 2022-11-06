@@ -6,6 +6,7 @@ import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.dto.request.UpdateUserDto;
 import net.sinzak.server.domain.User;
 import net.sinzak.server.error.InstanceNotFoundException;
+import net.sinzak.server.error.UserNotFoundException;
 import net.sinzak.server.repository.UserRepository;
 import org.json.simple.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -67,13 +68,13 @@ public class UserCommandService {
     public User getUser(SessionUser user) {
         User User = userRepository
                 .findByEmail(user.getEmail())
-                .orElseThrow(()-> new InstanceNotFoundException("유저가 존재하지 않습니다"));
+                .orElseThrow(()-> new UserNotFoundException());
         return User;
     }
     public User getFindUser(Long userId){
         User findUser = userRepository
                 .findById(userId)
-                .orElseThrow(()->new InstanceNotFoundException("유저가 존재하지 않습니다"));
+                .orElseThrow(()->new UserNotFoundException());
         return findUser;
     }
     @Transactional //실제론 연동로그인이기에 api테스트용
