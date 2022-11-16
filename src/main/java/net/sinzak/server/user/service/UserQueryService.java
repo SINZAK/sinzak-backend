@@ -30,36 +30,29 @@ public class UserQueryService {
         JSONObject object = new JSONObject();
         Optional<User> User = userRepository.findByEmail(user.getEmail());
         Optional<User> findUser = userRepository.findById(otherUserId);
-        if(User.isPresent() && findUser.isPresent()){
-            if(findUser.get().equals(User.get())){//만약 Id가 똑같다면 본인프로파일
-                object.put("myProfile",true); //내 프로필임
-            }
-            else{
-                object.put("myProfile",false);
-            }
-            object.put("name",findUser.get().getName());
-            object.put("introduction",findUser.get().getIntroduction());
-            object.put("success",true);
-        }
-        else{
-            object.put("success",false);
+        boolean usersPresent = checkIfTwoUserPresent(User,findUser);
+        object.put("success",usersPresent);
+        if(usersPresent){
+            object.put("myProfile",checkIfMyProfile(User,findUser));
+            putUserInformation(object, findUser);
         }
         return object;
     }
-    //팔로우,팔로잉 가져오기
-    private List<GetFollowDto> getGetFollowDtoList(Set<Long> followList) {
-        List<GetFollowDto> getFollowingDtoList = new ArrayList<>();
-        for(Long follow : followList){
-            Optional<User> findUser = userRepository.findById(follow);
-            if(findUser.isPresent()){
-                GetFollowDto getFollowDto = GetFollowDto.builder().userId(findUser.get().getId()).name(findUser.get().getName()).picture(findUser.get().getPicture()).build();
-                getFollowingDtoList.add(getFollowDto);
-            }
-            else{
-                followList.remove(follow); //만약 UserRepository에 존재하지 않는다면(유저가 삭제된 거임) 삭제해주기
-            }
+    public void putUserInformation(JSONObject object, Optional<User> findUser) {
+        object.put("name", findUser.get().getName());
+        object.put("introduction", findUser.get().getIntroduction());
+    }
+    public boolean checkIfMyProfile(Optional<User> User, Optional<User> findUser){
+        if(findUser.get().equals(User.get())){
+            return true;
         }
-        return getFollowingDtoList;
+        return false;
+    }
+    public boolean checkIfTwoUserPresent(Optional<User> User,Optional<User> findUser){
+        if(User.isPresent()&&findUser.isPresent()){
+            return true;
+        }
+        return false;
     }
     //팔로워가져오기
     public List<GetFollowDto> getFollowerDtoList(Long userId){
@@ -71,6 +64,21 @@ public class UserQueryService {
         Set<Long> followingList = userRepository.findById(userId).get().getFollowingList();
         return getGetFollowDtoList(followingList);
     }
-
+    //팔로우,팔로잉 가져오기
+    private List<GetFollowDto> getGetFollowDtoList(Set<Long> followList) {
+        List<GetFollowDto> getFollowingDtoList = new ArrayList<>();
+        for(Long follow : followList){
+            Optional<User> findUser = userRepository.findById(follow);
+            if(findUser.isPresent()){
+                GetFollowDto getFollowDto = GetFollowDto.builder().
+                        userId(findUser.get().getId()).
+                        name(findUser.get().getName()).
+                        picture(findUser.get().getPicture()).
+                        build();
+                getFollowingDtoList.add(getFollowDto);
+            }
+        }
+        return getFollowingDtoList;
+    }
 
 }
