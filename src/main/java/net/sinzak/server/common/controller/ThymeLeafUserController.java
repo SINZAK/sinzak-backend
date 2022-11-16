@@ -1,23 +1,21 @@
-package net.sinzak.server.controller;
+package net.sinzak.server.common.controller;
 
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.config.auth.LoginUser;
 import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.dto.ProductPostDto;
 import net.sinzak.server.dto.WorkPostDto;
-import net.sinzak.server.dto.respond.GetFollowDto;
+import net.sinzak.server.user.dto.respond.GetFollowDto;
 import net.sinzak.server.repository.ProductRepository;
-import net.sinzak.server.domain.User;
-import net.sinzak.server.repository.UserRepository;
+import net.sinzak.server.user.domain.User;
+import net.sinzak.server.user.repository.UserRepository;
 import net.sinzak.server.repository.WorkRepository;
-import net.sinzak.server.service.UserCommandService;
-import net.sinzak.server.service.UserQueryService;
-import org.h2.engine.Mode;
+import net.sinzak.server.user.service.UserCommandService;
+import net.sinzak.server.user.service.UserQueryService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 

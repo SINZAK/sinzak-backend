@@ -1,10 +1,9 @@
 package net.sinzak.server.config.auth.dto;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import net.sinzak.server.domain.User;
+import net.sinzak.server.user.domain.User;
 
 import java.io.Serializable;
 

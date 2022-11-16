@@ -1,4 +1,4 @@
-package net.sinzak.server.controller;
+package net.sinzak.server.user.controller;
 
 
 import io.swagger.annotations.ApiOperation;
@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 
 import net.sinzak.server.config.auth.LoginUser;
 import net.sinzak.server.config.auth.dto.SessionUser;
-import net.sinzak.server.dto.request.UpdateUserDto;
-import net.sinzak.server.error.InstanceNotFoundException;
-import net.sinzak.server.service.UserCommandService;
+import net.sinzak.server.user.dto.request.UpdateUserDto;
+import net.sinzak.server.common.error.InstanceNotFoundException;
+import net.sinzak.server.user.service.UserCommandService;
 import org.json.simple.JSONObject;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;

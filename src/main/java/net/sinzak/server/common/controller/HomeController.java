@@ -1,4 +1,4 @@
-package net.sinzak.server.controller;
+package net.sinzak.server.common.controller;
 
 import io.swagger.annotations.ApiOperation;
 import org.springframework.stereotype.Controller;
