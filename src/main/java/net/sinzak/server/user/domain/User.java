@@ -25,7 +25,7 @@ public class User extends BaseTimeEntity {
     private String email;
 
     @Column
-    private String name;  //일단 nickName안쓰고 name으로 통일중
+    private String name;
 
     @Column
     private String nickName;

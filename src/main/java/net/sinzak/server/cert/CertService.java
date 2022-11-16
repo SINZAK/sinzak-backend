@@ -2,6 +2,10 @@ package net.sinzak.server.cert;
 
 import lombok.AllArgsConstructor;
 import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.error.UserNotFoundException;
+import net.sinzak.server.config.auth.dto.SessionUser;
+import net.sinzak.server.user.domain.User;
+import net.sinzak.server.user.repository.UserRepository;
 import org.json.simple.JSONObject;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -16,6 +20,7 @@ public class CertService {
 
     private JavaMailSender emailSender;
     private CertRepository certRepository;
+    private UserRepository userRepository;
 
     @Transactional
     public JSONObject sendMail(MailDto mailDto) {
@@ -36,13 +41,25 @@ public class CertService {
         return PropertyUtil.response(true);
     }
 
-    public JSONObject receiveMail(MailDto mailDto) {
+    @Transactional
+    public JSONObject receiveMail(SessionUser User, MailDto mailDto) {
         Cert savedCert = certRepository.findCertByUnivEmail(mailDto.getAddress()).orElseThrow();
+
         if(savedCert.getCode().equals(mailDto.getCode())){
+            User user = userRepository.findByEmail(User.getEmail()).orElseThrow(() -> new UserNotFoundException());
             savedCert.setVerified();
+//            check(String univMail);
+            user.updateUniv(mailDto.getAddress());  /** univ_email 등록 및  대학 인증 true 변경 **/
+
             return PropertyUtil.response(true);
         }
         return PropertyUtil.response(false);
 
     }
+
+
+//    private boolean check(String mail){
+//        UnivMail.changeMailToUniv(mail)
+//
+//    }
 }

@@ -42,10 +42,12 @@ public enum UnivMail {  /** 약 62개 **/
         }
         return "";
     }
-    public static String changeMailToUniv(String mail){
+    public static String changeMailToUniv(String mail){ //insi2000@mail.hongik.ac.kr
         UnivMail[] univMails = UnivMail.values();
+        String[] domain = mail.split("@",2); // domain[1]에 메일 도메인 존재
+
         for (UnivMail univMail : univMails) {
-            if(univMail.mail.equals(mail))
+            if(domain[1].contains(univMail.mail))
                 return univMail.name;
         }
         return "";
