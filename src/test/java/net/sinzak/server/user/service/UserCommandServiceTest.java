@@ -1,4 +1,4 @@
-package net.sinzak.server.service;
+package net.sinzak.server.user.service;
 
 
 import net.sinzak.server.config.auth.dto.SessionUser;
