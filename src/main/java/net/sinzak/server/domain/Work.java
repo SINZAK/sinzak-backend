@@ -2,6 +2,7 @@ package net.sinzak.server.domain;
 
 import lombok.Builder;
 import lombok.Getter;
+import net.sinzak.server.user.domain.User;
 
 import javax.persistence.*;
 import java.util.ArrayList;

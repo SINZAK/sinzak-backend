@@ -2,6 +2,7 @@ package net.sinzak.server.domain;
 
 import lombok.Getter;
 import net.sinzak.server.BaseTimeEntity;
+import net.sinzak.server.user.domain.User;
 
 import javax.persistence.*;
 

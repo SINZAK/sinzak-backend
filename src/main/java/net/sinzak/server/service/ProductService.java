@@ -1,27 +1,23 @@
 package net.sinzak.server.service;
 
-import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.domain.Product;
 import net.sinzak.server.domain.ProductWish;
-import net.sinzak.server.domain.User;
+import net.sinzak.server.user.domain.User;
 import net.sinzak.server.domain.embed.Size;
 import net.sinzak.server.dto.ProductPostDto;
 import net.sinzak.server.dto.WishForm;
-import net.sinzak.server.error.InstanceNotFoundException;
 import net.sinzak.server.repository.ProductRepository;
 import net.sinzak.server.repository.ProductWishRepository;
-import net.sinzak.server.repository.UserRepository;
+import net.sinzak.server.user.repository.UserRepository;
 import org.json.simple.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 

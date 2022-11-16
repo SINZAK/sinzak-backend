@@ -1,4 +1,4 @@
-package net.sinzak.server.dto.respond;
+package net.sinzak.server.user.dto.respond;
 
 
 import lombok.Builder;

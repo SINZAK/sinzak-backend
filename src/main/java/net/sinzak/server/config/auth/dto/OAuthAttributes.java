@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.domain.Role;
-import net.sinzak.server.domain.User;
+import net.sinzak.server.user.domain.User;
 
 import java.time.LocalDateTime;
 import java.util.Map;

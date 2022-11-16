@@ -1,4 +1,4 @@
-package net.sinzak.server.error;
+package net.sinzak.server.common.error;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

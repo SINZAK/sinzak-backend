@@ -1,9 +1,9 @@
 package net.sinzak.server.service;
 
 import net.sinzak.server.config.auth.dto.SessionUser;
-import net.sinzak.server.domain.User;
+import net.sinzak.server.user.domain.User;
 import net.sinzak.server.dto.WorkPostDto;
-import net.sinzak.server.repository.UserRepository;
+import net.sinzak.server.user.repository.UserRepository;
 import org.json.simple.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

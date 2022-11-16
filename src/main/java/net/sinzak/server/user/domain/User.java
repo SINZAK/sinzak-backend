@@ -1,8 +1,9 @@
-package net.sinzak.server.domain;
+package net.sinzak.server.user.domain;
 
 import lombok.Builder;
 import lombok.Getter;
 import net.sinzak.server.BaseTimeEntity;
+import net.sinzak.server.domain.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;

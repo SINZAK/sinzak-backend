@@ -1,16 +1,13 @@
-package net.sinzak.server.service;
+package net.sinzak.server.user.service;
 
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.config.auth.dto.SessionUser;
-import net.sinzak.server.dto.respond.GetFollowDto;
-import net.sinzak.server.domain.User;
-import net.sinzak.server.dto.WorkPostDto;
-import net.sinzak.server.error.InstanceNotFoundException;
-import net.sinzak.server.repository.UserRepository;
+import net.sinzak.server.user.dto.respond.GetFollowDto;
+import net.sinzak.server.user.domain.User;
+import net.sinzak.server.user.repository.UserRepository;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
