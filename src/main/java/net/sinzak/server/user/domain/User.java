@@ -25,13 +25,16 @@ public class User extends BaseTimeEntity {
     private String email;
 
     @Column
+    private String univ_email;
+
+    @Column
     private String name;
 
     @Column
     private String nickName;
 
     @Column
-    private String picture;
+    private String picture; //대표 사진
 
     @Column
     private String introduction; //한 줄 소개
@@ -112,13 +115,14 @@ public class User extends BaseTimeEntity {
         this.name =name;
         this.picture = picture;
         this.introduction = introduction;
-
         return this;
     }
     public String getRoleKey(){
         return this.role.getKey();
     }
 
-
-
+    public void updateUniv(String univ_email) {
+        this.univ_email = univ_email;
+        this.cert_uni = true;
+    }
 }

@@ -42,14 +42,25 @@ public enum UnivMail {  /** 약 62개 **/
         }
         return "";
     }
-    public static String changeMailToUniv(String mail){ //insi2000@mail.hongik.ac.kr
+    public static boolean certUniv(String univ, String mail){ //insi2000@mail.hongik.ac.kr
         UnivMail[] univMails = UnivMail.values();
         String[] domain = mail.split("@",2); // domain[1]에 메일 도메인 존재
-
+        System.out.println("체크: "+ domain[1]);
         for (UnivMail univMail : univMails) {
-            if(domain[1].contains(univMail.mail))
-                return univMail.name;
+            System.out.println(univMail.name+" ");
+            if(domain[1].contains(univMail.mail) && univ.equals((univMail.name+"대학교")))
+                return true;
         }
-        return "";
+        return false;
+    }
+
+
+    public static boolean needCheck(String univ){  //체크할 필요가 있는 대학인지?
+        UnivMail[] univMails = UnivMail.values();
+        for (UnivMail univMail : univMails) {
+            if(univ.equals(univMail.name+"대학교"))
+                return true;
+        }
+        return false;
     }
 }
