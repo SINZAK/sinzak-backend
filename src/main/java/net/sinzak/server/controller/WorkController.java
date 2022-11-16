@@ -6,14 +6,12 @@ import net.sinzak.server.config.auth.LoginUser;
 import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.dto.WishForm;
 import net.sinzak.server.dto.WorkPostDto;
-import net.sinzak.server.error.ErrorResponse;
+import net.sinzak.server.common.error.ErrorResponse;
 import net.sinzak.server.service.WorkService;
 import org.json.simple.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
-import javax.servlet.http.HttpSession;
 import java.util.NoSuchElementException;
 
 @RestController

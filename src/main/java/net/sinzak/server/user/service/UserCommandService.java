@@ -1,14 +1,14 @@
-package net.sinzak.server.service;
+package net.sinzak.server.user.service;
 
 
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.config.auth.dto.SessionUser;
-import net.sinzak.server.dto.request.UpdateUserDto;
+import net.sinzak.server.service.PropertyUtil;
+import net.sinzak.server.user.dto.request.UpdateUserDto;
 import net.sinzak.server.domain.User;
-import net.sinzak.server.error.InstanceNotFoundException;
-import net.sinzak.server.repository.UserRepository;
+import net.sinzak.server.common.error.InstanceNotFoundException;
+import net.sinzak.server.user.repository.UserRepository;
 import org.json.simple.JSONObject;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.Optional;

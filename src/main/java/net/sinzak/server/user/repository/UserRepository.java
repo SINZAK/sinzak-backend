@@ -1,4 +1,4 @@
-package net.sinzak.server.repository;
+package net.sinzak.server.user.repository;
 
 
 import net.sinzak.server.domain.User;

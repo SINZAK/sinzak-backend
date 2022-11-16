@@ -1,4 +1,4 @@
-package net.sinzak.server.error;
+package net.sinzak.server.common.error;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

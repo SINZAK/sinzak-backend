@@ -1,4 +1,4 @@
-package net.sinzak.server.controller;
+package net.sinzak.server.common;
 
 import io.swagger.annotations.ApiOperation;
 import org.springframework.stereotype.Controller;
@@ -14,6 +14,5 @@ public class HomeController {
     @ApiOperation(value = "API 명세서")
     @RequestMapping("/api")
     public String api() { return "redirect:/swagger-ui.html";}
-
 
 }
