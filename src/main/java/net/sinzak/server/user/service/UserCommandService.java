@@ -8,7 +8,7 @@ import net.sinzak.server.user.domain.User;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.user.repository.UserRepository;
-import net.sinzak.server.service.PropertyUtil;
+import net.sinzak.server.common.PropertyUtil;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;

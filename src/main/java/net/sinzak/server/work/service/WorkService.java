@@ -1,15 +1,16 @@
-package net.sinzak.server.service;
+package net.sinzak.server.work.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.domain.*;
-import net.sinzak.server.dto.WishForm;
-import net.sinzak.server.dto.WorkPostDto;
+import net.sinzak.server.common.dto.WishForm;
+import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.repository.UserRepository;
-import net.sinzak.server.repository.WorkRepository;
-import net.sinzak.server.repository.WorkWishRepository;
+import net.sinzak.server.work.repository.WorkRepository;
+import net.sinzak.server.work.repository.WorkWishRepository;
+import net.sinzak.server.work.dto.WorkPostDto;
 import org.json.simple.JSONObject;
 
 import org.springframework.http.HttpStatus;

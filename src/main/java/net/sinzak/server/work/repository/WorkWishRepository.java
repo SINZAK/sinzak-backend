@@ -1,4 +1,4 @@
-package net.sinzak.server.repository;
+package net.sinzak.server.work.repository;
 
 import net.sinzak.server.domain.WorkWish;
 import org.springframework.data.jpa.repository.JpaRepository;

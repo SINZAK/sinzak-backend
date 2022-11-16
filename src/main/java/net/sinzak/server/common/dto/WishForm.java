@@ -1,4 +1,4 @@
-package net.sinzak.server.dto;
+package net.sinzak.server.common.dto;
 
 import lombok.Getter;
 

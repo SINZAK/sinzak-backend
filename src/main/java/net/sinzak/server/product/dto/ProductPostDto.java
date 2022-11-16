@@ -1,4 +1,4 @@
-package net.sinzak.server.dto;
+package net.sinzak.server.product.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;

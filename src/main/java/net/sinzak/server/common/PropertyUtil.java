@@ -1,4 +1,4 @@
-package net.sinzak.server.service;
+package net.sinzak.server.common;
 
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
