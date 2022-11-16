@@ -115,13 +115,14 @@ public class User extends BaseTimeEntity {
         this.name =name;
         this.picture = picture;
         this.introduction = introduction;
-
         return this;
     }
     public String getRoleKey(){
         return this.role.getKey();
     }
 
-
-
+    public void updateUniv(String univ_email) {
+        this.univ_email = univ_email;
+        this.cert_uni = true;
+    }
 }
