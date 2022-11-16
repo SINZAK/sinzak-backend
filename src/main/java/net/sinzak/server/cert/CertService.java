@@ -48,8 +48,14 @@ public class CertService {
         if(savedCert.getCode().equals(mailDto.getCode())){
             User user = userRepository.findByEmail(User.getEmail()).orElseThrow(() -> new UserNotFoundException());
             savedCert.setVerified();
-//            check(String univMail);
-            user.updateUniv(mailDto.getAddress());  /** univ_email 등록 및  대학 인증 true 변경 **/
+
+            if(UnivMail.needCheck(mailDto.getUniv())){   /** 인증이 필요한 대학만 진행. **/
+                boolean result = UnivMail.certUniv(mailDto.getUniv(),mailDto.getAddress());
+                System.out.println("result = "+ result);
+                if(!result)
+                    return PropertyUtil.response(false); /** false가 와도 끊지말고 확인이 안되니 후에 마이페이지에서 학생증 인증하라고 고고 **/
+            }
+            user.updateUniv(mailDto.getUniv(), mailDto.getAddress());
 
             return PropertyUtil.response(true);
         }
@@ -57,9 +63,4 @@ public class CertService {
 
     }
 
-
-//    private boolean check(String mail){
-//        UnivMail.changeMailToUniv(mail)
-//
-//    }
 }

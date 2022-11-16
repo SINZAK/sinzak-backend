@@ -121,7 +121,8 @@ public class User extends BaseTimeEntity {
         return this.role.getKey();
     }
 
-    public void updateUniv(String univ_email) {
+    public void updateUniv(String univ, String univ_email) {
+        this.univ = univ;
         this.univ_email = univ_email;
         this.cert_uni = true;
     }
