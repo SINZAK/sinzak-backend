@@ -25,13 +25,16 @@ public class User extends BaseTimeEntity {
     private String email;
 
     @Column
+    private String univ_email;
+
+    @Column
     private String name;
 
     @Column
     private String nickName;
 
     @Column
-    private String picture;
+    private String picture; //대표 사진
 
     @Column
     private String introduction; //한 줄 소개
