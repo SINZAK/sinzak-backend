@@ -43,16 +43,16 @@ public class User extends BaseTimeEntity {
     private String major;
 
     @Column
-    private int followingNum;
+    private String followingNum;
 
     @Column
-    private int followerNum;
+    private String followerNum;
 
     @Column
     private String stack;  //전문 분야
 
     @Column
-    private String genre;  //관심 장르
+    private String categoryLike;  //관심 장르
 
     @Column
     private boolean cert_uni; //대학 인증여부
@@ -107,7 +107,10 @@ public class User extends BaseTimeEntity {
 
     protected User() {
     }
-
+    public void updateFollowNumber(String followingNumber,String followerNumber){
+        this.followerNum = followerNumber;
+        this.followingNum = followingNumber;
+    }
     public User update(String name, String picture,String introduction){
         this.name =name;
         this.picture = picture;

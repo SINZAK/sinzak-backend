@@ -18,7 +18,8 @@ import java.util.Set;
 public class UserQueryService {
 
     private final UserRepository userRepository;
-
+    private static final int hundredMillion = 100000000;
+    private static final int tenThousand =10000;
 //    @PostConstruct
 //    public void makeMockData(){
 //        User user = new User("insi2000@naver.com","송인서","그림2");
@@ -33,26 +34,18 @@ public class UserQueryService {
         boolean usersPresent = checkIfTwoUserPresent(User,findUser);
         object.put("success",usersPresent);
         if(usersPresent){
-            object.put("myProfile",checkIfMyProfile(User,findUser));
+            refreshFollowNumber(findUser);
             putUserInformation(object, findUser);
+            object.put("myProfile",checkIfMyProfile(User,findUser));
         }
         return object;
     }
     public void putUserInformation(JSONObject object, Optional<User> findUser) {
-        object.put("name", findUser.get().getName());
-        object.put("introduction", findUser.get().getIntroduction());
-    }
-    public boolean checkIfMyProfile(Optional<User> User, Optional<User> findUser){
-        if(findUser.get().equals(User.get())){
-            return true;
-        }
-        return false;
-    }
-    public boolean checkIfTwoUserPresent(Optional<User> User,Optional<User> findUser){
-        if(User.isPresent()&&findUser.isPresent()){
-            return true;
-        }
-        return false;
+        User user = findUser.get();
+        object.put("name", user.getName());
+        object.put("introduction", user.getIntroduction());
+        object.put("followingNumber", user.getFollowingNum());
+        object.put("followerNumber", user.getFollowerNum());
     }
     //팔로워가져오기
     public List<GetFollowDto> getFollowerDtoList(Long userId){
@@ -64,7 +57,6 @@ public class UserQueryService {
         Set<Long> followingList = userRepository.findById(userId).get().getFollowingList();
         return getGetFollowDtoList(followingList);
     }
-    //팔로우,팔로잉 가져오기
     private List<GetFollowDto> getGetFollowDtoList(Set<Long> followList) {
         List<GetFollowDto> getFollowingDtoList = new ArrayList<>();
         for(Long follow : followList){
@@ -79,6 +71,51 @@ public class UserQueryService {
             }
         }
         return getFollowingDtoList;
+    }
+
+
+    ////methods
+    public void refreshFollowNumber(Optional<User>findUser){
+        User user = findUser.get();
+        String followerNum = followNumberTrans(user.getFollowerList().size());
+        String followingNum = followNumberTrans(user.getFollowingList().size());
+        user.updateFollowNumber(followingNum,followerNum);
+    }
+    public String followNumberTrans(int number){
+        String unit =getUnit(number);
+        if(number>=hundredMillion){
+            number /= hundredMillion;
+        }
+        if(number>=tenThousand){
+            number /= tenThousand;
+        }
+        String transNumber = Integer.toString(number);
+        if(transNumber.length()>=4){
+            transNumber = transNumber.substring(0,1)+","+transNumber.substring(1);
+        }
+        transNumber +=unit;
+        return transNumber;
+    }
+    public String getUnit(int number){
+        if(number>=hundredMillion){
+            return "억";
+        }
+        if(number>=tenThousand){
+            return "만";
+        }
+        return "";
+    }
+    public boolean checkIfMyProfile(Optional<User> User, Optional<User> findUser){
+        if(findUser.get().equals(User.get())){
+            return true;
+        }
+        return false;
+    }
+    public boolean checkIfTwoUserPresent(Optional<User> User,Optional<User> findUser){
+        if(User.isPresent()&&findUser.isPresent()){
+            return true;
+        }
+        return false;
     }
 
 }
