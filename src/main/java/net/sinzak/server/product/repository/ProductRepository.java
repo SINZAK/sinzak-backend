@@ -1,4 +1,4 @@
-package net.sinzak.server.repository;
+package net.sinzak.server.product.repository;
 
 import net.sinzak.server.domain.Product;
 import org.springframework.data.jpa.repository.JpaRepository;

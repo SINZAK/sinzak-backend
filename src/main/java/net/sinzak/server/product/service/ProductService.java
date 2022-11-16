@@ -1,16 +1,17 @@
-package net.sinzak.server.service;
+package net.sinzak.server.product.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.domain.Product;
 import net.sinzak.server.domain.ProductWish;
+import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.product.repository.ProductWishRepository;
+import net.sinzak.server.product.repository.ProductRepository;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.domain.embed.Size;
-import net.sinzak.server.dto.ProductPostDto;
-import net.sinzak.server.dto.WishForm;
-import net.sinzak.server.repository.ProductRepository;
-import net.sinzak.server.repository.ProductWishRepository;
+import net.sinzak.server.product.dto.ProductPostDto;
+import net.sinzak.server.common.dto.WishForm;
 import net.sinzak.server.user.repository.UserRepository;
 import org.json.simple.JSONObject;
 import org.springframework.http.HttpStatus;

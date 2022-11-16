@@ -1,7 +1,7 @@
 package net.sinzak.server.cert;
 
 import lombok.AllArgsConstructor;
-import net.sinzak.server.service.PropertyUtil;
+import net.sinzak.server.common.PropertyUtil;
 import org.json.simple.JSONObject;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;

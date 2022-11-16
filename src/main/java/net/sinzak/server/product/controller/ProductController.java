@@ -1,12 +1,12 @@
-package net.sinzak.server.controller;
+package net.sinzak.server.product.controller;
 
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.config.auth.LoginUser;
 import net.sinzak.server.config.auth.dto.SessionUser;
-import net.sinzak.server.dto.ProductPostDto;
-import net.sinzak.server.dto.WishForm;
-import net.sinzak.server.service.ProductService;
+import net.sinzak.server.product.service.ProductService;
+import net.sinzak.server.product.dto.ProductPostDto;
+import net.sinzak.server.common.dto.WishForm;
 import org.json.simple.JSONObject;
 import org.springframework.web.bind.annotation.*;
 
