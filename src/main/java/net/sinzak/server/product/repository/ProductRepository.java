@@ -1,6 +1,6 @@
 package net.sinzak.server.product.repository;
 
-import net.sinzak.server.domain.Product;
+import net.sinzak.server.product.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package net.sinzak.server.domain;
+package net.sinzak.server.user.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

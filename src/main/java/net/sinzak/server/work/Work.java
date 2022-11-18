@@ -1,22 +1,22 @@
-package net.sinzak.server.domain;
+package net.sinzak.server.work;
 
 import lombok.Builder;
 import lombok.Getter;
-import net.sinzak.server.domain.embed.Size;
 import net.sinzak.server.user.domain.User;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Getter
 @Entity
-@SequenceGenerator(name = "Product_SEQ_GEN",sequenceName = "Product_SEQ")
-public class Product { /** 작품 **/
+@SequenceGenerator(name = "Work_SEQ_GEN",sequenceName = "Work_SEQ")
+public class Work { /** 외주 **/
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Product_SEQ")
-    @Column(name = "product_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Work_SEQ")
+    @Column(name = "work_id")
     private Long id;  //작품 번호
 
     @Column
@@ -29,19 +29,19 @@ public class Product { /** 작품 **/
     private String userName; //닉네임
 
     @Column
-    private int price;
+    private String category; //분류
 
     @Column
-    private boolean suggest = false;
+    private int pay;
+
+    @Column
+    private boolean suggest;
 
     @Column
     private String univ="";
 
     @Column
-    private String category; //분류
-
-    @Column
-    private String field;  //분야
+    private String field;
 
     @Column
     private int views = 2;
@@ -55,8 +55,8 @@ public class Product { /** 작품 **/
     @Column
     private String photo;
 
-    @Embedded
-    private Size size;
+    @Column
+    private boolean employment; //고용글인지 피고용글인지
 
     @Column
     private boolean complete = false;
@@ -65,36 +65,33 @@ public class Product { /** 작품 **/
     @JoinColumn(name = "user_id")
     private User user;  //수취인
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
-    private List<ProductWish> productWishList = new ArrayList<>();  //프로젝트-회원 엮여있는 리스트  스크랩!!!!
+    @OneToMany(mappedBy = "work", cascade = CascadeType.REMOVE)
+    private List<WorkWish> workWishList = new ArrayList<>();  //프로젝트-회원 엮여있는 리스트  스크랩!!!!
 
     @Builder
-    public Product(String title, String content, String category, int price, boolean suggest, String userName, String univ, String field, String photo, Size size) {
+    public Work(String title, String content, String category, int pay, boolean suggest, String userName, String univ, String field, String photo, boolean employment) {
         this.title = title;
         this.content = content;
         this.category = category;
-        this.price = price;
+        this.pay = pay;
         this.suggest = suggest;
         this.userName = userName;
         this.univ = univ;
         this.field = field;
         this.photo = photo;
-        this.size = size;
+        this.employment = employment;
     }
 
     public void setUser(User user) {
-        user.getProductPostList().add(this);
+        user.getWorkPostList().add(this);
         this.user = user;
     }
 
-
-    public void plusWishCnt() {
-        this.wishCnt++;
-    }
+    public void plusWishCnt() { this.wishCnt++; }
     public void minusWishCnt() {
         if(wishCnt>0) wishCnt--;
     }
-    protected Product() {
+    protected Work() {
     }
-
 }
+

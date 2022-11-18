@@ -3,7 +3,10 @@ package net.sinzak.server.user.domain;
 import lombok.Builder;
 import lombok.Getter;
 import net.sinzak.server.BaseTimeEntity;
-import net.sinzak.server.domain.*;
+import net.sinzak.server.product.Product;
+import net.sinzak.server.product.ProductWish;
+import net.sinzak.server.work.Work;
+import net.sinzak.server.work.WorkWish;
 
 import javax.persistence.*;
 import java.util.ArrayList;

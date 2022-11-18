@@ -1,4 +1,4 @@
-package net.sinzak.server.domain.embed;
+package net.sinzak.server.user.domain.embed;
 
 import javax.persistence.Embeddable;
 
