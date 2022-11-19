@@ -1,21 +1,20 @@
 package net.sinzak.server.product;
 
 import lombok.Getter;
-import net.sinzak.server.BaseTimeEntity;
 import net.sinzak.server.user.domain.User;
 
 import javax.persistence.*;
 
 import static javax.persistence.FetchType.LAZY;
 
-@Entity
 @Getter
-public class ProductWish extends BaseTimeEntity {
+@Entity
+public class Likes {
 
     @Id
     @GeneratedValue
-    @Column(name = "product_wish_id")
-    private Long id;
+    @Column(name = "likes_id")
+    private Long id;  //작품 번호
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name="user_id")
@@ -26,20 +25,19 @@ public class ProductWish extends BaseTimeEntity {
     private Product product;
 
 
-    public static ProductWish createConnect(Product product, User user){  //생성메서드
-        ProductWish connect = new ProductWish();
+    public static Likes createConnect(Product product, User user){  //생성메서드
+        Likes connect = new Likes();
         connect.setProduct(product);
         connect.setUser(user);
         return connect;
     }
 
     private void setUser(User user){
-        user.getProductWishList().add(this); //스크랩!
+        user.getLikesList().add(this); //스크랩!
         this.user=user;
     }
 
-    public void setProduct(Product product) {  this.product = product; }
-
-    protected ProductWish() {}
-
+    public void setProduct(Product product) {
+        this.product = product;
+    }
 }

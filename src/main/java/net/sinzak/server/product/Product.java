@@ -47,6 +47,9 @@ public class Product { /** 작품 **/
     private int views = 2;
 
     @Column
+    private int likesCnt = 0;
+
+    @Column
     private int wishCnt = 0;
 
     @Column
@@ -94,6 +97,10 @@ public class Product { /** 작품 **/
     public void minusWishCnt() {
         if(wishCnt>0) wishCnt--;
     }
+    public void plusLikesCnt() {
+        this.likesCnt++;
+    }
+    public void minusLikesCnt() {if(likesCnt>0)this.likesCnt--;}
     protected Product() {
     }
 

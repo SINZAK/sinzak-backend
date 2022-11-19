@@ -28,6 +28,12 @@ public class ProductController {
         return productService.wish(user, form);
     }
 
+    @PostMapping("/products/likes")
+    @ApiOperation(value = "작품 좋아요")
+    public JSONObject likes(@LoginUser SessionUser user, @RequestBody WishForm form) {
+        return productService.likes(user, form);
+    }
+
 
 
 //    @ExceptionHandler(NullPointerException.class)
