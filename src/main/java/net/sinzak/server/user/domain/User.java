@@ -5,6 +5,7 @@ import lombok.Getter;
 import net.sinzak.server.BaseTimeEntity;
 import net.sinzak.server.product.Likes;
 import net.sinzak.server.product.Product;
+import net.sinzak.server.product.ProductSell;
 import net.sinzak.server.product.ProductWish;
 import net.sinzak.server.work.Work;
 import net.sinzak.server.work.WorkWish;
@@ -81,6 +82,9 @@ public class User extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<Product> productPostList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<ProductSell> productSellList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<ProductWish> productWishList = new ArrayList<>();

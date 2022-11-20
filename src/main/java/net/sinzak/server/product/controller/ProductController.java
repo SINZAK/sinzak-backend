@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.config.auth.LoginUser;
 import net.sinzak.server.config.auth.dto.SessionUser;
+import net.sinzak.server.product.dto.SellDto;
 import net.sinzak.server.product.service.ProductService;
 import net.sinzak.server.product.dto.ProductPostDto;
 import net.sinzak.server.common.dto.WishForm;
@@ -34,7 +35,11 @@ public class ProductController {
         return productService.likes(user, form);
     }
 
-
+    @PostMapping("/products/sell")
+    @ApiOperation(value = "작품 판매", notes = "회원의 구매목록에 추가, 해당 작품 판매완료 설정")
+    public JSONObject sell(@LoginUser SessionUser user, @RequestBody SellDto dto) {
+        return productService.sell(user, dto);
+    }
 
 //    @ExceptionHandler(NullPointerException.class)
 //    @ResponseStatus(HttpStatus.BAD_REQUEST)
