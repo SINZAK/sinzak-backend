@@ -69,7 +69,10 @@ public class User extends BaseTimeEntity {
     private boolean cert_celeb; //인플루언서 인증여부
 
     @Column
-    private String origin;
+    private int popularity ;  //'지금 뜨는 아티스트' 때문에 만듦
+
+    @Column
+    private String origin; //무슨 로그인인지
 
     @Enumerated(EnumType.STRING)
     private Role role;
