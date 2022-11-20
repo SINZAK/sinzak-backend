@@ -5,9 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.product.Likes;
 import net.sinzak.server.product.Product;
+import net.sinzak.server.product.ProductSell;
 import net.sinzak.server.product.ProductWish;
 import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.product.dto.SellDto;
 import net.sinzak.server.product.repository.LikesRepository;
+import net.sinzak.server.product.repository.ProductSellRepository;
 import net.sinzak.server.product.repository.ProductWishRepository;
 import net.sinzak.server.product.repository.ProductRepository;
 import net.sinzak.server.user.domain.User;
@@ -30,6 +33,7 @@ import java.util.Optional;
 public class ProductService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final ProductSellRepository productSellRepository;
     private final ProductWishRepository productWishRepository;
     private final LikesRepository likesRepository;
 
@@ -140,5 +144,14 @@ public class ProductService {
             return obj;
         }
         return PropertyUtil.responseMessage(HttpStatus.NOT_FOUND,"존재하지 않는 작품에 요청된 좋아요");
+    }
+
+    @Transactional
+    public JSONObject sell(SessionUser tempUser, @RequestBody SellDto dto){   // 좋아요
+        User user = userRepository.findByEmailFetchPS(tempUser.getEmail()).orElseThrow();
+        Product product = productRepository.findById(dto.getProductId()).orElseThrow();
+        ProductSell connect = ProductSell.createConnect(product, user);
+        productSellRepository.save(connect);
+        return PropertyUtil.response(true);
     }
 }

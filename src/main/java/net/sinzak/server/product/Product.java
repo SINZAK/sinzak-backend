@@ -101,7 +101,6 @@ public class Product { /** 작품 **/
         this.likesCnt++;
     }
     public void minusLikesCnt() {if(likesCnt>0)this.likesCnt--;}
-    protected Product() {
-    }
+    protected Product() {}
 
 }
