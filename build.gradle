@@ -52,6 +52,8 @@ dependencies {
 	implementation'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
 
+	implementation group: 'com.google.firebase', name: 'firebase-admin', version: '8.1.0'
+
 //	//이것도 스웨거 관련인데
 //	implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
 //	implementation 'javax.servlet:jstl'
