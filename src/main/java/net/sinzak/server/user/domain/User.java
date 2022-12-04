@@ -3,7 +3,12 @@ package net.sinzak.server.user.domain;
 import lombok.Builder;
 import lombok.Getter;
 import net.sinzak.server.BaseTimeEntity;
-import net.sinzak.server.domain.*;
+import net.sinzak.server.product.Likes;
+import net.sinzak.server.product.Product;
+import net.sinzak.server.product.ProductSell;
+import net.sinzak.server.product.ProductWish;
+import net.sinzak.server.work.Work;
+import net.sinzak.server.work.WorkWish;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -64,7 +69,10 @@ public class User extends BaseTimeEntity {
     private boolean cert_celeb; //인플루언서 인증여부
 
     @Column
-    private String origin;
+    private int popularity ;  //'지금 뜨는 아티스트' 때문에 만듦
+
+    @Column
+    private String origin; //무슨 로그인인지
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -79,7 +87,13 @@ public class User extends BaseTimeEntity {
     private List<Product> productPostList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<ProductSell> productSellList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<ProductWish> productWishList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<Likes> likesList = new ArrayList<>();
 
 
     @ElementCollection

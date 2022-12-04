@@ -3,7 +3,7 @@ package net.sinzak.server.config.auth.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.sinzak.server.domain.Role;
+import net.sinzak.server.user.domain.Role;
 import net.sinzak.server.user.domain.User;
 
 import java.time.LocalDateTime;

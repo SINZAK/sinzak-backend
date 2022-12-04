@@ -48,6 +48,7 @@ public class UserQueryController {
                 .body(getFollowDtoList);
     }
 
+
     //    @ApiOperation(value ="팔로워리스트")
 //    @GetMapping(value ="/users/{userId}/followers")
 //    public List<GetFollowDto> getFollowerList2(@PathVariable("userId") Long userId) {

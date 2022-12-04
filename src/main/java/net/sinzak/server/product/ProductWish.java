@@ -1,4 +1,4 @@
-package net.sinzak.server.domain;
+package net.sinzak.server.product;
 
 import lombok.Getter;
 import net.sinzak.server.BaseTimeEntity;
@@ -26,10 +26,6 @@ public class ProductWish extends BaseTimeEntity {
     private Product product;
 
 
-    public ProductWish(User user, Product product) {
-        setUser(user);
-        setProduct(product);
-    }
     public static ProductWish createConnect(Product product, User user){  //생성메서드
         ProductWish connect = new ProductWish();
         connect.setProduct(product);
