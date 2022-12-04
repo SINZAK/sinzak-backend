@@ -1,1 +1,1 @@
-# sinJak-backend
+# sinzak-backend
