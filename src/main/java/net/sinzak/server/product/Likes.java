@@ -36,7 +36,6 @@ public class Likes {
         user.getLikesList().add(this); //스크랩!
         this.user=user;
     }
-
     public void setProduct(Product product) {
         this.product = product;
     }

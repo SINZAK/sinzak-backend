@@ -36,7 +36,7 @@ public class User extends BaseTimeEntity {
     private String name;
 
     @Column
-    private String nickName;
+    private String nickName; //얘는 안 쓸 수도있음
 
     @Column
     private String picture; //대표 사진
