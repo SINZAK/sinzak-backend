@@ -23,6 +23,7 @@ public class UserChatRoom {
     private User user;
 
     private String roomName;
+    private String image;
 
 
 }
