@@ -16,14 +16,13 @@ import javax.persistence.*;
 public class ChatMessage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     private String type;
     private String sender;
     private String receiver;
-    private Object data;
 
-    @Lob private byte[] message; //모든 언어에 다 있는 byte[]
+    @Lob private String message; //모든 언어에 다 있는 byte[]
 
     @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name ="CHATROOM_ID")
