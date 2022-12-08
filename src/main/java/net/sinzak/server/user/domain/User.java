@@ -3,6 +3,7 @@ package net.sinzak.server.user.domain;
 import lombok.Builder;
 import lombok.Getter;
 import net.sinzak.server.BaseTimeEntity;
+import net.sinzak.server.chatroom.domain.UserChatRoom;
 import net.sinzak.server.product.Likes;
 import net.sinzak.server.product.Product;
 import net.sinzak.server.product.ProductSell;
@@ -94,6 +95,9 @@ public class User extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<Likes> likesList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+    private List<UserChatRoom> userChatRooms = new ArrayList<>();
 
 
     @ElementCollection

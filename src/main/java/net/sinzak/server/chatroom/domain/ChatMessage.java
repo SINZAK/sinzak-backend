@@ -1,7 +1,9 @@
 package net.sinzak.server.chatroom.domain;
 
 
+import com.fasterxml.jackson.databind.ser.Serializers;
 import lombok.*;
+import net.sinzak.server.BaseTimeEntity;
 
 import javax.persistence.*;
 
@@ -11,7 +13,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class ChatMessage {
+public class ChatMessage extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
