@@ -11,6 +11,6 @@ import java.util.List;
 @Repository
 public interface UserChatRoomRepository extends JpaRepository<UserChatRoom,Long> {
 
-    @Query("select ac from UserChatRoom as ac where ac.user.email =:sessionUserEmail")
+    @Query("select uc from UserChatRoom as uc where uc.user.email =:sessionUserEmail")
     List<UserChatRoom> findUserChatRoomBySessionUserEmail(@Param ("sessionUserEmail") String sessionUserEmail);
 }
