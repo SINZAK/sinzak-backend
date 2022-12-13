@@ -28,14 +28,15 @@ public class ChatRoomCommandService {
     public JSONObject createUserChatRoom(User user,User inviteUser){
         UUID uuid = findIfChatRoomExist(user,inviteUser);
         if(uuid!=null){
-            return makeChatRoomJson(uuid);
+            return makeChatRoomJson(uuid,inviteUser.getName());
         }
         ChatRoom chatRoom = makeChatRoom(user, inviteUser);
-        return makeChatRoomJson(chatRoom.getUuid());
+        return makeChatRoomJson(chatRoom.getUuid(),inviteUser.getName());
     }
-    private JSONObject makeChatRoomJson(UUID uuid) {
+    private JSONObject makeChatRoomJson(UUID uuid,String roomName) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("success",true);
+        jsonObject.put("roomName",roomName);
         jsonObject.put("UUID",uuid);
         return jsonObject;
     }
