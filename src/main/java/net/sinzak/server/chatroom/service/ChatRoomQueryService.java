@@ -9,6 +9,8 @@ import net.sinzak.server.chatroom.dto.ChatRoomDto;
 import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.repository.UserChatRoomRepository;
 import net.sinzak.server.config.auth.dto.SessionUser;
+import net.sinzak.server.user.domain.User;
+import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,7 +19,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ChatRoomService {
+public class ChatRoomQueryService {
     private final ChatRoomRepository chatRoomRepository;
     private final UserChatRoomRepository userChatRoomRepository;
 
@@ -30,7 +32,6 @@ public class ChatRoomService {
         }
         return chatRoomDtos;
     }
-
     private ChatRoomDto getChatRoomDto(UserChatRoom userChatRoom) {
         ChatRoomDto chatRoomDto = ChatRoomDto.builder()
                 .image(userChatRoom.getImage())
@@ -38,6 +39,4 @@ public class ChatRoomService {
                 .build();
         return chatRoomDto;
     }
-
-
 }
