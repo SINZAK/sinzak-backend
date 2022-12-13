@@ -29,8 +29,8 @@ public class ChatRoom extends BaseTimeEntity {
     @OneToMany(mappedBy = "chatRoom",cascade = CascadeType.ALL)
     private Set<UserChatRoom> userChatRooms = new HashSet<>();
 
-    public void addUserChatRoom(User user){
-        UserChatRoom userChatRoom = new UserChatRoom(user.getName(),user.getPicture());
+    public void addUserChatRoom(User user,User inviteUser){
+        UserChatRoom userChatRoom = new UserChatRoom(inviteUser.getName(),inviteUser.getPicture());
         userChatRoom.setChatRoom(this);
         userChatRoom.setUser(user);
         this.participantsNumber++;
