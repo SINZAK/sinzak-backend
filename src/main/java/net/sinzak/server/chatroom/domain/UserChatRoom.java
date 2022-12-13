@@ -24,6 +24,18 @@ public class UserChatRoom {
 
     private String roomName;
     private String image;
+    public UserChatRoom(){}
+
+    public UserChatRoom(String roomName,String image){
+        this.roomName = roomName;
+        this.image = image;
+    }
+    public void setUser(User user){
+        this.user = user;
+    }
+    public void setChatRoom(ChatRoom chatRoom){
+        this.chatRoom = chatRoom;
+    }
 
 
 }
