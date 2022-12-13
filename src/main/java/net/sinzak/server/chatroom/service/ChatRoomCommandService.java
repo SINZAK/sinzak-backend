@@ -3,11 +3,18 @@ package net.sinzak.server.chatroom.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.sinzak.server.chatroom.domain.ChatRoom;
+import net.sinzak.server.chatroom.domain.UserChatRoom;
 import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.repository.UserChatRoomRepository;
+import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
