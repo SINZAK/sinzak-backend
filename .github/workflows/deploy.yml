@@ -39,6 +39,7 @@ jobs:
           username: ec2-user
           host: ${{ secrets.HOST_DEV }}
           key: ${{ secrets.SSH_PEM_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
           source: "./build/libs/*.jar"
           target: "/home/ec2-user/deploy"
           strip_components: 2
@@ -50,6 +51,7 @@ jobs:
           host: ${{ secrets.HOST_DEV }}
           username: ec2-user
           key: ${{ secrets.SSH_PEM_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
           port: 22
           envs: GITHUB_SHA
           script: chmod +x /home/ec2-user/deploy/deploy.sh && sh /home/ec2-user/deploy/deploy.sh
