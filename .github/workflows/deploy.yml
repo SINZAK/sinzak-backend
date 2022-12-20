@@ -3,7 +3,7 @@ name: Docker CI/CD
 on:
   push:
     branches:
-      - deploy/scp-action
+      - deploy/production
   workflow_dispatch:
 
 jobs:
