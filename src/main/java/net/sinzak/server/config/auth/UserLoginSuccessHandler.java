@@ -13,6 +13,6 @@ public class UserLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
-        response.sendRedirect("redirect:/home");
+        response.sendRedirect("http://ec2-13-209-121-29.ap-northeast-2.compute.amazonaws.com:8080/home");
     }
 }
