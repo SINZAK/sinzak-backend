@@ -13,6 +13,6 @@ public class UserLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
-        response.sendRedirect("http://localhost:8080/home");
+        response.sendRedirect("/home");
     }
 }
