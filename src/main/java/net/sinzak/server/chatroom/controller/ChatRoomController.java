@@ -2,18 +2,20 @@ package net.sinzak.server.chatroom.controller;
 
 
 import lombok.RequiredArgsConstructor;
-import net.sinzak.server.chatroom.service.ChatRoomService;
-import org.json.simple.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import net.sinzak.server.chatroom.repository.ChatRoomRepository;
+import net.sinzak.server.chatroom.service.ChatRoomQueryService;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
 public class ChatRoomController {
+    private final ChatRoomRepository chatRoomRepository;
+    private final ChatRoomQueryService chatRoomQueryService;
 
-    private final ChatRoomService chatRoomService;
+//    @Transactional
+//    public JSONObject createChatRoom(){
+//        ChatRoom chatRoom = new ChatRoom();
+//    }
 
 
 
