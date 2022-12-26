@@ -15,15 +15,15 @@ public class ChatMessageController {
 
     private final ChatMessageService chatMessageService;
 
-    @GetMapping("/getChatMessage")
-    public ChatMessage getChatMessage(@RequestParam String id) throws Exception{
-        return chatMessageService.getChatMessage(id);
-    }
-
-    @ApiOperation(value = "채팅 메시지 생성")
-    @PostMapping("/createChatMessage")
-    public JSONObject jsonObject(@RequestBody ChatMessageDto chatMessageDto) throws Exception{
-        return chatMessageService.createChatMessage(chatMessageDto);
-    }
+//    @GetMapping("/getChatMessage")
+//    public ChatMessage getChatMessage(@RequestParam String id) throws Exception{
+//        return chatMessageService.getChatMessage(id);
+//    }
+//
+//    @ApiOperation(value = "채팅 메시지 생성")
+//    @PostMapping("/createChatMessage")
+//    public JSONObject jsonObject(@RequestBody ChatMessageDto chatMessageDto) throws Exception{
+//        return chatMessageService.createChatMessage(chatMessageDto);
+//    }
 
 }
