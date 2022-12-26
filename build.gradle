@@ -1,6 +1,6 @@
 plugins {
 	id 'org.springframework.boot' version '2.6.6'
-	id 'io.spring.dependency-management' version '1.1.0'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
 }
 
@@ -59,7 +59,7 @@ dependencies {
 	implementation 'org.webjars:bootstrap:3.3.7'
 	implementation 'org.webjars:jquery:3.1.1-1'
 
-//	implementation group: 'com.google.firebase', name: 'firebase-admin', version: '8.1.0'
+	implementation group: 'com.google.firebase', name: 'firebase-admin', version: '8.1.0'
 
 //	//이것도 스웨거 관련인데
 //	implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'

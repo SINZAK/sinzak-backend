@@ -46,7 +46,6 @@ class UserCommandServiceTest {
         UpdateUserDto dto =  new UpdateUserDto("인서","저는 소프 개발자입니다","그림3");
         SessionUser findUser = new SessionUser(user);
         Assertions.assertTrue((Boolean)userCommandService.updateUser(dto,findUser).get("success"));
-
         //true검사
     }
 
