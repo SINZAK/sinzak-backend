@@ -27,15 +27,14 @@ public class UserCommandController {
     private final SecurityService securityService;
 
 
-    @ApiOperation(value = "마이페이지", notes = "아이디, 이름, 전화번호")
+    @ApiOperation(value = "jwt Authorization 헤더 테스트 페이지", notes = "헤더 테스트")
     @PostMapping("/mypage")
-    public User myPage(@AuthenticationPrincipal User user) {
+    public void myPage(@AuthenticationPrincipal User user) {
         System.out.println(user.getId());
         System.out.println(user.getUsername());
-        return user;
     }
 
-    @ApiOperation(value = "로그인", notes = "성공시 jwt 토큰을 헤더에 넣어서 반환합니다.")
+    @ApiOperation(value = "로그인테스트 \"email\" : \"insi2000@naver.com\" 과 같은 형식으로 보내주세요", notes = "성공시 jwt 토큰을 헤더에 넣어서 반환합니다. Authorization 헤더에 액세스토큰을 넣어주세요")
     @PostMapping("/login")
     public TokenDto login(@RequestBody Map<String, String> user) {
         return securityService.login(user);
