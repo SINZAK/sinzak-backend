@@ -10,17 +10,18 @@ import net.sinzak.server.product.ProductSell;
 import net.sinzak.server.product.ProductWish;
 import net.sinzak.server.work.Work;
 import net.sinzak.server.work.WorkWish;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @Entity
 @SequenceGenerator(name = "User_SEQ_GEN",sequenceName = "User_SEQ")
-public class User extends BaseTimeEntity {
+public class User extends BaseTimeEntity implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "User_SEQ")
@@ -110,6 +111,9 @@ public class User extends BaseTimeEntity {
     @Column(name = "FOLLOWER_ID")
     private Set<Long> followerList =new HashSet<>();
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<String> roles = new ArrayList<>();
+
     @Builder
     public User(String name, String email, String picture, String origin, Role role) {
         this.email = email;
@@ -126,8 +130,6 @@ public class User extends BaseTimeEntity {
         this.picture = picture;
     }
 
-    protected User() {
-    }
     public void updateFollowNumber(String followingNumber,String followerNumber){
         this.followerNum = followerNumber;
         this.followingNum = followingNumber;
@@ -147,4 +149,44 @@ public class User extends BaseTimeEntity {
         this.univ = univ;
         this.cert_uni = true;
     }
+
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.roles.stream()
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public String getPassword() {
+        return null;
+    }
+
+    @Override
+    public String getUsername() {  /** email 사용 !!! **/
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    protected User() {}
 }

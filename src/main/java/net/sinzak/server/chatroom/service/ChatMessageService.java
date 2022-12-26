@@ -1,6 +1,11 @@
 package net.sinzak.server.chatroom.service;
 
-
+//import com.google.api.core.ApiFuture;
+//import com.google.cloud.firestore.DocumentReference;
+//import com.google.cloud.firestore.DocumentSnapshot;
+//import com.google.cloud.firestore.Firestore;
+//import com.google.cloud.firestore.WriteResult;
+//import com.google.firebase.cloud.FirestoreClient;
 import net.sinzak.server.chatroom.domain.ChatMessage;
 import net.sinzak.server.chatroom.dto.ChatMessageDto;
 import net.sinzak.server.common.PropertyUtil;
@@ -31,4 +36,15 @@ public class ChatMessageService {
         chatMessage.setType("test");
         return chatMessage;
     }
+
+//    public ChatMessage getChatMessage(String id) throws Exception{
+//        Firestore firestore = FirestoreClient.getFirestore();
+//        DocumentReference documentReference = firestore.collection(COLLECTION_NAME).document(id);
+//        ApiFuture<DocumentSnapshot> apiFuture = documentReference.get();
+//        DocumentSnapshot documentSnapshot = apiFuture.get();
+//        if(documentSnapshot.exists()){
+//            return documentSnapshot.toObject(ChatMessage.class);
+//        }
+//        return null;
+//    }
 }
