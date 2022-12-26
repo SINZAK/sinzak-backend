@@ -1,6 +1,7 @@
 package net.sinzak.server.cert;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.config.auth.dto.SessionUser;
@@ -15,12 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CertService {
 
-    private JavaMailSender emailSender;
-    private CertRepository certRepository;
-    private UserRepository userRepository;
+    private final JavaMailSender emailSender;
+    private final CertRepository certRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public JSONObject sendMail(MailDto mailDto) {

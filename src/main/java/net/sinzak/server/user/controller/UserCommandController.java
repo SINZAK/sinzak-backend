@@ -5,18 +5,47 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
 import net.sinzak.server.config.auth.LoginUser;
+import net.sinzak.server.config.auth.SecurityService;
 import net.sinzak.server.config.auth.dto.SessionUser;
+import net.sinzak.server.config.auth.jwt.TokenDto;
+import net.sinzak.server.config.auth.jwt.TokenRequestDto;
+import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.dto.request.UpdateUserDto;
-import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.user.service.UserCommandService;
 import org.json.simple.JSONObject;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
 public class UserCommandController {
     private final UserCommandService userCommandService;
+    private final SecurityService securityService;
+
+
+    @ApiOperation(value = "마이페이지", notes = "아이디, 이름, 전화번호")
+    @PostMapping("/mypage")
+    public User myPage(@AuthenticationPrincipal User user) {
+        System.out.println(user.getId());
+        System.out.println(user.getUsername());
+        return user;
+    }
+
+    @ApiOperation(value = "로그인", notes = "성공시 jwt 토큰을 헤더에 넣어서 반환합니다.")
+    @PostMapping("/login")
+    public TokenDto login(@RequestBody Map<String, String> user) {
+        return securityService.login(user);
+    }
+
+    @ApiOperation(value = "토큰 만료시 재발급, access,refresh 둘 다 보내주세요")
+    @PostMapping("/reissue")
+    public TokenDto reissue(@RequestBody TokenRequestDto tokenRequestDto) {
+        return securityService.reissue(tokenRequestDto);
+    }
 
     @ApiOperation(value = "유저 정보변경", notes = "이름,한줄 소개, 학교(보류) ")
     @PostMapping(value = "/users/edit")
