@@ -115,7 +115,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     private List<String> roles = new ArrayList<>();
 
     @Builder
-    public User(String name, String email, String picture, String origin, Role role) {
+    public User(String name, String email, String picture, String origin, Role role) { //Collections.singletonList("ROLE_USER")로 후에 바꿔야됌
         this.email = email;
         this.picture = picture;
         this.origin = origin;
