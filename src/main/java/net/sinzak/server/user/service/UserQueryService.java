@@ -1,11 +1,14 @@
 package net.sinzak.server.user.service;
 
 import lombok.RequiredArgsConstructor;
+import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.user.dto.respond.GetFollowDto;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.repository.UserRepository;
+import org.hibernate.metamodel.model.convert.spi.JpaAttributeConverter;
 import org.json.simple.JSONObject;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -28,16 +31,15 @@ public class UserQueryService {
 //    }
 
     public JSONObject getUserProfile(Long otherUserId, SessionUser user) {
-        JSONObject object = new JSONObject();
         Optional<User> User = userRepository.findByEmail(user.getEmail());
         Optional<User> findUser = userRepository.findById(otherUserId);
-        boolean usersPresent = checkIfTwoUserPresent(User,findUser);
-        object.put("success",usersPresent);
-        if(usersPresent){
-            refreshFollowNumber(findUser);
-            putUserInformation(object, findUser);
-            object.put("myProfile",checkIfMyProfile(User,findUser));
-        }
+        return checkIfTwoUserPresent(User,findUser);
+    }
+    private JSONObject makeJson(Optional<User> User, Optional<User> findUser) {
+        JSONObject object = new JSONObject();
+        refreshFollowNumber(findUser);
+        putUserInformation(object, findUser);
+        object.put("myProfile",checkIfMyProfile(User, findUser));
         return object;
     }
     public void putUserInformation(JSONObject object, Optional<User> findUser) {
@@ -111,11 +113,14 @@ public class UserQueryService {
         }
         return false;
     }
-    public boolean checkIfTwoUserPresent(Optional<User> User,Optional<User> findUser){
-        if(User.isPresent()&&findUser.isPresent()){
-            return true;
+    public JSONObject checkIfTwoUserPresent(Optional<User> User,Optional<User> findUser){
+        if(!User.isPresent()){
+            return PropertyUtil.responseMessage("로그인한 유저가 존재하지 않음");
         }
-        return false;
+        if(!findUser.isPresent()){
+            return PropertyUtil.responseMessage("찾는 유저가 존재하지 않음");
+        }
+        return makeJson(User,findUser);
     }
 
 }
