@@ -9,6 +9,7 @@ import net.sinzak.server.product.ProductSell;
 import net.sinzak.server.product.ProductWish;
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.product.dto.SellDto;
+import net.sinzak.server.product.dto.ShowForm;
 import net.sinzak.server.product.repository.LikesRepository;
 import net.sinzak.server.product.repository.ProductSellRepository;
 import net.sinzak.server.product.repository.ProductWishRepository;
@@ -24,8 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -38,14 +39,14 @@ public class ProductService {
     private final LikesRepository likesRepository;
 
     @Transactional
-    public JSONObject makePost(SessionUser tempUser, ProductPostDto productPost){
+    public JSONObject makePost(SessionUser tempUser, ProductPostDto productPost){   // 글 생성
         User user = userRepository.findByEmailFetchPP(tempUser.getEmail()).orElseThrow();
                             /** 존재 하지 않는 유저면 NullPointer 에러 뜰거고, 핸들러가 처리 할 예정 **/
         Product product = Product.builder()
                     .title(productPost.getTitle())  //제목
                     .content(productPost.getContent()) //내용
                     .category(productPost.getCategory())
-                    .userName(user.getNickName()) //닉네임
+                    .author(user.getNickName()) //닉네임
                     .univ(user.getUniv()) // 대학
                     .price(productPost.getPrice()) // 페이
                     .suggest(productPost.isSuggest()) //가격제안여부
@@ -147,11 +148,101 @@ public class ProductService {
     }
 
     @Transactional
-    public JSONObject sell(SessionUser tempUser, @RequestBody SellDto dto){   // 좋아요
+    public JSONObject sell(SessionUser tempUser, @RequestBody SellDto dto){   // 판매완료시
         User user = userRepository.findByEmailFetchPS(tempUser.getEmail()).orElseThrow();
         Product product = productRepository.findById(dto.getProductId()).orElseThrow();
         ProductSell connect = ProductSell.createConnect(product, user);
         productSellRepository.save(connect);
         return PropertyUtil.response(true);
+    }
+
+    @Transactional
+    public JSONObject showHome(User User){
+        JSONObject obj = new JSONObject();
+
+        User user = userRepository.findByEmailFetchFLandLL(User.getEmail()).orElseThrow();
+        List<Likes> userLikesList = user.getLikesList();  /** 유저 좋아요 목록 **/
+        List<Product> productList = productRepository.findAll();
+        List<ShowForm> newList = getNewList(userLikesList, productList);
+        obj.put("new",newList);
+
+        List<ShowForm> recommendList = getRecommendList(user, userLikesList, productList);  /** 추천목록 **/
+        obj.put("recommend",recommendList);
+
+        Set<Long> followingIdList = user.getFollowingList();  /** 팔로잉 관련 **/
+        List<ShowForm> followingList = getFollowingList(userLikesList, productList, followingIdList);
+        obj.put("following",followingList);
+
+        return obj;
+    }
+
+    private List<ShowForm> getNewList(List<Likes> userLikesList, List<Product> productList) {
+        List<ShowForm> newList = new ArrayList<>();
+        for (int i = 0; i < productList.size(); i++) {
+            if(i==3)
+                break;  /** 홈화면이니까 3개까지만 가져오자 **/
+            boolean isLike = false;
+            for (Likes likes : userLikesList) {
+                if (likes.getProduct().getId().equals(productList.get(i).getId())) {
+                    isLike = true;
+                    break;
+                }
+            }
+            ShowForm showForm = new ShowForm(productList.get(i).getId(), productList.get(i).getTitle(), productList.get(i).getContent(), productList.get(i).getAuthor(), productList.get(i).getPrice(), productList.get(i).getLikesCnt(), productList.get(i).getPhoto(), productList.get(i).getCreatedDate().toString(), productList.get(i).isSuggest(), isLike);
+            newList.add(showForm);
+        }
+        return newList;
+    }
+
+
+    private List<ShowForm> getFollowingList(List<Likes> userLikesList, List<Product> productList, Set<Long> followingIdList) {
+        List<Product> followingProductList = new ArrayList<>();
+        for (Long followingId : followingIdList) {
+            for (Product product : productList) {
+                if(product.getUser().getId().equals(followingId)){
+                    followingProductList.add(product);
+                }
+            }
+        }
+        followingProductList.sort((o1, o2) -> (int) (o2.getId() - o1.getId()));  //내림차순 정렬
+        List<ShowForm> followingList = new ArrayList<>();
+        for (Product product : followingProductList) {
+            boolean isLike = false;
+            for (Likes likes : userLikesList) {
+                if(likes.getProduct().getId().equals(product.getId())){
+                    isLike = true;
+                    break;
+                }
+            }
+            ShowForm showForm = new ShowForm(product.getId(), product.getTitle(), product.getContent(), product.getAuthor(), product.getPrice(), product.getLikesCnt(),product.getPhoto(),product.getCreatedDate().toString(),product.isSuggest(),isLike);
+            followingList.add(showForm);
+        }
+        return followingList;
+    }
+
+    private List<ShowForm> getRecommendList(User user, List<Likes> userLikesList, List<Product> productList) {
+        List<Product> tempRecommendList; /** 카테고리 관련 **/
+        String[] categories = user.getCategoryLike().split(",");
+        if(categories.length == 1)
+            tempRecommendList = productRepository.find1CategoryRecommend(categories[0]);
+        else if(categories.length == 2)
+            tempRecommendList = productRepository.find2CategoryRecommend(categories[0],categories[1]);
+        else if(categories.length == 3)
+            tempRecommendList = productRepository.find3CategoryRecommend(categories[0],categories[1],categories[2]);
+        else
+            tempRecommendList = productList;
+        List<ShowForm> recommendList = new ArrayList<>();
+        for (Product product : tempRecommendList) { /** 추천 목록 중 좋아요 누른거 체크 후 ShowForm 으로 담기 **/
+            boolean isLike = false;
+            for (Likes likes : userLikesList) {
+                if(likes.getProduct().getId().equals(product.getId())){
+                    isLike = true;
+                    break;
+                }
+            }
+            ShowForm showForm = new ShowForm(product.getId(), product.getTitle(), product.getContent(), product.getAuthor(), product.getPrice(), product.getLikesCnt(),product.getPhoto(),product.getCreatedDate().toString(),product.isSuggest(),isLike);
+            recommendList.add(showForm);
+        }
+        return recommendList;
     }
 }

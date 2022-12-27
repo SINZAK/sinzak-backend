@@ -2,6 +2,7 @@ package net.sinzak.server.product;
 
 import lombok.Builder;
 import lombok.Getter;
+import net.sinzak.server.BaseTimeEntity;
 import net.sinzak.server.user.domain.embed.Size;
 import net.sinzak.server.user.domain.User;
 
@@ -12,7 +13,7 @@ import java.util.List;
 @Getter
 @Entity
 @SequenceGenerator(name = "Product_SEQ_GEN",sequenceName = "Product_SEQ")
-public class Product { /** 작품 **/
+public class Product extends BaseTimeEntity { /** 작품 **/
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Product_SEQ")
@@ -26,7 +27,7 @@ public class Product { /** 작품 **/
     private String content;
 
     @Column
-    private String userName; //닉네임
+    private String author; //닉네임
 
     @Column
     private int price;
@@ -72,13 +73,13 @@ public class Product { /** 작품 **/
     private List<ProductWish> productWishList = new ArrayList<>();  //프로젝트-회원 엮여있는 리스트  스크랩!!!!
 
     @Builder
-    public Product(String title, String content, String category, int price, boolean suggest, String userName, String univ, String field, String photo, Size size) {
+    public Product(String title, String content, String category, int price, boolean suggest, String author, String univ, String field, String photo, Size size) {
         this.title = title;
         this.content = content;
         this.category = category;
         this.price = price;
         this.suggest = suggest;
-        this.userName = userName;
+        this.author = author;
         this.univ = univ;
         this.field = field;
         this.photo = photo;
