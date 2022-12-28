@@ -1,5 +1,7 @@
 package net.sinzak.server.product.controller;
 
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.config.auth.LoginUser;
@@ -11,6 +13,8 @@ import net.sinzak.server.product.dto.ProductPostDto;
 import net.sinzak.server.common.dto.WishForm;
 import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -63,6 +67,23 @@ public class ProductController {
     @PostMapping("/home/following")
     public List<ShowForm> showFollowingDetail(@ApiIgnore @AuthenticationPrincipal User user) {
         return productService.showFollowingDetail(user);
+    }
+
+    @ApiOperation(value = "마켓 작품")
+    @PostMapping("/market/products")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
+                    value = "파라미터 형식으로 전달해주세요 (0..N) ex) http://localhost:8080/market/products?page=3&size=5", defaultValue = "0"),
+            @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+                    value = "Number of records per page.", defaultValue = "5")
+    })
+    public PageImpl<ShowForm> showMarketProduct(@AuthenticationPrincipal User user, @RequestParam(required=false, defaultValue="") List<String> stacks, @ApiIgnore Pageable pageable) {
+        try{
+            return productService.productListForUser(user, stacks, pageable);
+        }
+        catch (NullPointerException e){
+            return productService.productListForGuest(stacks,pageable);
+        }
     }
 
 //    @ExceptionHandler(NullPointerException.class)

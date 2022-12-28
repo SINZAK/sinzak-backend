@@ -6,6 +6,7 @@ import com.google.common.base.Predicates;
 import net.sinzak.server.config.auth.LoginUser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -55,7 +56,7 @@ public class SwaggerConfig {
     public Docket getDocket(String groupName, Predicate<String> predicate) {
         return new Docket(DocumentationType.SWAGGER_2)
                 .useDefaultResponseMessages(false)
-                .ignoredParameterTypes(LoginUser.class)
+                .ignoredParameterTypes(AuthenticationPrincipal.class)
                 .groupName(groupName)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("net.sinzak.server"))
