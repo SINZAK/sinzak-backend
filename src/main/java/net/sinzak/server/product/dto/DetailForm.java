@@ -1,13 +1,13 @@
 package net.sinzak.server.product.dto;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 import lombok.Getter;
-import net.sinzak.server.user.domain.embed.Size;
-
-import javax.persistence.*;
 
 @Getter
-public class ShowForm {
+@Builder
+public class DetailForm {
+
     @ApiModelProperty(example = "작품 ID")
     private Long id;
     @ApiModelProperty(example = "작품 판매글 제목")
@@ -28,20 +28,15 @@ public class ShowForm {
     private boolean isLike;
     @ApiModelProperty(example = "좋아요 수",notes = "true -> 누른 사람")
     private int likesCnt;
+    @ApiModelProperty(example = "찜 누른 사람인지 여부",notes = "true -> 누른 사람")
+    private boolean isWish;
     @ApiModelProperty(example = "판매완료 여부",notes = "true -> 판매완료")
     private boolean complete;
 
-    public ShowForm(Long id, String title, String content, String author, int price, String photo, String date, boolean suggest, boolean isLike, int likesCnt, boolean complete) {
-        this.id = id;
-        this.title = title;
-        this.content = content;
-        this.author = author;
-        this.price = price;
-        this.photo = photo;
-        this.date = date;
-        this.suggest = suggest;
-        this.isLike = isLike;
-        this.likesCnt = likesCnt;
-        this.complete = complete;
+
+    public void setLikeAndWish(boolean like, boolean wish) {
+        isLike = like;
+        isWish = wish;
     }
+
 }

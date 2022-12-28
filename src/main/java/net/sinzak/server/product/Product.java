@@ -70,7 +70,7 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     private User user;  //수취인
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
-    private List<ProductWish> productWishList = new ArrayList<>();  //프로젝트-회원 엮여있는 리스트  스크랩!!!!
+    private List<ProductWish> productWishList = new ArrayList<>();  //찜
 
     @Builder
     public Product(String title, String content, String category, int price, boolean suggest, String author, String univ, String field, String photo, Size size) {
