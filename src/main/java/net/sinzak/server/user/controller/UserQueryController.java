@@ -25,9 +25,15 @@ import java.util.List;
 public class UserQueryController {
     private final UserQueryService userQueryService;
 
+    @ApiOperation(value ="내 프로필 보기")
+    @GetMapping(value ="users/myProfile")
+    public UserDto getMyProfile(@ApiIgnore @AuthenticationPrincipal User user){
+        return userQueryService.getMyProfile(user);
+    }
+
     @ApiOperation(value ="유저 프로필 보기")
     @GetMapping(value ="/users/{userId}/")
-    public UserDto getUser( @PathVariable("userId") Long userId,@ApiIgnore @AuthenticationPrincipal User user){
+    public UserDto getUserProfile(@PathVariable("userId") Long userId, @ApiIgnore @AuthenticationPrincipal User user){
         UserDto userDto = userQueryService.getUserProfile(userId, user);
         return userDto;
     }
@@ -46,8 +52,6 @@ public class UserQueryController {
                 userQueryService.getFollowingDtoList(userId);
         return getFollowDtos;
     }
-
-
     //    @ApiOperation(value ="팔로워리스트")
 //    @GetMapping(value ="/users/{userId}/followers")
 //    public List<GetFollowDto> getFollowerList2(@PathVariable("userId") Long userId) {
