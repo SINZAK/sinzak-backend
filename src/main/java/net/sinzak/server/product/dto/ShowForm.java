@@ -13,11 +13,11 @@ public class ShowForm {
     private String content;
     @ApiModelProperty(example = "작가명")
     private String author;
-    @ApiModelProperty(example = "작품 가격")
+    @ApiModelProperty(value = "작품 가격",example ="1")
     private int price;
-    @ApiModelProperty(example = "좋아요 수")
+    @ApiModelProperty(value = "좋아요 수",example ="1")
     private int likes;
-    @ApiModelProperty(example = "작품 대표 사진")
+    @ApiModelProperty(value = "작품 대표 사진",example ="1")
     private String photo;
     @ApiModelProperty(example = "작품 게시일자")
     private String date;
