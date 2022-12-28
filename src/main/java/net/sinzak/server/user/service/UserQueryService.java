@@ -2,6 +2,7 @@ package net.sinzak.server.user.service;
 
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.user.dto.respond.GetFollowDto;
 import net.sinzak.server.user.domain.User;
@@ -32,7 +33,7 @@ public class UserQueryService {
     @Transactional
     public UserDto getMyProfile(User user){
         if(user ==null){
-            throw new IllegalArgumentException("로그인한 유저 존재하지 않음");
+            throw new UserNotFoundException("로그인한 유저 존재하지 않음");
         }
         Optional<User> findUser = userRepository.findById(user.getId());
         return makeUserDto(user,findUser);
@@ -44,7 +45,7 @@ public class UserQueryService {
     }
     public UserDto checkIfTwoUserPresent(User user,Optional<User> findUser){
         if(!findUser.isPresent()){
-            throw new IllegalArgumentException("찾는 유저가 존재하지 않음");
+            throw new UserNotFoundException();
         }
         return makeUserDto(user,findUser);
     }
