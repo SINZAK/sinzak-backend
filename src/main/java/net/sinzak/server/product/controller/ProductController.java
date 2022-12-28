@@ -14,7 +14,6 @@ import net.sinzak.server.product.dto.ProductPostDto;
 import net.sinzak.server.common.dto.WishForm;
 import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -48,25 +47,25 @@ public class ProductController {
 
     @PostMapping("/products/wish")
     @ApiOperation(value = "작품 찜")
-    public JSONObject wish(@LoginUser SessionUser user, @RequestBody WishForm form) {
+    public JSONObject wish(@AuthenticationPrincipal User user, @RequestBody WishForm form) {
         return productService.wish(user, form);
     }
 
     @PostMapping("/products/likes")
     @ApiOperation(value = "작품 좋아요")
-    public JSONObject likes(@LoginUser SessionUser user, @RequestBody WishForm form) {
+    public JSONObject likes(@AuthenticationPrincipal User user, @RequestBody WishForm form) {
         return productService.likes(user, form);
     }
 
     @PostMapping("/products/sell")
     @ApiOperation(value = "작품 판매", notes = "회원의 구매목록에 추가, 해당 작품 판매완료 설정")
-    public JSONObject sell(@LoginUser SessionUser user, @RequestBody SellDto dto) {
+    public JSONObject sell(@AuthenticationPrincipal User user, @RequestBody SellDto dto) {
         return productService.sell(user, dto);
     }
 
     @ApiOperation(value = "작품 홈")
     @PostMapping("/home/products")
-    public JSONObject showHomeProduct(@ApiIgnore @AuthenticationPrincipal User user) {
+    public JSONObject showHomeProduct(@AuthenticationPrincipal User user) {
         try {
             return productService.showHome(user);
         }
@@ -77,13 +76,13 @@ public class ProductController {
 
     @ApiOperation(value = "작품 추천 상세페이지")
     @PostMapping("/home/recommend")
-    public List<ShowForm> showRecommendDetail(@ApiIgnore @AuthenticationPrincipal User user) {
+    public List<ShowForm> showRecommendDetail(@AuthenticationPrincipal User user) {
         return productService.showRecommendDetail(user);
     }
 
     @ApiOperation(value = "작품 추천 상세페이지")
     @PostMapping("/home/following")
-    public List<ShowForm> showFollowingDetail(@ApiIgnore @AuthenticationPrincipal User user) {
+    public List<ShowForm> showFollowingDetail(@AuthenticationPrincipal User user) {
         return productService.showFollowingDetail(user);
     }
 

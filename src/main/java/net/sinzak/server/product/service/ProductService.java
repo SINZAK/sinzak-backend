@@ -26,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -122,9 +123,9 @@ public class ProductService {
     }
 
     @Transactional
-    public JSONObject wish(SessionUser tempUser, @RequestBody WishForm form){   // 찜
+    public JSONObject wish(User User, @RequestBody WishForm form){   // 찜
         JSONObject obj = new JSONObject();
-        User user = userRepository.findByEmailFetchPW(tempUser.getEmail()).orElseThrow(); // 작품 찜까지 페치 조인
+        User user = userRepository.findByEmailFetchPW(User.getEmail()).orElseThrow(); // 작품 찜까지 페치 조인
         List<ProductWish> wishList = user.getProductWishList(); //wishList == 유저의 찜 리스트
         boolean isWish=false;
         Optional<Product> Product = productRepository.findById(form.getId());
@@ -166,9 +167,9 @@ public class ProductService {
     }
 
     @Transactional
-    public JSONObject likes(SessionUser tempUser, @RequestBody WishForm form){   // 좋아요
+    public JSONObject likes(User User, @RequestBody WishForm form){   // 좋아요
         JSONObject obj = new JSONObject();
-        User user = userRepository.findByEmailFetchLL(tempUser.getEmail()).orElseThrow(); // 작품 좋아요까지 페치 조인
+        User user = userRepository.findByEmailFetchLL(User.getEmail()).orElseThrow(); // 작품 좋아요까지 페치 조인
         List<Likes> likesList = user.getLikesList(); //likesList == 유저의 좋아요 리스트
         boolean isLike=false;
         Optional<Product> Product = productRepository.findById(form.getId());
@@ -210,8 +211,8 @@ public class ProductService {
     }
 
     @Transactional
-    public JSONObject sell(SessionUser tempUser, @RequestBody SellDto dto){   // 판매완료시
-        User user = userRepository.findByEmailFetchPS(tempUser.getEmail()).orElseThrow();
+    public JSONObject sell(User User, @RequestBody SellDto dto){   // 판매완료시
+        User user = userRepository.findByEmailFetchPS(User.getEmail()).orElseThrow();
         Product product = productRepository.findById(dto.getProductId()).orElseThrow();
         ProductSell connect = ProductSell.createConnect(product, user);
         productSellRepository.save(connect);
