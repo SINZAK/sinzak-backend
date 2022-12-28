@@ -48,17 +48,17 @@ public class UserCommandController {
 
     @ApiOperation(value = "유저 정보변경", notes = "이름,한줄 소개, 학교(보류) ")
     @PostMapping(value = "/users/edit")
-    public JSONObject updateUser( @RequestBody UpdateUserDto dto , @ApiIgnore @LoginUser SessionUser user) {
+    public JSONObject updateUser( @RequestBody UpdateUserDto dto , @ApiIgnore @AuthenticationPrincipal User user) {
         return userCommandService.updateUser(dto,user);
     }
     @ApiOperation(value = "팔로우하기")
     @PostMapping(value = "/users/{userId}/follow")
-    public JSONObject followUser(@PathVariable("userId") Long userId,@ApiIgnore @LoginUser SessionUser user){
+    public JSONObject followUser(@PathVariable("userId") Long userId,@ApiIgnore @AuthenticationPrincipal User user){
         return userCommandService.follow(userId,user);
     }
     @ApiOperation(value = "언팔로우하기")
     @PostMapping(value = "/users/{userId}/unfollow")
-    public JSONObject unFollowUser(@PathVariable("userId") Long userId,@ApiIgnore @LoginUser SessionUser user){
+    public JSONObject unFollowUser(@PathVariable("userId") Long userId,@ApiIgnore @AuthenticationPrincipal User user){
         return userCommandService.unFollow(userId,user);
     }
 
