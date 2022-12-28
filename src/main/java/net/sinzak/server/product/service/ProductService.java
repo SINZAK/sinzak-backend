@@ -20,6 +20,9 @@ import net.sinzak.server.product.dto.ProductPostDto;
 import net.sinzak.server.common.dto.WishForm;
 import net.sinzak.server.user.repository.UserRepository;
 import org.json.simple.JSONObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -227,32 +230,6 @@ public class ProductService {
         return recommendList;
     }
 
-//    private List<ShowForm> getRecommendDetailList(User user, List<Likes> userLikesList, List<Product> productList) {
-//        List<Product> tempRecommendList; /** 카테고리 관련 **/
-//        String[] categories = user.getCategoryLike().split(",");
-//        if(categories.length == 1)
-//            tempRecommendList = productRepository.find1RecommendDetail50(categories[0]);
-//        else if(categories.length == 2)
-//            tempRecommendList = productRepository.find2RecommendDetail50(categories[0],categories[1]);
-//        else if(categories.length == 3)
-//            tempRecommendList = productRepository.find3RecommendDetail50(categories[0],categories[1],categories[2]);
-//        else
-//            tempRecommendList = productList;
-//        List<ShowForm> recommendList = new ArrayList<>();
-//        for (Product product : tempRecommendList) { /** 추천 목록 중 좋아요 누른거 체크 후 ShowForm 으로 담기 **/
-//            boolean isLike = false;
-//            for (Likes likes : userLikesList) {
-//                if(likes.getProduct().getId().equals(product.getId())){
-//                    isLike = true;
-//                    break;
-//                }
-//            }
-//            ShowForm showForm = new ShowForm(product.getId(), product.getTitle(), product.getContent(), product.getAuthor(), product.getPrice(), product.getLikesCnt(),product.getPhoto(),product.getCreatedDate().toString(),product.isSuggest(),isLike);
-//            recommendList.add(showForm);
-//        }
-//        return recommendList;
-//    }
-
     private List<ShowForm> getNewList(List<Likes> userLikesList, List<Product> productList) {
         List<ShowForm> newList = new ArrayList<>();
         for (int i = 0; i < productList.size(); i++) {
@@ -299,5 +276,55 @@ public class ProductService {
 
         return followingList;
     }
+
+    public PageImpl<ShowForm> productListForUser(User user, List<String> categories, Pageable pageable){
+        Page<Product> productList;
+        List<Likes> userLikesList = user.getLikesList();
+        if(categories.size()==0)
+            productList = productRepository.findAll(pageable);
+        else
+            productList = filter(categories, pageable);  //파라미터 입력받았을 경우
+        List<ShowForm> showList = new ArrayList<>();
+        for (Product product : productList.getContent()) {
+            boolean isLike = false;
+            for (Likes likes : userLikesList) {
+                if(likes.getProduct().getId().equals(product.getId())){
+                    isLike = true;
+                    break;
+                }
+            }
+            ShowForm showForm = new ShowForm(product.getId(), product.getTitle(), product.getContent(), product.getAuthor(), product.getPrice(), product.getLikesCnt(),product.getPhoto(),product.getCreatedDate().toString(),product.isSuggest(),isLike);
+            showList.add(showForm);
+        }
+        return new PageImpl<>(showList, pageable, productList.getTotalElements());
+    }
+
+    public PageImpl<ShowForm> productListForGuest(List<String> stacks, Pageable pageable){
+        Page<Product> projectList;
+        if(stacks.size()==0)
+            projectList = productRepository.findAll(pageable);
+        else
+            projectList = filter(stacks, pageable);  //파라미터 입력받았을 경우
+        List<ShowForm> showList = new ArrayList<>();
+
+        for (Product product : projectList.getContent()) {
+            ShowForm showForm = new ShowForm(product.getId(), product.getTitle(), product.getContent(), product.getAuthor(), product.getPrice(), product.getLikesCnt(),product.getPhoto(),product.getCreatedDate().toString(),product.isSuggest(),false);
+            showList.add(showForm);
+        }
+        return new PageImpl<>(showList, pageable, projectList.getTotalElements());
+    }
+
+    private Page<Product> filter(List<String> categories, Pageable pageable) {
+        if (categories.size() == 1)
+            return productRepository.findBy1StacksDesc(pageable, categories.get(0));
+        else if (categories.size() == 2)
+            return productRepository.findBy2StacksDesc(pageable, categories.get(0), categories.get(1));
+        else if (categories.size() == 3)
+            return productRepository.findBy3StacksDesc(pageable, categories.get(0), categories.get(1), categories.get(2));
+        else
+            return productRepository.findAll(pageable);
+    }
+
+
 
 }
