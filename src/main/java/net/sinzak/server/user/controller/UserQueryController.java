@@ -23,29 +23,25 @@ public class UserQueryController {
     private final UserQueryService userQueryService;
 
     @ApiOperation(value ="유저 프로필 보기")
-    @GetMapping(value ="/users/{userId}")
+    @GetMapping(value ="/users/{userId}/")
     public JSONObject getUser( @PathVariable("userId") Long userId,@ApiIgnore @LoginUser SessionUser user){
         JSONObject jsonObject = userQueryService.getUserProfile(userId, user);
         return jsonObject;
     }
     @ApiOperation(value ="팔로워리스트")
     @GetMapping(value ="/users/{userId}/followers")
-    public ResponseEntity getFollowerList( @PathVariable("userId") Long userId) {
-        List<GetFollowDto> getFollowDtoList =
+    public List<GetFollowDto> getFollowerList( @PathVariable("userId") Long userId) {
+        List<GetFollowDto> getFollowDtos =
                userQueryService.getFollowerDtoList(userId);
-        return ResponseEntity.status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(getFollowDtoList);
+        return getFollowDtos;
     }
 
     @ApiOperation(value ="팔로잉리스트")
     @GetMapping(value ="/users/{userId}/followings")
-    public ResponseEntity getFollowingList(@PathVariable("userId") Long userId) {
-        List<GetFollowDto> getFollowDtoList =
+    public List<GetFollowDto> getFollowingList(@PathVariable("userId") Long userId) {
+        List<GetFollowDto> getFollowDtos =
                 userQueryService.getFollowingDtoList(userId);
-        return ResponseEntity.status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(getFollowDtoList);
+        return getFollowDtos;
     }
 
 
