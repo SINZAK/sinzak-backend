@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 public class UserDto {
+    private Long userId;
     private boolean myProfile;
     private String name;
     private String introduction;
