@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import net.sinzak.server.config.auth.LoginUser;
 import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.product.dto.SellDto;
+import net.sinzak.server.product.dto.ShowForm;
 import net.sinzak.server.product.service.ProductService;
 import net.sinzak.server.product.dto.ProductPostDto;
 import net.sinzak.server.common.dto.WishForm;
@@ -12,6 +13,9 @@ import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -45,8 +49,20 @@ public class ProductController {
 
     @ApiOperation(value = "작품 홈")
     @PostMapping("/home/products")
-    public JSONObject showHomeProduct(@AuthenticationPrincipal User user) {
+    public JSONObject showHomeProduct(@ApiIgnore @AuthenticationPrincipal User user) {
         return productService.showHome(user);
+    }
+
+    @ApiOperation(value = "작품 추천 상세페이지")
+    @PostMapping("/home/recommend")
+    public List<ShowForm> showRecommendDetail(@ApiIgnore @AuthenticationPrincipal User user) {
+        return productService.showRecommendDetail(user);
+    }
+
+    @ApiOperation(value = "작품 추천 상세페이지")
+    @PostMapping("/home/following")
+    public List<ShowForm> showFollowingDetail(@ApiIgnore @AuthenticationPrincipal User user) {
+        return productService.showFollowingDetail(user);
     }
 
 //    @ExceptionHandler(NullPointerException.class)
