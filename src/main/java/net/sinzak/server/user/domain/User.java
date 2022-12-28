@@ -122,12 +122,14 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.role = role;
         this.name = name;
         this.nickName = name;
+        this.categoryLike = "";
     }
 
     public User(String email, String name, String picture) {
         this.email = email;
         this.name = name;
         this.picture = picture;
+        this.categoryLike = "";
     }
 
     public void updateFollowNumber(String followingNumber,String followerNumber){
