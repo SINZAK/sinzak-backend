@@ -1,6 +1,7 @@
 package net.sinzak.server.product.repository;
 
 import net.sinzak.server.product.Product;
+import net.sinzak.server.user.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,8 +22,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("select p from Product p order by p.id desc")
     Page<Product> findAll(Pageable pageable);
 
-    @Query(value = "select * from product as p order by p.product_id desc limit 3",nativeQuery = true)
-    List<Product> findTop3Desc();
+    @Query("select p from Product p left join fetch p.productWishList where p.id = :id")
+    Optional<Product> findByEmailFetchPW(@Param("id")Long id);   /** 해당 작품 찜을 누른 유저 목록까지 불러오기 **/
 
     @Query(value = "select * from product as p where p.category like %:category1% order by p.product_id desc limit :count", nativeQuery = true)
     List<Product> find1Recommend3(@Param("category1") String category1, @Param("count") int count);

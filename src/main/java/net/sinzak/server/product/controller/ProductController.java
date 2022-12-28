@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.config.auth.LoginUser;
 import net.sinzak.server.config.auth.dto.SessionUser;
+import net.sinzak.server.product.dto.DetailForm;
 import net.sinzak.server.product.dto.SellDto;
 import net.sinzak.server.product.dto.ShowForm;
 import net.sinzak.server.product.service.ProductService;
@@ -13,6 +14,7 @@ import net.sinzak.server.product.dto.ProductPostDto;
 import net.sinzak.server.common.dto.WishForm;
 import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -31,6 +33,17 @@ public class ProductController {
     @PostMapping("/products/build")
     public JSONObject makeProductPost(@LoginUser SessionUser user, /*@RequestBody*/ProductPostDto postDto) {
         return productService.makePost(user, postDto); //해당 유저의 작품 글 리스트까지 fetch해서 가져오기.
+    }
+
+    @PostMapping("/products/{id}")
+    @ApiOperation(value = "작품 상세 조회")
+    public DetailForm showProject(@PathVariable Long id, @AuthenticationPrincipal User user) {
+        try{
+            return productService.showDetail(id,user);
+        }
+        catch (NullPointerException e){
+            return productService.showDetail(id);
+        }
     }
 
     @PostMapping("/products/wish")
@@ -54,7 +67,12 @@ public class ProductController {
     @ApiOperation(value = "작품 홈")
     @PostMapping("/home/products")
     public JSONObject showHomeProduct(@ApiIgnore @AuthenticationPrincipal User user) {
-        return productService.showHome(user);
+        try {
+            return productService.showHome(user);
+        }
+        catch (NullPointerException e) {
+            return productService.showHome();
+        }
     }
 
     @ApiOperation(value = "작품 추천 상세페이지")

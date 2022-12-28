@@ -1,5 +1,6 @@
 package net.sinzak.server.product.service;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.config.auth.dto.SessionUser;
@@ -8,6 +9,7 @@ import net.sinzak.server.product.Product;
 import net.sinzak.server.product.ProductSell;
 import net.sinzak.server.product.ProductWish;
 import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.product.dto.DetailForm;
 import net.sinzak.server.product.dto.SellDto;
 import net.sinzak.server.product.dto.ShowForm;
 import net.sinzak.server.product.repository.LikesRepository;
@@ -59,6 +61,64 @@ public class ProductService {
         product.setUser(user); // user 연결 및, user의 외주 글 리스트에 글 추가
         productRepository.save(product);
         return PropertyUtil.response(true);
+    }
+
+    @Transactional(readOnly = true)
+    public DetailForm showDetail(Long id, User User){   // 글 생성
+        User user = userRepository.findByEmailFetchLL(User.getEmail()).orElseThrow();
+        List<Likes> userLikesList = user.getLikesList();  /** 유저가 좋아요 누른 작품 목록 **/
+        Product product = productRepository.findByEmailFetchPW(id).orElseThrow();
+        List<ProductWish> productWishList = product.getProductWishList();  /** 작품 찜 누른 사람 목록 **/
+        DetailForm detailForm = DetailForm.builder()
+                .id(product.getId())
+                .content(product.getContent())
+                .title(product.getTitle())
+                .author(product.getAuthor())
+                .price(product.getPrice())
+                .photo(product.getPhoto())
+                .date(product.getPhoto())
+                .suggest(product.isSuggest())
+                .likesCnt(product.getLikesCnt())
+                .complete(product.isComplete())
+                .build();
+
+        boolean isLike = false;
+        for (Likes likes : userLikesList) {
+            if(likes.getProduct().getId().equals(product.getId())){
+                isLike = true;
+                break;
+            }
+        }
+        boolean isWish = false;
+        for (ProductWish productWish : productWishList) {
+            if(productWish.getUser().getId().equals(user.getId())){
+                isWish = true;
+                break;
+            }
+        }
+        detailForm.setLikeAndWish(isLike,isWish);
+
+        return detailForm;
+    }
+
+    @Transactional(readOnly = true)
+    public DetailForm showDetail(Long id){   // 글 생성
+        Product product = productRepository.findByEmailFetchPW(id).orElseThrow();
+        DetailForm detailForm = DetailForm.builder()
+                .id(product.getId())
+                .content(product.getContent())
+                .title(product.getTitle())
+                .author(product.getAuthor())
+                .price(product.getPrice())
+                .photo(product.getPhoto())
+                .date(product.getPhoto())
+                .suggest(product.isSuggest())
+                .likesCnt(product.getLikesCnt())
+                .complete(product.isComplete())
+                .build();
+        detailForm.setLikeAndWish(false,false);
+
+        return detailForm;
     }
 
     @Transactional
@@ -180,6 +240,29 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
+    public JSONObject showHome(){  /**비회원 시 recommend 를 어떻게할지? **/
+        JSONObject obj = new JSONObject();
+
+        List<Product> productList = productRepository.findAll();
+        List<ShowForm> newList = new ArrayList<>();  /** 신작3개 **/
+        for (int i = 0; i < productList.size(); i++) {
+            if(i==3)
+                break;  /** 홈화면이니까 3개까지만 가져오자 **/
+            ShowForm showForm = new ShowForm(productList.get(i).getId(), productList.get(i).getTitle(), productList.get(i).getContent(), productList.get(i).getAuthor(), productList.get(i).getPrice(), productList.get(i).getPhoto(), productList.get(i).getCreatedDate().toString(), productList.get(i).isSuggest(), false, productList.get(i).getLikesCnt(), productList.get(i).isComplete());;
+            newList.add(showForm);
+        }
+        obj.put("new",newList);
+
+        List<ShowForm> recommendList = newList;
+        obj.put("recommend",recommendList);
+
+        List<ShowForm> followingList = newList;
+        obj.put("following",followingList);
+
+        return obj;
+    }
+
+    @Transactional(readOnly = true)
     public List<ShowForm> showRecommendDetail(User User){
         User user = userRepository.findByEmailFetchLL(User.getEmail()).orElseThrow();
         List<Likes> userLikesList = user.getLikesList();  /** 유저 좋아요 목록 **/
@@ -224,7 +307,7 @@ public class ProductService {
                     break;
                 }
             }
-            ShowForm showForm = new ShowForm(product.getId(), product.getTitle(), product.getContent(), product.getAuthor(), product.getPrice(), product.getLikesCnt(),product.getPhoto(),product.getCreatedDate().toString(),product.isSuggest(),isLike);
+            ShowForm showForm = new ShowForm(product.getId(), product.getTitle(), product.getContent(), product.getAuthor(), product.getPrice(), product.getPhoto(),product.getCreatedDate().toString(),product.isSuggest(), isLike, product.getLikesCnt(), product.isComplete());
             recommendList.add(showForm);
         }
         return recommendList;
@@ -242,7 +325,7 @@ public class ProductService {
                     break;
                 }
             }
-            ShowForm showForm = new ShowForm(productList.get(i).getId(), productList.get(i).getTitle(), productList.get(i).getContent(), productList.get(i).getAuthor(), productList.get(i).getPrice(), productList.get(i).getLikesCnt(), productList.get(i).getPhoto(), productList.get(i).getCreatedDate().toString(), productList.get(i).isSuggest(), isLike);
+            ShowForm showForm = new ShowForm(productList.get(i).getId(), productList.get(i).getTitle(), productList.get(i).getContent(), productList.get(i).getAuthor(), productList.get(i).getPrice(), productList.get(i).getPhoto(), productList.get(i).getCreatedDate().toString(), productList.get(i).isSuggest(), isLike, productList.get(i).getLikesCnt(), productList.get(i).isComplete());;
             newList.add(showForm);
         }
         return newList;
@@ -270,7 +353,7 @@ public class ProductService {
                     break;
                 }
             }
-            ShowForm showForm = new ShowForm(followingProductList.get(i).getId(), followingProductList.get(i).getTitle(), followingProductList.get(i).getContent(), followingProductList.get(i).getAuthor(), followingProductList.get(i).getPrice(), followingProductList.get(i).getLikesCnt(),followingProductList.get(i).getPhoto(),followingProductList.get(i).getCreatedDate().toString(),followingProductList.get(i).isSuggest(),isLike);
+            ShowForm showForm = new ShowForm(followingProductList.get(i).getId(), followingProductList.get(i).getTitle(), followingProductList.get(i).getContent(), followingProductList.get(i).getAuthor(), followingProductList.get(i).getPrice(), followingProductList.get(i).getPhoto(), followingProductList.get(i).getCreatedDate().toString(), followingProductList.get(i).isSuggest(), isLike, followingProductList.get(i).getLikesCnt(), followingProductList.get(i).isComplete());
             followingList.add(showForm);
         }
 
@@ -293,7 +376,7 @@ public class ProductService {
                     break;
                 }
             }
-            ShowForm showForm = new ShowForm(product.getId(), product.getTitle(), product.getContent(), product.getAuthor(), product.getPrice(), product.getLikesCnt(),product.getPhoto(),product.getCreatedDate().toString(),product.isSuggest(),isLike);
+            ShowForm showForm = new ShowForm(product.getId(), product.getTitle(), product.getContent(), product.getAuthor(), product.getPrice(), product.getPhoto(),product.getCreatedDate().toString(),product.isSuggest(),isLike, product.getLikesCnt(), product.isComplete());
             showList.add(showForm);
         }
         return new PageImpl<>(showList, pageable, productList.getTotalElements());
@@ -308,7 +391,7 @@ public class ProductService {
         List<ShowForm> showList = new ArrayList<>();
 
         for (Product product : projectList.getContent()) {
-            ShowForm showForm = new ShowForm(product.getId(), product.getTitle(), product.getContent(), product.getAuthor(), product.getPrice(), product.getLikesCnt(),product.getPhoto(),product.getCreatedDate().toString(),product.isSuggest(),false);
+            ShowForm showForm = new ShowForm(product.getId(), product.getTitle(), product.getContent(), product.getAuthor(), product.getPrice(), product.getPhoto(),product.getCreatedDate().toString(),product.isSuggest(),false, product.getLikesCnt(), product.isComplete());
             showList.add(showForm);
         }
         return new PageImpl<>(showList, pageable, projectList.getTotalElements());
