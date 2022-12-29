@@ -34,6 +34,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmailFetchFL(@Param("email")String email);   /** 유저의 팔로잉 목록까지 불러오기 **/
 
     @Query("select u from User u left join fetch u.followingList left join fetch u.likesList where u.email = :email")
-    Optional<User> findByEmailFetchFLandLL(@Param("email")String email);   /** 유저가 쓴 외주 글까지 불러오기 **/
+    Optional<User> findByEmailFetchFLandLL(@Param("email")String email);   /** 유저의 팔로잉 목록, 좋아요 목록까지 불러오기 **/
 
 }

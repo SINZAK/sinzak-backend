@@ -5,10 +5,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class UserNotFoundException extends RuntimeException {
+
+    public static String USER_NOT_FOUND ="존재하지 않는 유저를 조회하고 있습니다.";
+    public static String USER_NOT_LOGIN ="로그인한 유저가 존재하지 않습니다.";
     public UserNotFoundException(String message) {
         super(message);
     }
     public UserNotFoundException() {
-        super("존재하지 않는 유저를 조회하고 있습니다.");
+        super(USER_NOT_FOUND);
     }
 }

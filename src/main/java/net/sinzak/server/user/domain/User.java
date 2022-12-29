@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 @Entity
 @SequenceGenerator(name = "User_SEQ_GEN",sequenceName = "User_SEQ")
 public class User extends BaseTimeEntity implements UserDetails {
+    private static final int hundredMillion = 100000000;
+    private static final int tenThousand =10000;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "User_SEQ")
@@ -132,10 +134,6 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.categoryLike = "";
     }
 
-    public void updateFollowNumber(String followingNumber,String followerNumber){
-        this.followerNum = followerNumber;
-        this.followingNum = followingNumber;
-    }
     public User update(String name, String picture,String introduction){
         this.name =name;
         this.picture = picture;
@@ -150,6 +148,35 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.univ_email = univ_email;
         this.univ = univ;
         this.cert_uni = true;
+    }
+
+    public void updateFollowNumber(){
+        this.followerNum = followNumberTrans(this.getFollowerList().size());
+        this.followingNum = followNumberTrans(this.getFollowingList().size());
+    }
+    public String followNumberTrans(int number){
+        String unit =getUnit(number);
+        if(number>=hundredMillion){
+            number /= hundredMillion;
+        }
+        if(number>=tenThousand){
+            number /= tenThousand;
+        }
+        String transNumber = Integer.toString(number);
+        if(transNumber.length()>=4){
+            transNumber = transNumber.substring(0,1)+","+transNumber.substring(1);
+        }
+        transNumber +=unit;
+        return transNumber;
+    }
+    public String getUnit(int number){
+        if(number>=hundredMillion){
+            return "억";
+        }
+        if(number>=tenThousand){
+            return "만";
+        }
+        return "";
     }
 
 

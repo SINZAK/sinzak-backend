@@ -2,6 +2,9 @@ package net.sinzak.server.product.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
+import net.sinzak.server.user.domain.embed.Size;
+
+import javax.persistence.*;
 
 @Getter
 public class ShowForm {
@@ -15,8 +18,6 @@ public class ShowForm {
     private String author;
     @ApiModelProperty(example = "작품 가격")
     private int price;
-    @ApiModelProperty(example = "좋아요 수")
-    private int likes;
     @ApiModelProperty(example = "작품 대표 사진")
     private String photo;
     @ApiModelProperty(example = "작품 게시일자")
@@ -25,17 +26,22 @@ public class ShowForm {
     private boolean suggest;
     @ApiModelProperty(example = "좋아요 누른 사람인지 여부",notes = "true -> 누른 사람")
     private boolean isLike;
+    @ApiModelProperty(example = "좋아요 수",notes = "true -> 누른 사람")
+    private int likesCnt;
+    @ApiModelProperty(example = "판매완료 여부",notes = "true -> 판매완료")
+    private boolean complete;
 
-    public ShowForm(Long id, String title, String content, String author, int price, int likes, String photo, String date, boolean suggest, boolean isLike) {
+    public ShowForm(Long id, String title, String content, String author, int price, String photo, String date, boolean suggest, boolean isLike, int likesCnt, boolean complete) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.author = author;
         this.price = price;
-        this.likes = likes;
         this.photo = photo;
         this.date = date;
         this.suggest = suggest;
         this.isLike = isLike;
+        this.likesCnt = likesCnt;
+        this.complete = complete;
     }
 }

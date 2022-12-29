@@ -20,62 +20,52 @@ public class UserCommandService {
 
 
     @Transactional
-    public JSONObject updateUser(UpdateUserDto dto, SessionUser user){
-        Optional<User> User =userRepository.findByEmail(user.getEmail());
-        if(User.isPresent()){
-            User.get().update(dto.getName(),dto.getPicture(),dto.getIntroduction());
-            return PropertyUtil.response(true);
+    public JSONObject updateUser(UpdateUserDto dto, User loginUser){
+        if(loginUser ==null){
+            return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
         }
-        return PropertyUtil.response(false);
+        User user = userRepository.findById(loginUser.getId()).get();
+        user.update(dto.getName(),dto.getPicture(),dto.getIntroduction());
+        return PropertyUtil.response(true);
     }
-    public User sessionUserToUser(SessionUser user){
-        User newUser = User.builder()
-                .email(user.getEmail()).name(user.getName()).picture(user.getPicture()).build();
-        return newUser;
+
+    @Transactional
+    public JSONObject follow(Long userId, User loginUser){
+        Optional<User> findUser = userRepository.findById(userId);
+        JSONObject userNotExist = checkUsersExist(findUser,loginUser);
+        System.out.println((boolean)userNotExist.get(PropertyUtil.SUCCESS_WORD));
+        if(!(boolean)userNotExist.get(PropertyUtil.SUCCESS_WORD)){
+            return userNotExist;
+        }
+        User user = userRepository.findById(loginUser.getId()).get();
+        user.getFollowingList().add(userId);
+        findUser.get().getFollowerList().add(user.getId());
+        return PropertyUtil.response(true);
     }
     @Transactional
-    public JSONObject follow(Long userId, SessionUser user){
-        try{
-            User User = getUser(user);
-            User findUser = getFindUser(userId);
-            if(User.equals(findUser)){
-                return PropertyUtil.responseMessage("본인한테는 친구 추가 불가능");
-            }
-            User.getFollowingList().add(userId);
-            findUser.getFollowerList().add(User.getId());
-            return PropertyUtil.response(true);
+    public JSONObject unFollow(Long userId,User loginUser){
+        Optional<User> findUser = userRepository.findById(userId);
+        JSONObject userNotExist = checkUsersExist(findUser,loginUser);
+        if(!(boolean)userNotExist.get(PropertyUtil.SUCCESS_WORD)){
+            return userNotExist;
         }
-        catch(InstanceNotFoundException e){
-            return PropertyUtil.response(false);
-        }
+        User user = userRepository.findById(loginUser.getId()).get();
+        user.getFollowingList().remove(userId);
+        findUser.get().getFollowerList().remove(user.getId());
+        return PropertyUtil.response(true);
     }
     @Transactional
-    public JSONObject unFollow(Long userId,SessionUser user){
-        try{
-            User User = getUser(user);
-            User findUser = getFindUser(userId);
-            if(User.equals(findUser)){
-                return PropertyUtil.responseMessage("본인한테는 친구 추가 불가능");
-            }
-            User.getFollowingList().remove(userId);
-            findUser.getFollowerList().remove(User.getId());
-            return PropertyUtil.response(true);
+    public JSONObject checkUsersExist(Optional<User> findUser,User user){
+        if(user ==null){
+            return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
         }
-        catch(InstanceNotFoundException e){
-            return PropertyUtil.response(false);
+        if(!findUser.isPresent()){
+            return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_FOUND);
         }
-    }
-    public User getUser(SessionUser user) {
-        User User = userRepository
-                .findByEmail(user.getEmail())
-                .orElseThrow(()-> new UserNotFoundException());
-        return User;
-    }
-    public User getFindUser(Long userId){
-        User findUser = userRepository
-                .findById(userId)
-                .orElseThrow(()->new UserNotFoundException());
-        return findUser;
+        if(user.getId().equals(findUser.get().getId())){
+            return PropertyUtil.responseMessage("본인한테는 팔로우 불가능");
+        }
+        return PropertyUtil.response(true);
     }
     @Transactional //실제론 연동로그인이기에 api테스트용
     public long createUser(SessionUser user){ //이건 테스트
@@ -87,6 +77,11 @@ public class UserCommandService {
         User newUser = sessionUserToUser(user);
         userRepository.save(newUser);
         return userRepository.findByEmail(user.getEmail()).get().getId();
+    }
+    public User sessionUserToUser(SessionUser user){
+        User newUser = User.builder()
+                .email(user.getEmail()).name(user.getName()).picture(user.getPicture()).build();
+        return newUser;
     }
 
 //    @Transactional //실제론 연동로그인이기에 api테스트용
