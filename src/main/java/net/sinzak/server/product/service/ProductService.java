@@ -1,6 +1,5 @@
 package net.sinzak.server.product.service;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.config.auth.dto.SessionUser;
@@ -26,7 +25,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -66,20 +64,33 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public DetailForm showDetail(Long id, User User){   // 글 생성
-        User user = userRepository.findByEmailFetchLL(User.getEmail()).orElseThrow();
+        User user = userRepository.findByEmailFetchFLandLL(User.getEmail()).orElseThrow();
+        Set<Long> userFollowingList = user.getFollowingList();
         List<Likes> userLikesList = user.getLikesList();  /** 유저가 좋아요 누른 작품 목록 **/
-        Product product = productRepository.findByEmailFetchPW(id).orElseThrow();
+        Product product = productRepository.findByEmailFetchPWUser(id).orElseThrow();
         List<ProductWish> productWishList = product.getProductWishList();  /** 작품 찜 누른 사람 목록 **/
         DetailForm detailForm = DetailForm.builder()
                 .id(product.getId())
-                .content(product.getContent())
-                .title(product.getTitle())
                 .author(product.getAuthor())
-                .price(product.getPrice())
+                .author_picture(product.getUser().getPicture())
+                .univ(product.getUser().getUniv())
+                .cert_uni(product.getUser().isCert_uni())
+                .cert_celeb(product.getUser().isCert_celeb())
+                .followerNum(product.getUser().getFollowerNum())
                 .photo(product.getPhoto())
+                .title(product.getTitle())
+                .price(product.getPrice())
+                .category(product.getCategory())
                 .date(product.getPhoto())
+                .content(product.getContent())
                 .suggest(product.isSuggest())
                 .likesCnt(product.getLikesCnt())
+                .views(product.getViews())
+                .wishCnt(product.getWishCnt())
+                .chatCnt(product.getChatCnt())
+                .width(product.getSize().width)
+                .vertical(product.getSize().vertical)
+                .height(product.getSize().height)
                 .complete(product.isComplete())
                 .build();
 
@@ -97,27 +108,46 @@ public class ProductService {
                 break;
             }
         }
-        detailForm.setLikeAndWish(isLike,isWish);
+        boolean isFollowing = false;
+        for (Long followingId : userFollowingList) {
+            if(product.getUser().getId().equals(followingId)){
+                isFollowing = true;
+                break;
+            }
+        }
+        detailForm.setLikeAndWish(isLike,isWish, isFollowing);
 
         return detailForm;
     }
 
     @Transactional(readOnly = true)
     public DetailForm showDetail(Long id){   // 글 생성
-        Product product = productRepository.findByEmailFetchPW(id).orElseThrow();
+        Product product = productRepository.findByEmailFetchPWUser(id).orElseThrow();
         DetailForm detailForm = DetailForm.builder()
                 .id(product.getId())
-                .content(product.getContent())
-                .title(product.getTitle())
                 .author(product.getAuthor())
-                .price(product.getPrice())
+                .author_picture(product.getUser().getPicture())
+                .univ(product.getUser().getUniv())
+                .cert_uni(product.getUser().isCert_uni())
+                .cert_celeb(product.getUser().isCert_celeb())
+                .followerNum(product.getUser().getFollowerNum())
                 .photo(product.getPhoto())
+                .title(product.getTitle())
+                .price(product.getPrice())
+                .category(product.getCategory())
                 .date(product.getPhoto())
+                .content(product.getContent())
                 .suggest(product.isSuggest())
                 .likesCnt(product.getLikesCnt())
+                .views(product.getViews())
+                .wishCnt(product.getWishCnt())
+                .chatCnt(product.getChatCnt())
+                .width(product.getSize().width)
+                .vertical(product.getSize().vertical)
+                .height(product.getSize().height)
                 .complete(product.isComplete())
                 .build();
-        detailForm.setLikeAndWish(false,false);
+        detailForm.setLikeAndWish(false,false,false);
 
         return detailForm;
     }
