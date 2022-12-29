@@ -41,7 +41,7 @@ public class ProductController {
             return productService.showDetail(id,user);
         }
         catch (NullPointerException e){
-            return productService.showDetail(id);
+            return productService.showDetail(id); /** 비회원용 **/
         }
     }
 
@@ -70,7 +70,7 @@ public class ProductController {
             return productService.showHome(user);
         }
         catch (NullPointerException e) {
-            return productService.showHome();
+            return productService.showHome(); /** 비회원용 **/
         }
     }
 
@@ -92,7 +92,7 @@ public class ProductController {
             @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
                     value = "파라미터 형식으로 전달해주세요 (0..N) ex) http://localhost:8080/market/products?page=3&size=5", defaultValue = "0"),
             @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
-                    value = "Number of records per page.", defaultValue = "5")
+                    value = "페이지 수", defaultValue = "5")
     })
     public PageImpl<ShowForm> showMarketProduct(@AuthenticationPrincipal User user, @RequestParam(required=false, defaultValue="") List<String> stacks, @ApiIgnore Pageable pageable) {
         try{

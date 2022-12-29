@@ -25,6 +25,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("select p from Product p left join fetch p.productWishList where p.id = :id")
     Optional<Product> findByEmailFetchPW(@Param("id")Long id);   /** 해당 작품 찜을 누른 유저 목록까지 불러오기 **/
 
+    @Query("select p from Product p left join fetch p.productWishList left join fetch p.user where p.id = :id")
+    Optional<Product> findByEmailFetchPWUser(@Param("id")Long id);   /** 해당 작품 찜을 누른 유저 목록까지 불러오기 **/
+
     @Query(value = "select * from product as p where p.category like %:category1% order by p.product_id desc limit :count", nativeQuery = true)
     List<Product> find1Recommend3(@Param("category1") String category1, @Param("count") int count);
     @Query(value = "select * from product as p where p.category like %:category1% or p.category like %:category2% order by p.product_id desc limit :count", nativeQuery = true)
