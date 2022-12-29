@@ -7,6 +7,7 @@ import net.sinzak.server.user.domain.Role;
 import net.sinzak.server.user.domain.User;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Map;
 
 @Getter
@@ -80,9 +81,8 @@ public class OAuthAttributes {
         return User.builder()
                 .name(name)
                 .email(email)
-                .picture(picture)
                 .origin(origin)
-                .role(Role.GUEST) // 기본 권한 GUEST
+                .roles(Collections.singletonList("ROLE_USER")) // 기본 권한 GUEST
                 .build();
     }
 
