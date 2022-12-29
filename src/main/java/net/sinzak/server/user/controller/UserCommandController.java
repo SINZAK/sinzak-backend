@@ -4,12 +4,11 @@ package net.sinzak.server.user.controller;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
-import net.sinzak.server.config.auth.LoginUser;
 import net.sinzak.server.config.auth.SecurityService;
-import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.config.auth.jwt.TokenDto;
 import net.sinzak.server.config.auth.jwt.TokenRequestDto;
 import net.sinzak.server.user.domain.User;
+import net.sinzak.server.user.dto.request.JoinDto;
 import net.sinzak.server.user.dto.request.UpdateUserDto;
 import net.sinzak.server.user.service.UserCommandService;
 import org.json.simple.JSONObject;
@@ -17,7 +16,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -27,11 +25,10 @@ public class UserCommandController {
     private final SecurityService securityService;
 
 
-    @ApiOperation(value = "jwt Authorization 헤더 테스트 페이지", notes = "헤더 테스트")
-    @PostMapping("/mypage")
-    public void myPage(@AuthenticationPrincipal User user) {
-        System.out.println(user.getId());
-        System.out.println(user.getUsername());
+    @ApiOperation(value = "회원가입", notes = "{\"category_like\" : \"orient, western\" 처럼 콤마로 구분해서 보내주세요")
+    @PostMapping("/join")
+    public TokenDto join(@RequestBody JoinDto dto) {
+        return securityService.join(dto);
     }
 
     @ApiOperation(value = "로그인테스트 \"email\" : \"insi2000@naver.com\" 과 같은 형식으로 보내주세요", notes = "성공시 jwt 토큰을 헤더에 넣어서 반환합니다. Authorization 헤더에 액세스토큰을 넣어주세요")

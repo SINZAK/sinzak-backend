@@ -2,11 +2,16 @@ package net.sinzak.server.config.auth;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.config.auth.jwt.*;
+import net.sinzak.server.user.domain.JoinTerms;
 import net.sinzak.server.user.domain.User;
+import net.sinzak.server.user.dto.request.JoinDto;
+import net.sinzak.server.user.repository.JoinTermsRepository;
 import net.sinzak.server.user.repository.UserRepository;
+import org.json.simple.JSONObject;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,13 +32,43 @@ public class SecurityService {
 
         User user = userRepository.findByEmail(User.get("email"))
                 .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 ID 입니다."));
-        TokenDto tokenDto = jwtProvider.createToken(user.getUsername(), user.getRoleKey());
+        TokenDto tokenDto = jwtProvider.createToken(user.getUsername(), user.getRoles());
         //리프레시 토큰 저장
         RefreshToken refreshToken = RefreshToken.builder()
                 .key(user.getId())
                 .token(tokenDto.getRefreshToken())
                 .build();
         log.warn("access token = "+tokenDto.getAccessToken());
+        refreshTokenRepository.save(refreshToken);
+        return tokenDto;
+    }
+
+    private final JoinTermsRepository joinTermsRepository;
+
+    @Transactional
+    public TokenDto join(@RequestBody JoinDto dto) throws NullPointerException { //아이디 비번 이름 생일 통신사 번호 저장
+        User user = User.builder()
+                .name(dto.getName())
+                .email(dto.getEmail())
+                .univ_email(dto.getUniv_email())
+                .origin(dto.getOrigin())
+                .categoryLike(dto.getCategory_like())
+                .nickName(dto.getNickName())
+                .univ(dto.getUniv())
+                .cert_uni(dto.isCert_univ()).build();
+        User savedUser = userRepository.save(user);
+        JoinTerms terms = new JoinTerms(dto.isTerm());
+        terms.setUser(savedUser);
+        JoinTerms saveTerms = joinTermsRepository.save(terms);
+        if(savedUser.getId() == null || saveTerms.getId() == null)
+            throw new UserNotFoundException("서버 오류로 저장되지 않았습니다.");
+        TokenDto tokenDto = jwtProvider.createToken(user.getUsername(), user.getRoles());
+        //리프레시 토큰 저장
+        RefreshToken refreshToken = RefreshToken.builder()
+                .key(user.getId())
+                .token(tokenDto.getRefreshToken())
+                .build();
+        log.warn("회원가입 완료 access token = "+tokenDto.getAccessToken());
         refreshTokenRepository.save(refreshToken);
         return tokenDto;
     }
@@ -60,7 +95,7 @@ public class SecurityService {
             throw new NoSuchElementException();
 
         // AccessToken, RefreshToken 토큰 재발급, 리프레쉬 토큰 저장
-        TokenDto newCreatedToken = jwtProvider.createToken(user.getUsername(), user.getRoleKey());
+        TokenDto newCreatedToken = jwtProvider.createToken(user.getUsername(), user.getRoles());
         RefreshToken updateRefreshToken = refreshToken.updateToken(newCreatedToken.getRefreshToken());
         refreshTokenRepository.save(updateRefreshToken);
 

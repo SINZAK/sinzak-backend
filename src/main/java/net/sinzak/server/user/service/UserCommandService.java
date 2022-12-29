@@ -1,17 +1,24 @@
 package net.sinzak.server.user.service;
 
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.config.auth.dto.SessionUser;
+import net.sinzak.server.user.domain.JoinTerms;
+import net.sinzak.server.user.dto.request.JoinDto;
 import net.sinzak.server.user.dto.request.UpdateUserDto;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
+import net.sinzak.server.user.repository.JoinTermsRepository;
 import net.sinzak.server.user.repository.UserRepository;
 import net.sinzak.server.common.PropertyUtil;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+
 import javax.transaction.Transactional;
+import java.util.Collections;
 import java.util.Optional;
 @Service
 @RequiredArgsConstructor
@@ -79,8 +86,7 @@ public class UserCommandService {
         return userRepository.findByEmail(user.getEmail()).get().getId();
     }
     public User sessionUserToUser(SessionUser user){
-        User newUser = User.builder()
-                .email(user.getEmail()).name(user.getName()).picture(user.getPicture()).build();
+        User newUser = new User(user.getEmail(), user.getName(), user.getPicture());
         return newUser;
     }
 

@@ -19,7 +19,7 @@ public class DetailForm {
     @ApiModelProperty(example = "작가 프사")
     private String author_picture;
     @ApiModelProperty(example = "작가 대학명")
-    private String univ="";
+    private String univ;
     @ApiModelProperty(example = "작가 대학 인증여부")
     private boolean cert_uni;
     @ApiModelProperty(example = "작가 인플루언서 여부")
