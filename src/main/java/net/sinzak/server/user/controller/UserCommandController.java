@@ -1,6 +1,7 @@
 package net.sinzak.server.user.controller;
 
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +21,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import java.util.List;
 import java.util.Map;
 
+@Api(tags = "유저-명령")
 @RestController
 @RequiredArgsConstructor
 public class UserCommandController {

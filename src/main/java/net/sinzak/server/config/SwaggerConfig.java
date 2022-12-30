@@ -41,7 +41,7 @@ public class SwaggerConfig {
     }
     @Bean
     public Docket AllApi() {
-        return getDocket("ALL", Predicates.or(
+        return getDocket("All", Predicates.or(
                 PathSelectors.regex("/*.*")));
 
     }

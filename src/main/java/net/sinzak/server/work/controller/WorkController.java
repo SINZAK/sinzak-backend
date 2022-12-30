@@ -1,5 +1,6 @@
 package net.sinzak.server.work.controller;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.config.auth.LoginUser;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.NoSuchElementException;
 
+@Api(tags = "외주")
 @RestController
 @RequiredArgsConstructor
 public class WorkController {

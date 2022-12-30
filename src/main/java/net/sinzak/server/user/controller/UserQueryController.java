@@ -1,5 +1,6 @@
 package net.sinzak.server.user.controller;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.config.auth.LoginUser;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
-
+@Api(tags = "유저-조회")
 @RestController
 @RequiredArgsConstructor
 public class UserQueryController {
