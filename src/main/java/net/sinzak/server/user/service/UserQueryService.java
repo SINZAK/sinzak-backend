@@ -1,6 +1,7 @@
 package net.sinzak.server.user.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.config.auth.dto.SessionUser;
@@ -10,15 +11,16 @@ import net.sinzak.server.user.dto.respond.UserDto;
 import net.sinzak.server.user.repository.UserRepository;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.management.InstanceNotFoundException;
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserQueryService {
 
@@ -30,7 +32,6 @@ public class UserQueryService {
 //        User saved = userRepository.save(user);
 //        WorkPostDto dto = new WorkPostDto("테스트","내용테스트");
 //    }
-    @Transactional
     public UserDto getMyProfile(User user){
         if(user ==null){
             throw new UserNotFoundException("로그인한 유저 존재하지 않음");
@@ -38,7 +39,6 @@ public class UserQueryService {
         Optional<User> findUser = userRepository.findById(user.getId());
         return makeUserDto(user,findUser);
     }
-    @Transactional
     public UserDto getUserProfile(Long otherUserId, User user) {
         Optional<User> findUser = userRepository.findById(otherUserId);
         return checkIfTwoUserPresent(user,findUser);
@@ -71,13 +71,11 @@ public class UserQueryService {
         return false;
     }
     //팔로워가져오기
-    @Transactional
     public List<GetFollowDto> getFollowerDtoList(Long userId){
         Set<Long> followerList = userRepository.findById(userId).get().getFollowerList();
         return getGetFollowDtoList(followerList);
     }
     //팔로잉가져오기
-    @Transactional
     public List<GetFollowDto> getFollowingDtoList(Long userId){
         Set<Long> followingList = userRepository.findById(userId).get().getFollowingList();
         return getGetFollowDtoList(followingList);
