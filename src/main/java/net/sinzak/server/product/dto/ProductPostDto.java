@@ -20,8 +20,6 @@ public class ProductPostDto {
     private boolean suggest;
     @ApiModelProperty(example = "작품 분야")
     private String field;
-    @ApiModelProperty(example = "작품 사진")
-    private String photo;
 
     @ApiModelProperty(example = "120")
     private int width;

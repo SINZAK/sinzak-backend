@@ -57,7 +57,7 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     private int chatCnt = 0;
 
     @Column
-    private String photo;
+    private String thumbnail;
 
     @Embedded
     private Size size;
@@ -76,7 +76,7 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     private List<ProductWish> productWishList = new ArrayList<>();  //찜
 
     @Builder
-    public Product(String title, String content, String category, int price, boolean suggest, String author, String univ, String field, String photo, Size size) {
+    public Product(String title, String content, String category, int price, boolean suggest, String author, String univ, String field, Size size) {
         this.title = title;
         this.content = content;
         this.category = category;
@@ -85,7 +85,6 @@ public class Product extends BaseTimeEntity { /** 작품 **/
         this.author = author;
         this.univ = univ;
         this.field = field;
-        this.photo = photo;
         this.size = size;
     }
 
@@ -110,4 +109,7 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     public void minusLikesCnt() {if(likesCnt>0)this.likesCnt--;}
     protected Product() {}
 
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
+    }
 }
