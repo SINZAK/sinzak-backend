@@ -1,4 +1,4 @@
-package net.sinzak.server.product;
+package net.sinzak.server.product.domain;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -69,8 +69,11 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     @JoinColumn(name = "user_id")
     private User user;  //수취인
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER) /** 사진은 무조건 같이 불러오기 **/
+    private List<ProductImage> images = new ArrayList<>();  //수취인
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
-    private List<ProductWish> productWishList = new ArrayList<>();  //프로젝트-회원 엮여있는 리스트  스크랩!!!!
+    private List<ProductWish> productWishList = new ArrayList<>();  //찜
 
     @Builder
     public Product(String title, String content, String category, int price, boolean suggest, String author, String univ, String field, String photo, Size size) {
@@ -91,6 +94,9 @@ public class Product extends BaseTimeEntity { /** 작품 **/
         this.user = user;
     }
 
+    public void addImage(ProductImage images) {
+        this.getImages().add(images);
+    }
 
     public void plusWishCnt() {
         this.wishCnt++;

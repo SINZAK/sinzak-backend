@@ -1,4 +1,4 @@
-package net.sinzak.server.product;
+package net.sinzak.server.product.domain;
 
 import lombok.Getter;
 import net.sinzak.server.BaseTimeEntity;
