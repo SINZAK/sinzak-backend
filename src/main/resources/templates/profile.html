@@ -1,0 +1,155 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        header {
+            border: 1px solid black;
+            height: 30%;
+            padding: 10px;
+        }
+        html, body {
+            height: 890px;
+            text-align: center;
+        }
+        section {
+            border: 1px solid black;
+            padding: 10px;
+            height: 5%;
+        }
+        #productList{
+            border: 1px solid black;
+            padding: 10px;
+            height: 15%;
+        }
+        .productInList{
+            padding: 5px;
+            line-height: 100%;
+            border: 1px solid black;
+            float:left;
+            margin:4px;
+            width:27%;
+            height: 90%;
+            text-align: center;
+        }
+        footer {
+            line-height: 100%;
+            padding: 10px;
+            border: 1px solid black;
+            text-align: center;
+        }
+        .firstProfileBox{
+            height: 60%;
+        }
+        .imageBox{
+            /*border: 1px solid black;*/
+            float: left;
+            height: 80%;
+            width: 40%;
+            margin: 10px;
+        }
+        .followerBox{
+            width:20%;
+            /*border: 1px solid black;*/
+            height: 80%;
+            float:left;
+            margin: 10px;
+        }
+        .followingBox{
+            height: 80%;
+            float:right;
+            width:20%;
+            /*border: 1px solid black;*/
+            margin: 10px;
+            float:left;
+        }
+        .intro,.ButtonBox{
+            border: 1px solid black;
+            height: 5%;
+            padding:10px;
+            margin: 10px;
+        }
+        img{
+            padding: 5px;
+            width: 120px;
+            height: 120px;
+            text-align: center;
+            object-fit:cover;
+            filter:brightness(0.95);
+        }
+        form{
+            width:45%;
+        }
+
+    </style>
+</head>
+<body>
+<container >
+    <header>
+        <div class ="profileBox">
+
+        </div>
+        <div class ="firstProfileBox">
+            <div class="imageBox">
+                <img th:src="${imageUrl}">
+                <span th:text ="${userName}"> </span>
+            </div>
+            <div class ="followBox">
+                <div class ="followerBox" style="text-align: center" >
+                    <button th:onclick="'location.href=\' '+@{|/users/${userId}/followers/thymeleaf|}+'\''">팔로워</button>
+                    <div th:text ="${followerNum}" >
+                    </div>
+                </div>
+                <div class="followingBox">
+                    <button>팔로잉</button>
+                    <div th:text ="${followingNum}" style="text-align: center">
+                    </div>
+                </div>
+                <div class ="schoolBox">
+                    학교 (미구현)
+                </div>
+            </div>
+        </div>
+        <div class = "ButtonBox">
+            <form th:action="@{|/users/${userId}/follow|}" method="post" style="float:left">
+                <button type="submit" class="btn btn-primary" style="width: 100%">팔로우/팔로잉 </button>
+            </form>
+            <form style="float: right">
+                <button style="width: 100%"> 메시지 </button>
+            </form>
+        </div>
+        <div class ="intro">
+            자기소개
+        </div>
+
+    </header>
+    <section > 프로필편집(본인한테만 뜨는 거 아직미구현)
+    </section>
+    <section id="productList">
+        <div class="productInList">판매내역<p>(미구현)</div>
+        <div class="productInList">구매내역<p>(미구현)</div>
+        <div class="productInList">찜한목록<p>(미구현)</div>
+    </section>
+    <section>
+        설정(미구현)
+    </section>
+    <section>
+        학교인증(미구현)
+    </section>
+    <section>
+        키워드알림(미구현)
+    </section>
+    <footer>
+        <button th:id="homeButton"> 홈</button>
+        <button th:id="marketButton"> 마켓</button>
+        <button th:id="workButton"> 외주</button>
+        <button th:id="chatButton"> 채팅</button>
+        <button th:id="profileButton" th:onclick="'location.href=\' '+@{|/users/${userId}/thymeleaf|}+'\''"> 프로필</button>
+    </footer>
+</container>
+</body>
+</html>
