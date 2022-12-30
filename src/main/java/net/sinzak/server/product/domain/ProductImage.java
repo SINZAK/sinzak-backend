@@ -1,14 +1,13 @@
-package net.sinzak.server.image;
+package net.sinzak.server.product.domain;
 
 import lombok.Getter;
 import net.sinzak.server.BaseTimeEntity;
-import net.sinzak.server.product.image.Product;
 
 import javax.persistence.*;
 
 @Getter
 @Entity
-public class Image extends BaseTimeEntity {
+public class ProductImage extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,10 +20,10 @@ public class Image extends BaseTimeEntity {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    public Image(String imgUrl, Product product) {
+    public ProductImage(String imgUrl, Product product) {
         this.imageUrl = imgUrl;
         this.product = product;
     }
 
-    protected Image() {}
+    protected ProductImage() {}
 }
