@@ -6,6 +6,7 @@ import lombok.Getter;
 import net.sinzak.server.user.domain.embed.Size;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @Builder
@@ -30,8 +31,8 @@ public class DetailForm {
     private boolean isFollowing;
 
 
-    @ApiModelProperty(example = "작품 대표 사진") /** 작품 조회 **/
-    private String photo;
+    @ApiModelProperty(example = "사진 URL 리스트")  /** 작품 조회 **/
+    private List<String> images;
     @ApiModelProperty(example = "작품 판매글 제목")
     private String title;
     @ApiModelProperty(example = "작품 가격")

@@ -33,7 +33,7 @@ public class ProductController {
     @ApiOperation(value = "작품 판매 글 생성")
     @PostMapping(value = "/products/build", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public JSONObject makeProductPost(@AuthenticationPrincipal User user, @RequestPart ProductPostDto postDto, @RequestPart List<MultipartFile> multipartFile) {
-        return productService.makePost(user, postDto, multipartFile); //해당 유저의 작품 글 리스트까지 fetch해서 가져오기.
+        return productService.makePost(user, postDto, multipartFile);
     }
 
     @PostMapping("/products/{id}")

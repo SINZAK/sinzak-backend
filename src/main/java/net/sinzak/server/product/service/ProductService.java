@@ -65,12 +65,14 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public DetailForm showDetail(Long id, User User){   // 글 생성
+    public DetailForm showDetail(Long id, User User){   // 글 상세 확인
         User user = userRepository.findByEmailFetchFLandLL(User.getEmail()).orElseThrow();
         Set<Long> userFollowingList = user.getFollowingList();
         List<Likes> userLikesList = user.getLikesList();  /** 유저가 좋아요 누른 작품 목록 **/
-        Product product = productRepository.findByEmailFetchPWUser(id).orElseThrow();
+        Product product = productRepository.findByIdFetchPWUser(id).orElseThrow();
         List<ProductWish> productWishList = product.getProductWishList();  /** 작품 찜 누른 사람 목록 **/
+        List<String> imagesUrl = getProductImages(product);  /** 이미지 엔티티에서 url만 빼오기 **/
+
         DetailForm detailForm = DetailForm.builder()
                 .id(product.getId())
                 .author(product.getAuthor())
@@ -79,7 +81,7 @@ public class ProductService {
                 .cert_uni(product.getUser().isCert_uni())
                 .cert_celeb(product.getUser().isCert_celeb())
                 .followerNum(product.getUser().getFollowerNum())
-                .photo(product.getPhoto())
+                .images(imagesUrl)
                 .title(product.getTitle())
                 .price(product.getPrice())
                 .category(product.getCategory())
@@ -122,9 +124,18 @@ public class ProductService {
         return detailForm;
     }
 
+    private List<String> getProductImages(Product product) {
+        List<String> imagesUrl = new ArrayList<>();
+        for (ProductImage image : product.getImages()) {
+            imagesUrl.add(image.getImageUrl());  /** 이미지 엔티티에서 url만 빼오기 **/
+        }
+        return imagesUrl;
+    }
+
     @Transactional(readOnly = true)
     public DetailForm showDetail(Long id){   // 글 생성
-        Product product = productRepository.findByEmailFetchPWUser(id).orElseThrow();
+        Product product = productRepository.findByIdFetchPWUser(id).orElseThrow();
+        List<String> imagesUrl = getProductImages(product);  /** 이미지 엔티티에서 url만 빼오기 **/
         DetailForm detailForm = DetailForm.builder()
                 .id(product.getId())
                 .author(product.getAuthor())
@@ -133,7 +144,7 @@ public class ProductService {
                 .cert_uni(product.getUser().isCert_uni())
                 .cert_celeb(product.getUser().isCert_celeb())
                 .followerNum(product.getUser().getFollowerNum())
-                .photo(product.getPhoto())
+                .images(imagesUrl)
                 .title(product.getTitle())
                 .price(product.getPrice())
                 .category(product.getCategory())
