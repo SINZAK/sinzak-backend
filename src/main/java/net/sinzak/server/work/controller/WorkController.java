@@ -1,7 +1,9 @@
 package net.sinzak.server.work.controller;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.config.auth.LoginUser;
 import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.common.dto.WishForm;
@@ -14,18 +16,21 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.NoSuchElementException;
 
+@Api(tags = "외주")
 @RestController
 @RequiredArgsConstructor
 public class WorkController {
 
     private final WorkService workService;
 
+    @ApiDocumentResponse
     @ApiOperation(value = "외주 모집 글 생성")
     @PostMapping("/works/build")
     public JSONObject makeWorkPost(@LoginUser SessionUser user, /*@RequestBody*/ WorkPostDto postDto) {
         return workService.makeWorkPost(user, postDto);
     }
 
+    @ApiDocumentResponse
     @PostMapping("/works/wish")
     @ApiOperation(value = "작품 찜")
     public JSONObject wish(@LoginUser SessionUser user, @RequestBody WishForm form) {

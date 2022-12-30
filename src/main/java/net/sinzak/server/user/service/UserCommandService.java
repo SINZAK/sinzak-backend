@@ -15,18 +15,20 @@ import net.sinzak.server.user.repository.UserRepository;
 import net.sinzak.server.common.PropertyUtil;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import org.springframework.web.bind.annotation.RequestBody;
 
-import javax.transaction.Transactional;
+
 import java.util.Collections;
 import java.util.Optional;
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserCommandService {
     private final UserRepository userRepository;
 
 
-    @Transactional
     public JSONObject updateUser(UpdateUserDto dto, User loginUser){
         if(loginUser ==null){
             return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
@@ -36,7 +38,7 @@ public class UserCommandService {
         return PropertyUtil.response(true);
     }
 
-    @Transactional
+
     public JSONObject follow(Long userId, User loginUser){
         Optional<User> findUser = userRepository.findById(userId);
         JSONObject userNotExist = checkUsersExist(findUser,loginUser);
@@ -49,7 +51,6 @@ public class UserCommandService {
         findUser.get().getFollowerList().add(user.getId());
         return PropertyUtil.response(true);
     }
-    @Transactional
     public JSONObject unFollow(Long userId,User loginUser){
         Optional<User> findUser = userRepository.findById(userId);
         JSONObject userNotExist = checkUsersExist(findUser,loginUser);
@@ -61,7 +62,7 @@ public class UserCommandService {
         findUser.get().getFollowerList().remove(user.getId());
         return PropertyUtil.response(true);
     }
-    @Transactional
+
     public JSONObject checkUsersExist(Optional<User> findUser,User user){
         if(user ==null){
             return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
@@ -74,7 +75,7 @@ public class UserCommandService {
         }
         return PropertyUtil.response(true);
     }
-    @Transactional //실제론 연동로그인이기에 api테스트용
+     //실제론 연동로그인이기에 api테스트용
     public long createUser(SessionUser user){ //이건 테스트
         Optional<User> findUser =
                 userRepository.findByEmail(user.getEmail());

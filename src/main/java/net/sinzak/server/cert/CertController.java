@@ -1,5 +1,7 @@
 package net.sinzak.server.cert;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.config.auth.LoginUser;
 import net.sinzak.server.config.auth.dto.SessionUser;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
+@Api(tags = "인증")
 @RestController
 @RequiredArgsConstructor
 public class CertController {

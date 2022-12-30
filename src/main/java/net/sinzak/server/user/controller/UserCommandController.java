@@ -1,9 +1,11 @@
 package net.sinzak.server.user.controller;
 
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
+import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.config.auth.SecurityService;
 import net.sinzak.server.config.auth.jwt.TokenDto;
 import net.sinzak.server.config.auth.jwt.TokenRequestDto;
@@ -18,6 +20,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Map;
 
+@Api(tags = "유저-명령")
 @RestController
 @RequiredArgsConstructor
 public class UserCommandController {
@@ -43,16 +46,20 @@ public class UserCommandController {
         return securityService.reissue(tokenRequestDto);
     }
 
+    @ApiDocumentResponse
     @ApiOperation(value = "유저 정보변경", notes = "이름,한줄 소개, 학교(보류) ")
     @PostMapping(value = "/users/edit")
     public JSONObject updateUser( @RequestBody UpdateUserDto dto , @ApiIgnore @AuthenticationPrincipal User user) {
         return userCommandService.updateUser(dto,user);
     }
+    @ApiDocumentResponse
     @ApiOperation(value = "팔로우하기")
     @PostMapping(value = "/users/{userId}/follow")
     public JSONObject followUser(@PathVariable("userId") Long userId,@ApiIgnore @AuthenticationPrincipal User user){
         return userCommandService.follow(userId,user);
     }
+
+    @ApiDocumentResponse
     @ApiOperation(value = "언팔로우하기")
     @PostMapping(value = "/users/{userId}/unfollow")
     public JSONObject unFollowUser(@PathVariable("userId") Long userId,@ApiIgnore @AuthenticationPrincipal User user){

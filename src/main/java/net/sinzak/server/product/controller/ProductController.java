@@ -1,9 +1,11 @@
 package net.sinzak.server.product.controller;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.config.auth.LoginUser;
 import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.product.dto.DetailForm;
@@ -19,17 +21,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
+@Api(tags = "작품")
 @RestController
 @RequiredArgsConstructor
 public class ProductController {
 
     private final ProductService productService;
 
+    @ApiDocumentResponse
     @ApiOperation(value = "작품 판매 글 생성")
     @PostMapping(value = "/products/build", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public JSONObject makeProductPost(@AuthenticationPrincipal User user, @RequestPart ProductPostDto postDto, @RequestPart List<MultipartFile> multipartFile) {
@@ -47,27 +52,31 @@ public class ProductController {
         }
     }
 
+    @ApiDocumentResponse
     @PostMapping("/products/wish")
     @ApiOperation(value = "작품 찜")
     public JSONObject wish(@AuthenticationPrincipal User user, @RequestBody WishForm form) {
         return productService.wish(user, form);
     }
 
+    @ApiDocumentResponse
     @PostMapping("/products/likes")
     @ApiOperation(value = "작품 좋아요")
     public JSONObject likes(@AuthenticationPrincipal User user, @RequestBody WishForm form) {
         return productService.likes(user, form);
     }
 
+    @ApiDocumentResponse
     @PostMapping("/products/sell")
     @ApiOperation(value = "작품 판매", notes = "회원의 구매목록에 추가, 해당 작품 판매완료 설정")
     public JSONObject sell(@AuthenticationPrincipal User user, @RequestBody SellDto dto) {
         return productService.sell(user, dto);
     }
 
+    @ApiDocumentResponse
     @ApiOperation(value = "작품 홈")
     @PostMapping("/home/products")
-    public JSONObject showHomeProduct(@AuthenticationPrincipal User user) {
+    public JSONObject showHomeProduct(@ApiIgnore @AuthenticationPrincipal User user) {
         try {
             return productService.showHome(user);
         }
