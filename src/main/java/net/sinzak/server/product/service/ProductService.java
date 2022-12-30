@@ -2,19 +2,13 @@ package net.sinzak.server.product.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.sinzak.server.config.auth.dto.SessionUser;
-import net.sinzak.server.product.Likes;
-import net.sinzak.server.product.Product;
-import net.sinzak.server.product.ProductSell;
-import net.sinzak.server.product.ProductWish;
+import net.sinzak.server.image.S3Service;
+import net.sinzak.server.product.domain.*;
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.product.dto.DetailForm;
 import net.sinzak.server.product.dto.SellDto;
 import net.sinzak.server.product.dto.ShowForm;
-import net.sinzak.server.product.repository.LikesRepository;
-import net.sinzak.server.product.repository.ProductSellRepository;
-import net.sinzak.server.product.repository.ProductWishRepository;
-import net.sinzak.server.product.repository.ProductRepository;
+import net.sinzak.server.product.repository.*;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.domain.embed.Size;
 import net.sinzak.server.product.dto.ProductPostDto;
@@ -28,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -39,12 +34,13 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductSellRepository productSellRepository;
     private final ProductWishRepository productWishRepository;
+    private final ProductImageRepository imageRepository;
     private final LikesRepository likesRepository;
+    private final S3Service s3Service;
 
     @Transactional
-    public JSONObject makePost(SessionUser tempUser, ProductPostDto productPost){   // 글 생성
-        User user = userRepository.findByEmailFetchPP(tempUser.getEmail()).orElseThrow();
-                            /** 존재 하지 않는 유저면 NullPointer 에러 뜰거고, 핸들러가 처리 할 예정 **/
+    public JSONObject makePost(User User, ProductPostDto productPost, List<MultipartFile> multipartFiles){   // 글 생성
+        User user = userRepository.findByEmailFetchPP(User.getEmail()).orElseThrow(); /** 존재 하지 않는 유저면 NullPointer 에러 뜰거고, 핸들러가 처리 할 예정 **/
         Product product = Product.builder()
                     .title(productPost.getTitle())  //제목
                     .content(productPost.getContent()) //내용
@@ -54,21 +50,29 @@ public class ProductService {
                     .price(productPost.getPrice()) // 페이
                     .suggest(productPost.isSuggest()) //가격제안여부
                     .field(productPost.getField()) //외주분야
-                    .size(new Size(productPost.getWidth(), productPost.getVertical(), productPost.getHeight())) //고용자 or 피고용자
+                    .size(new Size(productPost.getWidth(), productPost.getVertical(), productPost.getHeight()))
                     .photo(productPost.getPhoto())
                     .build();
         product.setUser(user); // user 연결 및, user의 외주 글 리스트에 글 추가
         productRepository.save(product);
+        for (MultipartFile img : multipartFiles) {  /** 이미지 추가, s3에 저장 **/
+            String url = s3Service.uploadImage(img);
+            ProductImage image = new ProductImage(url,product);
+            product.addImage(image);
+            imageRepository.save(image);
+        }
         return PropertyUtil.response(true);
     }
 
     @Transactional(readOnly = true)
-    public DetailForm showDetail(Long id, User User){   // 글 생성
+    public DetailForm showDetail(Long id, User User){   // 글 상세 확인
         User user = userRepository.findByEmailFetchFLandLL(User.getEmail()).orElseThrow();
         Set<Long> userFollowingList = user.getFollowingList();
         List<Likes> userLikesList = user.getLikesList();  /** 유저가 좋아요 누른 작품 목록 **/
-        Product product = productRepository.findByEmailFetchPWUser(id).orElseThrow();
+        Product product = productRepository.findByIdFetchPWUser(id).orElseThrow();
         List<ProductWish> productWishList = product.getProductWishList();  /** 작품 찜 누른 사람 목록 **/
+        List<String> imagesUrl = getProductImages(product);  /** 이미지 엔티티에서 url만 빼오기 **/
+
         DetailForm detailForm = DetailForm.builder()
                 .id(product.getId())
                 .author(product.getAuthor())
@@ -77,7 +81,7 @@ public class ProductService {
                 .cert_uni(product.getUser().isCert_uni())
                 .cert_celeb(product.getUser().isCert_celeb())
                 .followerNum(product.getUser().getFollowerNum())
-                .photo(product.getPhoto())
+                .images(imagesUrl)
                 .title(product.getTitle())
                 .price(product.getPrice())
                 .category(product.getCategory())
@@ -120,9 +124,18 @@ public class ProductService {
         return detailForm;
     }
 
+    private List<String> getProductImages(Product product) {
+        List<String> imagesUrl = new ArrayList<>();
+        for (ProductImage image : product.getImages()) {
+            imagesUrl.add(image.getImageUrl());  /** 이미지 엔티티에서 url만 빼오기 **/
+        }
+        return imagesUrl;
+    }
+
     @Transactional(readOnly = true)
     public DetailForm showDetail(Long id){   // 글 생성
-        Product product = productRepository.findByEmailFetchPWUser(id).orElseThrow();
+        Product product = productRepository.findByIdFetchPWUser(id).orElseThrow();
+        List<String> imagesUrl = getProductImages(product);  /** 이미지 엔티티에서 url만 빼오기 **/
         DetailForm detailForm = DetailForm.builder()
                 .id(product.getId())
                 .author(product.getAuthor())
@@ -131,7 +144,7 @@ public class ProductService {
                 .cert_uni(product.getUser().isCert_uni())
                 .cert_celeb(product.getUser().isCert_celeb())
                 .followerNum(product.getUser().getFollowerNum())
-                .photo(product.getPhoto())
+                .images(imagesUrl)
                 .title(product.getTitle())
                 .price(product.getPrice())
                 .category(product.getCategory())

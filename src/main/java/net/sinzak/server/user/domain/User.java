@@ -1,14 +1,13 @@
 package net.sinzak.server.user.domain;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Getter;
 import net.sinzak.server.BaseTimeEntity;
 import net.sinzak.server.chatroom.domain.UserChatRoom;
-import net.sinzak.server.product.Likes;
-import net.sinzak.server.product.Product;
-import net.sinzak.server.product.ProductSell;
-import net.sinzak.server.product.ProductWish;
+import net.sinzak.server.product.domain.Likes;
+import net.sinzak.server.product.domain.Product;
+import net.sinzak.server.product.domain.ProductSell;
+import net.sinzak.server.product.domain.ProductWish;
 import net.sinzak.server.work.Work;
 import net.sinzak.server.work.WorkWish;
 import org.springframework.security.core.GrantedAuthority;

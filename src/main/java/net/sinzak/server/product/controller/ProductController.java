@@ -16,8 +16,10 @@ import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
@@ -29,9 +31,9 @@ public class ProductController {
     private final ProductService productService;
 
     @ApiOperation(value = "작품 판매 글 생성")
-    @PostMapping("/products/build")
-    public JSONObject makeProductPost(@LoginUser SessionUser user, /*@RequestBody*/ProductPostDto postDto) {
-        return productService.makePost(user, postDto); //해당 유저의 작품 글 리스트까지 fetch해서 가져오기.
+    @PostMapping(value = "/products/build", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public JSONObject makeProductPost(@AuthenticationPrincipal User user, @RequestPart ProductPostDto postDto, @RequestPart List<MultipartFile> multipartFile) {
+        return productService.makePost(user, postDto, multipartFile);
     }
 
     @PostMapping("/products/{id}")
