@@ -284,11 +284,12 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public JSONObject showHome(){  /**비회원 시 recommend 를 어떻게할지? **/
+    public JSONObject showHome(){
         JSONObject obj = new JSONObject();
 
         List<Product> productList = productRepository.findAll();
-        List<ShowForm> newList = new ArrayList<>();  /** 신작3개 **/
+        List<Product> recentList = productList;
+        List<ShowForm> newList = new ArrayList<>();  /** 신작 3개 **/
         for (int i = 0; i < productList.size(); i++) {
             if(i==3)
                 break;  /** 홈화면이니까 3개까지만 가져오자 **/
@@ -297,11 +298,29 @@ public class ProductService {
         }
         obj.put("new",newList);
 
-        List<ShowForm> recommendList = newList;
-        obj.put("recommend",recommendList);
+        productList.sort((o1, o2) -> o2.getLikesCnt() - o1.getLikesCnt());
 
-        List<ShowForm> followingList = newList;
-        obj.put("following",followingList);
+        List<ShowForm> hotList = new ArrayList<>();  /** 사랑받는작품 3개 **/
+        for (int i = 0; i < productList.size(); i++) {
+            if(i==3)
+                break;  /** 홈화면이니까 3개까지만 가져오자 **/
+            ShowForm showForm = new ShowForm(productList.get(i).getId(), productList.get(i).getTitle(), productList.get(i).getContent(), productList.get(i).getAuthor(), productList.get(i).getPrice(), productList.get(i).getPhoto(), productList.get(i).getCreatedDate().toString(), productList.get(i).isSuggest(), false, productList.get(i).getLikesCnt(), productList.get(i).isComplete());
+            hotList.add(showForm);
+        }
+        obj.put("hot",hotList);
+
+        List<ShowForm> tradingList = new ArrayList<>();   /** 지금 거래 중 (홈) **/
+        int cnt = 0;
+        for (Product product : recentList) {
+            if(product.getChatCnt()>=1){
+                ShowForm showForm = new ShowForm(product.getId(), product.getTitle(), product.getContent(), product.getAuthor(), product.getPrice(), product.getPhoto(), product.getCreatedDate().toString(), product.isSuggest(), false, product.getLikesCnt(), product.isComplete());
+                tradingList.add(showForm);
+                cnt++;
+                if(cnt == 3)  /** 홈화면이니까 3개까지만 가져오자 **/
+                    break;
+            }
+        }
+        obj.put("trading",tradingList);
 
         return obj;
     }
