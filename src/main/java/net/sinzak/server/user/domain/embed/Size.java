@@ -4,9 +4,9 @@ import javax.persistence.Embeddable;
 
 @Embeddable
 public class Size {
-    private int width; //가로
-    private int vertical; //세로
-    private int height; //높이
+    public int width; //가로
+    public int vertical; //세로
+    public int height; //높이
 
     public Size(int width, int vertical, int height) {
         this.width = width;

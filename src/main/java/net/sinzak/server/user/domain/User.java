@@ -4,10 +4,10 @@ import lombok.Builder;
 import lombok.Getter;
 import net.sinzak.server.BaseTimeEntity;
 import net.sinzak.server.chatroom.domain.UserChatRoom;
-import net.sinzak.server.product.Likes;
-import net.sinzak.server.product.Product;
-import net.sinzak.server.product.ProductSell;
-import net.sinzak.server.product.ProductWish;
+import net.sinzak.server.product.domain.Likes;
+import net.sinzak.server.product.domain.Product;
+import net.sinzak.server.product.domain.ProductSell;
+import net.sinzak.server.product.domain.ProductWish;
 import net.sinzak.server.work.Work;
 import net.sinzak.server.work.WorkWish;
 import org.springframework.security.core.GrantedAuthority;
@@ -116,20 +116,27 @@ public class User extends BaseTimeEntity implements UserDetails {
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles = new ArrayList<>();
 
+
     @Builder
-    public User(String name, String email, String picture, String origin, Role role) { //Collections.singletonList("ROLE_USER")로 후에 바꿔야됌
+    public User(String email, String univ_email, String name, String nickName, String univ, String categoryLike, boolean cert_uni, String origin, List<String> roles) {
         this.email = email;
-        this.picture = picture;
-        this.origin = origin;
-        this.role = role;
+        this.univ_email = univ_email;
         this.name = name;
-        this.nickName = name;
+        this.nickName = nickName;
+        this.univ = univ;
+        this.categoryLike = categoryLike;
+        this.cert_uni = cert_uni;
+        this.origin = origin;
+        this.roles = Collections.singletonList("ROLE_USER");
+        this.role = Role.GUEST;
     }
 
+    @Builder
     public User(String email, String name, String picture) {
         this.email = email;
         this.name = name;
         this.picture = picture;
+        this.categoryLike = "";
     }
 
     public User update(String name, String picture,String introduction){
