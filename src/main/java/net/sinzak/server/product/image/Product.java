@@ -1,8 +1,9 @@
-package net.sinzak.server.product;
+package net.sinzak.server.product.image;
 
 import lombok.Builder;
 import lombok.Getter;
 import net.sinzak.server.BaseTimeEntity;
+import net.sinzak.server.image.Image;
 import net.sinzak.server.user.domain.embed.Size;
 import net.sinzak.server.user.domain.User;
 
@@ -68,6 +69,9 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;  //수취인
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER) /** 사진은 무조건 같이 불러오기 **/
+    private List<Image> images;  //수취인
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
     private List<ProductWish> productWishList = new ArrayList<>();  //찜

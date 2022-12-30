@@ -1,7 +1,6 @@
 package net.sinzak.server.product.repository;
 
-import net.sinzak.server.product.Product;
-import net.sinzak.server.user.domain.User;
+import net.sinzak.server.product.image.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

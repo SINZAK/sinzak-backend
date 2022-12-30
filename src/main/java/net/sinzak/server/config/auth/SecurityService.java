@@ -3,6 +3,7 @@ package net.sinzak.server.config.auth;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.error.ErrorResponse;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.config.auth.jwt.*;
 import net.sinzak.server.user.domain.JoinTerms;
@@ -11,10 +12,13 @@ import net.sinzak.server.user.dto.request.JoinDto;
 import net.sinzak.server.user.repository.JoinTermsRepository;
 import net.sinzak.server.user.repository.UserRepository;
 import org.json.simple.JSONObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -100,5 +104,11 @@ public class SecurityService {
         refreshTokenRepository.save(updateRefreshToken);
 
         return newCreatedToken;
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    protected ErrorResponse handleException1() {
+        return ErrorResponse.of(HttpStatus.BAD_REQUEST, "유효하지 않은 토큰입니다.");
     }
 }
