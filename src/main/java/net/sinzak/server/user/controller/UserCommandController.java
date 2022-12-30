@@ -5,6 +5,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
+import net.sinzak.server.common.ApiDocumentResponse;
+import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.config.auth.LoginUser;
 import net.sinzak.server.config.auth.SecurityService;
 import net.sinzak.server.config.auth.dto.SessionUser;
@@ -31,7 +33,7 @@ public class UserCommandController {
 
     @ApiOperation(value = "jwt Authorization 헤더 테스트 페이지", notes = "헤더 테스트")
     @PostMapping("/mypage")
-    public void myPage(@AuthenticationPrincipal User user) {
+    public void myPage(@ApiIgnore @AuthenticationPrincipal User user) {
         System.out.println(user.getId());
         System.out.println(user.getUsername());
     }
@@ -48,16 +50,20 @@ public class UserCommandController {
         return securityService.reissue(tokenRequestDto);
     }
 
+    @ApiDocumentResponse
     @ApiOperation(value = "유저 정보변경", notes = "이름,한줄 소개, 학교(보류) ")
     @PostMapping(value = "/users/edit")
     public JSONObject updateUser( @RequestBody UpdateUserDto dto , @ApiIgnore @AuthenticationPrincipal User user) {
         return userCommandService.updateUser(dto,user);
     }
+    @ApiDocumentResponse
     @ApiOperation(value = "팔로우하기")
     @PostMapping(value = "/users/{userId}/follow")
     public JSONObject followUser(@PathVariable("userId") Long userId,@ApiIgnore @AuthenticationPrincipal User user){
         return userCommandService.follow(userId,user);
     }
+
+    @ApiDocumentResponse
     @ApiOperation(value = "언팔로우하기")
     @PostMapping(value = "/users/{userId}/unfollow")
     public JSONObject unFollowUser(@PathVariable("userId") Long userId,@ApiIgnore @AuthenticationPrincipal User user){

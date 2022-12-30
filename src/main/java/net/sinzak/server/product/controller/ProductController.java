@@ -13,6 +13,7 @@ import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 @Api(tags = "작품")
 @RestController
@@ -47,7 +48,7 @@ public class ProductController {
 
     @ApiOperation(value = "작품 홈")
     @PostMapping("/home/products")
-    public JSONObject showHomeProduct(@AuthenticationPrincipal User user) {
+    public JSONObject showHomeProduct(@ApiIgnore @AuthenticationPrincipal User user) {
         return productService.showHome(user);
     }
 
