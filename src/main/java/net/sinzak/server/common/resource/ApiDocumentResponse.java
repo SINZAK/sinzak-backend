@@ -1,4 +1,4 @@
-package net.sinzak.server.common;
+package net.sinzak.server.common.resource;
 
 
 import io.swagger.annotations.ApiResponse;

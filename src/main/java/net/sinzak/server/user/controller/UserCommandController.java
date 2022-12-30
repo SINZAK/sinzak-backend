@@ -5,11 +5,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
-import net.sinzak.server.common.ApiDocumentResponse;
-import net.sinzak.server.common.PropertyUtil;
-import net.sinzak.server.config.auth.LoginUser;
+import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.config.auth.SecurityService;
-import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.config.auth.jwt.TokenDto;
 import net.sinzak.server.config.auth.jwt.TokenRequestDto;
 import net.sinzak.server.user.domain.User;
@@ -20,7 +17,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.List;
 import java.util.Map;
 
 @Api(tags = "유저-명령")

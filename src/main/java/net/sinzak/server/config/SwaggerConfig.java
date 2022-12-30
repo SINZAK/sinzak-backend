@@ -31,8 +31,7 @@ public class SwaggerConfig {
     private static final String API_NAME = "신작 API";
     private static final String API_VERSION = "0.0.1";
     private static final String API_DESCRIPTION = "신작 API 명세서\n" +
-            "1.Response에 \"additionalProp\" 포함된 API는 \n{\n  success:true/false\n   message:에러메시지\n}\n 로 Response\n "+
-            "2.그 외의 것들은 실패시 Error 로그 ";
+            "1.에러 코드 Response가 없는 API는 실패시 Error 로그 ";
 
 
 
