@@ -49,7 +49,6 @@ public class ProductService {
                     .univ(user.getUniv()) // 대학
                     .price(productPost.getPrice()) // 페이
                     .suggest(productPost.isSuggest()) //가격제안여부
-                    .field(productPost.getField()) //외주분야
                     .size(new Size(productPost.getWidth(), productPost.getVertical(), productPost.getHeight()))
                     .build();
         product.setUser(user); // user 연결 및, user의 외주 글 리스트에 글 추가
@@ -91,7 +90,7 @@ public class ProductService {
                 .title(product.getTitle())
                 .price(product.getPrice())
                 .category(product.getCategory())
-                .date(product.getThumbnail())
+                .date(product.getCreatedDate().toString())
                 .content(product.getContent())
                 .suggest(product.isSuggest())
                 .likesCnt(product.getLikesCnt())
@@ -146,7 +145,7 @@ public class ProductService {
                 .title(product.getTitle())
                 .price(product.getPrice())
                 .category(product.getCategory())
-                .date(product.getThumbnail())
+                .date(product.getCreatedDate().toString())
                 .content(product.getContent())
                 .suggest(product.isSuggest())
                 .likesCnt(product.getLikesCnt())
@@ -195,7 +194,7 @@ public class ProductService {
         for (int i = 0; i < productList.size(); i++) {
             if(i==3)
                 break;  /** 홈화면이니까 3개까지만 가져오자 **/
-            ShowForm showForm = new ShowForm(productList.get(i).getId(), productList.get(i).getTitle(), productList.get(i).getContent(), productList.get(i).getAuthor(), productList.get(i).getPrice(), productList.get(i).getThumbnail(), productList.get(i).getCreatedDate().toString(), productList.get(i).isSuggest(), false, productList.get(i).getLikesCnt(), productList.get(i).isComplete(), productList.get(i).getPopularity());;
+            ShowForm showForm = new ShowForm(productList.get(i).getId(), productList.get(i).getTitle(), productList.get(i).getContent(), productList.get(i).getAuthor(), productList.get(i).getPrice(), productList.get(i).getThumbnail(), productList.get(i).getCreatedDate().toString(), productList.get(i).isSuggest(), false, productList.get(i).getLikesCnt(), productList.get(i).isComplete(), productList.get(i).getPopularity());
             newList.add(showForm);
         }
         obj.put("new",newList);
@@ -247,9 +246,7 @@ public class ProductService {
 
         Set<Long> followingIdList = user.getFollowingList();  /** 팔로잉 관련 3개 **/
 
-        List<ShowForm> followingList = getFollowingList(userLikesList, productList, followingIdList);
-
-        return followingList;
+        return getFollowingList(userLikesList, productList, followingIdList);
     }
 
     @Transactional
@@ -462,7 +459,7 @@ public class ProductService {
                     break;
                 }
             }
-            ShowForm showForm = new ShowForm(productList.get(i).getId(), productList.get(i).getTitle(), productList.get(i).getContent(), productList.get(i).getAuthor(), productList.get(i).getPrice(), productList.get(i).getThumbnail(), productList.get(i).getCreatedDate().toString(), productList.get(i).isSuggest(), isLike, productList.get(i).getLikesCnt(), productList.get(i).isComplete(), productList.get(i).getPopularity());;
+            ShowForm showForm = new ShowForm(productList.get(i).getId(), productList.get(i).getTitle(), productList.get(i).getContent(), productList.get(i).getAuthor(), productList.get(i).getPrice(), productList.get(i).getThumbnail(), productList.get(i).getCreatedDate().toString(), productList.get(i).isSuggest(), isLike, productList.get(i).getLikesCnt(), productList.get(i).isComplete(), productList.get(i).getPopularity());
             newList.add(showForm);
         }
         return newList;

@@ -6,8 +6,6 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
-import net.sinzak.server.config.auth.LoginUser;
-import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.product.dto.DetailForm;
 import net.sinzak.server.product.dto.SellDto;
 import net.sinzak.server.product.dto.ShowForm;
@@ -23,7 +21,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 import org.springframework.web.multipart.MultipartFile;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
@@ -126,7 +123,13 @@ public class ProductController {
                             "low - 낮은가격순\n" +
                             "high - 높은가격순", defaultValue = "recommend"),
             @ApiImplicitParam(name = "categories", dataType = "string", paramType = "query",
-                    value = "categories(최대 3개)", defaultValue = "")
+                    value = "categories(최대 3개)\n" +
+                            "painting - 회화일반\n" +
+                            "orient - 동양화\n" +
+                            "sculpture - 조소\n" +
+                            "print\n - 판화" +
+                            "craft\n - 공예" +
+                            "other\n - 기타", defaultValue = "생략하기")
     })
     public PageImpl<ShowForm> showMarketProduct(@AuthenticationPrincipal User user, @RequestParam(required=false, defaultValue="") List<String> categories, @RequestParam(required=false, defaultValue="recommend") String align, @ApiIgnore Pageable pageable) {
         try{

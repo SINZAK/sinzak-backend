@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.List;
+
 @Getter
 public class ShowForm {
     @ApiModelProperty(example = "작품 ID")
@@ -16,9 +18,9 @@ public class ShowForm {
     private String author;
     @ApiModelProperty(value = "작품 가격",example ="1")
     private int price;
-    @ApiModelProperty(example = "작품 대표 사진")
+    @ApiModelProperty(example = "https://sinzakimage.s3.ap-northeast-2.amazonaws.com/7aea0508-4b3b-4b52-a98e-8f699b5b4bc7.jpg")
     private String thumbnail;
-    @ApiModelProperty(example = "작품 게시일자")
+    @ApiModelProperty(example = "2023-01-02T18:26:27", notes = "작품 글 올린 날짜")
     private String date;
     @ApiModelProperty(example = "boolean",notes = "true -> 체크 한 사람(가격 제안 받겠다는 사람)")
     private boolean suggest;

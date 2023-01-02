@@ -14,7 +14,7 @@ import org.springframework.http.HttpStatus;
 @PropertySource("classpath:/application-real.properties")
 public class PropertyUtil implements EnvironmentAware {
     private static Environment environment;
-    public static String SUCCESS_WORD ="success";
+    public static final String SUCCESS_WORD ="success";
 
     @Override public void setEnvironment(final Environment environment) {
         this.environment = environment;
