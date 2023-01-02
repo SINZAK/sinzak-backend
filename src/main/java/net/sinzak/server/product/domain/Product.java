@@ -42,9 +42,6 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     private String category; //분류
 
     @Column
-    private String field;  //분야
-
-    @Column
     private int views = 2;
 
     @Column
@@ -79,7 +76,7 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     private List<ProductWish> productWishList = new ArrayList<>();  //찜
 
     @Builder
-    public Product(String title, String content, String category, int price, boolean suggest, String author, String univ, String field, Size size) {
+    public Product(String title, String content, String category, int price, boolean suggest, String author, String univ, Size size) {
         this.title = title;
         this.content = content;
         this.category = category;
@@ -87,7 +84,6 @@ public class Product extends BaseTimeEntity { /** 작품 **/
         this.suggest = suggest;
         this.author = author;
         this.univ = univ;
-        this.field = field;
         this.size = size;
     }
 

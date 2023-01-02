@@ -6,8 +6,6 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
-import net.sinzak.server.config.auth.LoginUser;
-import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.product.dto.DetailForm;
 import net.sinzak.server.product.dto.SellDto;
 import net.sinzak.server.product.dto.ShowForm;
@@ -23,7 +21,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 import org.springframework.web.multipart.MultipartFile;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
