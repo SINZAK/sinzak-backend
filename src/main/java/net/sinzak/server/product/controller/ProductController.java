@@ -126,7 +126,13 @@ public class ProductController {
                             "low - 낮은가격순\n" +
                             "high - 높은가격순", defaultValue = "recommend"),
             @ApiImplicitParam(name = "categories", dataType = "string", paramType = "query",
-                    value = "categories(최대 3개)", defaultValue = "")
+                    value = "categories(최대 3개)\n" +
+                            "painting - 회화일반\n" +
+                            "orient - 동양화\n" +
+                            "sculpture - 조소\n" +
+                            "print\n - 판화" +
+                            "craft\n - 공예" +
+                            "other\n - 기타", defaultValue = "생략하기")
     })
     public PageImpl<ShowForm> showMarketProduct(@AuthenticationPrincipal User user, @RequestParam(required=false, defaultValue="") List<String> categories, @RequestParam(required=false, defaultValue="recommend") String align, @ApiIgnore Pageable pageable) {
         try{
