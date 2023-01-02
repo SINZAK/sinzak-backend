@@ -57,6 +57,9 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     private int chatCnt = 0;
 
     @Column
+    private int popularity = 0;
+
+    @Column
     private String thumbnail;
 
     @Embedded
@@ -69,7 +72,7 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     @JoinColumn(name = "user_id")
     private User user;  //수취인
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER) /** 사진은 무조건 같이 불러오기 **/
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER) /** 사진은 무조건 EAGER로 같이 불러오기 **/
     private List<ProductImage> images = new ArrayList<>();  //수취인
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
@@ -97,19 +100,15 @@ public class Product extends BaseTimeEntity { /** 작품 **/
         this.getImages().add(images);
     }
 
-    public void plusWishCnt() {
-        this.wishCnt++;
-    }
-    public void minusWishCnt() {
-        if(wishCnt>0) wishCnt--;
-    }
-    public void plusLikesCnt() {
-        this.likesCnt++;
-    }
-    public void minusLikesCnt() {if(likesCnt>0)this.likesCnt--;}
+    public void plusWishCnt() {this.wishCnt++;this.popularity+=20;}
+    public void minusWishCnt() {if(wishCnt>0) this.wishCnt--;this.popularity-=10;    }
+    public void plusLikesCnt() {this.likesCnt++;this.popularity+=10;}
+    public void minusLikesCnt() {if(likesCnt>0)this.likesCnt--;this.popularity-=10;}
     protected Product() {}
 
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
     }
+
+    public void addViews() {this.views++;this.popularity++;}
 }

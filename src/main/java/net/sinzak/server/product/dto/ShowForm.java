@@ -2,6 +2,7 @@ package net.sinzak.server.product.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
+import springfox.documentation.annotations.ApiIgnore;
 
 @Getter
 public class ShowForm {
@@ -27,8 +28,10 @@ public class ShowForm {
     private int likesCnt;
     @ApiModelProperty(example = "판매완료 여부",notes = "true -> 판매완료")
     private boolean complete;
+    @ApiModelProperty(hidden = true)
+    private int popularity;
 
-    public ShowForm(Long id, String title, String content, String author, int price, String thumbnail, String date, boolean suggest, boolean isLike, int likesCnt, boolean complete) {
+    public ShowForm(Long id, String title, String content, String author, int price, String thumbnail, String date, boolean suggest, boolean isLike, int likesCnt, boolean complete, int popularity) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -40,5 +43,6 @@ public class ShowForm {
         this.isLike = isLike;
         this.likesCnt = likesCnt;
         this.complete = complete;
+        this.popularity = popularity;
     }
 }
