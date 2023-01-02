@@ -21,6 +21,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("select p from Product p order by p.id desc")
     Page<Product> findAll(Pageable pageable);
 
+    @Query("select p from Product p order by p.popularity desc")
+    Page<Product> findAllPopularityDesc(Pageable pageable);
+
     @Query(value = "select * from Product as p order by p.id desc limit 3", nativeQuery = true)
     List<Product> findTop3RecentProduct();
 
