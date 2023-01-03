@@ -9,6 +9,7 @@ import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.config.auth.jwt.*;
 import net.sinzak.server.user.domain.JoinTerms;
 import net.sinzak.server.user.domain.User;
+import net.sinzak.server.user.dto.request.EmailDto;
 import net.sinzak.server.user.dto.request.JoinDto;
 import net.sinzak.server.user.repository.JoinTermsRepository;
 import net.sinzak.server.user.repository.UserRepository;
@@ -35,9 +36,9 @@ public class SecurityService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
-    public TokenDto login(@RequestBody Map<String, String> User) {
+    public TokenDto login(EmailDto dto) {
 
-        User user = userRepository.findByEmail(User.get("email"))
+        User user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 ID 입니다."));
         TokenDto tokenDto = jwtProvider.createToken(user.getEmail(), user.getRoles());
         //리프레시 토큰 저장
@@ -119,5 +120,13 @@ public class SecurityService {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     protected ErrorResponse handleException1() {
         return ErrorResponse.of(HttpStatus.BAD_REQUEST, "유효하지 않은 토큰입니다.");
+    }
+
+    @Transactional(readOnly = true)
+    public JSONObject checkEmail(EmailDto dto) {
+        Optional<User> existUser = userRepository.findByEmail(dto.getEmail());
+        if (existUser.isPresent())
+            return PropertyUtil.responseMessage("이미 가입된 이메일입니다.");
+        return PropertyUtil.response(true);
     }
 }
