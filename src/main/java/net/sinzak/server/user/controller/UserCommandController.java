@@ -3,6 +3,7 @@ package net.sinzak.server.user.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
@@ -13,14 +14,15 @@ import net.sinzak.server.config.auth.jwt.TokenRequestDto;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.dto.request.EmailDto;
 import net.sinzak.server.user.dto.request.JoinDto;
+import net.sinzak.server.user.dto.request.UnivDto;
 import net.sinzak.server.user.dto.request.UpdateUserDto;
 import net.sinzak.server.user.service.UserCommandService;
 import org.json.simple.JSONObject;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
-
-import java.util.Map;
 
 @Api(tags = "유저-명령")
 @RestController
@@ -92,8 +94,6 @@ public class UserCommandController {
     public JSONObject unFollowUser(@PathVariable("userId") Long userId,@ApiIgnore @AuthenticationPrincipal User user){
         return userCommandService.unFollow(userId,user);
     }
-
-
 
 
 

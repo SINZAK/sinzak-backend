@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.user.domain.JoinTerms;
 import net.sinzak.server.user.dto.request.JoinDto;
+import net.sinzak.server.user.dto.request.UnivDto;
 import net.sinzak.server.user.dto.request.UpdateUserDto;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.common.error.InstanceNotFoundException;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import java.util.Collections;
@@ -91,15 +93,4 @@ public class UserCommandService {
         return newUser;
     }
 
-//    @Transactional //실제론 연동로그인이기에 api테스트용
-//    public JSONObject createUser2(SessionUser user){
-//        Optional<User> findUser =
-//                userRepository.findByEmail(user.getEmail());
-//        if(findUser.isPresent()){
-//            return PropertyUtil.responseMessage("이미 존재하는 회원입니다.");
-//        }
-//        User newUser = sessionUserToUser(user);
-//        userRepository.save(newUser);
-//        return PropertyUtil.response(true);
-//    }
 }

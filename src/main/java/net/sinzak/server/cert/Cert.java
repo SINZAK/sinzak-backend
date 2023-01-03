@@ -21,11 +21,16 @@ public class Cert extends BaseTimeEntity {
     private String code;  //메일 인증번호
 
     @Column
-    private boolean verified;  //메일 인증번호
+    private String imageUrl;  //학생증 url
 
-    public Cert(String univ_email, String code) {
+    @Column
+    private boolean verified;  //메일 인증여부
+
+    public Cert(String univ_email, String code, String imageUrl, boolean verified) {
         this.univ_email = univ_email;
         this.code = code;
+        this.imageUrl = imageUrl;
+        this.verified = verified;
     }
 
     protected Cert() {
@@ -33,6 +38,10 @@ public class Cert extends BaseTimeEntity {
 
     public void updateKey(String code) {
         this.code = code;
+    }
+
+    public void updateImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public void setVerified() {
