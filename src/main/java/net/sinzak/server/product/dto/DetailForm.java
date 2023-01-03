@@ -63,6 +63,8 @@ public class DetailForm {
     private int vertical;
     @ApiModelProperty(example = "30", notes = "nullable")
     private int height;
+    @ApiModelProperty(example = "false",notes = "true -> 거래중")
+    private boolean trading;
     @ApiModelProperty(example = "false",notes = "true -> 판매완료")
     private boolean complete;
 
