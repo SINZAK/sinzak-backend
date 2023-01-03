@@ -99,6 +99,7 @@ public class ProductService {
                 .width(product.getSize().width)
                 .vertical(product.getSize().vertical)
                 .height(product.getSize().height)
+                .trading(product.isTrading())
                 .complete(product.isComplete())
                 .build();
 
@@ -154,6 +155,7 @@ public class ProductService {
                 .width(product.getSize().width)
                 .vertical(product.getSize().vertical)
                 .height(product.getSize().height)
+                .trading(product.isTrading())
                 .complete(product.isComplete())
                 .build();
         detailForm.setLikeAndWish(false,false,false);
