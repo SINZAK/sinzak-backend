@@ -28,9 +28,9 @@ public class UserCommandController {
     private final SecurityService securityService;
 
 
-    @ApiOperation(value = "회원가입", notes = "{\"category_like\" : \"orient, western\" 처럼 콤마로 구분해서 보내주세요")
+    @ApiOperation(value = "회원가입", notes = "{\"category_like\" : \"orient, painting\" 처럼 콤마로 구분해서 보내주세요")
     @PostMapping("/join")
-    public TokenDto join(@RequestBody JoinDto dto) {
+    public JSONObject join(@RequestBody JoinDto dto) {
         return securityService.join(dto);
     }
 
@@ -42,8 +42,8 @@ public class UserCommandController {
 
     @ApiOperation(value = "토큰 만료시 재발급, access,refresh 둘 다 보내주세요")
     @PostMapping("/reissue")
-    public TokenDto reissue(@RequestBody TokenRequestDto tokenRequestDto) {
-        return securityService.reissue(tokenRequestDto);
+    public TokenDto reissue(@AuthenticationPrincipal User user, @RequestBody TokenRequestDto tokenRequestDto) {
+        return securityService.reissue(user, tokenRequestDto);
     }
 
     @ApiDocumentResponse

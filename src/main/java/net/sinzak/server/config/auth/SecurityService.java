@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.error.ErrorResponse;
+import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.config.auth.jwt.*;
 import net.sinzak.server.user.domain.JoinTerms;
@@ -20,8 +21,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -36,7 +39,7 @@ public class SecurityService {
 
         User user = userRepository.findByEmail(User.get("email"))
                 .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 ID 입니다."));
-        TokenDto tokenDto = jwtProvider.createToken(user.getUsername(), user.getRoles());
+        TokenDto tokenDto = jwtProvider.createToken(user.getEmail(), user.getRoles());
         //리프레시 토큰 저장
         RefreshToken refreshToken = RefreshToken.builder()
                 .key(user.getId())
@@ -49,8 +52,12 @@ public class SecurityService {
 
     private final JoinTermsRepository joinTermsRepository;
 
-    @Transactional
-    public TokenDto join(@RequestBody JoinDto dto) throws NullPointerException { //아이디 비번 이름 생일 통신사 번호 저장
+    @Transactional(rollbackFor = Exception.class)
+    public JSONObject join(@RequestBody JoinDto dto) {
+        JSONObject obj = new JSONObject();
+        Optional<User> existUser = userRepository.findByEmail(dto.getEmail());
+        if(existUser.isPresent())
+            return PropertyUtil.responseMessage("이미 가입된 이메일입니다.");
         User user = User.builder()
                 .name(dto.getName())
                 .email(dto.getEmail())
@@ -65,7 +72,7 @@ public class SecurityService {
         terms.setUser(savedUser);
         JoinTerms saveTerms = joinTermsRepository.save(terms);
         if(savedUser.getId() == null || saveTerms.getId() == null)
-            throw new UserNotFoundException("서버 오류로 저장되지 않았습니다.");
+            throw new InstanceNotFoundException("서버 오류로 저장되지 않았습니다.");
         TokenDto tokenDto = jwtProvider.createToken(user.getUsername(), user.getRoles());
         //리프레시 토큰 저장
         RefreshToken refreshToken = RefreshToken.builder()
@@ -74,11 +81,13 @@ public class SecurityService {
                 .build();
         log.warn("회원가입 완료 access token = "+tokenDto.getAccessToken());
         refreshTokenRepository.save(refreshToken);
-        return tokenDto;
+        obj.put("token",tokenDto);
+        obj.put("success",true);
+        return obj;
     }
 
     @Transactional
-    public TokenDto reissue(TokenRequestDto tokenRequestDto) {
+    public TokenDto reissue(User User,TokenRequestDto tokenRequestDto) {
         // 만료된 refresh token 에러
         if (!jwtProvider.validateToken(tokenRequestDto.getRefreshToken())) {
             throw new NoSuchElementException();
@@ -89,17 +98,17 @@ public class SecurityService {
         Authentication authentication = jwtProvider.getAuthentication(accessToken);
 
         // user pk로 유저 검색 / repo 에 저장된 Refresh Token 이 없음
-        User user = userRepository.findById(Long.parseLong(authentication.getName()))
-                .orElseThrow(NullPointerException::new);
-        RefreshToken refreshToken = refreshTokenRepository.findByKey(user.getId())
-                .orElseThrow(NullPointerException::new);
 
+        if(!authentication.getName().equals(User.getEmail()))
+            throw new NoSuchElementException();
+        List<RefreshToken> refreshTokens = refreshTokenRepository.findByKey(User.getId());
+        RefreshToken refreshToken = refreshTokens.get(refreshTokens.size()-1); //마지막꺼가 가장 최신반영된 토큰
         // 리프레시 토큰 불일치 에러
         if (!refreshToken.getToken().equals(tokenRequestDto.getRefreshToken()))
             throw new NoSuchElementException();
 
         // AccessToken, RefreshToken 토큰 재발급, 리프레쉬 토큰 저장
-        TokenDto newCreatedToken = jwtProvider.createToken(user.getUsername(), user.getRoles());
+        TokenDto newCreatedToken = jwtProvider.createToken(User.getEmail(), User.getRoles());
         RefreshToken updateRefreshToken = refreshToken.updateToken(newCreatedToken.getRefreshToken());
         refreshTokenRepository.save(updateRefreshToken);
 

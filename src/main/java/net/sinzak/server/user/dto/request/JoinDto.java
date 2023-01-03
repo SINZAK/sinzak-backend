@@ -15,7 +15,7 @@ public class JoinDto {
     private String univ_email;
     @ApiModelProperty(example = "kakao")
     private String origin;
-    @ApiModelProperty(example = "선호 카테고리",notes = "{\"category_like\" : \"orient, western\" 처럼 콤마로 구분해서 보내주세요")
+    @ApiModelProperty(example = "선호 카테고리",notes = "{\"category_like\" : \"orient, painting\" 처럼 콤마로 구분해서 보내주세요")
     private String category_like;
     @ApiModelProperty(example = "닉네임")
     private String nickName;
