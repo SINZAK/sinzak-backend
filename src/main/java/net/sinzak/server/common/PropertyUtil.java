@@ -32,13 +32,6 @@ public class PropertyUtil implements EnvironmentAware {
             obj.put(SUCCESS_WORD,false);
         return obj;
     }
-    public static JSONObject responseMessage(HttpStatus status, String message){ //그냥 json 리턴해줄때 씀
-        JSONObject obj = new JSONObject();
-        obj.put(SUCCESS_WORD, false);
-        obj.put("code",status.value());
-        obj.put("message", message);
-        return obj;
-    }
 
     public static JSONObject responseMessage(String message){ //그냥 json 리턴해줄때 씀
         JSONObject obj = new JSONObject();
