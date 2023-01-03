@@ -62,7 +62,7 @@ public class ProductService {
                 imageRepository.save(image);
             }
             catch (Exception e){
-                PropertyUtil.responseMessage("이미지 저장 실패");
+                return PropertyUtil.responseMessage("이미지 저장 실패");
             }
         }
         return PropertyUtil.response(true);

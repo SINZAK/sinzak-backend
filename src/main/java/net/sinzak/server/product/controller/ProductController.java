@@ -44,7 +44,8 @@ public class ProductController {
                     "\"title\": \"작품 판매글 제목\",\n" +
                     "\"vertical\": 150,\n" +
                     "\"width\": 120\n" +
-                    "}"),
+                    "}\n"+
+                    "주의사항 : Content-Type = application/json"),
             @ApiImplicitParam(name = "multipartFile", dataType = "multipartFile",
                     value = "파일 보내주시면 파일 s3서버에 저장 및, 해당 파일이 저장되어 있는 URL을 디비에 저장합니다")
     })
