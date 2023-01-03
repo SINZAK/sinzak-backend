@@ -11,7 +11,7 @@ import net.sinzak.server.product.dto.SellDto;
 import net.sinzak.server.product.dto.ShowForm;
 import net.sinzak.server.product.service.ProductService;
 import net.sinzak.server.product.dto.ProductPostDto;
-import net.sinzak.server.common.dto.WishForm;
+import net.sinzak.server.common.dto.ActionForm;
 import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
 import org.springframework.data.domain.PageImpl;
@@ -66,15 +66,22 @@ public class ProductController {
     @ApiDocumentResponse
     @PostMapping("/products/wish")
     @ApiOperation(value = "작품 찜")
-    public JSONObject wish(@AuthenticationPrincipal User user, @RequestBody WishForm form) {
+    public JSONObject wish(@AuthenticationPrincipal User user, @RequestBody ActionForm form) {
         return productService.wish(user, form);
     }
 
     @ApiDocumentResponse
     @PostMapping("/products/likes")
     @ApiOperation(value = "작품 좋아요")
-    public JSONObject likes(@AuthenticationPrincipal User user, @RequestBody WishForm form) {
+    public JSONObject likes(@AuthenticationPrincipal User user, @RequestBody ActionForm form) {
         return productService.likes(user, form);
+    }
+
+    @ApiDocumentResponse
+    @PostMapping("/products/trading")
+    @ApiOperation(value = "작품 거래중")
+    public JSONObject trading(@RequestBody ActionForm form) {
+        return productService.trading(form);
     }
 
     @ApiDocumentResponse

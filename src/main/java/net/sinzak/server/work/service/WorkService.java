@@ -3,7 +3,7 @@ package net.sinzak.server.work.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.config.auth.dto.SessionUser;
-import net.sinzak.server.common.dto.WishForm;
+import net.sinzak.server.common.dto.ActionForm;
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.repository.UserRepository;
@@ -14,7 +14,6 @@ import net.sinzak.server.work.repository.WorkWishRepository;
 import net.sinzak.server.work.dto.WorkPostDto;
 import org.json.simple.JSONObject;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,7 +50,7 @@ public class WorkService {
     }
 
     @Transactional
-    public JSONObject wish(SessionUser tempUser, @RequestBody WishForm form){   // 좋아요
+    public JSONObject wish(SessionUser tempUser, @RequestBody ActionForm form){   // 좋아요
         JSONObject obj = new JSONObject();
         User user = userRepository.findByEmailFetchWW(tempUser.getEmail()).orElseThrow(); // 외주 찜까지 페치 조인
         List<WorkWish> wishList = user.getWorkWishList(); //wishList == 유저의 외주 찜 리스트
@@ -91,7 +90,7 @@ public class WorkService {
             obj.put("isWish",isWish);
             return obj;
         }
-        return PropertyUtil.responseMessage(HttpStatus.NOT_FOUND,"존재하지 않는 외주 글에 요청된 찜");
+        return PropertyUtil.responseMessage("존재하지 않는 외주 글에 요청된 찜");
     }
 
 

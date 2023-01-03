@@ -12,13 +12,12 @@ import net.sinzak.server.product.repository.*;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.domain.embed.Size;
 import net.sinzak.server.product.dto.ProductPostDto;
-import net.sinzak.server.common.dto.WishForm;
+import net.sinzak.server.common.dto.ActionForm;
 import net.sinzak.server.user.repository.UserRepository;
 import org.json.simple.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -250,7 +249,7 @@ public class ProductService {
     }
 
     @Transactional
-    public JSONObject wish(User User, @RequestBody WishForm form){   // 찜
+    public JSONObject wish(User User, @RequestBody ActionForm form){   // 찜
         JSONObject obj = new JSONObject();
         User user = userRepository.findByEmailFetchPW(User.getEmail()).orElseThrow(); // 작품 찜까지 페치 조인
         List<ProductWish> wishList = user.getProductWishList(); //wishList == 유저의 찜 리스트
@@ -290,11 +289,11 @@ public class ProductService {
             obj.put("isWish",isWish);
             return obj;
         }
-        return PropertyUtil.responseMessage(HttpStatus.NOT_FOUND,"존재하지 않는 작품에 요청된 찜");
+        return PropertyUtil.responseMessage("존재하지 않는 작품에 요청된 찜");
     }
 
     @Transactional
-    public JSONObject likes(User User, @RequestBody WishForm form){   // 좋아요
+    public JSONObject likes(User User, @RequestBody ActionForm form){   // 좋아요
         JSONObject obj = new JSONObject();
         User user = userRepository.findByEmailFetchLL(User.getEmail()).orElseThrow(); // 작품 좋아요까지 페치 조인
         List<Likes> likesList = user.getLikesList(); //likesList == 유저의 좋아요 리스트
@@ -334,7 +333,32 @@ public class ProductService {
             obj.put("isLike",isLike);
             return obj;
         }
-        return PropertyUtil.responseMessage(HttpStatus.NOT_FOUND,"존재하지 않는 작품에 요청된 좋아요");
+        return PropertyUtil.responseMessage("존재하지 않는 작품에 요청된 좋아요");
+    }
+
+    @Transactional
+    public JSONObject trading(@RequestBody ActionForm form){   // 거래중
+        JSONObject obj = new JSONObject();
+        boolean isTrading;
+        Optional<Product> Product = productRepository.findById(form.getId());
+        if(Product.isPresent()){
+            Product product = Product.get();
+            isTrading = product.isTrading();
+            if (form.isMode() && !isTrading){
+                product.setTrading(true);
+                isTrading=true;
+                obj.put("success",true);
+            }
+            else if(!form.isMode() && isTrading){
+                product.setTrading(false);
+                obj.put("success",true);
+            }
+            else
+                obj.put("success",false);
+            obj.put("isTrading",isTrading);
+            return obj;
+        }
+        return PropertyUtil.responseMessage("존재하지 않는 작품에 요청된 좋아요");
     }
 
     @Transactional
