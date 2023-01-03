@@ -39,17 +39,17 @@ public class ProductService {
     private final S3Service s3Service;
 
     @Transactional(rollbackFor = {Exception.class})
-    public JSONObject makePost(User User, ProductPostDto productPost, List<MultipartFile> multipartFiles){   // 글 생성
+    public JSONObject makePost(User User, ProductPostDto buildDto, List<MultipartFile> multipartFiles){   // 글 생성
         User user = userRepository.findByEmailFetchPP(User.getEmail()).orElseThrow(); /** 존재 하지 않는 유저면 NullPointer 에러 뜰거고, 핸들러가 처리 할 예정 **/
         Product product = Product.builder()
-                    .title(productPost.getTitle())  //제목
-                    .content(productPost.getContent()) //내용
-                    .category(productPost.getCategory())
+                    .title(buildDto.getTitle())  //제목
+                    .content(buildDto.getContent()) //내용
+                    .category(buildDto.getCategory())
                     .author(user.getNickName()) //닉네임
                     .univ(user.getUniv()) // 대학
-                    .price(productPost.getPrice()) // 페이
-                    .suggest(productPost.isSuggest()) //가격제안여부
-                    .size(new Size(productPost.getWidth(), productPost.getVertical(), productPost.getHeight()))
+                    .price(buildDto.getPrice()) // 페이
+                    .suggest(buildDto.isSuggest()) //가격제안여부
+                    .size(new Size(buildDto.getWidth(), buildDto.getVertical(), buildDto.getHeight()))
                     .build();
         product.setUser(user); // user 연결 및, user의 외주 글 리스트에 글 추가
         productRepository.save(product); // 미리 저장해야 이미지도 저장가능..
