@@ -31,10 +31,7 @@ public class DetailForm {
     private boolean isFollowing;
 
 
-    @ApiModelProperty(example = "[\n" +
-            "    \"https://sinzakimage.s3.ap-northeast-2.amazonaws.com/7aea0508-4b3b-4b52-a98e-8f699b5b4bc7.jpg\"\n" +
-            "    \"https://sinzakimage.s3.ap-northeast-2.amazonaws.com/kkkjjwej-abcd-gfff-1234-akfuwagukawe.jpg\"\n" +
-            "  ]")  /** 작품 조회 **/
+    @ApiModelProperty(value = "[이미지[0], 이미지배열[1], 이미지배열[2] ...]")  /** 작품 조회 **/
     private List<String> images;
     @ApiModelProperty(example = "작품 판매글 제목")
     private String title;

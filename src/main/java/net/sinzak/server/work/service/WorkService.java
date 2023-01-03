@@ -40,12 +40,10 @@ public class WorkService {
                 .content(workPost.getContent()) //내용
                 .userName(user.getNickName()) //닉네임
                 .univ(user.getUniv()) // 대학
-                .category(workPost.getCategory())
+                .category(workPost.getCategory()) //카테고리
                 .pay(workPost.getPay()) // 페이
                 .suggest(workPost.isSuggest()) //가격제안여부
-                .field(workPost.getField()) //외주분야
                 .employment(workPost.isEmployment()) //고용자 or 피고용자
-                .photo(workPost.getPhoto())
                 .build(); // 사진
         work.setUser(user); // user 연결 및, user의 외주 글 리스트에 글 추가
         workRepository.save(work);
