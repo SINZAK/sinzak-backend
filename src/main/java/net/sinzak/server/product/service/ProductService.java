@@ -52,14 +52,14 @@ public class ProductService {
                     .build();
         product.setUser(user); // user 연결 및, user의 외주 글 리스트에 글 추가
         productRepository.save(product); // 미리 저장해야 이미지도 저장가능..
+        return saveImageInS3AndProduct(multipartFiles, product);
+    }
+
+    private JSONObject saveImageInS3AndProduct(List<MultipartFile> multipartFiles, Product product) {
         for (MultipartFile img : multipartFiles) {  /** 이미지 추가, s3에 저장 **/
             try{
-                String url = s3Service.uploadImage(img);
-                if(img.equals(multipartFiles.get(0)))
-                    product.setThumbnail(url);
-                ProductImage image = new ProductImage(url,product);
-                product.addImage(image);
-                imageRepository.save(image);
+                String url = uploadImage(multipartFiles, product, img);
+                saveImageUrl(product, url);
             }
             catch (Exception e){
                 return PropertyUtil.responseMessage("이미지 저장 실패");
@@ -68,14 +68,24 @@ public class ProductService {
         return PropertyUtil.response(true);
     }
 
+
+    private String uploadImage(List<MultipartFile> multipartFiles, Product product, MultipartFile img) {
+        String url = s3Service.uploadImage(img);
+        if(img.equals(multipartFiles.get(0)))
+            product.setThumbnail(url);
+        return url;
+    }
+
+    private void saveImageUrl(Product product, String url) {
+        ProductImage image = new ProductImage(url, product);
+        product.addImage(image);
+        imageRepository.save(image);
+    }
+
     @Transactional
     public DetailForm showDetail(Long id, User User){   // 글 상세 확인
-        User user = userRepository.findByEmailFetchFLandLL(User.getEmail()).orElseThrow();
-        Set<Long> userFollowingList = user.getFollowingList();
-        List<Likes> userLikesList = user.getLikesList();  /** 유저가 좋아요 누른 작품 목록 **/
+        User user = userRepository.findByEmailFetchFLandLL(User.getEmail()).orElseThrow(); /** 팔로우리스트, 좋아요리스트 페치 조인 **/
         Product product = productRepository.findByIdFetchPWUser(id).orElseThrow();
-        List<ProductWish> productWishList = product.getProductWishList();  /** 작품 찜 누른 사람 목록 **/
-        List<String> imagesUrl = getProductImages(product);  /** 이미지 엔티티에서 url만 빼오기 **/
 
         DetailForm detailForm = DetailForm.builder()
                 .id(product.getId())
@@ -85,7 +95,7 @@ public class ProductService {
                 .cert_uni(product.getUser().isCert_uni())
                 .cert_celeb(product.getUser().isCert_celeb())
                 .followerNum(product.getUser().getFollowerNum())
-                .images(imagesUrl)
+                .images(getProductImages(product))  /** 이미지 엔티티에서 url만 빼오기 **/
                 .title(product.getTitle())
                 .price(product.getPrice())
                 .category(product.getCategory())
@@ -100,16 +110,29 @@ public class ProductService {
                 .vertical(product.getSize().vertical)
                 .height(product.getSize().height)
                 .trading(product.isTrading())
-                .complete(product.isComplete())
-                .build();
+                .complete(product.isComplete()).build();
 
+        boolean isLike = checkIsLikes(user.getLikesList(), product);  /** 유저가 좋아요 누른 작품 목록 **/
+        boolean isWish = checkIsWish(user, product.getProductWishList());  /** 인수 : 유저, 해당 작품 찜 누른 사람 목록 **/
+        boolean isFollowing  = checkIsFollowing(user.getFollowingList(), product); /** 인수 : 유저의 팔로잉 목록, 해당 작품(작성자) **/
+
+        detailForm.setUserAction(isLike, isWish, isFollowing); /** 유저의 좋아요, 찜, 팔로우여부 **/
+        product.addViews();
+        return detailForm;
+    }
+
+    private boolean checkIsLikes(List<Likes> userLikesList, Product product) {
         boolean isLike = false;
         for (Likes likes : userLikesList) {
-            if(likes.getProduct().getId().equals(product.getId())){
+            if (likes.getProduct().getId().equals(product.getId())) {
                 isLike = true;
                 break;
             }
         }
+        return isLike;
+    }
+
+    private boolean checkIsWish(User user, List<ProductWish> productWishList) {
         boolean isWish = false;
         for (ProductWish productWish : productWishList) {
             if(productWish.getUser().getId().equals(user.getId())){
@@ -117,6 +140,10 @@ public class ProductService {
                 break;
             }
         }
+        return isWish;
+    }
+
+    private boolean checkIsFollowing(Set<Long> userFollowingList, Product product) {
         boolean isFollowing = false;
         for (Long followingId : userFollowingList) {
             if(product.getUser().getId().equals(followingId)){
@@ -124,13 +151,11 @@ public class ProductService {
                 break;
             }
         }
-        detailForm.setLikeAndWish(isLike,isWish, isFollowing);
-        product.addViews();
-        return detailForm;
+        return isFollowing;
     }
 
     @Transactional
-    public DetailForm showDetail(Long id){   // 글 생성
+    public DetailForm showDetail(Long id){   // 비회원 글 보기
         Product product = productRepository.findByIdFetchPWUser(id).orElseThrow();
         List<String> imagesUrl = getProductImages(product);  /** 이미지 엔티티에서 url만 빼오기 **/
         DetailForm detailForm = DetailForm.builder()
@@ -158,7 +183,7 @@ public class ProductService {
                 .trading(product.isTrading())
                 .complete(product.isComplete())
                 .build();
-        detailForm.setLikeAndWish(false,false,false);
+        detailForm.setUserAction(false,false,false);
         product.addViews();
         return detailForm;
     }
@@ -167,21 +192,14 @@ public class ProductService {
     @Transactional(readOnly = true)
     public JSONObject showHome(User User){
         JSONObject obj = new JSONObject();
-
         User user = userRepository.findByEmailFetchFLandLL(User.getEmail()).orElseThrow();
-        List<Likes> userLikesList = user.getLikesList();  /** 유저 좋아요 목록 **/
         List<Product> productList = productRepository.findAll();
-        List<ShowForm> newList = getNewList(userLikesList, productList);  /** 신작 3개 **/
-        obj.put("new",newList);
 
-        int count = 3;
-        List<ShowForm> recommendList = getRecommendList(user, userLikesList, productList,count);  /** 추천목록 3개 **/
-        obj.put("recommend",recommendList);
+        obj.put("new", getNewList(user.getLikesList(), productList));   /** 신작 3개 **/
 
-        Set<Long> followingIdList = user.getFollowingList();  /** 팔로잉 관련 3개 **/
-        List<ShowForm> followingList = getFollowingList(userLikesList, productList, followingIdList);
-        obj.put("following",followingList);
+        obj.put("recommend", getRecommendList(user, user.getLikesList() , productList)); /** 추천목록 3개 **/
 
+        obj.put("following",getFollowingList(user.getLikesList(), productList, user.getFollowingList())); /** 팔로잉 관련 3개 **/
         return obj;
     }
 
@@ -191,41 +209,44 @@ public class ProductService {
 
         List<Product> productList = productRepository.findAll();
         List<Product> recentList = productList;
-        List<ShowForm> newList = new ArrayList<>();  /** 신작 3개 **/
-        for (int i = 0; i < productList.size(); i++) {
-            if(i==3)
-                break;  /** 홈화면이니까 3개까지만 가져오자 **/
-            ShowForm showForm = new ShowForm(productList.get(i).getId(), productList.get(i).getTitle(), productList.get(i).getContent(), productList.get(i).getAuthor(), productList.get(i).getPrice(), productList.get(i).getThumbnail(), productList.get(i).getCreatedDate().toString(), productList.get(i).isSuggest(), false, productList.get(i).getLikesCnt(), productList.get(i).isComplete(), productList.get(i).getPopularity());
-            newList.add(showForm);
-        }
+        List<ShowForm> newList = getProductListForNonUser(productList);
         obj.put("new",newList);
 
-        productList.sort((o1, o2) -> o2.getLikesCnt() - o1.getLikesCnt());
-
-        List<ShowForm> hotList = new ArrayList<>();  /** 좋아요 순 작품 3개 **/
-        for (int i = 0; i < productList.size(); i++) {
-            if(i==3)
-                break;  /** 홈화면이니까 3개까지만 가져오자 **/
-            ShowForm showForm = new ShowForm(productList.get(i).getId(), productList.get(i).getTitle(), productList.get(i).getContent(), productList.get(i).getAuthor(), productList.get(i).getPrice(), productList.get(i).getThumbnail(), productList.get(i).getCreatedDate().toString(), productList.get(i).isSuggest(), false, productList.get(i).getLikesCnt(), productList.get(i).isComplete(), productList.get(i).getPopularity());
-            hotList.add(showForm);
-        }
+        productList.sort((o1, o2) -> o2.getLikesCnt() - o1.getLikesCnt()); /** 좋아요 순 정렬!! **/
+        List<ShowForm> hotList = getProductListForNonUser(productList);
         obj.put("hot",hotList);
 
+
+        List<ShowForm> tradingList = getTradingList(recentList); /**최신 목록 내림차순 중 채팅수가 1이상, 거래 완료되지 않은 것 보여주기 **/
+        obj.put("trading",tradingList);
+
+        return obj;
+    }
+
+    private List<ShowForm> getProductListForNonUser(List<Product> productList) {
+        List<ShowForm> newList = new ArrayList<>();  /** 신작 3개 **/
+        for (int i = 0; i < productList.size(); i++) {
+            if (i == 3)
+                break;  /** 홈화면이니까 3개까지만 가져오자 **/
+            addProductInJSONFormat(newList, productList.get(i), false);
+        }
+        return newList;
+    }
+
+    private List<ShowForm> getTradingList(List<Product> recentList) {
         List<ShowForm> tradingList = new ArrayList<>();   /** 지금 거래 중 (홈) **/
         int cnt = 0;
         for (Product product : recentList) {
-            if(product.getChatCnt()>=1){
-                ShowForm showForm = new ShowForm(product.getId(), product.getTitle(), product.getContent(), product.getAuthor(), product.getPrice(), product.getThumbnail(), product.getCreatedDate().toString(), product.isSuggest(), false, product.getLikesCnt(), product.isComplete(), product.getPopularity());
-                tradingList.add(showForm);
+            if(product.getChatCnt()>=1 && !product.isComplete()){
+                addProductInJSONFormat(tradingList, product, false);
                 cnt++;
                 if(cnt == 3)  /** 홈화면이니까 3개까지만 가져오자 **/
                     break;
             }
         }
-        obj.put("trading",tradingList);
-
-        return obj;
+        return tradingList;
     }
+
 
     @Transactional(readOnly = true)
     public List<ShowForm> showRecommendDetail(User User){
@@ -234,7 +255,7 @@ public class ProductService {
         List<Product> productList = productRepository.findAll();
 
         int count = 50;
-        List<ShowForm> recommendList = getRecommendList(user, userLikesList, productList, count);  /** 추천목록 50개까지만 **/
+        List<ShowForm> recommendList = getRecommendList(user, userLikesList, productList);  /** 추천목록 50개까지만 **/
 
         return recommendList;
     }
@@ -382,17 +403,10 @@ public class ProductService {
             productList = categoryFilter(categories, pageable);  //파라미터 입력받았을 경우
         List<ShowForm> showList = new ArrayList<>();
         for (Product product : productList.getContent()) {
-            boolean isLike = false;
-            for (Likes likes : userLikesList) {
-                if(likes.getProduct().getId().equals(product.getId())){
-                    isLike = true;
-                    break;
-                }
-            }
-            ShowForm showForm = new ShowForm(product.getId(), product.getTitle(), product.getContent(), product.getAuthor(), product.getPrice(), product.getThumbnail(),product.getCreatedDate().toString(),product.isSuggest(),isLike, product.getLikesCnt(), product.isComplete(), product.getPopularity());
-            showList.add(showForm);
+            boolean isLike = checkIsLikes(userLikesList, product);
+            addProductInJSONFormat(showList, product, isLike);
         }
-        standardFilter(align, showList);
+        standardFilter(align, showList);  /** 선택한 기준대로 정렬 **/
         return new PageImpl<>(showList, pageable, productList.getTotalElements());
     }
 
@@ -406,10 +420,9 @@ public class ProductService {
         List<ShowForm> showList = new ArrayList<>();
 
         for (Product product : productList.getContent()) {
-            ShowForm showForm = new ShowForm(product.getId(), product.getTitle(), product.getContent(), product.getAuthor(), product.getPrice(), product.getThumbnail(),product.getCreatedDate().toString(),product.isSuggest(),false, product.getLikesCnt(), product.isComplete(), product.getPopularity());
-            showList.add(showForm);
+            addProductInJSONFormat(showList, product, false);
         }
-        standardFilter(align, showList);
+        standardFilter(align, showList);  /** 선택한 기준대로 정렬 **/
         return new PageImpl<>(showList, pageable, productList.getTotalElements());
     }
 
@@ -447,30 +460,28 @@ public class ProductService {
     }
 
 
-    private List<ShowForm> getRecommendList(User user, List<Likes> userLikesList, List<Product> productList, int count) {
+    private List<ShowForm> getRecommendList(User user, List<Likes> userLikesList, List<Product> productList) {
         List<Product> tempRecommendList; /** 카테고리 관련 **/
         String[] categories = user.getCategoryLike().split(",");
         if(categories.length == 1)
-            tempRecommendList = productRepository.find1Recommend3(categories[0], count);
+            tempRecommendList = productRepository.find1RecommendLimit(categories[0], 3);
         else if(categories.length == 2)
-            tempRecommendList = productRepository.find2Recommend3(categories[0],categories[1], count);
+            tempRecommendList = productRepository.find2RecommendLimit(categories[0],categories[1], 3);
         else if(categories.length == 3)
-            tempRecommendList = productRepository.find3Recommend3(categories[0],categories[1],categories[2], count);
+            tempRecommendList = productRepository.find3RecommendLimit(categories[0],categories[1],categories[2], 3);
         else
             tempRecommendList = productList;
         List<ShowForm> recommendList = new ArrayList<>();
         for (Product product : tempRecommendList) { /** 추천 목록 중 좋아요 누른거 체크 후 ShowForm 으로 담기 **/
-            boolean isLike = false;
-            for (Likes likes : userLikesList) {
-                if(likes.getProduct().getId().equals(product.getId())){
-                    isLike = true;
-                    break;
-                }
-            }
-            ShowForm showForm = new ShowForm(product.getId(), product.getTitle(), product.getContent(), product.getAuthor(), product.getPrice(), product.getThumbnail(),product.getCreatedDate().toString(),product.isSuggest(), isLike, product.getLikesCnt(), product.isComplete(), product.getPopularity());
-            recommendList.add(showForm);
+            boolean isLike = checkIsLikes(userLikesList, product);
+            addProductInJSONFormat(recommendList, product, isLike);
         }
         return recommendList;
+    }
+
+    private void addProductInJSONFormat(List<ShowForm> recommendList, Product product, boolean isLike) {
+        ShowForm showForm = new ShowForm(product.getId(), product.getTitle(), product.getContent(), product.getAuthor(), product.getPrice(), product.getThumbnail(), product.getCreatedDate().toString(), product.isSuggest(), isLike, product.getLikesCnt(), product.isComplete(), product.getPopularity());
+        recommendList.add(showForm);
     }
 
     private List<ShowForm> getNewList(List<Likes> userLikesList, List<Product> productList) {
@@ -478,19 +489,11 @@ public class ProductService {
         for (int i = 0; i < productList.size(); i++) {
             if(i==3)
                 break;  /** 홈화면이니까 3개까지만 가져오자 **/
-            boolean isLike = false;
-            for (Likes likes : userLikesList) {
-                if (likes.getProduct().getId().equals(productList.get(i).getId())) {
-                    isLike = true;
-                    break;
-                }
-            }
-            ShowForm showForm = new ShowForm(productList.get(i).getId(), productList.get(i).getTitle(), productList.get(i).getContent(), productList.get(i).getAuthor(), productList.get(i).getPrice(), productList.get(i).getThumbnail(), productList.get(i).getCreatedDate().toString(), productList.get(i).isSuggest(), isLike, productList.get(i).getLikesCnt(), productList.get(i).isComplete(), productList.get(i).getPopularity());
-            newList.add(showForm);
+            boolean isLike = checkIsLikes(userLikesList, productList.get(i));
+            addProductInJSONFormat(newList, productList.get(i), isLike);
         }
         return newList;
     }
-
 
     private List<ShowForm> getFollowingList(List<Likes> userLikesList, List<Product> productList, Set<Long> followingIdList) {
         List<Product> followingProductList = new ArrayList<>();
@@ -506,19 +509,11 @@ public class ProductService {
         for (int i = 0; i < followingProductList.size(); i++) {
             if(i==3)
                 break;  /** 홈화면이니까 3개까지만 가져오자 **/
-            boolean isLike = false;
-            for (Likes likes : userLikesList) {
-                if(likes.getProduct().getId().equals(followingProductList.get(i).getId())){
-                    isLike = true;
-                    break;
-                }
-            }
-            ShowForm showForm = new ShowForm(followingProductList.get(i).getId(), followingProductList.get(i).getTitle(), followingProductList.get(i).getContent(), followingProductList.get(i).getAuthor(), followingProductList.get(i).getPrice(), followingProductList.get(i).getThumbnail(), followingProductList.get(i).getCreatedDate().toString(), followingProductList.get(i).isSuggest(), isLike, followingProductList.get(i).getLikesCnt(), followingProductList.get(i).isComplete(), followingProductList.get(i).getPopularity());
-            followingList.add(showForm);
+            boolean isLike = checkIsLikes(userLikesList, followingProductList.get(i));
+            addProductInJSONFormat(followingList, followingProductList.get(i), isLike);
         }
 
         return followingList;
     }
-
 
 }
