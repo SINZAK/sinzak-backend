@@ -32,7 +32,7 @@ public class WorkService {
 
     @Transactional
     public JSONObject makeWorkPost(SessionUser tempUser, WorkPostDto workPost){
-        User user = userRepository.findByEmailFetchWP(tempUser.getEmail()).orElseThrow(); //해당 유저의 외주 글 리스트까지 fetch해서 가져오기.
+        User user = userRepository.findByEmailFetchWorkPostList(tempUser.getEmail()).orElseThrow(); //해당 유저의 외주 글 리스트까지 fetch해서 가져오기.
                             /** 존재 하지 않는 유저면 NullPointer 에러 뜰거고, 핸들러가 처리 할 예정 **/
         Work work = Work.builder()
                 .title(workPost.getTitle())  //제목
@@ -52,7 +52,7 @@ public class WorkService {
     @Transactional
     public JSONObject wish(SessionUser tempUser, @RequestBody ActionForm form){   // 좋아요
         JSONObject obj = new JSONObject();
-        User user = userRepository.findByEmailFetchWW(tempUser.getEmail()).orElseThrow(); // 외주 찜까지 페치 조인
+        User user = userRepository.findByEmailFetchWorkWishList(tempUser.getEmail()).orElseThrow(); // 외주 찜까지 페치 조인
         List<WorkWish> wishList = user.getWorkWishList(); //wishList == 유저의 외주 찜 리스트
         boolean isWish=false;
         Optional<Work> Work = workRepository.findById(form.getId());
