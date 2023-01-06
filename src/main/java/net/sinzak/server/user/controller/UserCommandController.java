@@ -7,6 +7,9 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
+import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.error.ErrorResponse;
+import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.config.auth.SecurityService;
 import net.sinzak.server.config.auth.jwt.TokenDto;
@@ -18,11 +21,14 @@ import net.sinzak.server.user.dto.request.UnivDto;
 import net.sinzak.server.user.dto.request.UpdateUserDto;
 import net.sinzak.server.user.service.UserCommandService;
 import org.json.simple.JSONObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.NoSuchElementException;
 
 @Api(tags = "유저-명령")
 @RestController
@@ -117,5 +123,16 @@ public class UserCommandController {
 //    public JSONObject createUser2(@RequestBody SessionUser user) {
 //        return userCommandService.createUser2(user);
 //    }
+    @ExceptionHandler(NoSuchElementException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    protected JSONObject handleException1() {
+        return PropertyUtil.responseMessage("유효하지 않은 토큰입니다.");
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    protected JSONObject handleUserNotFoundException() {
+        return PropertyUtil.responseMessage("가입되지 않은 ID입니다.");
+    }
 }
 
