@@ -69,9 +69,9 @@ public class DetailForm {
     private boolean complete;
 
 
-    public void setLikeAndWish(boolean like, boolean wish, boolean isFollowing) {
-        isLike = like;
-        isWish = wish;
+    public void setUserAction(boolean like, boolean wish, boolean isFollowing) {
+        this.isLike = like;
+        this.isWish = wish;
         this.isFollowing = isFollowing;
     }
 }

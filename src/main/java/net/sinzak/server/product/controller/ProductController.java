@@ -104,13 +104,13 @@ public class ProductController {
         }
     }
 
-    @ApiOperation(value = "작품 추천 상세페이지")
+    @ApiOperation(value = "홈 - 추천 더보기")
     @PostMapping("/home/recommend")
     public List<ShowForm> showRecommendDetail(@AuthenticationPrincipal User user) {
         return productService.showRecommendDetail(user);
     }
 
-    @ApiOperation(value = "작품 추천 상세페이지")
+    @ApiOperation(value = "홈 - 팔로잉 더보기")
     @PostMapping("/home/following")
     public List<ShowForm> showFollowingDetail(@AuthenticationPrincipal User user) {
         return productService.showFollowingDetail(user);
