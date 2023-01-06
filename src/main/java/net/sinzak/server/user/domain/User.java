@@ -156,6 +156,10 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.cert_uni = true;
     }
 
+    public void updateEmail(String email) {
+        this.email = email;
+    }
+
     public void updateFollowNumber(){
         this.followerNum = followNumberTrans(this.getFollowerList().size());
         this.followingNum = followNumberTrans(this.getFollowingList().size());
