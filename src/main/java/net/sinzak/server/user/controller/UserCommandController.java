@@ -130,7 +130,7 @@ public class UserCommandController {
     }
 
     @ExceptionHandler(UserNotFoundException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseStatus(HttpStatus.OK)
     protected JSONObject handleUserNotFoundException() {
         return PropertyUtil.responseMessage("가입되지 않은 ID입니다.");
     }
