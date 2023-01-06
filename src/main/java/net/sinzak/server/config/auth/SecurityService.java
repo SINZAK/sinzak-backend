@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.error.ErrorResponse;
 import net.sinzak.server.common.error.InstanceNotFoundException;
+import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.config.auth.jwt.*;
 import net.sinzak.server.user.domain.JoinTerms;
 import net.sinzak.server.user.domain.User;
@@ -37,7 +38,7 @@ public class SecurityService {
     public TokenDto login(EmailDto dto) {
 
         User user = userRepository.findByEmail(dto.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 ID 입니다."));
+                .orElseThrow(() -> new UserNotFoundException("가입되지 않은 ID 입니다."));
         TokenDto tokenDto = jwtProvider.createToken(user.getEmail(), user.getRoles());
         //리프레시 토큰 저장
         RefreshToken refreshToken = RefreshToken.builder()
