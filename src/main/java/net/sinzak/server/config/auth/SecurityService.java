@@ -117,18 +117,7 @@ public class SecurityService {
         return newCreatedToken;
     }
 
-    @ExceptionHandler(NoSuchElementException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    protected ErrorResponse handleException1() {
-        return ErrorResponse.of(HttpStatus.BAD_REQUEST, "유효하지 않은 토큰입니다.");
-    }
 
-
-    @ExceptionHandler(UserNotFoundException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    protected JSONObject handleException2() {
-        return PropertyUtil.responseMessage("가입되지 않은 ID입니다.");
-    }
     @Transactional(readOnly = true)
     public JSONObject checkEmail(EmailDto dto) {
         Optional<User> existUser = userRepository.findByEmail(dto.getEmail());
