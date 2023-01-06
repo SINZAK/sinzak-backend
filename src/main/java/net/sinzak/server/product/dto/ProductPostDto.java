@@ -16,12 +16,8 @@ public class ProductPostDto {
     private String category;
     @ApiModelProperty(value ="작품 가격",example ="30000",notes = "int 값 이상 안들어오게 프론트라인 체크 필수")
     private int price;
-    @ApiModelProperty(example = "작품 모집글 가격 제안 여부 true/false",notes = "true -> 체크 한 사람(가격 제안 받겠다는 사람)")
+    @ApiModelProperty(value = "작품 모집글 가격 제안 여부", example = "false" ,notes = "true -> 체크 한 사람(가격 제안 받겠다는 사람)")
     private boolean suggest;
-    @ApiModelProperty(example = "작품 분야")
-    private String field;
-    @ApiModelProperty(example = "작품 사진")
-    private String photo;
 
     @ApiModelProperty(value = "가로 사이즈",example ="120")
     private int width;

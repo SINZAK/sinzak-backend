@@ -21,6 +21,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("select p from Product p order by p.id desc")
     Page<Product> findAll(Pageable pageable);
 
+    @Query("select p from Product p order by p.popularity desc")
+    Page<Product> findAllPopularityDesc(Pageable pageable);
+
+    @Query(value = "select * from Product as p order by p.id desc limit 3", nativeQuery = true)
+    List<Product> findTop3RecentProduct();
+
+    @Query(value = "select * from Product as p order by p.likesCnt desc limit 3", nativeQuery = true)
+    List<Product> findTop3HotProduct();
+
     @Query("select p from Product p left join fetch p.productWishList where p.id = :id")
     Optional<Product> findByIdFetchPW(@Param("id")Long id);   /** 해당 작품 찜을 누른 유저 목록까지 불러오기 **/
 
@@ -28,11 +37,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findByIdFetchPWUser(@Param("id")Long id);   /** 해당 작품 찜을 누른 유저 목록까지 불러오기 **/
 
     @Query(value = "select * from product as p where p.category like %:category1% order by p.product_id desc limit :count", nativeQuery = true)
-    List<Product> find1Recommend3(@Param("category1") String category1, @Param("count") int count);
+    List<Product> find1RecommendLimit(@Param("category1") String category1, @Param("count") int count);
     @Query(value = "select * from product as p where p.category like %:category1% or p.category like %:category2% order by p.product_id desc limit :count", nativeQuery = true)
-    List<Product> find2Recommend3(@Param("category1") String category1, @Param("category2") String category2, @Param("count") int count);
+    List<Product> find2RecommendLimit(@Param("category1") String category1, @Param("category2") String category2, @Param("count") int count);
     @Query(value = "select * from product as p where p.category like %:category1% or p.category like %:category2% or p.category like %:category3% order by p.product_id desc limit :count", nativeQuery = true)
-    List<Product> find3Recommend3(@Param("category1") String category1, @Param("category2") String category2, @Param("category3") String category3, @Param("count") int count);
+    List<Product> find3RecommendLimit(@Param("category1") String category1, @Param("category2") String category2, @Param("category3") String category3, @Param("count") int count);
 
     @Query("select p from Product p where p.category like %:stack1% order by p.id desc")
     Page<Product> findBy1StacksDesc(Pageable pageable, @Param("stack1") String stack1);
@@ -42,5 +51,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("select p from Product p where p.category like %:stack1% or p.category like %:stack2% or p.category like %:stack3% order by p.id desc")
     Page<Product> findBy3StacksDesc(Pageable pageable, @Param("stack1")String stack1, @Param("stack2")String stack2, @Param("stack3")String stack3);
+
 
 }
