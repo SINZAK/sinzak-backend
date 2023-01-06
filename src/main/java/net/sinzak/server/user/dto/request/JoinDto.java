@@ -6,7 +6,8 @@ import lombok.Getter;
 @Getter
 public class JoinDto {
 
-
+    @ApiModelProperty(example = "토큰 ID(애플 로그인만 필수)",notes = "선택값")
+    private String tokenId;
     @ApiModelProperty(example = "이름")
     private String name;
     @ApiModelProperty(example = "이메일")
