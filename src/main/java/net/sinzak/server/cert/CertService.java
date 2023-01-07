@@ -1,12 +1,9 @@
 package net.sinzak.server.cert;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.error.UserNotFoundException;
-import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.image.S3Service;
-import net.sinzak.server.product.domain.ProductImage;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.dto.request.UnivDto;
 import net.sinzak.server.user.repository.UserRepository;
@@ -48,7 +45,7 @@ public class CertService {
     }
 
     @Transactional
-    public JSONObject receiveMail(SessionUser User, MailDto mailDto) {
+    public JSONObject receiveMail(User User, MailDto mailDto) {
         Cert savedCert = certRepository.findCertByUnivEmail(mailDto.getAddress()).orElseThrow();
 
         if(savedCert.getCode().equals(mailDto.getCode())){
@@ -59,13 +56,13 @@ public class CertService {
                 boolean result = UnivMail.certUniv(mailDto.getUniv(),mailDto.getAddress());
                 System.out.println("result = "+ result);
                 if(!result)
-                    return PropertyUtil.response(false);
+                    return PropertyUtil.responseMessage("일치하지 않는 인증코드입니다.");
             }
-            user.updateUniv(mailDto.getUniv(), mailDto.getAddress());
+            user.updateCertifiedUniv(mailDto.getUniv(), mailDto.getAddress());
 
             return PropertyUtil.response(true);
         }
-        return PropertyUtil.response(false);
+        return PropertyUtil.responseMessage("일치하지 않는 인증코드입니다.");
 
     }
 
@@ -75,7 +72,7 @@ public class CertService {
         Optional<Cert> savedCert = certRepository.findCertByUnivEmail(dto.getUniv_email());
         if(savedCert.isEmpty()){
             try{
-                user.updateUniv(dto.getUniv(),dto.getUniv_email()); /** 일단은 허용해주고, 나중에 거짓말이면 대학 미인증으로 바꾸면 됨.**/
+                user.updateCertifiedUniv(dto.getUniv(),dto.getUniv_email()); /** 일단은 허용해주고, 나중에 거짓말이면 대학 미인증으로 바꾸면 됨.**/
                 String url = s3Service.uploadImage(file);
                 certRepository.save(new Cert(dto.getUniv_email(), "", url,true));
             }
@@ -87,7 +84,7 @@ public class CertService {
             Cert cert = savedCert.get();
             if(!cert.isVerified()){
                 try{
-                    user.updateUniv(dto.getUniv(),dto.getUniv_email());
+                    user.updateCertifiedUniv(dto.getUniv(),dto.getUniv_email());
                     String url = s3Service.uploadImage(file);
                     cert.updateImageUrl(url);
                 }

@@ -35,7 +35,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     private String email;
 
     @Column
-    private String univ_email;
+    private String univ_email="";
 
     @Column
     private String name;
@@ -119,14 +119,11 @@ public class User extends BaseTimeEntity implements UserDetails {
 
 
     @Builder
-    public User(String email, String univ_email, String name, String nickName, String univ, String categoryLike, boolean cert_uni, String origin, List<String> roles) {
+    public User(String email, String name, String nickName, String categoryLike, String origin) {
         this.email = email;
-        this.univ_email = univ_email;
         this.name = name;
         this.nickName = nickName;
-        this.univ = univ;
         this.categoryLike = categoryLike;
-        this.cert_uni = cert_uni;
         this.origin = origin;
         this.roles = Collections.singletonList("ROLE_USER");
         this.role = Role.GUEST;
@@ -150,13 +147,13 @@ public class User extends BaseTimeEntity implements UserDetails {
         return this.role.getKey();
     }
 
-    public void updateUniv(String univ, String univ_email) {
+    public void updateCertifiedUniv(String univ, String univ_email) {
         this.univ_email = univ_email;
         this.univ = univ;
         this.cert_uni = true;
     }
 
-    public void updateEmail(String email) {
+    public void updateEmailForAppleUser(String email) {
         this.email = email;
     }
 
