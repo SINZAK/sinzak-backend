@@ -36,6 +36,9 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     private boolean suggest = false;
 
     @Column
+    private int topPrice=0;
+
+    @Column
     private String univ="";
 
     @Column
@@ -93,6 +96,10 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     public void setUser(User user) {
         user.getProductPostList().add(this);
         this.user = user;
+    }
+
+    public void setTopPrice(int topPrice) {
+        this.topPrice = topPrice;
     }
 
     public void addImage(ProductImage images) {
