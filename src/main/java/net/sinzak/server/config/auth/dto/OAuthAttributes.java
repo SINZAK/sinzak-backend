@@ -82,7 +82,6 @@ public class OAuthAttributes {
                 .name(name)
                 .email(email)
                 .origin(origin)
-                .roles(Collections.singletonList("ROLE_USER")) // 기본 권한 GUEST
                 .build();
     }
 
