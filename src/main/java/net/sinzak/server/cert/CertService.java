@@ -2,6 +2,7 @@ package net.sinzak.server.cert;
 
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.image.S3Service;
 import net.sinzak.server.user.domain.User;
@@ -49,7 +50,7 @@ public class CertService {
         Cert savedCert = certRepository.findCertByUnivEmail(mailDto.getAddress()).orElseThrow();
 
         if(savedCert.getCode().equals(mailDto.getCode())){
-            User user = userRepository.findByEmail(User.getEmail()).orElseThrow(() -> new UserNotFoundException());
+            User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
             savedCert.setVerified();
 
             if(UnivMail.needCheck(mailDto.getUniv())){   /** 인증이 필요한 대학만 진행. **/
@@ -67,34 +68,29 @@ public class CertService {
     }
 
     @Transactional
-    public JSONObject certifyUniv(User User, UnivDto dto, MultipartFile file){
-        User user = userRepository.findByEmail(User.getEmail()).orElseThrow();
+    public JSONObject certifyUniv(User User, UnivDto dto){
+        User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
         Optional<Cert> savedCert = certRepository.findCertByUnivEmail(dto.getUniv_email());
-        if(savedCert.isEmpty()){
-            try{
-                user.updateCertifiedUniv(dto.getUniv(),dto.getUniv_email()); /** 일단은 허용해주고, 나중에 거짓말이면 대학 미인증으로 바꾸면 됨.**/
-                String url = s3Service.uploadImage(file);
-                certRepository.save(new Cert(dto.getUniv_email(), "", url,true));
-            }
-            catch(Exception E){
-                return PropertyUtil.response(false);
-            }
-        }
-        else{ /** 대학 이메일 인증 실패했을 때는 이메일이 남아있으니까 **/
+        Long certId;
+        if(savedCert.isEmpty())
+            certId = certRepository.save(new Cert(dto.getUniv_email(), "", "temp", true)).getId();
+        else
+        { /** 대학 이메일 인증 실패했을 때는 이메일이 남아있으니까 **/
             Cert cert = savedCert.get();
-            if(!cert.isVerified()){
-                try{
-                    user.updateCertifiedUniv(dto.getUniv(),dto.getUniv_email());
-                    String url = s3Service.uploadImage(file);
-                    cert.updateImageUrl(url);
-                }
-                catch(Exception E){
-                    return PropertyUtil.response(false);
-                }
-            }
+            if(!cert.isVerified())
+                certId = cert.getId();
             else
                 return PropertyUtil.responseMessage("이미 인증 처리된 이메일입니다.");
         }
+        user.updateCertifiedUniv(dto.getUniv(),dto.getUniv_email()); /** 일단은 허용해주고, 나중에 거짓말이면 대학 미인증으로 바꾸면 됨.**/
+        return PropertyUtil.response(certId);
+    }
+
+    @Transactional
+    public JSONObject uploadUnivCard(Long id, MultipartFile file){
+        Cert cert = certRepository.findById(id).orElseThrow(InstanceNotFoundException::new);
+        String url = s3Service.uploadImage(file);
+        cert.updateImageUrl(url);
         return PropertyUtil.response(true);
     }
 
