@@ -92,7 +92,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional
-    public DetailForm showDetail(Long id, User User){   // 글 상세 확인
+    public DetailProductForm showDetail(Long id, User User){   // 글 상세 확인
         User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow();
         Product product = productRepository.findByIdFetchPWUser(id).orElseThrow();
 
@@ -163,7 +163,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional
-    public DetailForm showDetail(Long id){   // 비회원 글 보기
+    public DetailProductForm showDetail(Long id){   // 비회원 글 보기
         Product product = productRepository.findByIdFetchPWUser(id).orElseThrow();
         List<String> imagesUrl = getImages(product);  /** 이미지 엔티티에서 url만 빼오기 **/
         DetailProductForm detailForm = DetailProductForm.builder()
@@ -218,11 +218,11 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         List<Product> productList = productRepository.findAll();
         List<Product> recentList = productList;
 
-        List<ShowForm> newList = get3ProductForNonUser(productList);
+        List<ShowForm> newList = get3ProductForGuest(productList);
         obj.put("new",newList);
 
         productList.sort((o1, o2) -> o2.getLikesCnt() - o1.getLikesCnt()); /** hot : 좋아요 순 정렬!! **/
-        List<ShowForm> hotList = get3ProductForNonUser(productList);
+        List<ShowForm> hotList = get3ProductForGuest(productList);
         obj.put("hot",hotList);
 
 
@@ -232,7 +232,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return obj;
     }
 
-    private List<ShowForm> get3ProductForNonUser(List<Product> productList) {
+    private List<ShowForm> get3ProductForGuest(List<Product> productList) {
         List<ShowForm> newList = new ArrayList<>();  /** 신작 3개 **/
         for (int i = 0; i < productList.size(); i++) {
             if (i >= HOME_OBJECTS)

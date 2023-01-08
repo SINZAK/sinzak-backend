@@ -8,8 +8,8 @@ import net.sinzak.server.common.dto.ActionForm;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.image.S3Service;
-import net.sinzak.server.common.dto.DetailForm;
 import net.sinzak.server.common.dto.SuggestDto;
+import net.sinzak.server.product.dto.ShowForm;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.repository.UserRepository;
 import net.sinzak.server.work.domain.*;
@@ -19,6 +19,9 @@ import net.sinzak.server.work.repository.*;
 
 
 import org.json.simple.JSONObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,16 +49,15 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         User user = userRepository.findByEmailFetchWorkPostList(User.getEmail()).orElseThrow(UserNotFoundException::new); //해당 유저의 외주 글 리스트까지 fetch해서 가져오기.
                             /** 존재 하지 않는 유저면 NullPointer 에러 뜰거고, 핸들러가 처리 할 예정 **/
         Work work = Work.builder()
-                .title(postDto.getTitle())  //제목
-                .content(postDto.getContent()) //내용
-                .author(user.getNickName()) //닉네임
-                .univ(user.getUniv()) // 대학
+                .title(postDto.getTitle())
+                .content(postDto.getContent())
+                .author(user.getNickName())
+                .univ(user.getUniv())
                 .category(postDto.getCategory())
-                .pay(postDto.getPay()) // 페이
-                .suggest(postDto.isSuggest()) //가격제안여부
-                .employment(postDto.isEmployment()) //고용자 or 피고용자
-                .build(); // 사진
-        work.setUser(user); // user 연결 및, user의 외주 글 리스트에 글 추가
+                .price(postDto.getPay())
+                .suggest(postDto.isSuggest())
+                .employment(postDto.isEmployment()).build();
+        work.setUser(user);
         Long workId = workRepository.save(work).getId();
         return PropertyUtil.response(workId);
     }
@@ -90,7 +92,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     }
 
     @Transactional
-    public DetailForm showDetail(Long id, User User){   // 글 상세 확인
+    public DetailWorkForm showDetail(Long id, User User){   // 글 상세 확인
         User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow();
         Work work = workRepository.findByIdFetchPWUser(id).orElseThrow();
 
@@ -104,7 +106,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
                 .followerNum(work.getUser().getFollowerNum())
                 .images(getImages(work))  /** 이미지 엔티티에서 url만 빼오기 **/
                 .title(work.getTitle())
-                .pay(work.getPay())
+                .price(work.getPrice())
                 .category(work.getCategory())
                 .date(work.getCreatedDate().toString())
                 .content(work.getContent())
@@ -113,7 +115,6 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
                 .views(work.getViews())
                 .wishCnt(work.getWishCnt())
                 .chatCnt(work.getChatCnt())
-                .trading(work.isTrading())
                 .employment(work.isEmployment())
                 .complete(work.isComplete()).build();
 
@@ -160,7 +161,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     }
 
     @Transactional
-    public DetailForm showDetail(Long id){   // 글 상세 확인
+    public DetailWorkForm showDetail(Long id){   // 글 상세 확인
         Work work = workRepository.findByIdFetchPWUser(id).orElseThrow();
 
         DetailWorkForm detailForm = DetailWorkForm.builder()
@@ -173,7 +174,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
                 .followerNum(work.getUser().getFollowerNum())
                 .images(getImages(work))  /** 이미지 엔티티에서 url만 빼오기 **/
                 .title(work.getTitle())
-                .pay(work.getPay())
+                .price(work.getPrice())
                 .category(work.getCategory())
                 .date(work.getCreatedDate().toString())
                 .content(work.getContent())
@@ -182,7 +183,6 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
                 .views(work.getViews())
                 .wishCnt(work.getWishCnt())
                 .chatCnt(work.getChatCnt())
-                .trading(work.isTrading())
                 .employment(work.isEmployment())
                 .complete(work.isComplete()).build();
 
@@ -295,6 +295,64 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     }
 
 
+    @Transactional(readOnly = true)
+    public PageImpl<ShowForm> workListForUser(User User, List<String> categories, String align, boolean employment, Pageable pageable){
+        User user  = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow();
+        Page<Work> workList;
+        if(categories.size()==0)
+            workList = workRepository.findAll(employment, pageable);
+        else
+            workList = categoryFilter(categories, employment, pageable);  //파라미터 입력받았을 경우
+        List<ShowForm> showList = getShowFormCheckIsLikes(user.getWorkLikesList(), workList.getContent());
+        standardAlign(align, showList);  /** 선택한 기준대로 정렬 **/
+        return new PageImpl(showList, pageable, workList.getTotalElements());
+    }
+
+    @Transactional(readOnly = true)
+    public PageImpl<ShowForm> workListForGuest(List<String> stacks, String align, boolean employment, Pageable pageable){
+        Page<Work> workList;
+        if(stacks.size()==0)
+            workList = workRepository.findAll(employment, pageable);
+        else
+            workList = categoryFilter(stacks, employment, pageable);  //파라미터 입력받았을 경우
+
+        List<ShowForm> showList = new ArrayList<>();
+        for (Work work : workList.getContent()) {
+            addWorkInJSONFormat(showList, work, false);
+        }
+        standardAlign(align, showList);  /** 선택한 기준대로 정렬 **/
+        return new PageImpl<>(showList, pageable, workList.getTotalElements());
+    }
+
+    private Page<Work> categoryFilter(List<String> categories, boolean employment, Pageable pageable) {
+        if (categories.size() == 1)
+            return workRepository.findBy1StacksDesc(pageable, categories.get(0), employment);
+        else if (categories.size() == 2)
+            return workRepository.findBy2StacksDesc(pageable, categories.get(0), categories.get(1), employment);
+        else if (categories.size() == 3)
+            return workRepository.findBy3StacksDesc(pageable, categories.get(0), categories.get(1), categories.get(2), employment);
+        else
+            return workRepository.findAll(pageable);
+    }
+
+    private void standardAlign(String align, List<ShowForm> showList) {
+        if (align.equals("recent")) {} //default
+        else if (align.equals("recommend"))  /** 인기순 **/
+            showList.sort((o1, o2) -> o2.getPopularity() - o1.getPopularity());
+    }
+    private List<ShowForm> getShowFormCheckIsLikes(List<WorkLikes> userLikesList, List<Work> workList) {
+        List<ShowForm> showFormList = new ArrayList<>();
+        for (Work work : workList) { /** 추천 목록 중 좋아요 누른거 체크 후 ShowForm 으로 담기 **/
+            boolean isLike = checkIsLikes(userLikesList, work);
+            addWorkInJSONFormat(showFormList, work, isLike);
+        }
+        return showFormList;
+    }
+
+    private void addWorkInJSONFormat(List<ShowForm> showFormList, Work work, boolean isLike) {
+        ShowForm showForm = new ShowForm(work.getId(), work.getTitle(), work.getContent(), work.getAuthor(), work.getPrice(), work.getThumbnail(), work.getCreatedDate().toString(), work.isSuggest(), isLike, work.getLikesCnt(), work.isComplete(), work.getPopularity());
+        showFormList.add(showForm);
+    }
 
 }
 

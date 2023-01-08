@@ -40,6 +40,8 @@ public class DetailForm {
     private String date;
     @ApiModelProperty(example = "작품 판매글 내용")
     private String content;
+    @ApiModelProperty(value = "작품(가격), 외주(페이)", example = "30000")
+    private int price;
     @ApiModelProperty(example = "false",notes = "true -> 체크 한 사람(가격 제안 받겠다는 사람)")
     private boolean suggest;
     @ApiModelProperty(example = "true",notes = "true -> 누른 사람")
@@ -54,8 +56,6 @@ public class DetailForm {
     private int wishCnt;
     @ApiModelProperty(example = "2")
     private int chatCnt;
-    @ApiModelProperty(example = "false",notes = "true -> 거래중")
-    private boolean trading;
     @ApiModelProperty(example = "false",notes = "true -> 판매완료")
     private boolean complete;
 
@@ -66,7 +66,7 @@ public class DetailForm {
         this.isFollowing = isFollowing;
     }
 
-    public DetailForm(Long id, String author, String author_picture, String univ, boolean cert_uni, boolean cert_celeb, String followerNum, List<String> images, String title, String category, String date, String content, boolean suggest, int likesCnt, int views, int wishCnt, int chatCnt, boolean trading, boolean complete) {
+    public DetailForm(Long id, String author, String author_picture, String univ, boolean cert_uni, boolean cert_celeb, String followerNum, List<String> images, String title, String category, String date, String content, int price, boolean suggest, int likesCnt, int views, int wishCnt, int chatCnt, boolean complete) {
         this.id = id;
         this.author = author;
         this.author_picture = author_picture;
@@ -79,12 +79,12 @@ public class DetailForm {
         this.category = category;
         this.date = date;
         this.content = content;
+        this.price = price;
         this.suggest = suggest;
         this.likesCnt = likesCnt;
         this.views = views;
         this.wishCnt = wishCnt;
         this.chatCnt = chatCnt;
-        this.trading = trading;
         this.complete = complete;
     }
 }
