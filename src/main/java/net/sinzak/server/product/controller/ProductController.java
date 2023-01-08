@@ -51,7 +51,7 @@ public class ProductController {
 
     @PostMapping("/products/{id}")
     @ApiOperation(value = "작품 상세 조회")
-    public DetailForm showProject(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    public DetailProductForm showProject(@PathVariable Long id, @AuthenticationPrincipal User user) {
         try{
             return productService.showDetail(id,user);
         }
@@ -69,7 +69,7 @@ public class ProductController {
 
     @ApiDocumentResponse
     @PostMapping("/products/likes")
-    @ApiOperation(value = "작품 좋아요")
+    @ApiOperation(value = "작품 좋아요", notes = "{\"success\":true, \"isfav\" : true} 이런식으로 보냅니다. 요청 이후 좋아요 버튼이 어떻게 되어있어야 하는지 알려주기위해서")
     public JSONObject likes(@AuthenticationPrincipal User user, @RequestBody ActionForm form) {
         return productService.likes(user, form);
     }
@@ -139,7 +139,7 @@ public class ProductController {
                             "sculpture - 조소\n" +
                             "print - 판화\n" +
                             "craft - 공예\n" +
-                            "other - 기타", defaultValue = "생략하기")
+                            "other - 기타", defaultValue = "")
     })
     public PageImpl<ShowForm> showMarketProduct(@AuthenticationPrincipal User user, @RequestParam(required=false, defaultValue="") List<String> categories, @RequestParam(required=false, defaultValue="recommend") String align, @ApiIgnore Pageable pageable) {
         try{

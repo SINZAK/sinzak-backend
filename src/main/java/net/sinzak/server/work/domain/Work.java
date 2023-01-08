@@ -3,7 +3,6 @@ package net.sinzak.server.work.domain;
 import lombok.Builder;
 import lombok.Getter;
 import net.sinzak.server.BaseTimeEntity;
-import net.sinzak.server.product.domain.ProductImage;
 import net.sinzak.server.user.domain.User;
 
 import javax.persistence.*;
@@ -31,7 +30,7 @@ public class Work extends BaseTimeEntity { /** 외주 **/
     private String author;
 
     @Column
-    private int pay;
+    private int price;
 
     @Column
     private boolean suggest;
@@ -67,9 +66,6 @@ public class Work extends BaseTimeEntity { /** 외주 **/
     private boolean employment; //고용글인지 피고용글인지
 
     @Column
-    private boolean trading;
-
-    @Column
     private boolean complete = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -83,11 +79,11 @@ public class Work extends BaseTimeEntity { /** 외주 **/
     private List<WorkWish> workWishList = new ArrayList<>();
 
     @Builder
-    public Work(String title, String content, String category, int pay, boolean suggest, String author, String univ, boolean employment) {
+    public Work(String title, String content, String category, int price, boolean suggest, String author, String univ, boolean employment) {
         this.title = title;
         this.content = content;
         this.category = category;
-        this.pay = pay;
+        this.price = price;
         this.suggest = suggest;
         this.author = author;
         this.univ = univ;
