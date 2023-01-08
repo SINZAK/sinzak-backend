@@ -6,13 +6,10 @@ import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.image.S3Service;
 import net.sinzak.server.product.domain.*;
 import net.sinzak.server.common.PropertyUtil;
-import net.sinzak.server.product.dto.DetailForm;
-import net.sinzak.server.product.dto.SellDto;
-import net.sinzak.server.product.dto.ShowForm;
+import net.sinzak.server.product.dto.*;
 import net.sinzak.server.product.repository.*;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.domain.embed.Size;
-import net.sinzak.server.product.dto.ProductPostDto;
 import net.sinzak.server.common.dto.ActionForm;
 import net.sinzak.server.user.repository.UserRepository;
 import org.json.simple.JSONObject;
@@ -33,6 +30,7 @@ public class ProductService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final ProductSellRepository productSellRepository;
+    private final ProductSuggestRepository productSuggestRepository;
     private final ProductWishRepository productWishRepository;
     private final ProductImageRepository imageRepository;
     private final LikesRepository likesRepository;
@@ -390,6 +388,18 @@ public class ProductService {
         Product product = productRepository.findById(dto.getProductId()).orElseThrow();
         ProductSell connect = ProductSell.createConnect(product, user);
         productSellRepository.save(connect);
+        return PropertyUtil.response(true);
+    }
+
+    @Transactional
+    public JSONObject suggest(User User, @RequestBody SuggestDto dto){   // 판매완료시
+        User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        if(productSuggestRepository.findByUserIdAndProductId(user.getId(),dto.getProductId()).isPresent())
+            return PropertyUtil.responseMessage("이미 제안을 하신 작품입니다.");
+        Product product = productRepository.findById(dto.getProductId()).orElseThrow();
+        ProductSuggest connect = ProductSuggest.createConnect(product, user);
+        product.setTopPrice(dto.getPrice());
+        productSuggestRepository.save(connect);
         return PropertyUtil.response(true);
     }
 

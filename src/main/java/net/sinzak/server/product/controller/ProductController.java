@@ -5,17 +5,17 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
-import net.sinzak.server.product.dto.DetailForm;
-import net.sinzak.server.product.dto.SellDto;
-import net.sinzak.server.product.dto.ShowForm;
+import net.sinzak.server.product.dto.*;
 import net.sinzak.server.product.service.ProductService;
-import net.sinzak.server.product.dto.ProductPostDto;
 import net.sinzak.server.common.dto.ActionForm;
 import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -93,6 +93,13 @@ public class ProductController {
     }
 
     @ApiDocumentResponse
+    @PostMapping("/products/suggest")
+    @ApiOperation(value = "작품 가격제안")
+    public JSONObject suggest(@AuthenticationPrincipal User user, @RequestBody SuggestDto dto) {
+        return productService.suggest(user, dto);
+    }
+
+    @ApiDocumentResponse
     @ApiOperation(value = "작품 홈")
     @PostMapping("/home/products")
     public JSONObject showHomeProduct(@ApiIgnore @AuthenticationPrincipal User user) {
@@ -158,4 +165,10 @@ public class ProductController {
 //    protected ErrorResponse handleException2() {
 //        return ErrorResponse.of(HttpStatus.BAD_REQUEST, "존재하지 않는 값을 조회중입니다.");
 //    }
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.OK)
+    protected JSONObject handleUserNotFoundException() {
+        return PropertyUtil.responseMessage("존재하지 않는 유저입니다.");
+    }
+
 }
