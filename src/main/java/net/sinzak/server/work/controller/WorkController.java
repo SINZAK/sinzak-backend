@@ -23,21 +23,21 @@ public class WorkController {
 
     private final WorkService workService;
 
-    @ApiDocumentResponse
-    @ApiOperation(value = "외주 모집 글 생성")
-    @PostMapping("/works/build")
-    public JSONObject makeWorkPost(@LoginUser SessionUser user, /*@RequestBody*/ WorkPostDto postDto) {
-        return workService.makeWorkPost(user, postDto);
-    }
-
-    @ApiDocumentResponse
-    @PostMapping("/works/wish")
-    @ApiOperation(value = "작품 찜")
-    public JSONObject wish(@LoginUser SessionUser user, @RequestBody ActionForm form) {
-        return workService.wish(user, form);
-    }
-
-
+//    @ApiDocumentResponse
+//    @ApiOperation(value = "외주 모집 글 생성")
+//    @PostMapping("/works/build")
+//    public JSONObject makeWorkPost(@LoginUser SessionUser user, @RequestBody WorkPostDto postDto) {
+//        return workService.makeWorkPost(user, postDto);
+//    }
+//
+//    @ApiDocumentResponse
+//    @PostMapping("/works/wish")
+//    @ApiOperation(value = "작품 찜")
+//    public JSONObject wish(@LoginUser SessionUser user, @RequestBody ActionForm form) {
+//        return workService.wish(user, form);
+//    }
+//
+//
 
 
     @ExceptionHandler(NullPointerException.class)

@@ -123,7 +123,7 @@ public class ProductService {
         return detailForm;
     }
 
-    private boolean checkIsLikes(List<Likes> userLikesList, Product product) {
+    boolean checkIsLikes(List<Likes> userLikesList, Product product) {
         boolean isLike = false;
         for (Likes likes : userLikesList) {
             if (likes.getProduct().getId().equals(product.getId())) {
@@ -134,7 +134,7 @@ public class ProductService {
         return isLike;
     }
 
-    private boolean checkIsWish(User user, List<ProductWish> productWishList) {
+    boolean checkIsWish(User user, List<ProductWish> productWishList) {
         boolean isWish = false;
         for (ProductWish productWish : productWishList) {
             if(productWish.getUser().getId().equals(user.getId())){
@@ -145,7 +145,7 @@ public class ProductService {
         return isWish;
     }
 
-    private boolean checkIsFollowing(Set<Long> userFollowingList, Product product) {
+    boolean checkIsFollowing(Set<Long> userFollowingList, Product product) {
         boolean isFollowing = false;
         for (Long followingId : userFollowingList) {
             if(product.getUser().getId().equals(followingId)){
@@ -432,7 +432,7 @@ public class ProductService {
         return new PageImpl<>(showList, pageable, productList.getTotalElements());
     }
 
-    private List<String> getProductImages(Product product) {
+    List<String> getProductImages(Product product) {
         List<String> imagesUrl = new ArrayList<>();
         for (ProductImage image : product.getImages()) {
             imagesUrl.add(image.getImageUrl());  /** 이미지 엔티티에서 url만 빼오기 **/
