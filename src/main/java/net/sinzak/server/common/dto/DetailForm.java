@@ -1,4 +1,4 @@
-package net.sinzak.server.product.dto;
+package net.sinzak.server.common.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
@@ -9,13 +9,12 @@ import javax.persistence.*;
 import java.util.List;
 
 @Getter
-@Builder
 public class DetailForm {
 
     @ApiModelProperty(example = "작품 ID")
     private Long id;
 
-    @ApiModelProperty(example = "작가명")   /** 작가 조회 **/
+    @ApiModelProperty(example = "작가명")
     private String author;
     @ApiModelProperty(example = "작가 프사")
     private String author_picture;
@@ -31,12 +30,10 @@ public class DetailForm {
     private boolean isFollowing;
 
 
-    @ApiModelProperty(value = "[이미지[0], 이미지배열[1], 이미지배열[2] ...]")  /** 작품 조회 **/
+    @ApiModelProperty(value = "[이미지[0], 이미지배열[1], 이미지배열[2] ...]")
     private List<String> images;
     @ApiModelProperty(example = "작품 판매글 제목")
     private String title;
-    @ApiModelProperty(value = "작품 가격", example = "30000")
-    private int price;
     @ApiModelProperty(example = "동양화")
     private String category;
     @ApiModelProperty(example = "2023-01-02T18:26:27", notes = "작품 글 올린 날짜")
@@ -57,12 +54,6 @@ public class DetailForm {
     private int wishCnt;
     @ApiModelProperty(example = "2")
     private int chatCnt;
-    @ApiModelProperty(example = "150")
-    private int width;
-    @ApiModelProperty(example = "70")
-    private int vertical;
-    @ApiModelProperty(example = "30", notes = "nullable")
-    private int height;
     @ApiModelProperty(example = "false",notes = "true -> 거래중")
     private boolean trading;
     @ApiModelProperty(example = "false",notes = "true -> 판매완료")
@@ -73,5 +64,27 @@ public class DetailForm {
         this.isLike = like;
         this.isWish = wish;
         this.isFollowing = isFollowing;
+    }
+
+    public DetailForm(Long id, String author, String author_picture, String univ, boolean cert_uni, boolean cert_celeb, String followerNum, List<String> images, String title, String category, String date, String content, boolean suggest, int likesCnt, int views, int wishCnt, int chatCnt, boolean trading, boolean complete) {
+        this.id = id;
+        this.author = author;
+        this.author_picture = author_picture;
+        this.univ = univ;
+        this.cert_uni = cert_uni;
+        this.cert_celeb = cert_celeb;
+        this.followerNum = followerNum;
+        this.images = images;
+        this.title = title;
+        this.category = category;
+        this.date = date;
+        this.content = content;
+        this.suggest = suggest;
+        this.likesCnt = likesCnt;
+        this.views = views;
+        this.wishCnt = wishCnt;
+        this.chatCnt = chatCnt;
+        this.trading = trading;
+        this.complete = complete;
     }
 }

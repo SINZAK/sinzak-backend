@@ -79,7 +79,7 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     private List<ProductImage> images = new ArrayList<>();  //수취인
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
-    private List<ProductWish> productWishList = new ArrayList<>();  //찜
+    private List<ProductWish> productWishList = new ArrayList<>();
 
     @Builder
     public Product(String title, String content, String category, int price, boolean suggest, String author, String univ, Size size) {
@@ -102,8 +102,8 @@ public class Product extends BaseTimeEntity { /** 작품 **/
         this.topPrice = topPrice;
     }
 
-    public void addImage(ProductImage images) {
-        this.getImages().add(images);
+    public void addImage(ProductImage image) {
+        this.getImages().add(image);
     }
 
     public void plusWishCnt() {this.wishCnt++;this.popularity+=20;}
