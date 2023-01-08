@@ -61,6 +61,27 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return PropertyUtil.response(productId);
     }
 
+    @Transactional(rollbackFor = {Exception.class})
+    public JSONObject deleteImage(User User, Long productId, String url){   // 글 생성
+        Product product = productRepository.findById(productId).orElseThrow(InstanceNotFoundException::new);
+        if(!User.getId().equals(product.getUser().getId()))
+            return PropertyUtil.responseMessage("해당 작품의 작가가 아닙니다.");
+        if(product.getImages().size()==1)
+            return PropertyUtil.responseMessage("최소 1개 이상의 이미지를 보유해야 합니다.");
+
+        for (ProductImage image : product.getImages()) {
+//            if(image.getImageUrl().equals(product.getThumbnail()))
+//                return PropertyUtil.responseMessage("썸네일은 삭제 불가능합니다."); //TODO 프론트가 어쩔지 보자.
+            if(image.getImageUrl().equals(url)){
+                imageRepository.delete(image);
+                product.getImages().remove(image);
+                break;
+            }
+        }
+        s3Service.deleteImage(url);
+        return PropertyUtil.response(productId);
+    }
+
     public JSONObject saveImageInS3AndProduct(User user, List<MultipartFile> multipartFiles, Long id) {
         Product product = productRepository.findById(id).orElseThrow(InstanceNotFoundException::new);
         if(!user.getId().equals(product.getUser().getId()))

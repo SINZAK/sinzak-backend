@@ -31,17 +31,8 @@ public class CertController {
     }
 
     @ApiDocumentResponse
-    @ApiOperation(value = "대학교 학생증 인증")
+    @ApiOperation(value = "대학교 학생증 인증",notes = "{\"success\":true, \"id\":3}\n해당 유저의 id를 전해드리니 이 /certify/{id}/univ 에 넘겨주세요)")
     @PostMapping(value = "/certify/univ", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "univDto", dataType = "json", value = "{\n" +
-                    "\"univ\": \"대학명\",\n" +
-                    "\"univ_email\": \"대학 메일\"\n" +
-                    "}\n" +
-                    "주의사항 : Content-Type = application/json"),
-            @ApiImplicitParam(name = "multipartFile", dataType = "multipartFile",
-                    value = "파일 보내주시면 파일 s3서버에 저장 및, 해당 파일이 저장되어 있는 URL을 디비에 저장합니다")
-    })
     public JSONObject certifyUniv(@AuthenticationPrincipal User user, @RequestBody UnivDto univDto) {
         return certService.certifyUniv(user, univDto);
     }

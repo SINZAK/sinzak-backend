@@ -26,7 +26,7 @@ public class S3Service {
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
-
+    private static final int substr = 52;
     private final AmazonS3 amazonS3;
 
     public String uploadImage(MultipartFile file) {
@@ -44,8 +44,8 @@ public class S3Service {
         }
     }
 
-    public void deleteImage(String fileName) {
-        amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
+    public void deleteImage(String fileUrl) {
+        amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileUrl.substring(substr)));
     }
 
     public void getImage(String fileName) {

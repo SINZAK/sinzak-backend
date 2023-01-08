@@ -34,7 +34,7 @@ public class ProductController {
     private final ProductService productService;
 
     @ApiDocumentResponse
-    @ApiOperation(value = "작품 판매 글 생성")
+    @ApiOperation(value = "작품 판매 글 생성",notes = "{\"success\":true, \"id\":52}\n해당 글의 id를 전해드리니 이 /products/{id}/image 에 넘겨주세요")
     @PostMapping(value = "/products/build", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public JSONObject makeProductPost(@AuthenticationPrincipal User user, @RequestBody ProductPostDto buildDto) {
         return productService.makePost(user, buildDto);
@@ -47,6 +47,13 @@ public class ProductController {
             value = "파일 보내주시면 파일 s3서버에 저장 및, 해당 파일이 저장되어 있는 URL을 디비에 저장합니다")
     public JSONObject makeProductPost(@AuthenticationPrincipal User user, @PathVariable("id") Long productId, @RequestPart List<MultipartFile> multipartFile) {
         return productService.saveImageInS3AndProduct(user, multipartFile, productId);
+    }
+
+    @ApiDocumentResponse
+    @ApiOperation(value = "작품 이미지 삭제", notes = "하나씩만 처리할게요, 썸네일(첫번째 사진)은 불가능하게 가시죠")
+    @PostMapping(value = "/products/{id}/deleteimage")
+    public JSONObject deleteProductImage(@AuthenticationPrincipal User user, @PathVariable("id") Long productId, @RequestBody ImageUrlDto dto) {
+        return productService.deleteImage(user, productId, dto.getUrl());
     }
 
     @PostMapping("/products/{id}")
