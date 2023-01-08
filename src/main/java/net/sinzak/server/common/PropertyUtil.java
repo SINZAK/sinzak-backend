@@ -14,7 +14,7 @@ import org.springframework.http.HttpStatus;
 @PropertySource("classpath:/application-real.properties")
 public class PropertyUtil implements EnvironmentAware {
     private static Environment environment;
-    public static String SUCCESS_WORD ="success";
+    public static final String SUCCESS_WORD ="success";
 
     @Override public void setEnvironment(final Environment environment) {
         this.environment = environment;
@@ -30,13 +30,6 @@ public class PropertyUtil implements EnvironmentAware {
         }
         else
             obj.put(SUCCESS_WORD,false);
-        return obj;
-    }
-    public static JSONObject responseMessage(HttpStatus status, String message){ //그냥 json 리턴해줄때 씀
-        JSONObject obj = new JSONObject();
-        obj.put(SUCCESS_WORD, false);
-        obj.put("code",status.value());
-        obj.put("message", message);
         return obj;
     }
 

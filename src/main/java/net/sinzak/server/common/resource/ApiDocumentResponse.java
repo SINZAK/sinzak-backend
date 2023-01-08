@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 @Documented
 @ApiResponses(value = {
         @ApiResponse(code = 200, message = "API 호출 성공",response = ApiResponseSuccess.class),
-        @ApiResponse(code = 404, message = "파일 찾지 못 함",response = ApiResponseFail.class)
+        @ApiResponse(code = 404, message = "API 호출 실패",response = ApiResponseFail.class)
 })
 public @interface ApiDocumentResponse {
 }

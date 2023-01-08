@@ -1,17 +1,18 @@
 package net.sinzak.server.cert;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.error.UserNotFoundException;
-import net.sinzak.server.config.auth.dto.SessionUser;
+import net.sinzak.server.image.S3Service;
 import net.sinzak.server.user.domain.User;
+import net.sinzak.server.user.dto.request.UnivDto;
 import net.sinzak.server.user.repository.UserRepository;
 import org.json.simple.JSONObject;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -22,6 +23,7 @@ public class CertService {
     private final JavaMailSender emailSender;
     private final CertRepository certRepository;
     private final UserRepository userRepository;
+    private final S3Service s3Service;
 
     @Transactional
     public JSONObject sendMail(MailDto mailDto) {
@@ -38,12 +40,12 @@ public class CertService {
             cert.updateKey(code);
         }
         else
-            certRepository.save(new Cert(mailDto.getAddress(), code));
+            certRepository.save(new Cert(mailDto.getAddress(), code, "",false));
         return PropertyUtil.response(true);
     }
 
     @Transactional
-    public JSONObject receiveMail(SessionUser User, MailDto mailDto) {
+    public JSONObject receiveMail(User User, MailDto mailDto) {
         Cert savedCert = certRepository.findCertByUnivEmail(mailDto.getAddress()).orElseThrow();
 
         if(savedCert.getCode().equals(mailDto.getCode())){
@@ -54,14 +56,47 @@ public class CertService {
                 boolean result = UnivMail.certUniv(mailDto.getUniv(),mailDto.getAddress());
                 System.out.println("result = "+ result);
                 if(!result)
-                    return PropertyUtil.response(false); /** false가 와도 끊지말고 확인이 안되니 후에 마이페이지에서 학생증 인증하라고 고고 **/
+                    return PropertyUtil.responseMessage("일치하지 않는 인증코드입니다.");
             }
-            user.updateUniv(mailDto.getUniv(), mailDto.getAddress());
+            user.updateCertifiedUniv(mailDto.getUniv(), mailDto.getAddress());
 
             return PropertyUtil.response(true);
         }
-        return PropertyUtil.response(false);
+        return PropertyUtil.responseMessage("일치하지 않는 인증코드입니다.");
 
     }
+
+    @Transactional
+    public JSONObject certifyUniv(User User, UnivDto dto, MultipartFile file){
+        User user = userRepository.findByEmail(User.getEmail()).orElseThrow();
+        Optional<Cert> savedCert = certRepository.findCertByUnivEmail(dto.getUniv_email());
+        if(savedCert.isEmpty()){
+            try{
+                user.updateCertifiedUniv(dto.getUniv(),dto.getUniv_email()); /** 일단은 허용해주고, 나중에 거짓말이면 대학 미인증으로 바꾸면 됨.**/
+                String url = s3Service.uploadImage(file);
+                certRepository.save(new Cert(dto.getUniv_email(), "", url,true));
+            }
+            catch(Exception E){
+                return PropertyUtil.response(false);
+            }
+        }
+        else{ /** 대학 이메일 인증 실패했을 때는 이메일이 남아있으니까 **/
+            Cert cert = savedCert.get();
+            if(!cert.isVerified()){
+                try{
+                    user.updateCertifiedUniv(dto.getUniv(),dto.getUniv_email());
+                    String url = s3Service.uploadImage(file);
+                    cert.updateImageUrl(url);
+                }
+                catch(Exception E){
+                    return PropertyUtil.response(false);
+                }
+            }
+            else
+                return PropertyUtil.responseMessage("이미 인증 처리된 이메일입니다.");
+        }
+        return PropertyUtil.response(true);
+    }
+
 
 }
