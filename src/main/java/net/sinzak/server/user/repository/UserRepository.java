@@ -24,7 +24,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmailFetchWorkWishList(@Param("email")String email);
 
 
-    @Query("select u from User u left join fetch u.likesList where u.email = :email")
+    @Query("select u from User u left join fetch u.productLikesList where u.email = :email")
     Optional<User> findByEmailFetchLikesList(@Param("email")String email);
 
     @Query("select u from User u left join fetch u.productSellList where u.email = :email")
@@ -33,7 +33,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select u from User u left join fetch u.followingList where u.email = :email")
     Optional<User> findByEmailFetchFollowingList(@Param("email")String email);
 
-    @Query("select u from User u left join fetch u.followingList left join fetch u.likesList where u.email = :email")
+    @Query("select u from User u left join fetch u.followingList left join fetch u.productLikesList where u.email = :email")
     Optional<User> findByEmailFetchFollowingAndLikesList(@Param("email")String email);
 
 }

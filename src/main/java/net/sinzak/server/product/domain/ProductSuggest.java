@@ -7,7 +7,6 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@SequenceGenerator(name = "Product_SELL_SEQ_GEN",sequenceName = "Product_SELL_SEQ")
 public class ProductSuggest {
 
     @Id
@@ -24,8 +23,7 @@ public class ProductSuggest {
     private Product product;
 
     public static ProductSuggest createConnect(Product product, User user){  //생성메서드
-        ProductSuggest connect = new ProductSuggest(user,product);
-        return connect;
+        return new ProductSuggest(user,product);
     }
 
 

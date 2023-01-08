@@ -1,7 +1,9 @@
-package net.sinzak.server.work;
+package net.sinzak.server.work.domain;
 
 import lombok.Builder;
 import lombok.Getter;
+import net.sinzak.server.BaseTimeEntity;
+import net.sinzak.server.product.domain.ProductImage;
 import net.sinzak.server.user.domain.User;
 
 import javax.persistence.*;
@@ -12,7 +14,7 @@ import java.util.List;
 @Getter
 @Entity
 @SequenceGenerator(name = "Work_SEQ_GEN",sequenceName = "Work_SEQ")
-public class Work { /** 외주 **/
+public class Work extends BaseTimeEntity { /** 외주 **/
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Work_SEQ")
@@ -26,10 +28,7 @@ public class Work { /** 외주 **/
     private String content;
 
     @Column
-    private String userName; //닉네임
-
-    @Column
-    private String category; //분류
+    private String author;
 
     @Column
     private int pay;
@@ -38,13 +37,19 @@ public class Work { /** 외주 **/
     private boolean suggest;
 
     @Column
+    private int topPrice=0;
+
+    @Column
     private String univ="";
 
     @Column
-    private String field;
+    private String category; //분류
 
     @Column
     private int views = 2;
+
+    @Column
+    private int likesCnt = 0;
 
     @Column
     private int wishCnt = 0;
@@ -53,10 +58,16 @@ public class Work { /** 외주 **/
     private int chatCnt = 0;
 
     @Column
-    private String photo;
+    private int popularity = 0;
+
+    @Column
+    private String thumbnail;
 
     @Column
     private boolean employment; //고용글인지 피고용글인지
+
+    @Column
+    private boolean trading;
 
     @Column
     private boolean complete = false;
@@ -65,20 +76,21 @@ public class Work { /** 외주 **/
     @JoinColumn(name = "user_id")
     private User user;  //수취인
 
+    @OneToMany(mappedBy = "work", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER) /** 사진은 무조건 EAGER로 같이 불러오기 **/
+    private List<WorkImage> images = new ArrayList<>();  //수취인
+
     @OneToMany(mappedBy = "work", cascade = CascadeType.REMOVE)
-    private List<WorkWish> workWishList = new ArrayList<>();  //프로젝트-회원 엮여있는 리스트  스크랩!!!!
+    private List<WorkWish> workWishList = new ArrayList<>();
 
     @Builder
-    public Work(String title, String content, String category, int pay, boolean suggest, String userName, String univ, String field, String photo, boolean employment) {
+    public Work(String title, String content, String category, int pay, boolean suggest, String author, String univ, boolean employment) {
         this.title = title;
         this.content = content;
         this.category = category;
         this.pay = pay;
         this.suggest = suggest;
-        this.userName = userName;
+        this.author = author;
         this.univ = univ;
-        this.field = field;
-        this.photo = photo;
         this.employment = employment;
     }
 
@@ -91,7 +103,20 @@ public class Work { /** 외주 **/
     public void minusWishCnt() {
         if(wishCnt>0) wishCnt--;
     }
-    protected Work() {
+    public void plusLikesCnt() {this.likesCnt++;this.popularity+=10;}
+    public void minusLikesCnt() {if(likesCnt>0)this.likesCnt--;this.popularity-=10;}
+    protected Work() {}
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
+    }
+    public void addViews() {this.views++;this.popularity++;}
+    public void addImage(WorkImage image) {
+        this.getImages().add(image);
+    }
+
+    public void setTopPrice(int topPrice) {
+        this.topPrice = topPrice;
     }
 }
 

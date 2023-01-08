@@ -6,6 +6,8 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.dto.DetailForm;
+import net.sinzak.server.common.dto.SuggestDto;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.product.dto.*;
@@ -34,19 +36,6 @@ public class ProductController {
     @ApiDocumentResponse
     @ApiOperation(value = "작품 판매 글 생성")
     @PostMapping(value = "/products/build", consumes = {MediaType.APPLICATION_JSON_VALUE})
-
-            @ApiImplicitParam(name = "buildDto", dataType = "json", value = "{\n" +
-                    "\"category\": \"작품 카테고리\",\n" +
-                    "\"content\": \"작품 판매글 내용\",\n" +
-                    "\"height\": 50,\n" +
-                    "\"price\": 30000,\n" +
-                    "\"suggest\": false,\n" +
-                    "\"title\": \"작품 판매글 제목\",\n" +
-                    "\"vertical\": 150,\n" +
-                    "\"width\": 120\n" +
-                    "}\n"+
-                    "주의사항 : Content-Type = application/json")
-
     public JSONObject makeProductPost(@AuthenticationPrincipal User user, @RequestBody ProductPostDto buildDto) {
         return productService.makePost(user, buildDto);
     }
@@ -57,7 +46,7 @@ public class ProductController {
     @ApiImplicitParam(name = "multipartFile", dataType = "multipartFile",
             value = "파일 보내주시면 파일 s3서버에 저장 및, 해당 파일이 저장되어 있는 URL을 디비에 저장합니다")
     public JSONObject makeProductPost(@AuthenticationPrincipal User user, @PathVariable("id") Long productId, @RequestPart List<MultipartFile> multipartFile) {
-        return productService.saveImageInS3AndProduct(multipartFile, productId);
+        return productService.saveImageInS3AndProduct(user, multipartFile, productId);
     }
 
     @PostMapping("/products/{id}")

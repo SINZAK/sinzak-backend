@@ -2,6 +2,9 @@ package net.sinzak.server.product.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.sinzak.server.common.PostService;
+import net.sinzak.server.common.dto.DetailForm;
+import net.sinzak.server.common.dto.SuggestDto;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.image.S3Service;
@@ -27,14 +30,14 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ProductService {
+public class ProductService implements PostService<Product,ProductPostDto,ProductWish,ProductLikes> {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final ProductSellRepository productSellRepository;
-    private final ProductSuggestRepository productSuggestRepository;
+    private final ProductSuggestRepository suggestRepository;
     private final ProductWishRepository productWishRepository;
     private final ProductImageRepository imageRepository;
-    private final LikesRepository likesRepository;
+    private final ProductLikesRepository likesRepository;
     private final S3Service s3Service;
 
     private final int HOME_OBJECTS = 3;
@@ -58,8 +61,10 @@ public class ProductService {
         return PropertyUtil.response(productId);
     }
 
-    public JSONObject saveImageInS3AndProduct(List<MultipartFile> multipartFiles, Long id) {
+    public JSONObject saveImageInS3AndProduct(User user, List<MultipartFile> multipartFiles, Long id) {
         Product product = productRepository.findById(id).orElseThrow(InstanceNotFoundException::new);
+        if(!user.getId().equals(product.getUser().getId()))
+            return PropertyUtil.responseMessage("잘못된 접근입니다.");
         for (MultipartFile img : multipartFiles) {  /** 이미지 추가, s3에 저장 **/
             try{
                 String url = uploadImageAndSetThumbnail(multipartFiles, product, img);
@@ -91,7 +96,7 @@ public class ProductService {
         User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow();
         Product product = productRepository.findByIdFetchPWUser(id).orElseThrow();
 
-        DetailForm detailForm = DetailForm.builder()
+        DetailProductForm detailForm = DetailProductForm.builder()
                 .id(product.getId())
                 .author(product.getAuthor())
                 .author_picture(product.getUser().getPicture())
@@ -99,7 +104,7 @@ public class ProductService {
                 .cert_uni(product.getUser().isCert_uni())
                 .cert_celeb(product.getUser().isCert_celeb())
                 .followerNum(product.getUser().getFollowerNum())
-                .images(getProductImages(product))  /** 이미지 엔티티에서 url만 빼오기 **/
+                .images(getImages(product))  /** 이미지 엔티티에서 url만 빼오기 **/
                 .title(product.getTitle())
                 .price(product.getPrice())
                 .category(product.getCategory())
@@ -116,18 +121,17 @@ public class ProductService {
                 .trading(product.isTrading())
                 .complete(product.isComplete()).build();
 
-        boolean isLike = checkIsLikes(user.getLikesList(), product);
+        boolean isLike = checkIsLikes(user.getProductLikesList(), product);
         boolean isWish = checkIsWish(user, product.getProductWishList());
         boolean isFollowing  = checkIsFollowing(user.getFollowingList(), product);
-
         detailForm.setUserAction(isLike, isWish, isFollowing); /** 유저의 좋아요, 찜, 팔로우여부 **/
         product.addViews();
         return detailForm;
     }
 
-    boolean checkIsLikes(List<Likes> userLikesList, Product product) {
+    public boolean checkIsLikes(List<ProductLikes> userLikesList, Product product) {
         boolean isLike = false;
-        for (Likes likes : userLikesList) {
+        for (ProductLikes likes : userLikesList) {
             if (likes.getProduct().getId().equals(product.getId())) {
                 isLike = true;
                 break;
@@ -136,7 +140,7 @@ public class ProductService {
         return isLike;
     }
 
-    boolean checkIsWish(User user, List<ProductWish> productWishList) {
+    public boolean checkIsWish(User user, List<ProductWish> productWishList) {
         boolean isWish = false;
         for (ProductWish productWish : productWishList) {
             if(productWish.getUser().getId().equals(user.getId())){
@@ -147,7 +151,7 @@ public class ProductService {
         return isWish;
     }
 
-    boolean checkIsFollowing(Set<Long> userFollowingList, Product product) {
+    public boolean checkIsFollowing(Set<Long> userFollowingList, Product product) {
         boolean isFollowing = false;
         for (Long followingId : userFollowingList) {
             if(product.getUser().getId().equals(followingId)){
@@ -161,8 +165,8 @@ public class ProductService {
     @Transactional
     public DetailForm showDetail(Long id){   // 비회원 글 보기
         Product product = productRepository.findByIdFetchPWUser(id).orElseThrow();
-        List<String> imagesUrl = getProductImages(product);  /** 이미지 엔티티에서 url만 빼오기 **/
-        DetailForm detailForm = DetailForm.builder()
+        List<String> imagesUrl = getImages(product);  /** 이미지 엔티티에서 url만 빼오기 **/
+        DetailProductForm detailForm = DetailProductForm.builder()
                 .id(product.getId())
                 .author(product.getAuthor())
                 .author_picture(product.getUser().getPicture())
@@ -199,7 +203,7 @@ public class ProductService {
         User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow();
         List<Product> productList = productRepository.findAll();
 
-        obj.put("new", get3NewList(user.getLikesList(), productList));   /** 신작 3개 **/
+        obj.put("new", get3NewList(user.getProductLikesList(), productList));   /** 신작 3개 **/
 
         obj.put("recommend", getRecommendListLimitCount(user, HOME_OBJECTS)); /** 추천목록 3개 **/
 
@@ -257,7 +261,7 @@ public class ProductService {
     public List<ShowForm> showRecommendDetail(User User){
         User user = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow();
         List<Product> tempRecommendList = getRecommendListLimitCount(user, HOME_DETAIL_OBJECTS);
-        List<ShowForm> recommendList = getShowFormCheckIsLikes(user.getLikesList(), tempRecommendList);
+        List<ShowForm> recommendList = getShowFormCheckIsLikes(user.getProductLikesList(), tempRecommendList);
         return recommendList;
     }
 
@@ -267,65 +271,63 @@ public class ProductService {
         List<Product> productList = productRepository.findAll();
 
         List<Product> followingList = getFollowingListLimitCount(user, productList, HOME_DETAIL_OBJECTS);
-        return getShowFormCheckIsLikes(user.getLikesList(), followingList); /** TODO 50개로 추려야됨 **/
+        return getShowFormCheckIsLikes(user.getProductLikesList(), followingList); /** TODO 50개로 추려야됨 **/
 
     }
 
     @Transactional
     public JSONObject wish(User User, @RequestBody ActionForm form){   // 찜
         JSONObject obj = new JSONObject();
-        User user = userRepository.findByEmailFetchProductWishList(User.getEmail()).orElseThrow(); // 작품 찜까지 페치 조인
-        List<ProductWish> userWishList = user.getProductWishList(); //userWishList == 유저의 찜 리스트
+        User user = userRepository.findByEmailFetchProductWishList(User.getEmail()).orElseThrow(UserNotFoundException::new); // 작품 찜까지 페치 조인
+        List<ProductWish> wishList = user.getProductWishList(); //wishList == 유저의 찜 리스트
         boolean isWish=false;
-        Optional<Product> Product = productRepository.findById(form.getId());
-        if(Product.isPresent()){
-            Product product = Product.get();
-            if(userWishList.size()!=0){ /** 유저가 찜이 누른 적이 있다면 이미 누른 작품인지 비교 **/
-                for (ProductWish wish : userWishList) { //유저의 찜목록과 현재 누른 작품의 찜과 비교
-                    if(product.equals(wish.getProduct())) {  //같으면 이미 찜 누른 항목
-                        isWish = true;
-                        break;
-                    }
-                }
-            }
+        Product product = productRepository.findById(form.getId()).orElseThrow(InstanceNotFoundException::new);
 
-            if (form.isMode() && !isWish){
-                product.plusWishCnt();
-                ProductWish connect = ProductWish.createConnect(product, user);
-                productWishRepository.save(connect);
-                isWish=true;
-                obj.put("success",true);
-            }
-            else if(!form.isMode() && isWish){
-                product.minusWishCnt();
-                for (ProductWish wish : userWishList) {
-                    if(product.equals(wish.getProduct())) {  //같으면 이미 찜 누른 항목
-                        productWishRepository.delete(wish);
-                        isWish = false;
-                        break;
-                    }
+        if(wishList.size()!=0){ /** 유저가 찜이 누른 적이 있다면 이미 누른 작품인지 비교 **/
+            for (ProductWish wish : wishList) { //유저의 찜목록과 현재 누른 작품의 찜과 비교
+                if(product.equals(wish.getProduct())) {  //같으면 이미 찜 누른 항목
+                    isWish = true;
+                    break;
                 }
-                obj.put("success",true);
             }
-            else
-                obj.put("success",false);
-            obj.put("isWish",isWish);
-            return obj;
         }
-        return PropertyUtil.responseMessage("존재하지 않는 작품에 요청된 찜");
+
+        if (form.isMode() && !isWish){
+            product.plusWishCnt();
+            ProductWish connect = ProductWish.createConnect(product, user);
+            productWishRepository.save(connect);
+            isWish=true;
+            obj.put("success",true);
+        }
+        else if(!form.isMode() && isWish){
+            product.minusWishCnt();
+            for (ProductWish wish : wishList) {
+                if(product.equals(wish.getProduct())) {  //같으면 이미 찜 누른 항목
+                    productWishRepository.delete(wish);
+                    isWish = false;
+                    break;
+                }
+            }
+            obj.put("success",true);
+        }
+        else
+            obj.put("success",false);
+        obj.put("isWish",isWish);
+        return obj;
+
     }
 
     @Transactional
     public JSONObject likes(User User, @RequestBody ActionForm form){   // 좋아요
         JSONObject obj = new JSONObject();
         User user = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow(); // 작품 좋아요까지 페치 조인
-        List<Likes> userLikesList = user.getLikesList(); //userLikesList == 유저의 좋아요 리스트
+        List<ProductLikes> userLikesList = user.getProductLikesList(); //userLikesList == 유저의 좋아요 리스트
         boolean isLike=false;
         Optional<Product> Product = productRepository.findById(form.getId());
         if(Product.isPresent()){
             Product product = Product.get();
             if(userLikesList.size()!=0){ /** 유저가 좋아요룰 누른 적이 있다면 이미 누른 작품인지 비교 **/
-                for (Likes like : userLikesList) { //유저의 찜목록과 현재 누른 작품의 찜과 비교
+                for (ProductLikes like : userLikesList) { //유저의 찜목록과 현재 누른 작품의 찜과 비교
                     if(product.equals(like.getProduct())) {  //같으면 이미 찜 누른 항목
                         isLike = true;
                         break;
@@ -335,14 +337,14 @@ public class ProductService {
 
             if (form.isMode() && !isLike){
                 product.plusLikesCnt();
-                Likes connect = Likes.createConnect(product, user);
+                ProductLikes connect = ProductLikes.createConnect(product, user);
                 likesRepository.save(connect);
                 isLike=true;
                 obj.put("success",true);
             }
             else if(!form.isMode() && isLike){
                 product.minusLikesCnt();
-                for (Likes like : userLikesList) { //유저의 찜목록과 현재 누른 작품의 찜과 비교
+                for (ProductLikes like : userLikesList) { //유저의 찜목록과 현재 누른 작품의 찜과 비교
                     if(product.equals(like.getProduct())) {  //같으면 이미 찜 누른 항목
                         likesRepository.delete(like);
                         isLike = false;
@@ -396,12 +398,12 @@ public class ProductService {
     @Transactional
     public JSONObject suggest(User User, @RequestBody SuggestDto dto){   // 판매완료시
         User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
-        if(productSuggestRepository.findByUserIdAndProductId(user.getId(),dto.getProductId()).isPresent())
+        if(suggestRepository.findByUserIdAndProductId(user.getId(),dto.getId()).isPresent())
             return PropertyUtil.responseMessage("이미 제안을 하신 작품입니다.");
-        Product product = productRepository.findById(dto.getProductId()).orElseThrow();
+        Product product = productRepository.findById(dto.getId()).orElseThrow();
         ProductSuggest connect = ProductSuggest.createConnect(product, user);
         product.setTopPrice(dto.getPrice());
-        productSuggestRepository.save(connect);
+        suggestRepository.save(connect);
         return PropertyUtil.response(true);
     }
 
@@ -413,7 +415,7 @@ public class ProductService {
             productList = productRepository.findAllPopularityDesc(pageable);
         else
             productList = categoryFilter(categories, pageable);  //파라미터 입력받았을 경우
-        List<ShowForm> showList = getShowFormCheckIsLikes(user.getLikesList(), productList.getContent());
+        List<ShowForm> showList = getShowFormCheckIsLikes(user.getProductLikesList(), productList.getContent());
         standardAlign(align, showList);  /** 선택한 기준대로 정렬 **/
         return new PageImpl<>(showList, pageable, productList.getTotalElements());
     }
@@ -434,7 +436,7 @@ public class ProductService {
         return new PageImpl<>(showList, pageable, productList.getTotalElements());
     }
 
-    List<String> getProductImages(Product product) {
+    public List<String> getImages(Product product) {
         List<String> imagesUrl = new ArrayList<>();
         for (ProductImage image : product.getImages()) {
             imagesUrl.add(image.getImageUrl());  /** 이미지 엔티티에서 url만 빼오기 **/
@@ -482,7 +484,7 @@ public class ProductService {
         return tempRecommendList;
     }
 
-    private List<ShowForm> getShowFormCheckIsLikes(List<Likes> userLikesList, List<Product> productList) {
+    private List<ShowForm> getShowFormCheckIsLikes(List<ProductLikes> userLikesList, List<Product> productList) {
         List<ShowForm> showFormList = new ArrayList<>();
         for (Product product : productList) { /** 추천 목록 중 좋아요 누른거 체크 후 ShowForm 으로 담기 **/
             boolean isLike = checkIsLikes(userLikesList, product);
@@ -496,7 +498,7 @@ public class ProductService {
         showFormList.add(showForm);
     }
 
-    private List<ShowForm> get3NewList(List<Likes> userLikesList, List<Product> productList) {
+    private List<ShowForm> get3NewList(List<ProductLikes> userLikesList, List<Product> productList) {
         List<ShowForm> newList = new ArrayList<>();
         for (int i = 0; i < productList.size(); i++) {
             if(i == HOME_OBJECTS)

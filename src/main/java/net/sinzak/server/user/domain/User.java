@@ -4,16 +4,16 @@ import lombok.Builder;
 import lombok.Getter;
 import net.sinzak.server.BaseTimeEntity;
 import net.sinzak.server.chatroom.domain.UserChatRoom;
-import net.sinzak.server.product.domain.Likes;
+import net.sinzak.server.product.domain.ProductLikes;
 import net.sinzak.server.product.domain.Product;
 import net.sinzak.server.product.domain.ProductSell;
 import net.sinzak.server.product.domain.ProductWish;
-import net.sinzak.server.work.Work;
-import net.sinzak.server.work.WorkWish;
+import net.sinzak.server.work.domain.Work;
+import net.sinzak.server.work.domain.WorkLikes;
+import net.sinzak.server.work.domain.WorkWish;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.util.*;
@@ -83,12 +83,6 @@ public class User extends BaseTimeEntity implements UserDetails {
     private Role role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    private List<Work> workPostList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    private List<WorkWish> workWishList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<Product> productPostList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
@@ -98,7 +92,16 @@ public class User extends BaseTimeEntity implements UserDetails {
     private List<ProductWish> productWishList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    private List<Likes> likesList = new ArrayList<>();
+    private List<ProductLikes> productLikesList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<Work> workPostList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<WorkWish> workWishList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<WorkLikes> workLikesList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     private List<UserChatRoom> userChatRooms = new ArrayList<>();
@@ -171,7 +174,7 @@ public class User extends BaseTimeEntity implements UserDetails {
         }
         String transNumber = Integer.toString(number);
         if(transNumber.length()>=4){
-            transNumber = transNumber.substring(0,1)+","+transNumber.substring(1);
+            transNumber = transNumber.charAt(0)+","+transNumber.substring(1);
         }
         transNumber +=unit;
         return transNumber;
