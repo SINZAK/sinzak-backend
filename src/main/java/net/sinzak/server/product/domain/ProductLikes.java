@@ -9,7 +9,7 @@ import static javax.persistence.FetchType.LAZY;
 
 @Getter
 @Entity
-public class Likes {
+public class ProductLikes {
 
     @Id
     @GeneratedValue
@@ -25,15 +25,15 @@ public class Likes {
     private Product product;
 
 
-    public static Likes createConnect(Product product, User user){  //생성메서드
-        Likes connect = new Likes();
+    public static ProductLikes createConnect(Product product, User user){  //생성메서드
+        ProductLikes connect = new ProductLikes();
         connect.setProduct(product);
         connect.setUser(user);
         return connect;
     }
 
     private void setUser(User user){
-        user.getLikesList().add(this); //스크랩!
+        user.getProductLikesList().add(this); //스크랩!
         this.user=user;
     }
     public void setProduct(Product product) {

@@ -5,17 +5,19 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.dto.DetailForm;
+import net.sinzak.server.common.dto.SuggestDto;
+import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
-import net.sinzak.server.product.dto.DetailForm;
-import net.sinzak.server.product.dto.SellDto;
-import net.sinzak.server.product.dto.ShowForm;
+import net.sinzak.server.product.dto.*;
 import net.sinzak.server.product.service.ProductService;
-import net.sinzak.server.product.dto.ProductPostDto;
 import net.sinzak.server.common.dto.ActionForm;
 import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -33,29 +35,23 @@ public class ProductController {
 
     @ApiDocumentResponse
     @ApiOperation(value = "작품 판매 글 생성")
-    @PostMapping(value = "/products/build", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "buildDto", dataType = "json", value = "{\n" +
-                    "\"category\": \"작품 카테고리\",\n" +
-                    "\"content\": \"작품 판매글 내용\",\n" +
-                    "\"height\": 50,\n" +
-                    "\"price\": 30000,\n" +
-                    "\"suggest\": false,\n" +
-                    "\"title\": \"작품 판매글 제목\",\n" +
-                    "\"vertical\": 150,\n" +
-                    "\"width\": 120\n" +
-                    "}\n"+
-                    "주의사항 : Content-Type = application/json"),
-            @ApiImplicitParam(name = "multipartFile", dataType = "multipartFile",
-                    value = "파일 보내주시면 파일 s3서버에 저장 및, 해당 파일이 저장되어 있는 URL을 디비에 저장합니다")
-    })
-    public JSONObject makeProductPost(@AuthenticationPrincipal User user, @RequestPart ProductPostDto buildDto, @RequestPart List<MultipartFile> multipartFile) {
-        return productService.makePost(user, buildDto, multipartFile);
+    @PostMapping(value = "/products/build", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public JSONObject makeProductPost(@AuthenticationPrincipal User user, @RequestBody ProductPostDto buildDto) {
+        return productService.makePost(user, buildDto);
+    }
+
+    @ApiDocumentResponse
+    @ApiOperation(value = "작품 판매 글 이미지 연결")
+    @PostMapping(value = "/products/{id}/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @ApiImplicitParam(name = "multipartFile", dataType = "multipartFile",
+            value = "파일 보내주시면 파일 s3서버에 저장 및, 해당 파일이 저장되어 있는 URL을 디비에 저장합니다")
+    public JSONObject makeProductPost(@AuthenticationPrincipal User user, @PathVariable("id") Long productId, @RequestPart List<MultipartFile> multipartFile) {
+        return productService.saveImageInS3AndProduct(user, multipartFile, productId);
     }
 
     @PostMapping("/products/{id}")
     @ApiOperation(value = "작품 상세 조회")
-    public DetailForm showProject(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    public DetailProductForm showProject(@PathVariable Long id, @AuthenticationPrincipal User user) {
         try{
             return productService.showDetail(id,user);
         }
@@ -73,7 +69,7 @@ public class ProductController {
 
     @ApiDocumentResponse
     @PostMapping("/products/likes")
-    @ApiOperation(value = "작품 좋아요")
+    @ApiOperation(value = "작품 좋아요", notes = "{\"success\":true, \"isfav\" : true} 이런식으로 보냅니다. 요청 이후 좋아요 버튼이 어떻게 되어있어야 하는지 알려주기위해서")
     public JSONObject likes(@AuthenticationPrincipal User user, @RequestBody ActionForm form) {
         return productService.likes(user, form);
     }
@@ -90,6 +86,13 @@ public class ProductController {
     @ApiOperation(value = "작품 판매", notes = "회원의 구매목록에 추가, 해당 작품 판매완료 설정")
     public JSONObject sell(@AuthenticationPrincipal User user, @RequestBody SellDto dto) {
         return productService.sell(user, dto);
+    }
+
+    @ApiDocumentResponse
+    @PostMapping("/products/suggest")
+    @ApiOperation(value = "작품 가격제안")
+    public JSONObject suggest(@AuthenticationPrincipal User user, @RequestBody SuggestDto dto) {
+        return productService.suggest(user, dto);
     }
 
     @ApiDocumentResponse
@@ -136,7 +139,7 @@ public class ProductController {
                             "sculpture - 조소\n" +
                             "print - 판화\n" +
                             "craft - 공예\n" +
-                            "other - 기타", defaultValue = "생략하기")
+                            "other - 기타", defaultValue = "")
     })
     public PageImpl<ShowForm> showMarketProduct(@AuthenticationPrincipal User user, @RequestParam(required=false, defaultValue="") List<String> categories, @RequestParam(required=false, defaultValue="recommend") String align, @ApiIgnore Pageable pageable) {
         try{
@@ -158,4 +161,10 @@ public class ProductController {
 //    protected ErrorResponse handleException2() {
 //        return ErrorResponse.of(HttpStatus.BAD_REQUEST, "존재하지 않는 값을 조회중입니다.");
 //    }
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.OK)
+    protected JSONObject handleUserNotFoundException() {
+        return PropertyUtil.responseMessage("존재하지 않는 유저입니다.");
+    }
+
 }

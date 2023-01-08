@@ -1,19 +1,34 @@
 package net.sinzak.server.work.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import net.sinzak.server.common.dto.DetailForm;
+import net.sinzak.server.common.dto.SuggestDto;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.config.auth.LoginUser;
 import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.common.dto.ActionForm;
+import net.sinzak.server.product.dto.SellDto;
+import net.sinzak.server.product.dto.ShowForm;
+import net.sinzak.server.user.domain.User;
+import net.sinzak.server.work.dto.DetailWorkForm;
 import net.sinzak.server.work.dto.WorkPostDto;
 import net.sinzak.server.common.error.ErrorResponse;
 import net.sinzak.server.work.service.WorkService;
 import org.json.simple.JSONObject;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Api(tags = "외주")
@@ -25,19 +40,81 @@ public class WorkController {
 
     @ApiDocumentResponse
     @ApiOperation(value = "외주 모집 글 생성")
-    @PostMapping("/works/build")
-    public JSONObject makeWorkPost(@LoginUser SessionUser user, /*@RequestBody*/ WorkPostDto postDto) {
-        return workService.makeWorkPost(user, postDto);
+    @PostMapping(value = "/works/build", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public JSONObject makeWorkPost(@AuthenticationPrincipal User user, @RequestBody WorkPostDto postDto) {
+        return workService.makePost(user, postDto);
+    }
+
+    @ApiDocumentResponse
+    @ApiOperation(value = "외주 모집 글 이미지 연결")
+    @PostMapping(value = "/works/{id}/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @ApiImplicitParam(name = "multipartFile", dataType = "multipartFile",
+            value = "파일 보내주시면 파일 s3서버에 저장 및, 해당 파일이 저장되어 있는 URL을 디비에 저장합니다")
+    public JSONObject makeProductPost(@AuthenticationPrincipal User user, @PathVariable("id") Long workId, @RequestPart List<MultipartFile> multipartFile) {
+        return workService.saveImageInS3AndWork(user, multipartFile, workId);
+    }
+
+    @PostMapping("/works/{id}")
+    @ApiOperation(value = "외주 상세 조회")
+    public DetailWorkForm showProject(@PathVariable Long id, @AuthenticationPrincipal User user) {
+        try{
+            return workService.showDetail(id,user);
+        }
+        catch (NullPointerException e){
+            return workService.showDetail(id); /** 비회원용 **/
+        }
     }
 
     @ApiDocumentResponse
     @PostMapping("/works/wish")
     @ApiOperation(value = "작품 찜")
-    public JSONObject wish(@LoginUser SessionUser user, @RequestBody ActionForm form) {
+    public JSONObject wish(@AuthenticationPrincipal User user, @RequestBody ActionForm form) {
         return workService.wish(user, form);
     }
 
+    @ApiDocumentResponse
+    @PostMapping("/works/likes")
+    @ApiOperation(value = "외주 좋아요", notes = "{\"success\":true, \"isfav\" : true} 이런식으로 보냅니다. 요청 이후 좋아요 버튼이 어떻게 되어있어야 하는지 알려주기위해서")
+    public JSONObject likes(@AuthenticationPrincipal User user, @RequestBody ActionForm form) {
+        return workService.likes(user, form);
+    }
 
+    @ApiDocumentResponse
+    @PostMapping("/works/suggest")
+    @ApiOperation(value = "외주 가격제안")
+    public JSONObject suggest(@AuthenticationPrincipal User user, @RequestBody SuggestDto dto) {
+        return workService.suggest(user, dto);
+    }
+
+    @ApiOperation(value = "외주 글 모음")
+    @PostMapping("/works")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
+                    value = "파라미터 형식으로 전달해주세요 (0..N) \nex) http://localhost:8080/works?page=3&size=5&stacks=logo,design\nhttp://localhost:8080/works?page=0&size=5&stacks=design&stacks=logo  둘 다 가능합니다", defaultValue = "0"),
+            @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+                    value = "3", defaultValue = "5"),
+            @ApiImplicitParam(name = "align", dataType = "string", paramType = "query",
+                    value = "정렬 기준\n" +"recent - 최신순\n"+
+                            "recommend - 신작추천순\n" , defaultValue = "recent"),
+            @ApiImplicitParam(name = "categories", dataType = "string", paramType = "query",
+                    value = "categories(최대 3개)\n" +
+                            "portrait\n" +
+                            "illustration\n" +
+                            "logo\n" +
+                            "poster\n" +
+                            "design\n" +
+                            "print\n" +
+                            "label\n" +
+                            "other", defaultValue = "")
+    })
+    public PageImpl<ShowForm> showWorks(@AuthenticationPrincipal User user, @RequestParam(required=false, defaultValue="") List<String> categories, @RequestParam(required=false, defaultValue="recent") String align, @RequestParam(required=false, defaultValue="true") Boolean employment, @ApiIgnore Pageable pageable) {
+        try{
+            return workService.workListForUser(user, categories, align, employment, pageable);
+        }
+        catch (NullPointerException e){
+            return workService.workListForGuest(categories,align, employment, pageable);
+        }
+    }
 
 
     @ExceptionHandler(NullPointerException.class)
