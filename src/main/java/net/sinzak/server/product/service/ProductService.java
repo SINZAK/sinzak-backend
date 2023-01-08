@@ -2,6 +2,7 @@ package net.sinzak.server.product.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.image.S3Service;
 import net.sinzak.server.product.domain.*;
@@ -40,27 +41,28 @@ public class ProductService {
     private final int HOME_DETAIL_OBJECTS = 50;
 
     @Transactional(rollbackFor = {Exception.class})
-    public JSONObject makePost(User User, ProductPostDto buildDto, List<MultipartFile> multipartFiles){   // 글 생성
-        User user = userRepository.findByEmailFetchProductPostList(User.getEmail()).orElseThrow(); /** 존재 하지 않는 유저면 NullPointer 에러 뜰거고, 핸들러가 처리 할 예정 **/
+    public JSONObject makePost(User User, ProductPostDto buildDto){   // 글 생성
+        User user = userRepository.findByEmailFetchProductPostList(User.getEmail()).orElseThrow(UserNotFoundException::new);
         Product product = Product.builder()
-                    .title(buildDto.getTitle())  //제목
-                    .content(buildDto.getContent()) //내용
+                    .title(buildDto.getTitle())
+                    .content(buildDto.getContent())
                     .category(buildDto.getCategory())
-                    .author(user.getNickName()) //닉네임
-                    .univ(user.getUniv()) // 대학
-                    .price(buildDto.getPrice()) // 페이
-                    .suggest(buildDto.isSuggest()) //가격제안여부
+                    .author(user.getNickName())
+                    .univ(user.getUniv())
+                    .price(buildDto.getPrice())
+                    .suggest(buildDto.isSuggest())
                     .size(new Size(buildDto.getWidth(), buildDto.getVertical(), buildDto.getHeight()))
                     .build();
         product.setUser(user); // user 연결 및, user의 외주 글 리스트에 글 추가
-        productRepository.save(product); // 미리 저장해야 이미지도 저장가능..
-        return saveImageInS3AndProduct(multipartFiles, product);
+        Long productId = productRepository.save(product).getId();// 미리 저장해야 이미지도 저장가능..
+        return PropertyUtil.response(productId);
     }
 
-    private JSONObject saveImageInS3AndProduct(List<MultipartFile> multipartFiles, Product product) {
+    public JSONObject saveImageInS3AndProduct(List<MultipartFile> multipartFiles, Long id) {
+        Product product = productRepository.findById(id).orElseThrow(InstanceNotFoundException::new);
         for (MultipartFile img : multipartFiles) {  /** 이미지 추가, s3에 저장 **/
             try{
-                String url = uploadImage(multipartFiles, product, img);
+                String url = uploadImageAndSetThumbnail(multipartFiles, product, img);
                 saveImageUrl(product, url);
             }
             catch (Exception e){
@@ -71,7 +73,7 @@ public class ProductService {
     }
 
 
-    private String uploadImage(List<MultipartFile> multipartFiles, Product product, MultipartFile img) {
+    private String uploadImageAndSetThumbnail(List<MultipartFile> multipartFiles, Product product, MultipartFile img) {
         String url = s3Service.uploadImage(img);
         if(img.equals(multipartFiles.get(0)))
             product.setThumbnail(url);
