@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.sinzak.server.config.auth.LoginUser;
 import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.user.domain.User;
+import net.sinzak.server.user.dto.request.UserIdDto;
 import net.sinzak.server.user.dto.respond.GetFollowDto;
 import net.sinzak.server.user.dto.respond.UserDto;
 import net.sinzak.server.user.service.UserQueryService;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -27,30 +29,30 @@ public class UserQueryController {
     private final UserQueryService userQueryService;
 
     @ApiOperation(value ="내 프로필 보기")
-    @GetMapping(value ="users/myProfile")
+    @GetMapping(value ="users/my-profile")
     public UserDto getMyProfile(@ApiIgnore @AuthenticationPrincipal User user){
         return userQueryService.getMyProfile(user);
     }
 
     @ApiOperation(value ="유저 프로필 보기")
-    @GetMapping(value ="/users/{userId}/")
-    public UserDto getUserProfile(@PathVariable("userId") Long userId, @ApiIgnore @AuthenticationPrincipal User user){
-        UserDto userDto = userQueryService.getUserProfile(userId, user);
+    @GetMapping(value ="/users/profile")
+    public UserDto getUserProfile(@RequestBody UserIdDto userIdDto, @ApiIgnore @AuthenticationPrincipal User user){
+        UserDto userDto = userQueryService.getUserProfile(userIdDto, user);
         return userDto;
     }
     @ApiOperation(value ="팔로워리스트")
-    @GetMapping(value ="/users/{userId}/followers")
-    public List<GetFollowDto> getFollowerList( @PathVariable("userId") Long userId) {
+    @GetMapping(value ="/users/followers")
+    public List<GetFollowDto> getFollowerList( @RequestBody UserIdDto userIdDto) {
         List<GetFollowDto> getFollowDtos =
-               userQueryService.getFollowerDtoList(userId);
+               userQueryService.getFollowerDtoList(userIdDto);
         return getFollowDtos;
     }
 
     @ApiOperation(value ="팔로잉리스트")
-    @GetMapping(value ="/users/{userId}/followings")
-    public List<GetFollowDto> getFollowingList(@PathVariable("userId") Long userId) {
+    @GetMapping(value ="/users/followings")
+    public List<GetFollowDto> getFollowingList(@RequestBody UserIdDto userIdDto) {
         List<GetFollowDto> getFollowDtos =
-                userQueryService.getFollowingDtoList(userId);
+                userQueryService.getFollowingDtoList(userIdDto);
         return getFollowDtos;
     }
     //    @ApiOperation(value ="팔로워리스트")

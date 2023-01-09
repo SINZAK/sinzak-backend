@@ -15,10 +15,7 @@ import net.sinzak.server.config.auth.SecurityService;
 import net.sinzak.server.config.auth.jwt.TokenDto;
 import net.sinzak.server.config.auth.jwt.TokenRequestDto;
 import net.sinzak.server.user.domain.User;
-import net.sinzak.server.user.dto.request.EmailDto;
-import net.sinzak.server.user.dto.request.JoinDto;
-import net.sinzak.server.user.dto.request.UnivDto;
-import net.sinzak.server.user.dto.request.UpdateUserDto;
+import net.sinzak.server.user.dto.request.*;
 import net.sinzak.server.user.service.UserCommandService;
 import org.json.simple.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -89,16 +86,16 @@ public class UserCommandController {
     }
     @ApiDocumentResponse
     @ApiOperation(value = "팔로우하기")
-    @PostMapping(value = "/users/{userId}/follow")
-    public JSONObject followUser(@PathVariable("userId") Long userId,@ApiIgnore @AuthenticationPrincipal User user){
-        return userCommandService.follow(userId,user);
+    @PostMapping(value = "/users/follow")
+    public JSONObject followUser(@RequestBody UserIdDto userIdDto, @ApiIgnore @AuthenticationPrincipal User user){
+        return userCommandService.follow(userIdDto,user);
     }
 
     @ApiDocumentResponse
     @ApiOperation(value = "언팔로우하기")
-    @PostMapping(value = "/users/{userId}/unfollow")
-    public JSONObject unFollowUser(@PathVariable("userId") Long userId,@ApiIgnore @AuthenticationPrincipal User user){
-        return userCommandService.unFollow(userId,user);
+    @PostMapping(value = "/users/unfollow")
+    public JSONObject unFollowUser(@RequestBody UserIdDto userIdDto,@ApiIgnore @AuthenticationPrincipal User user){
+        return userCommandService.unFollow(userIdDto,user);
     }
 
 

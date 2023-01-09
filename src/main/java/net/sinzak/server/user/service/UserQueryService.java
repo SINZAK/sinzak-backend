@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.config.auth.dto.SessionUser;
+import net.sinzak.server.user.dto.request.UserIdDto;
 import net.sinzak.server.user.dto.respond.GetFollowDto;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.dto.respond.UserDto;
@@ -39,8 +40,8 @@ public class UserQueryService {
         Optional<User> findUser = userRepository.findById(user.getId());
         return makeUserDto(user,findUser);
     }
-    public UserDto getUserProfile(Long otherUserId, User user) {
-        Optional<User> findUser = userRepository.findById(otherUserId);
+    public UserDto getUserProfile(UserIdDto userIdDto, User user) {
+        Optional<User> findUser = userRepository.findById(userIdDto.getUserId());
         return checkIfTwoUserPresent(user,findUser);
     }
     public UserDto checkIfTwoUserPresent(User user,Optional<User> findUser){
@@ -71,12 +72,14 @@ public class UserQueryService {
         return false;
     }
     //팔로워가져오기
-    public List<GetFollowDto> getFollowerDtoList(Long userId){
+    public List<GetFollowDto> getFollowerDtoList(UserIdDto userIdDto){
+        Long userId = userIdDto.getUserId();
         Set<Long> followerList = userRepository.findById(userId).get().getFollowerList();
         return getGetFollowDtoList(followerList);
     }
     //팔로잉가져오기
-    public List<GetFollowDto> getFollowingDtoList(Long userId){
+    public List<GetFollowDto> getFollowingDtoList(UserIdDto userIdDto){
+        Long userId = userIdDto.getUserId();
         Set<Long> followingList = userRepository.findById(userId).get().getFollowingList();
         return getGetFollowDtoList(followingList);
     }
