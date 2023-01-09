@@ -78,20 +78,20 @@ public class UserCommandService {
         return PropertyUtil.response(true);
     }
      //실제론 연동로그인이기에 api테스트용
-    public long createUser(SessionUser user){ //이건 테스트
-        Optional<User> findUser =
-                userRepository.findByEmail(user.getEmail());
-        if(findUser.isPresent()){
-            throw new InstanceNotFoundException("이미 존재하는 이메일입니다");
-        }
-        User newUser = sessionUserToUser(user);
-        userRepository.save(newUser);
-        return userRepository.findByEmail(user.getEmail()).get().getId();
-    }
-    public User sessionUserToUser(SessionUser user){
-        User newUser = User.builder()
-                .email(user.getEmail()).name(user.getName()).picture(user.getPicture()).build();
-        return newUser;
-    }
+//    public long createUser(SessionUser user){ //이건 테스트
+//        Optional<User> findUser =
+//                userRepository.findByEmail(user.getEmail());
+//        if(findUser.isPresent()){
+//            throw new InstanceNotFoundException("이미 존재하는 이메일입니다");
+//        }
+//        User newUser = sessionUserToUser(user);
+//        userRepository.save(newUser);
+//        return userRepository.findByEmail(user.getEmail()).get().getId();
+//    }
+//    public User sessionUserToUser(SessionUser user){
+//        User newUser = User.builder()
+//                .email(user.getEmail()).name(user.getName()).(user.getPicture()).build();
+//        return newUser;
+//    }
 
 }

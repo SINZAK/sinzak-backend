@@ -3,7 +3,6 @@ package net.sinzak.server.config.auth;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.common.PropertyUtil;
-import net.sinzak.server.common.error.ErrorResponse;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.config.auth.jwt.*;
@@ -14,13 +13,10 @@ import net.sinzak.server.user.dto.request.JoinDto;
 import net.sinzak.server.user.repository.JoinTermsRepository;
 import net.sinzak.server.user.repository.UserRepository;
 import org.json.simple.JSONObject;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -61,14 +57,11 @@ public class SecurityService {
         User user = User.builder()
                 .name(dto.getName())
                 .email(dto.getEmail())
-                .univ_email(dto.getUniv_email())
                 .origin(dto.getOrigin())
                 .categoryLike(dto.getCategory_like())
-                .nickName(dto.getNickName())
-                .univ(dto.getUniv())
-                .cert_uni(dto.isCert_univ()).build();
+                .nickName(dto.getNickName()).build();
         if(dto.getOrigin().equals("apple"))
-            user.updateEmail(dto.getTokenId());  /** 애플로그인은 이메일을 토큰 ID로써야함  --> 왜냐면 이후에 애플 로그인시 프론트에서 이메일 못받아옴 **/
+            user.updateEmailForAppleUser(dto.getTokenId());  /** 애플로그인은 이메일을 토큰 ID로써야함  --> 왜냐면 이후에 애플 로그인시 프론트에서 이메일 못받아옴 **/
         User savedUser = userRepository.save(user);
         JoinTerms terms = new JoinTerms(dto.isTerm());
         terms.setUser(savedUser);
