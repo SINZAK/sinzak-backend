@@ -30,7 +30,7 @@ public class FireBaseCloudMessageService {
     private static final String GOOGLE_CLOUD_URL = "https://www.googleapis.com/auth/cloud-platform";
     private static final String API_URL = "https://www.fcm.googleapis.com/v1/projects/sinzak-372703/messages:send";
     private final ObjectMapper objectMapper;
-    public void sendMessageTo(String targetToken, String title,String body) throws IOException{ //targetToken으로 fcm 푸시알람 전송(프론트에서 전송해줌)
+    public void sendMessageTo(String targetToken, String title,String body) throws IOException{ //targetToken으로 fcm 푸시알람 전송(프론트에서 전송해줌) 얘는 회원가입할 떄 같이 받음
         String message = makeMessage(targetToken, title, body);
         OkHttpClient client = new OkHttpClient();
         RequestBody requestBody = RequestBody.create(message, MediaType.get("application/json; charset=utf-8"));
