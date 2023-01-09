@@ -6,6 +6,8 @@ package net.sinzak.server.firebase;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -65,16 +68,17 @@ public class FireBaseCloudMessageService {
     }
     @PostConstruct
     private String getAccessToken() throws IOException{
+        FileInputStream serviceAccount =
+                new FileInputStream(FIREBASE_CONFIG_PATH);
         GoogleCredentials googleCredentials = GoogleCredentials
-                .fromStream(new ClassPathResource(FIREBASE_CONFIG_PATH).getInputStream())
+                .fromStream(serviceAccount)
                 .createScoped(List.of(GOOGLE_CLOUD_URL));
         googleCredentials.refreshIfExpired();  //accessToken 생성
-        System.out.println(googleCredentials.getAccessToken().getTokenValue());
         return googleCredentials.getAccessToken().getTokenValue();
     }
 }
 
-//    @PostConstruct
+//@PostConstruct
 //    public void init(){
 //        try{
 //            FileInputStream serviceAccount =
@@ -83,6 +87,7 @@ public class FireBaseCloudMessageService {
 //            FirebaseOptions options = new FirebaseOptions.Builder()
 //                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
 //                    .build();
+//            System.out.println("s");
 //
 //            FirebaseApp.initializeApp(options);
 //
@@ -91,5 +96,6 @@ public class FireBaseCloudMessageService {
 //            e.printStackTrace();
 //        }
 //    }
+
 
 
