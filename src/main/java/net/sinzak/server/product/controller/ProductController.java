@@ -127,10 +127,10 @@ public class ProductController {
     }
 
     @ApiOperation(value = "마켓 작품")
-    @PostMapping("/market/products")
+    @PostMapping("/products")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
-                    value = "파라미터 형식으로 전달해주세요 (0..N) \nex) http://localhost:8080/market/products?page=3&size=5&stacks=orient,western\nhttp://localhost:8080/market/products?page=0&size=5&stacks=orient&stacks=western  둘 다 가능합니다", defaultValue = "0"),
+                    value = "파라미터 형식으로 전달해주세요 (0..N) \nex) http://localhost:8080/products?page=3&size=5&stacks=orient,western\nhttp://localhost:8080/products?page=0&size=5&stacks=orient&stacks=western&sale=true  둘 다 가능합니다", defaultValue = "0"),
             @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
                     value = "3", defaultValue = "5"),
             @ApiImplicitParam(name = "align", dataType = "string", paramType = "query",
@@ -146,14 +146,18 @@ public class ProductController {
                             "sculpture - 조소\n" +
                             "print - 판화\n" +
                             "craft - 공예\n" +
-                            "other - 기타", defaultValue = "")
+                            "other - 기타", defaultValue = ""),
+            @ApiImplicitParam(name = "sale", dataType = "boolean", paramType = "query",
+                    value = "sale = false -> 모든 작품(디폴트)" +
+                            "sale = true -> 판매중인 작품만(거래중도 포함, 거래완료는 X)" +
+                            "생략시 판매중인 작품만 보기 버튼이 체크 되지 않은 상태라고 생각하시면 됩니다  어떤 파라미터명을써도 딱 맞아떨어지는게 없어서 sale로 갈게요", defaultValue = "false")
     })
-    public PageImpl<ShowForm> showMarketProduct(@AuthenticationPrincipal User user, @RequestParam(required=false, defaultValue="") List<String> categories, @RequestParam(required=false, defaultValue="recommend") String align, @ApiIgnore Pageable pageable) {
+    public PageImpl<ShowForm> showMarketProduct(@AuthenticationPrincipal User user, @RequestParam(required=false, defaultValue="") List<String> categories, @RequestParam(required=false, defaultValue="recommend") String align, @RequestParam(required=false, defaultValue="false") Boolean sale, @ApiIgnore Pageable pageable) {
         try{
-            return productService.productListForUser(user, categories, align, pageable);
+            return productService.productListForUser(user, categories, align, sale, pageable);
         }
         catch (NullPointerException e){
-            return productService.productListForGuest(categories,align,pageable);
+            return productService.productListForGuest(categories, align, sale, pageable);
         }
     }
 
