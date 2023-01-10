@@ -11,6 +11,7 @@ import net.sinzak.server.user.dto.request.UpdateUserDto;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
+import net.sinzak.server.user.dto.request.UserIdDto;
 import net.sinzak.server.user.repository.JoinTermsRepository;
 import net.sinzak.server.user.repository.UserRepository;
 import net.sinzak.server.common.PropertyUtil;
@@ -41,7 +42,8 @@ public class UserCommandService {
     }
 
 
-    public JSONObject follow(Long userId, User loginUser){
+    public JSONObject follow(UserIdDto userIdDto, User loginUser){
+        Long userId = userIdDto.getUserId();
         Optional<User> findUser = userRepository.findById(userId);
         JSONObject userNotExist = checkUsersExist(findUser,loginUser);
         System.out.println((boolean)userNotExist.get(PropertyUtil.SUCCESS_WORD));
@@ -53,7 +55,8 @@ public class UserCommandService {
         findUser.get().getFollowerList().add(user.getId());
         return PropertyUtil.response(true);
     }
-    public JSONObject unFollow(Long userId,User loginUser){
+    public JSONObject unFollow(UserIdDto userIdDto,User loginUser){
+        Long userId = userIdDto.getUserId();
         Optional<User> findUser = userRepository.findById(userId);
         JSONObject userNotExist = checkUsersExist(findUser,loginUser);
         if(!(boolean)userNotExist.get(PropertyUtil.SUCCESS_WORD)){
