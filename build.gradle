@@ -1,12 +1,20 @@
+buildscript {
+	ext {
+		queryDslVersion = "5.0.0"
+	}
+}
+
 plugins {
 	id 'org.springframework.boot' version '2.6.6'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 	id 'java'
 }
 
 group = 'net.sinzak'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
+
 
 configurations {
 	compileOnly {
@@ -35,7 +43,9 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.2.2'
 	implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
-
+	//querydsl 추가
+	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+	annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
 
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	compileOnly 'org.projectlombok:lombok'
@@ -62,13 +72,28 @@ dependencies {
 
 //	implementation group: 'com.google.firebase', name: 'firebase-admin', version: '8.1.0'
 
-//	//이것도 스웨거 관련인데
-//	implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
-//	implementation 'javax.servlet:jstl'
+
 }
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+// querydsl 세팅 시작
+def querydslDir = "$buildDir/generated/querydsl"
+querydsl {
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+sourceSets {
+	main.java.srcDir querydslDir
+}
+configurations {
+	querydsl.extendsFrom compileClasspath
+}
+compileQuerydsl {
+	options.annotationProcessorPath = configurations.querydsl
+}
+// querydsl 세팅 끝
 
 
 

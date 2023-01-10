@@ -3,7 +3,6 @@ package net.sinzak.server.product.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.common.PostService;
-import net.sinzak.server.common.dto.DetailForm;
 import net.sinzak.server.common.dto.SuggestDto;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
@@ -39,6 +38,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     private final ProductImageRepository imageRepository;
     private final ProductLikesRepository likesRepository;
     private final S3Service s3Service;
+    private final ProductQDSLRepositoryImpl productQDSLRepository;
 
     private final int HOME_OBJECTS = 3;
     private final int HOME_DETAIL_OBJECTS = 50;
@@ -429,26 +429,25 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional(readOnly = true)
-    public PageImpl<ShowForm> productListForUser(User User, List<String> categories, String align, Pageable pageable){
+    public PageImpl<ShowForm> productListForUser(User User, List<String> categories, String align, boolean complete, Pageable pageable){
         User user  = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow();
         Page<Product> productList;
         if(categories.size()==0)
-            productList = productRepository.findAllPopularityDesc(pageable);
+            productList = productQDSLRepository.findAllByCompletePopularityDesc(complete, pageable); /** QueryDSL 최적화 완료 **/
         else
-            productList = categoryFilter(categories, pageable);  //파라미터 입력받았을 경우
+            productList = productQDSLRepository.findNByCategoriesDesc(categories, pageable);  //파라미터 입력받았을 경우
         List<ShowForm> showList = getShowFormCheckIsLikes(user.getProductLikesList(), productList.getContent());
         standardAlign(align, showList);  /** 선택한 기준대로 정렬 **/
         return new PageImpl<>(showList, pageable, productList.getTotalElements());
     }
 
     @Transactional(readOnly = true)
-    public PageImpl<ShowForm> productListForGuest(List<String> stacks, String align, Pageable pageable){
+    public PageImpl<ShowForm> productListForGuest(List<String> categories, String align, boolean complete, Pageable pageable){
         Page<Product> productList;
-        if(stacks.size()==0)
-            productList = productRepository.findAllPopularityDesc(pageable);
+        if(categories.size()==0)
+            productList = productQDSLRepository.findAllByCompletePopularityDesc(complete, pageable); /** QueryDSL 최적화 완료 **/
         else
-            productList = categoryFilter(stacks, pageable);  //파라미터 입력받았을 경우
-
+            productList = productQDSLRepository.findNByCategoriesDesc(categories, pageable);  //파라미터 입력받았을 경우
         List<ShowForm> showList = new ArrayList<>();
         for (Product product : productList.getContent()) {
             addProductInJSONFormat(showList, product, false);
@@ -465,20 +464,9 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return imagesUrl;
     }
 
-    private Page<Product> categoryFilter(List<String> categories, Pageable pageable) {
-        if (categories.size() == 1)
-            return productRepository.findBy1StacksDesc(pageable, categories.get(0));
-        else if (categories.size() == 2)
-            return productRepository.findBy2StacksDesc(pageable, categories.get(0), categories.get(1));
-        else if (categories.size() == 3)
-            return productRepository.findBy3StacksDesc(pageable, categories.get(0), categories.get(1), categories.get(2));
-        else
-            return productRepository.findAll(pageable);
-    }
-
     private void standardAlign(String align, List<ShowForm> showList) {
         if (align.equals("recommend")) {
-              /** 신작 추천순 popularity 내림차순 **/
+              /** 신작 추천순 popularity(인기도)  내림차순 **/
         } else if (align.equals("popular")) { /** 인기순 **/
             showList.sort((o1, o2) -> o2.getLikesCnt() - o1.getLikesCnt());
         } else if (align.equals("recent")) {

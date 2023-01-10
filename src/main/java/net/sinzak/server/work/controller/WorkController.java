@@ -103,7 +103,7 @@ public class WorkController {
                             "logo\n" +
                             "poster\n" +
                             "design\n" +
-                            "print\n" +
+                            "editorial\n" +
                             "label\n" +
                             "other", defaultValue = "")
     })
