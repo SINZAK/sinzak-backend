@@ -20,7 +20,7 @@ import static net.sinzak.server.product.domain.QProduct.product;
 
 @Repository
 @RequiredArgsConstructor
-public class ProductQDSLRepositoryImpl implements QDSLRepository {
+public class ProductQDSLRepositoryImpl implements QDSLRepository<Product> {
 
     private final JPAQueryFactory queryFactory;
 

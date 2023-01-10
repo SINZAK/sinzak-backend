@@ -34,7 +34,8 @@ public class ProductController {
     private final ProductService productService;
 
     @ApiDocumentResponse
-    @ApiOperation(value = "작품 판매 글 생성",notes = "{\"success\":true, \"id\":52}\n해당 글의 id를 전해드리니 이 /products/{id}/image 에 넘겨주세요")
+    @ApiOperation(value = "작품 판매 글 생성",notes = "{\"success\":true, \"id\":52}\n해당 글의 id를 전해드리니 이 /products/{id}/image 에 넘겨주세요\n" +
+            "category = painting,orient,sculpture,print,craft,other")
     @PostMapping(value = "/products/build", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public JSONObject makeProductPost(@AuthenticationPrincipal User user, @RequestBody ProductPostDto buildDto) {
         return productService.makePost(user, buildDto);

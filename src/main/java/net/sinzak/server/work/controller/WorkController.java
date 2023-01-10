@@ -39,7 +39,8 @@ public class WorkController {
     private final WorkService workService;
 
     @ApiDocumentResponse
-    @ApiOperation(value = "외주 모집 글 생성")
+    @ApiOperation(value = "외주 모집 글 생성", notes =  "{\"success\":true, \"id\":52}\n해당 글의 id를 전해드리니 이 /works/{id}/image 에 넘겨주세요\n" +
+            "category = portrait, illustration, logo, poster, design, editorial, label, other 주의점은 콤마로 구분하되 공백은 삽입X")
     @PostMapping(value = "/works/build", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public JSONObject makeWorkPost(@AuthenticationPrincipal User user, @RequestBody WorkPostDto postDto) {
         return workService.makePost(user, postDto);

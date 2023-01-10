@@ -12,9 +12,6 @@ import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long>{
 
-    @Override
-    Optional<Product> findById(Long aLong);
-
     @Query("select p from Product p order by p.id desc")
     List<Product> findAll();
 
