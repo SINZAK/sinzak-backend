@@ -222,15 +222,21 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     public JSONObject showHome(User User){
         JSONObject obj = new JSONObject();
         User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow();
+        List<String> userCategories = Arrays.asList(user.getCategoryLike().split(","));
+
         List<Product> productList = productRepository.findAll();
+        obj.put("new", makeHomeShowFormList(user.getProductLikesList(), productList));   /** 신작 3개 **/
 
-        obj.put("new", get3NewList(user.getProductLikesList(), productList));   /** 신작 3개 **/
 
-        obj.put("recommend", getRecommendListLimitCount(user, HOME_OBJECTS)); /** 추천목록 3개 **/
+        List<Product> list = productQDSLRepository.findCountByCategoriesDesc(userCategories, HOME_OBJECTS);
+        obj.put("recommend", makeHomeShowFormList(user.getProductLikesList(), list)); /** 추천목록 3개 **/
 
-        obj.put("following", getFollowingListLimitCount(user, productList ,HOME_OBJECTS)); /** 팔로잉 관련 3개 **/
+
+        List<Product> followingList = getFollowingList(user, productList, HOME_OBJECTS);
+        obj.put("following", makeHomeShowFormList(user.getProductLikesList(),followingList)); /** 팔로잉 관련 3개 **/
         return obj;
     }
+
 
     @Transactional(readOnly = true)
     public JSONObject showHome(){
@@ -281,7 +287,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     @Transactional(readOnly = true)
     public List<ShowForm> showRecommendDetail(User User){
         User user = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow();
-        List<Product> tempRecommendList = getRecommendListLimitCount(user, HOME_DETAIL_OBJECTS);
+        List<Product> tempRecommendList = productQDSLRepository.findCountByCategoriesDesc(Arrays.asList(user.getCategoryLike().split(",")), HOME_DETAIL_OBJECTS);
         List<ShowForm> recommendList = getShowFormCheckIsLikes(user.getProductLikesList(), tempRecommendList);
         return recommendList;
     }
@@ -291,7 +297,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow();
         List<Product> productList = productRepository.findAll();
 
-        List<Product> followingList = getFollowingListLimitCount(user, productList, HOME_DETAIL_OBJECTS);
+        List<Product> followingList = getFollowingList(user, productList, HOME_DETAIL_OBJECTS);
         return getShowFormCheckIsLikes(user.getProductLikesList(), followingList); /** TODO 50개로 추려야됨 **/
 
     }
@@ -479,20 +485,6 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
 
-    private List<Product> getRecommendListLimitCount(User user, int count) {
-        List<Product> tempRecommendList; /** 카테고리 관련 **/
-        String[] categories = user.getCategoryLike().split(",");
-        if(categories.length == 1)
-            tempRecommendList = productRepository.find1RecommendLimit(categories[0], count);
-        else if(categories.length == 2)
-            tempRecommendList = productRepository.find2RecommendLimit(categories[0],categories[1], count);
-        else if(categories.length == 3)
-            tempRecommendList = productRepository.find3RecommendLimit(categories[0],categories[1],categories[2], count);
-        else
-            tempRecommendList = productRepository.findAll();
-        return tempRecommendList;
-    }
-
     private List<ShowForm> getShowFormCheckIsLikes(List<ProductLikes> userLikesList, List<Product> productList) {
         List<ShowForm> showFormList = new ArrayList<>();
         for (Product product : productList) { /** 추천 목록 중 좋아요 누른거 체크 후 ShowForm 으로 담기 **/
@@ -507,7 +499,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         showFormList.add(showForm);
     }
 
-    private List<ShowForm> get3NewList(List<ProductLikes> userLikesList, List<Product> productList) {
+    private List<ShowForm> makeHomeShowFormList(List<ProductLikes> userLikesList, List<Product> productList) {
         List<ShowForm> newList = new ArrayList<>();
         for (int i = 0; i < productList.size(); i++) {
             if(i == HOME_OBJECTS)
@@ -518,7 +510,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return newList;
     }
 
-    private List<Product> getFollowingListLimitCount(User user, List<Product> productList, int limit) {
+    private List<Product> getFollowingList(User user, List<Product> productList, int limit) {
         int count = 0;
         List<Product> followingProductList = new ArrayList<>();
         for (Product product : productList) {
@@ -529,7 +521,6 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                     break;
             }
         }
-        followingProductList.sort((o1, o2) -> (int) (o2.getId() - o1.getId()));  //내림차순 정렬
         return followingProductList;
     }
 

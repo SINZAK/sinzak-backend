@@ -74,17 +74,22 @@ public class ProductQDSLRepositoryImpl implements QDSLRepository {
     private BooleanBuilder eqCategories(List<String> categories) {
         BooleanBuilder builder = new BooleanBuilder();
 
-        if(categories.get(0) != null){
-            builder.or(product.category.contains(categories.get(0)));
-        }
-        if(categories.get(1) != null){
-            builder.or(product.category.contains(categories.get(1)));
-        }
-        if(categories.get(2) != null){
-            builder.or(product.category.contains(categories.get(2)));
+        for (String category : categories) {
+            if(category != null)
+                builder.or(product.category.contains(category));
         }
 
         return builder;
+    }
+    public List<Product> findCountByCategoriesDesc(List<String> categories, int count) {
+        List<Product> result = queryFactory
+                .selectFrom(product)
+                .where(eqCategories(categories))
+                .orderBy(product.id.desc())
+                .limit(count)
+                .fetch();
+
+        return result;
     }
 
 }
