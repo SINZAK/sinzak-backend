@@ -241,25 +241,20 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     @Transactional(readOnly = true)
     public JSONObject showHome(){
         JSONObject obj = new JSONObject();
-
         List<Product> productList = productRepository.findAll();
-        List<Product> recentList = productList;
 
-        List<ShowForm> newList = get3ProductForGuest(productList);
-        obj.put("new",newList);
+        obj.put("new",makeHomeShowFormListForGuest(productList));
+
+        List<Product> tradingList = getTradingList(productList, HOME_OBJECTS); /** Trading = 최신 목록 내림차순 중 채팅수가 1이상, 거래 완료되지 않은 것 **/
+        obj.put("trading", makeHomeShowFormListForGuest(tradingList));
 
         productList.sort((o1, o2) -> o2.getLikesCnt() - o1.getLikesCnt()); /** hot : 좋아요 순 정렬!! **/
-        List<ShowForm> hotList = get3ProductForGuest(productList);
-        obj.put("hot",hotList);
-
-
-        List<ShowForm> tradingList = get3TradingList(recentList); /** Trading = 최신 목록 내림차순 중 채팅수가 1이상, 거래 완료되지 않은 것 **/
-        obj.put("trading",tradingList); // TODO 교체 예정
+        obj.put("hot", makeHomeShowFormListForGuest(productList));
 
         return obj;
     }
 
-    private List<ShowForm> get3ProductForGuest(List<Product> productList) {
+    private List<ShowForm> makeHomeShowFormListForGuest(List<Product> productList) {
         List<ShowForm> newList = new ArrayList<>();  /** 신작 3개 **/
         for (int i = 0; i < productList.size(); i++) {
             if (i >= HOME_OBJECTS)
@@ -269,26 +264,27 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return newList;
     }
 
-    private List<ShowForm> get3TradingList(List<Product> productList) {
-        List<ShowForm> tradingList = new ArrayList<>();   /** 지금 거래 중 (홈) **/
-        int cnt = 0;
+    private List<Product> getTradingList(List<Product> productList, int limit) {
+        int count = 0;
+        List<Product> tradingList = new ArrayList<>();   /** 지금 거래 중 (홈) **/
         for (Product product : productList) {
             if(product.getChatCnt()>=1 && !product.isComplete()){
-                addProductInJSONFormat(tradingList, product, false);
-                cnt++;
-                if(cnt >= HOME_OBJECTS)  /** 홈화면이니까 3개까지만 **/
+                tradingList.add(product);
+                count++;
+                if(count >= limit)  /** 홈화면이니까 3개까지만 **/
                     break;
             }
         }
         return tradingList;
     }
 
-
     @Transactional(readOnly = true)
     public List<ShowForm> showRecommendDetail(User User){
         User user = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow();
-        List<Product> tempRecommendList = productQDSLRepository.findCountByCategoriesDesc(Arrays.asList(user.getCategoryLike().split(",")), HOME_DETAIL_OBJECTS);
-        List<ShowForm> recommendList = getShowFormCheckIsLikes(user.getProductLikesList(), tempRecommendList);
+        List<String> userCategories = Arrays.asList(user.getCategoryLike().split(","));
+
+        List<Product> tempRecommendList = productQDSLRepository.findCountByCategoriesDesc(userCategories, HOME_DETAIL_OBJECTS);
+        List<ShowForm> recommendList = makeDetailHomeShowFormList(user.getProductLikesList(), tempRecommendList);
         return recommendList;
     }
 
@@ -298,7 +294,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         List<Product> productList = productRepository.findAll();
 
         List<Product> followingList = getFollowingList(user, productList, HOME_DETAIL_OBJECTS);
-        return getShowFormCheckIsLikes(user.getProductLikesList(), followingList); /** TODO 50개로 추려야됨 **/
+        return makeDetailHomeShowFormList(user.getProductLikesList(), followingList);
 
     }
 
@@ -442,7 +438,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
             productList = productQDSLRepository.findAllByCompletePopularityDesc(complete, pageable); /** QueryDSL 최적화 완료 **/
         else
             productList = productQDSLRepository.findNByCategoriesDesc(categories, pageable);  //파라미터 입력받았을 경우
-        List<ShowForm> showList = getShowFormCheckIsLikes(user.getProductLikesList(), productList.getContent());
+        List<ShowForm> showList = makeDetailHomeShowFormList(user.getProductLikesList(), productList.getContent());
         standardAlign(align, showList);  /** 선택한 기준대로 정렬 **/
         return new PageImpl<>(showList, pageable, productList.getTotalElements());
     }
@@ -484,30 +480,29 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         }
     }
 
-
-    private List<ShowForm> getShowFormCheckIsLikes(List<ProductLikes> userLikesList, List<Product> productList) {
-        List<ShowForm> showFormList = new ArrayList<>();
-        for (Product product : productList) { /** 추천 목록 중 좋아요 누른거 체크 후 ShowForm 으로 담기 **/
-            boolean isLike = checkIsLikes(userLikesList, product);
-            addProductInJSONFormat(showFormList, product, isLike);
-        }
-        return showFormList;
-    }
-
     private void addProductInJSONFormat(List<ShowForm> showFormList, Product product, boolean isLike) {
         ShowForm showForm = new ShowForm(product.getId(), product.getTitle(), product.getContent(), product.getAuthor(), product.getPrice(), product.getThumbnail(), product.getCreatedDate().toString(), product.isSuggest(), isLike, product.getLikesCnt(), product.isComplete(), product.getPopularity());
         showFormList.add(showForm);
     }
 
     private List<ShowForm> makeHomeShowFormList(List<ProductLikes> userLikesList, List<Product> productList) {
-        List<ShowForm> newList = new ArrayList<>();
+        List<ShowForm> showFormList = new ArrayList<>();
         for (int i = 0; i < productList.size(); i++) {
             if(i == HOME_OBJECTS)
                 break;  /** 홈화면이니까 3개까지만 가져오자 **/
             boolean isLike = checkIsLikes(userLikesList, productList.get(i));
-            addProductInJSONFormat(newList, productList.get(i), isLike);
+            addProductInJSONFormat(showFormList, productList.get(i), isLike);
         }
-        return newList;
+        return showFormList;
+    }
+
+    private List<ShowForm> makeDetailHomeShowFormList(List<ProductLikes> userLikesList, List<Product> productList) {
+        List<ShowForm> showFormList = new ArrayList<>();
+        for (Product product : productList) { /** 추천 목록 중 좋아요 누른거 체크 후 ShowForm 으로 담기 **/
+            boolean isLike = checkIsLikes(userLikesList, product);
+            addProductInJSONFormat(showFormList, product, isLike);
+        }
+        return showFormList;
     }
 
     private List<Product> getFollowingList(User user, List<Product> productList, int limit) {
