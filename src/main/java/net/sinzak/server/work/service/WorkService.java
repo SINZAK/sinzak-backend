@@ -42,6 +42,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     private final WorkImageRepository imageRepository;
     private final WorkLikesRepository likesRepository;
     private final WorkSuggestRepository suggestRepository;
+    private final WorkQDSLRepositoryImpl QDSLRepository;
     private final S3Service s3Service;
 
     @Transactional(rollbackFor = {Exception.class})
@@ -94,7 +95,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     @Transactional
     public DetailWorkForm showDetail(Long id, User User){   // 글 상세 확인
         User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow();
-        Work work = workRepository.findByIdFetchPWUser(id).orElseThrow();
+        Work work = workRepository.findByIdFetchWorkWishAndUser(id).orElseThrow();
 
         DetailWorkForm detailForm = DetailWorkForm.builder()
                 .id(work.getId())
@@ -162,7 +163,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
 
     @Transactional
     public DetailWorkForm showDetail(Long id){   // 글 상세 확인
-        Work work = workRepository.findByIdFetchPWUser(id).orElseThrow();
+        Work work = workRepository.findByIdFetchWorkWishAndUser(id).orElseThrow();
 
         DetailWorkForm detailForm = DetailWorkForm.builder()
                 .id(work.getId())
@@ -302,19 +303,19 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         if(categories.size()==0)
             workList = workRepository.findAll(employment, pageable);
         else
-            workList = categoryFilter(categories, employment, pageable);  //파라미터 입력받았을 경우
-        List<ShowForm> showList = getShowFormCheckIsLikes(user.getWorkLikesList(), workList.getContent());
+            workList = QDSLRepository.findNByCategoriesDesc(categories, employment, pageable);  //파라미터 입력받았을 경우
+        List<ShowForm> showList = makeShowFormList(user.getWorkLikesList(), workList.getContent());
         standardAlign(align, showList);  /** 선택한 기준대로 정렬 **/
         return new PageImpl(showList, pageable, workList.getTotalElements());
     }
 
     @Transactional(readOnly = true)
-    public PageImpl<ShowForm> workListForGuest(List<String> stacks, String align, boolean employment, Pageable pageable){
+    public PageImpl<ShowForm> workListForGuest(List<String> categories, String align, boolean employment, Pageable pageable){
         Page<Work> workList;
-        if(stacks.size()==0)
+        if(categories.size()==0)
             workList = workRepository.findAll(employment, pageable);
         else
-            workList = categoryFilter(stacks, employment, pageable);  //파라미터 입력받았을 경우
+            workList = QDSLRepository.findNByCategoriesDesc(categories, employment, pageable);;  //파라미터 입력받았을 경우
 
         List<ShowForm> showList = new ArrayList<>();
         for (Work work : workList.getContent()) {
@@ -324,23 +325,13 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         return new PageImpl<>(showList, pageable, workList.getTotalElements());
     }
 
-    private Page<Work> categoryFilter(List<String> categories, boolean employment, Pageable pageable) {
-        if (categories.size() == 1)
-            return workRepository.findBy1StacksDesc(pageable, categories.get(0), employment);
-        else if (categories.size() == 2)
-            return workRepository.findBy2StacksDesc(pageable, categories.get(0), categories.get(1), employment);
-        else if (categories.size() == 3)
-            return workRepository.findBy3StacksDesc(pageable, categories.get(0), categories.get(1), categories.get(2), employment);
-        else
-            return workRepository.findAll(pageable);
-    }
 
     private void standardAlign(String align, List<ShowForm> showList) {
         if (align.equals("recent")) {} //default
         else if (align.equals("recommend"))  /** 인기순 **/
             showList.sort((o1, o2) -> o2.getPopularity() - o1.getPopularity());
     }
-    private List<ShowForm> getShowFormCheckIsLikes(List<WorkLikes> userLikesList, List<Work> workList) {
+    private List<ShowForm> makeShowFormList(List<WorkLikes> userLikesList, List<Work> workList) {
         List<ShowForm> showFormList = new ArrayList<>();
         for (Work work : workList) { /** 추천 목록 중 좋아요 누른거 체크 후 ShowForm 으로 담기 **/
             boolean isLike = checkIsLikes(userLikesList, work);

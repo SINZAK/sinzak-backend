@@ -2,15 +2,13 @@ package net.sinzak.server.product.repository;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import net.sinzak.server.common.QDSLRepository;
 import net.sinzak.server.product.domain.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
@@ -22,7 +20,7 @@ import static net.sinzak.server.product.domain.QProduct.product;
 
 @Repository
 @RequiredArgsConstructor
-public class ProductQDSLRepositoryImpl implements QDSLRepository {
+public class ProductQDSLRepositoryImpl implements QDSLRepository<Product> {
 
     private final JPAQueryFactory queryFactory;
 
