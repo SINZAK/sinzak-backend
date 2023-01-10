@@ -115,7 +115,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     @Transactional
     public DetailProductForm showDetail(Long id, User User){   // 글 상세 확인
         User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow();
-        Product product = productRepository.findByIdFetchPWUser(id).orElseThrow();
+        Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow();
 
         DetailProductForm detailForm = DetailProductForm.builder()
                 .id(product.getId())
@@ -185,7 +185,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     @Transactional
     public DetailProductForm showDetail(Long id){   // 비회원 글 보기
-        Product product = productRepository.findByIdFetchPWUser(id).orElseThrow();
+        Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow();
         List<String> imagesUrl = getImages(product);  /** 이미지 엔티티에서 url만 빼오기 **/
         DetailProductForm detailForm = DetailProductForm.builder()
                 .id(product.getId())
@@ -254,16 +254,6 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return obj;
     }
 
-    private List<ShowForm> makeHomeShowFormListForGuest(List<Product> productList) {
-        List<ShowForm> newList = new ArrayList<>();  /** 신작 3개 **/
-        for (int i = 0; i < productList.size(); i++) {
-            if (i >= HOME_OBJECTS)
-                break;
-            addProductInJSONFormat(newList, productList.get(i), false);
-        }
-        return newList;
-    }
-
     private List<Product> getTradingList(List<Product> productList, int limit) {
         int count = 0;
         List<Product> tradingList = new ArrayList<>();   /** 지금 거래 중 (홈) **/
@@ -296,6 +286,19 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         List<Product> followingList = getFollowingList(user, productList, HOME_DETAIL_OBJECTS);
         return makeDetailHomeShowFormList(user.getProductLikesList(), followingList);
 
+    }
+    private List<Product> getFollowingList(User user, List<Product> productList, int limit) {
+        int count = 0;
+        List<Product> followingProductList = new ArrayList<>();
+        for (Product product : productList) {
+            if(checkIsFollowing(user.getFollowingList(), product)){
+                followingProductList.add(product);
+                count++;
+                if(count>=limit) /** 표시할 개수 충족 **/
+                    break;
+            }
+        }
+        return followingProductList;
     }
 
     @Transactional
@@ -496,6 +499,16 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return showFormList;
     }
 
+    private List<ShowForm> makeHomeShowFormListForGuest(List<Product> productList) {
+        List<ShowForm> newList = new ArrayList<>();  /** 신작 3개 **/
+        for (int i = 0; i < productList.size(); i++) {
+            if (i >= HOME_OBJECTS)
+                break;
+            addProductInJSONFormat(newList, productList.get(i), false);
+        }
+        return newList;
+    }
+
     private List<ShowForm> makeDetailHomeShowFormList(List<ProductLikes> userLikesList, List<Product> productList) {
         List<ShowForm> showFormList = new ArrayList<>();
         for (Product product : productList) { /** 추천 목록 중 좋아요 누른거 체크 후 ShowForm 으로 담기 **/
@@ -505,18 +518,5 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return showFormList;
     }
 
-    private List<Product> getFollowingList(User user, List<Product> productList, int limit) {
-        int count = 0;
-        List<Product> followingProductList = new ArrayList<>();
-        for (Product product : productList) {
-            if(checkIsFollowing(user.getFollowingList(), product)){
-                followingProductList.add(product);
-                count++;
-                if(count>=limit) /** 표시할 개수 충족 **/
-                    break;
-            }
-        }
-        return followingProductList;
-    }
 
 }

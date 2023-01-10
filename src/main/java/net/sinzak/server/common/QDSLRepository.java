@@ -1,4 +1,4 @@
-package net.sinzak.server.product.repository;
+package net.sinzak.server.common;
 
 import net.sinzak.server.product.domain.Product;
 import org.springframework.data.domain.Page;
