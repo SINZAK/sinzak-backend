@@ -113,7 +113,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional
-    public DetailProductForm showDetail(Long id, User User){   // 글 상세 확인
+    public JSONObject showDetail(Long id, User User){   // 글 상세 확인
         User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow();
         Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow();
         DetailProductForm detailForm = DetailProductForm.builder()
@@ -147,7 +147,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         boolean isFollowing  = checkIsFollowing(user.getFollowingList(), product);
         detailForm.setUserAction(isLike, isWish, isFollowing); /** 유저의 좋아요, 찜, 팔로우여부 **/
         product.addViews();
-        return detailForm;
+        return PropertyUtil.response(detailForm);
     }
 
     public boolean checkIsLikes(List<ProductLikes> userLikesList, Product product) {
@@ -184,7 +184,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional
-    public DetailProductForm showDetail(Long id){   // 비회원 글 보기
+    public JSONObject showDetail(Long id){   // 비회원 글 보기
         Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow();
         List<String> imagesUrl = getImages(product);  /** 이미지 엔티티에서 url만 빼오기 **/
         DetailProductForm detailForm = DetailProductForm.builder()
@@ -215,7 +215,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                 .build();
         detailForm.setUserAction(false,false,false);
         product.addViews();
-        return detailForm;
+        return PropertyUtil.response(detailForm);
     }
 
 
@@ -235,7 +235,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
         List<Product> followingList = getFollowingList(user, productList, HOME_OBJECTS);
         obj.put("following", makeHomeShowFormList(user.getProductLikesList(),followingList)); /** 팔로잉 관련 3개 **/
-        return obj;
+
+        return PropertyUtil.response(obj);
     }
 
 
@@ -252,7 +253,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         productList.sort((o1, o2) -> o2.getLikesCnt() - o1.getLikesCnt()); /** hot : 좋아요 순 정렬!! **/
         obj.put("hot", makeHomeShowFormListForGuest(productList));
 
-        return obj;
+        return PropertyUtil.response(obj);
     }
 
     private List<Product> getTradingList(List<Product> productList, int limit) {
@@ -270,23 +271,26 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional(readOnly = true)
-    public List<ShowForm> showRecommendDetail(User User){
+    public JSONObject showRecommendDetail(User User){
+
         User user = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow();
         List<String> userCategories = Arrays.asList(user.getCategoryLike().split(","));
 
-        List<Product> tempRecommendList = QDSLRepository.findCountByCategoriesDesc(userCategories, HOME_DETAIL_OBJECTS);
-        List<ShowForm> recommendList = makeDetailHomeShowFormList(user.getProductLikesList(), tempRecommendList);
-        return recommendList;
+        List<Product> recommendList = QDSLRepository.findCountByCategoriesDesc(userCategories, HOME_DETAIL_OBJECTS);
+        List<ShowForm> data = makeDetailHomeShowFormList(user.getProductLikesList(), recommendList);
+
+        return PropertyUtil.response(data);
     }
 
     @Transactional(readOnly = true)
-    public List<ShowForm> showFollowingDetail(User User){
+    public JSONObject showFollowingDetail(User User){
         User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow();
         List<Product> productList = productRepository.findAll();
 
         List<Product> followingList = getFollowingList(user, productList, HOME_DETAIL_OBJECTS);
-        return makeDetailHomeShowFormList(user.getProductLikesList(), followingList);
+        List<ShowForm> data = makeDetailHomeShowFormList(user.getProductLikesList(), followingList);
 
+        return PropertyUtil.response(data);
     }
     private List<Product> getFollowingList(User user, List<Product> productList, int limit) {
         int count = 0;
