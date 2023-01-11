@@ -40,7 +40,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     private final S3Service s3Service;
     private final ProductQDSLRepositoryImpl QDSLRepository;
 
-    private final int HOME_OBJECTS = 3;
+    private final int HOME_OBJECTS = 10;
     private final int HOME_DETAIL_OBJECTS = 50;
 
     @Transactional(rollbackFor = {Exception.class})
@@ -494,7 +494,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         List<ShowForm> showFormList = new ArrayList<>();
         for (int i = 0; i < productList.size(); i++) {
             if(i == HOME_OBJECTS)
-                break;  /** 홈화면이니까 3개까지만 가져오자 **/
+                break;  /** 홈화면이니까 10개까지만 가져오자 **/
             boolean isLike = checkIsLikes(userLikesList, productList.get(i));
             addProductInJSONFormat(showFormList, productList.get(i), isLike);
         }
