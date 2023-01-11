@@ -12,8 +12,8 @@ import java.util.Set;
 
 public interface PostService<T,R,V,N> {
     JSONObject makePost(User User, R postDto);
-    DetailForm showDetail(Long id, User User);
-    DetailForm showDetail(Long id);
+    JSONObject showDetail(Long id, User User);
+    JSONObject showDetail(Long id);
     JSONObject wish(User User, @RequestBody ActionForm form);
     JSONObject likes(User User, @RequestBody ActionForm form);
     JSONObject suggest(User User, @RequestBody SuggestDto dto);

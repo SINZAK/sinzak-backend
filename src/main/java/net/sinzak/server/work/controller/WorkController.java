@@ -53,7 +53,7 @@ public class WorkController {
 
     @PostMapping("/works/{id}")
     @ApiOperation(value = "외주 상세 조회")
-    public DetailWorkForm showProject(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    public JSONObject showProject(@PathVariable Long id, @AuthenticationPrincipal User user) {
         try{
             return workService.showDetail(id,user);
         }

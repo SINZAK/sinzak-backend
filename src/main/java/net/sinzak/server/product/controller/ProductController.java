@@ -59,7 +59,7 @@ public class ProductController {
 
     @PostMapping("/products/{id}")
     @ApiOperation(value = "작품 상세 조회")
-    public DetailProductForm showProject(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    public JSONObject showProject(@PathVariable Long id, @AuthenticationPrincipal User user) {
         try{
             return productService.showDetail(id,user);
         }
@@ -117,13 +117,13 @@ public class ProductController {
 
     @ApiOperation(value = "홈 - 추천 더보기")
     @PostMapping("/home/recommend")
-    public List<ShowForm> showRecommendDetail(@AuthenticationPrincipal User user) {
+    public JSONObject showRecommendDetail(@AuthenticationPrincipal User user) {
         return productService.showRecommendDetail(user);
     }
 
     @ApiOperation(value = "홈 - 팔로잉 더보기")
     @PostMapping("/home/following")
-    public List<ShowForm> showFollowingDetail(@AuthenticationPrincipal User user) {
+    public JSONObject showFollowingDetail(@AuthenticationPrincipal User user) {
         return productService.showFollowingDetail(user);
     }
 

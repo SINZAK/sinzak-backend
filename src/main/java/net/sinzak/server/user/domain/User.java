@@ -47,7 +47,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     private String picture; //대표 사진
 
     @Column
-    private String introduction; //한 줄 소개
+    private String introduction=""; //한 줄 소개
 
     @Column
     private String univ;
@@ -56,10 +56,10 @@ public class User extends BaseTimeEntity implements UserDetails {
     private String major;
 
     @Column
-    private String followingNum;
+    private String followingNum="0";
 
     @Column
-    private String followerNum;
+    private String followerNum="0";
 
     @Column
     private String stack;  //전문 분야
@@ -74,7 +74,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     private boolean cert_celeb; //인플루언서 인증여부
 
     @Column
-    private int popularity ;  //'지금 뜨는 아티스트' 때문에 만듦
+    private int popularity=0;  //'지금 뜨는 아티스트' 때문에 만듦
 
     @Column
     private String origin; //무슨 로그인인지

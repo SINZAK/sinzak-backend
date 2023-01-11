@@ -93,7 +93,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     }
 
     @Transactional
-    public DetailWorkForm showDetail(Long id, User User){   // 글 상세 확인
+    public JSONObject showDetail(Long id, User User){   // 글 상세 확인
         User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow();
         Work work = workRepository.findByIdFetchWorkWishAndUser(id).orElseThrow();
 
@@ -126,7 +126,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
 
         detailForm.setUserAction(isLike, isWish, isFollowing); /** 유저의 좋아요, 찜, 팔로우여부 **/
         work.addViews();
-        return detailForm;
+        return PropertyUtil.response(detailForm);
     }
 
     public boolean checkIsLikes(List<WorkLikes> userLikesList, Work work) {
@@ -163,7 +163,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     }
 
     @Transactional
-    public DetailWorkForm showDetail(Long id){   // 글 상세 확인
+    public JSONObject showDetail(Long id){   // 글 상세 확인
         Work work = workRepository.findByIdFetchWorkWishAndUser(id).orElseThrow();
 
         DetailWorkForm detailForm = DetailWorkForm.builder()
@@ -191,7 +191,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
 
         detailForm.setUserAction(false,false,false);
         work.addViews();
-        return detailForm;
+        return PropertyUtil.response(detailForm);
     }
 
     @Transactional
