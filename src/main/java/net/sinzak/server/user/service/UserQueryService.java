@@ -1,20 +1,15 @@
 package net.sinzak.server.user.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.error.UserNotFoundException;
-import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.user.dto.request.UserIdDto;
 import net.sinzak.server.user.dto.respond.GetFollowDto;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.dto.respond.UserDto;
 import net.sinzak.server.user.repository.UserRepository;
-import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.management.InstanceNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
