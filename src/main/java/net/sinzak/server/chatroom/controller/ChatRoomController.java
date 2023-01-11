@@ -35,11 +35,11 @@ public class ChatRoomController {
                 .type(chatMessageDto.getMessageType())
                 .build();
 
-        template.convertAndSend("api/sub/chat/room/"+chatMessageDto.getRoomId(),chatMessageDto);
+        template.convertAndSend("sub/chat/room/"+chatMessageDto.getRoomId(),chatMessageDto);
     }
     @MessageMapping(value ="/message")
     public void message(ChatMessageDto chatMessageDto){
-        template.convertAndSend("api/sub/chat/room/"+chatMessageDto.getRoomId(),chatMessageDto);
+        template.convertAndSend("sub/chat/room/"+chatMessageDto.getRoomId(),chatMessageDto);
     }
 
     //아래는 테스트용
