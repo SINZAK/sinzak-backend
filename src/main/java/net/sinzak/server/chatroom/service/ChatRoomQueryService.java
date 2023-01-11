@@ -20,21 +20,21 @@ public class ChatRoomQueryService {
     private final ChatRoomRepository chatRoomRepository;
     private final UserChatRoomRepository userChatRoomRepository;
 
-    public List<ChatRoomDto> getChatRooms(User user){
-        List<UserChatRoom> userChatRooms = userChatRoomRepository.findUserChatRoomBySessionUserEmail(user.getEmail());
-        List<ChatRoomDto> chatRoomDtos =new ArrayList<>();
-        for(UserChatRoom userChatRoom: userChatRooms){
-            ChatRoomDto chatRoomDto = makeChatRoomDto(userChatRoom);
-            chatRoomDtos.add(chatRoomDto);
-        }
-        return chatRoomDtos;
-    }
-    private ChatRoomDto makeChatRoomDto(UserChatRoom userChatRoom) {
-        ChatRoomDto chatRoomDto = ChatRoomDto.builder()
-                .image(userChatRoom.getImage())
-                .roomName(userChatRoom.getRoomName())
-                .uuid(userChatRoom.getChatRoom().getUuid())
-                .build();
-        return chatRoomDto;
-    }
+//    public List<ChatRoomDto> getChatRooms(User user){
+//        List<UserChatRoom> userChatRooms = userChatRoomRepository.findUserChatRoomBySessionUserEmail(user.getEmail());
+//        List<ChatRoomDto> chatRoomDtos =new ArrayList<>();
+//        for(UserChatRoom userChatRoom: userChatRooms){
+//            ChatRoomDto chatRoomDto = makeChatRoomDto(userChatRoom);
+//            chatRoomDtos.add(chatRoomDto);
+//        }
+//        return chatRoomDtos;
+//    }
+//    private ChatRoomDto makeChatRoomDto(UserChatRoom userChatRoom) {
+//        ChatRoomDto chatRoomDto = ChatRoomDto.builder()
+//                .image(userChatRoom.getImage())
+//                .roomName(userChatRoom.getRoomName())
+//                .uuid(userChatRoom.getChatRoom().getUuid())
+//                .build();
+//        return chatRoomDto;
+//    }
 }

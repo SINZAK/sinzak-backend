@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatRoomDto {
-    private UUID uuid;
+    private UUID roomId;
     private String roomName;
     private String image;
 }
