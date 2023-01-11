@@ -40,8 +40,8 @@ public class UserQueryService {
         Optional<User> findUser = userRepository.findById(user.getId());
         return makeUserDto(user,findUser);
     }
-    public UserDto getUserProfile(UserIdDto userIdDto, User user) {
-        Optional<User> findUser = userRepository.findById(userIdDto.getUserId());
+    public UserDto getUserProfile(Long userId, User user) {
+        Optional<User> findUser = userRepository.findById(userId);
         return checkIfTwoUserPresent(user,findUser);
     }
     public UserDto checkIfTwoUserPresent(User user,Optional<User> findUser){
@@ -72,14 +72,12 @@ public class UserQueryService {
         return false;
     }
     //팔로워가져오기
-    public List<GetFollowDto> getFollowerDtoList(UserIdDto userIdDto){
-        Long userId = userIdDto.getUserId();
+    public List<GetFollowDto> getFollowerDtoList(Long userId){
         Set<Long> followerList = userRepository.findById(userId).get().getFollowerList();
         return getGetFollowDtoList(followerList);
     }
     //팔로잉가져오기
-    public List<GetFollowDto> getFollowingDtoList(UserIdDto userIdDto){
-        Long userId = userIdDto.getUserId();
+    public List<GetFollowDto> getFollowingDtoList(Long userId){
         Set<Long> followingList = userRepository.findById(userId).get().getFollowingList();
         return getGetFollowDtoList(followingList);
     }
