@@ -116,7 +116,6 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     public DetailProductForm showDetail(Long id, User User){   // 글 상세 확인
         User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow();
         Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow();
-
         DetailProductForm detailForm = DetailProductForm.builder()
                 .id(product.getId())
                 .userId(product.getUser().getId())
@@ -190,6 +189,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         List<String> imagesUrl = getImages(product);  /** 이미지 엔티티에서 url만 빼오기 **/
         DetailProductForm detailForm = DetailProductForm.builder()
                 .id(product.getId())
+                .userId(product.getUser().getId())
                 .author(product.getAuthor())
                 .author_picture(product.getUser().getPicture())
                 .univ(product.getUser().getUniv())
