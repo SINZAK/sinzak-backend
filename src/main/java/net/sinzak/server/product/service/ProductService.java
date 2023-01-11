@@ -119,6 +119,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
         DetailProductForm detailForm = DetailProductForm.builder()
                 .id(product.getId())
+                .userId(product.getUser().getId())
                 .author(product.getAuthor())
                 .author_picture(product.getUser().getPicture())
                 .univ(product.getUser().getUniv())

@@ -167,6 +167,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
 
         DetailWorkForm detailForm = DetailWorkForm.builder()
                 .id(work.getId())
+                .userId(work.getUser().getId())
                 .author(work.getAuthor())
                 .author_picture(work.getUser().getPicture())
                 .univ(work.getUser().getUniv())
