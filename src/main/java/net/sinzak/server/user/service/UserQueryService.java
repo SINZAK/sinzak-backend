@@ -1,20 +1,14 @@
 package net.sinzak.server.user.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.error.UserNotFoundException;
-import net.sinzak.server.config.auth.dto.SessionUser;
-import net.sinzak.server.user.dto.request.UserIdDto;
 import net.sinzak.server.user.dto.respond.GetFollowDto;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.dto.respond.UserDto;
 import net.sinzak.server.user.repository.UserRepository;
-import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.management.InstanceNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +35,8 @@ public class UserQueryService {
         return makeUserDto(user,findUser);
     }
     public UserDto getUserProfile(Long userId, User user) {
-        Optional<User> findUser = userRepository.findById(userId);
+        Optional<User> findUser = userRepository.findByIdFetchFollowerList(userId);
+        //System.out.println("쿼리 수 확인");
         return checkIfTwoUserPresent(user,findUser);
     }
     public UserDto checkIfTwoUserPresent(User user,Optional<User> findUser){
@@ -59,8 +54,20 @@ public class UserQueryService {
                 .followingNumber(findUser.get().getFollowingNum())
                 .followerNumber(findUser.get().getFollowerNum())
                 .myProfile(checkIfMyProfile(user,findUser))
+                .imageUrl(findUser.get().getPicture())
+                .univ(findUser.get().getUniv())
+                .ifFollow(checkIfFollowFindUser(user,findUser))
                 .build();
         return userDto;
+    }
+    public boolean checkIfFollowFindUser(User user,Optional<User> findUser){
+        if(user== null){
+            return false;
+        }
+        if(findUser.get().getFollowerList().contains(user.getId())){
+            return true;
+        }
+        return false;
     }
     public boolean checkIfMyProfile(User user, Optional<User> findUser){
         if(user == null){
