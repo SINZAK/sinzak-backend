@@ -3,7 +3,6 @@ package net.sinzak.server.user.service;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.RequiredArgsConstructor;
-import net.sinzak.server.config.auth.dto.SessionUser;
 import net.sinzak.server.user.domain.JoinTerms;
 import net.sinzak.server.user.dto.request.JoinDto;
 import net.sinzak.server.user.dto.request.UnivDto;
@@ -79,21 +78,6 @@ public class UserCommandService {
             return PropertyUtil.responseMessage("본인한테는 팔로우 불가능");
         }
         return PropertyUtil.response(true);
-    }
-     //실제론 연동로그인이기에 api테스트용
-    public long createUser(SessionUser user){ //이건 테스트
-        Optional<User> findUser =
-                userRepository.findByEmail(user.getEmail());
-        if(findUser.isPresent()){
-            throw new InstanceNotFoundException("이미 존재하는 이메일입니다");
-        }
-        User newUser = sessionUserToUser(user);
-        userRepository.save(newUser);
-        return userRepository.findByEmail(user.getEmail()).get().getId();
-    }
-    public User sessionUserToUser(SessionUser user){
-        User newUser = new User(user.getEmail(), user.getName(), user.getPicture());
-        return newUser;
     }
 
 }

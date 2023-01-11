@@ -7,7 +7,7 @@ import net.sinzak.server.chatroom.domain.UserChatRoom;
 import net.sinzak.server.chatroom.dto.ChatRoomDto;
 import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.repository.UserChatRoomRepository;
-import net.sinzak.server.config.auth.dto.SessionUser;
+import net.sinzak.server.user.domain.User;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ public class ChatRoomQueryService {
     private final ChatRoomRepository chatRoomRepository;
     private final UserChatRoomRepository userChatRoomRepository;
 
-    public List<ChatRoomDto> getChatRooms(SessionUser user){
+    public List<ChatRoomDto> getChatRooms(User user){
         List<UserChatRoom> userChatRooms = userChatRoomRepository.findUserChatRoomBySessionUserEmail(user.getEmail());
         List<ChatRoomDto> chatRoomDtos =new ArrayList<>();
         for(UserChatRoom userChatRoom: userChatRooms){
