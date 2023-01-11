@@ -13,4 +13,8 @@ public class UserDto {
     private String introduction;
     private String followingNumber;
     private String followerNumber;
+    private String imageUrl;
+    private String univ;
+    private boolean cert_uni;
+    private boolean ifFollow;
 }

@@ -9,9 +9,7 @@ import net.sinzak.server.user.dto.respond.GetFollowDto;
 import net.sinzak.server.user.dto.respond.UserDto;
 import net.sinzak.server.user.service.UserQueryService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
@@ -28,24 +26,24 @@ public class UserQueryController {
     }
 
     @ApiOperation(value ="유저 프로필 보기")
-    @GetMapping(value ="/users/profile")
-    public UserDto getUserProfile(@RequestBody UserIdDto userIdDto, @ApiIgnore @AuthenticationPrincipal User user){
-        UserDto userDto = userQueryService.getUserProfile(userIdDto, user);
+    @GetMapping(value ="/users/{userId}/profile")
+    public UserDto getUserProfile(@PathVariable Long userId, @ApiIgnore @AuthenticationPrincipal User user){
+        UserDto userDto = userQueryService.getUserProfile(userId, user);
         return userDto;
     }
     @ApiOperation(value ="팔로워리스트")
-    @GetMapping(value ="/users/followers")
-    public List<GetFollowDto> getFollowerList( @RequestBody UserIdDto userIdDto) {
+    @GetMapping(value ="/users/{userId}/followers")
+    public List<GetFollowDto> getFollowerList( @PathVariable Long userId) {
         List<GetFollowDto> getFollowDtos =
-               userQueryService.getFollowerDtoList(userIdDto);
+               userQueryService.getFollowerDtoList(userId);
         return getFollowDtos;
     }
 
     @ApiOperation(value ="팔로잉리스트")
-    @GetMapping(value ="/users/followings")
-    public List<GetFollowDto> getFollowingList(@RequestBody UserIdDto userIdDto) {
+    @GetMapping(value ="/users/{userId}/followings")
+    public List<GetFollowDto> getFollowingList(@PathVariable Long userId) {
         List<GetFollowDto> getFollowDtos =
-                userQueryService.getFollowingDtoList(userIdDto);
+                userQueryService.getFollowingDtoList(userId);
         return getFollowDtos;
     }
     //    @ApiOperation(value ="팔로워리스트")
