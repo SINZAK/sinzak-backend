@@ -25,22 +25,6 @@ public class ChatRoomController {
     private final ChatRoomQueryService chatRoomQueryService;
     private final SimpMessagingTemplate template;
 
-//    }// /pub/chat/enter로 발행요청을 하면 /sub/chatroom/{roomId}로 메시지 전송
-    @MessageMapping(value = "/enter")
-    public void enter(ChatMessageDto chatMessageDto) {
-        ChatMessage chatMessage = ChatMessage.builder()
-                .message(chatMessageDto.getSender()+"님이 채팅방에 참여하였습니다.")
-                .sender(chatMessageDto.getSender())
-                .roomId(chatMessageDto.getRoomId())
-                .type(chatMessageDto.getMessageType())
-                .build();
-
-        template.convertAndSend("sub/chat/room/"+chatMessageDto.getRoomId(),chatMessageDto);
-    }
-    @MessageMapping(value ="/message")
-    public void message(ChatMessageDto chatMessageDto){
-        template.convertAndSend("sub/chat/room/"+chatMessageDto.getRoomId(),chatMessageDto);
-    }
 
     //아래는 테스트용
     //채팅방 전체조회
