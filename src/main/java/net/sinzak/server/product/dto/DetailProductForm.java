@@ -19,8 +19,8 @@ public class DetailProductForm extends DetailForm {
     private boolean trading;
 
     @Builder
-    public DetailProductForm(Long id, String author, String author_picture, String univ, boolean cert_uni, boolean cert_celeb, String followerNum, List<String> images, String title, String category, String date, String content, int price, boolean suggest, int likesCnt, int views, int wishCnt, int chatCnt, boolean complete, int width, int vertical, int height, boolean trading) {
-        super(id, author, author_picture, univ, cert_uni, cert_celeb, followerNum, images, title, category, date, content, price, suggest, likesCnt, views, wishCnt, chatCnt, complete);
+    public DetailProductForm(Long id, Long userId, String author, String author_picture, String univ, boolean cert_uni, boolean cert_celeb, String followerNum, List<String> images, String title, String category, String date, String content, int price, boolean suggest, int likesCnt, int views, int wishCnt, int chatCnt, boolean complete, int width, int vertical, int height, boolean trading) {
+        super(id, userId, author, author_picture, univ, cert_uni, cert_celeb, followerNum, images, title, category, date, content, price, suggest, likesCnt, views, wishCnt, chatCnt, complete);
         this.width = width;
         this.vertical = vertical;
         this.height = height;

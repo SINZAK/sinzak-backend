@@ -13,7 +13,8 @@ public class DetailForm {
 
     @ApiModelProperty(example = "작품 ID")
     private Long id;
-
+    @ApiModelProperty(example = "유저 ID")
+    private Long userId;
     @ApiModelProperty(example = "작가명")
     private String author;
     @ApiModelProperty(example = "작가 프사")
@@ -66,8 +67,9 @@ public class DetailForm {
         this.isFollowing = isFollowing;
     }
 
-    public DetailForm(Long id, String author, String author_picture, String univ, boolean cert_uni, boolean cert_celeb, String followerNum, List<String> images, String title, String category, String date, String content, int price, boolean suggest, int likesCnt, int views, int wishCnt, int chatCnt, boolean complete) {
+    public DetailForm(Long id, Long userId, String author, String author_picture, String univ, boolean cert_uni, boolean cert_celeb, String followerNum, List<String> images, String title, String category, String date, String content, int price, boolean suggest, int likesCnt, int views, int wishCnt, int chatCnt, boolean complete) {
         this.id = id;
+        this.userId = userId;
         this.author = author;
         this.author_picture = author_picture;
         this.univ = univ;

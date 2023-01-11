@@ -3,7 +3,6 @@ package net.sinzak.server.config;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import net.sinzak.server.config.auth.LoginUser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
