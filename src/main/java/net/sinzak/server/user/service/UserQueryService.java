@@ -57,6 +57,7 @@ public class UserQueryService {
                 .imageUrl(findUser.get().getPicture())
                 .univ(findUser.get().getUniv())
                 .ifFollow(checkIfFollowFindUser(user,findUser))
+                .cert_uni(findUser.get().isCert_uni())
                 .build();
         return userDto;
     }
