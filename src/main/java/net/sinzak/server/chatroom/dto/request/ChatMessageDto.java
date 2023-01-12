@@ -1,4 +1,4 @@
-package net.sinzak.server.chatroom.dto;
+package net.sinzak.server.chatroom.dto.request;
 
 
 import lombok.AllArgsConstructor;
