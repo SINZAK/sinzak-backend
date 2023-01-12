@@ -1,17 +1,14 @@
 package net.sinzak.server.chatroom.controller;
 
 
-import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.chatroom.domain.ChatMessage;
-import net.sinzak.server.chatroom.dto.ChatMessageDto;
+import net.sinzak.server.chatroom.dto.request.ChatMessageDto;
 import net.sinzak.server.chatroom.service.ChatMessageService;
-import org.json.simple.JSONObject;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor

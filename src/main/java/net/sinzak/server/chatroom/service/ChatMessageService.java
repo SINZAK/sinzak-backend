@@ -8,9 +8,7 @@ package net.sinzak.server.chatroom.service;
 //import com.google.firebase.cloud.FirestoreClient;
 import net.sinzak.server.chatroom.domain.ChatMessage;
 import net.sinzak.server.chatroom.domain.MessageType;
-import net.sinzak.server.chatroom.dto.ChatMessageDto;
-import net.sinzak.server.common.PropertyUtil;
-import org.json.simple.JSONObject;
+import net.sinzak.server.chatroom.dto.request.ChatMessageDto;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
