@@ -1,6 +1,7 @@
 package net.sinzak.server.chatroom.controller;
 
 
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.chatroom.repository.ChatRoomRepository;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 
+@Api("채팅-조회")
 @Controller
 @RequiredArgsConstructor
 @Slf4j

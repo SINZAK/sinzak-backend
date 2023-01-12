@@ -1,6 +1,7 @@
 package net.sinzak.server.chatroom.controller;
 
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+@Api(tags =" 채팅-명령")
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -25,7 +27,7 @@ public class ChatRoomCommandController {
 
 
     @PostMapping (value ="/chatRooms/create")
-    @ApiOperation(value ="채팅방 생성",notes = "로그인한 유저, 글 아이디,글 타입(work or product) 사용")
+    @ApiOperation(value ="채팅방 생성",notes = "로그인한 유저, 글 아이디(postId),글 타입(postType = work,product ) 사용")
     public JSONObject createChatRoom(@RequestBody PostDto postDto, @AuthenticationPrincipal User user){
         return chatRoomCommandService.createUserChatRoom(postDto,user);
     }
