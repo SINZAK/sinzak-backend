@@ -7,9 +7,8 @@ package net.sinzak.server.chatroom.service;
 //import com.google.cloud.firestore.WriteResult;
 //import com.google.firebase.cloud.FirestoreClient;
 import net.sinzak.server.chatroom.domain.ChatMessage;
-import net.sinzak.server.chatroom.dto.ChatMessageDto;
-import net.sinzak.server.common.PropertyUtil;
-import org.json.simple.JSONObject;
+import net.sinzak.server.chatroom.domain.MessageType;
+import net.sinzak.server.chatroom.dto.request.ChatMessageDto;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -29,11 +28,11 @@ public class ChatMessageService {
 
     private ChatMessage makeTestMessage(ChatMessageDto chatMessageDto) {
         ChatMessage chatMessage = new ChatMessage();
-        chatMessage.setId(UUID.randomUUID().toString());
+        chatMessage.setRoomId(UUID.randomUUID().toString());
         chatMessage.setMessage(chatMessageDto.getMessage());
         chatMessage.setSender(chatMessageDto.getSender());
         chatMessage.setReceiver("유성욱");
-        chatMessage.setType("test");
+        chatMessage.setType(MessageType.TEXT);
         return chatMessage;
     }
 

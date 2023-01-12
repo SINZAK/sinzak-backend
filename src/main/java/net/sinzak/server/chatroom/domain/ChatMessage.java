@@ -6,6 +6,8 @@ import lombok.*;
 import net.sinzak.server.BaseTimeEntity;
 
 import javax.persistence.*;
+import java.util.UUID;
+
 
 @Getter
 @Setter
@@ -17,18 +19,16 @@ public class ChatMessage extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private Long id;
 
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private MessageType type;
     private String sender;
     private String receiver;
+    private String roomId;
 
+    @Setter
     @Lob private String message; //모든 언어에 다 있는 byte[]
-
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    @JoinColumn(name ="CHATROOM_ID")
-    private ChatRoom chatRoom;
-
 
 
     public void setSender(String sender){
@@ -36,10 +36,10 @@ public class ChatMessage extends BaseTimeEntity {
     }
 
     public void newConnect(){
-        this.type = "new";
+        this.type = MessageType.ENTER;
     }
 
     public void closeConnect(){
-        this.type = "close";
+        this.type = MessageType.LEAVE;
     }
 }

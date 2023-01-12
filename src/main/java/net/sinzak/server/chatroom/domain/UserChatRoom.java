@@ -22,13 +22,19 @@ public class UserChatRoom {
     @JoinColumn(name="USER_ID")
     private User user;
 
+    private String opponentUserEmail;
+    private String opponentUserUniv;
     private String roomName;
     private String image;
+    @Lob private byte[] latestMessage;
     public UserChatRoom(){}
 
-    public UserChatRoom(String roomName,String image){
-        this.roomName = roomName;
-        this.image = image;
+    public UserChatRoom(User user,User opponentUser){
+        this.roomName = opponentUser.getName();
+        this.opponentUserEmail = opponentUser.getEmail();
+        this.opponentUserUniv = opponentUser.getUniv();
+        this.image = opponentUser.getPicture();
+        this.user = user;
     }
     public void setUser(User user){
         this.user = user;
