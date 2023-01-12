@@ -6,9 +6,6 @@ import net.sinzak.server.common.PostType;
 
 @Builder
 @Getter
-public class GetChatRoomDto {
-    private String uuid;
-    private String roomName;
-    private String image;
-    private String postType;
+public class GetCreatedChatRoomDto {
+    private String roomUuid;
 }
