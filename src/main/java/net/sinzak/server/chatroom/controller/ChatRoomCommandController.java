@@ -25,20 +25,19 @@ public class ChatRoomCommandController {
     private final ChatRoomCommandService chatRoomCommandService;
 
 
-
-    @PostMapping (value ="/chatRooms/create")
+    @PostMapping (value ="/chat/rooms/create")
     @ApiOperation(value ="채팅방 생성",notes = "로그인한 유저, 글 아이디(postId),글 타입(postType = work,product ) 사용")
     public JSONObject createChatRoom(@RequestBody PostDto postDto, @AuthenticationPrincipal User user){
         return chatRoomCommandService.createUserChatRoom(postDto,user);
     }
-    //채팅방 개설
-    @PostMapping(value = "/chat/room")
-    public String createRoom(@RequestParam String roomName, RedirectAttributes rttr){
-        log.info("#채팅방 개설,채팅방 이름: "+ roomName);
-        chatRoomCommandService.makeChatRoom(roomName);
-        rttr.addFlashAttribute("roomName",roomName);
-        return "redirect:/chat/rooms";
-    }
+//    채팅방 개설
+//    @PostMapping(value = "/chat/room")
+//    public String createRoom(@RequestParam String roomName, RedirectAttributes rttr){
+//        log.info("#채팅방 개설,채팅방 이름: "+ roomName);
+//        chatRoomCommandService.makeChatRoom(roomName);
+//        rttr.addFlashAttribute("roomName",roomName);
+//        return "redirect:/chat/rooms";
+//    }
 
 
 

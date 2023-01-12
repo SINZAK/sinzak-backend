@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.chatroom.domain.ChatRoom;
 import net.sinzak.server.chatroom.domain.UserChatRoom;
 import net.sinzak.server.chatroom.dto.request.PostDto;
-import net.sinzak.server.chatroom.dto.respond.GetChatRoomDto;
+import net.sinzak.server.chatroom.dto.respond.GetCreatedChatRoomDto;
 import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.repository.UserChatRoomRepository;
 import net.sinzak.server.common.PostType;
@@ -71,8 +71,8 @@ public class ChatRoomCommandService {
             chatRoom = makeChatRoomAndUserChatRoom(postUser, findUser);
             addChatRoomToPost(postDto, product, work, chatRoom);
         }
-        GetChatRoomDto getChatRoomDto = makeChatRoomDto(postUser, chatRoom);
-        return PropertyUtil.response(getChatRoomDto);
+        GetCreatedChatRoomDto getCreatedChatRoomDto = makeChatRoomDto(chatRoom);
+        return PropertyUtil.response(getCreatedChatRoomDto);
     }
     private void addChatRoomToPost(PostDto postDto, Product product, Work work, ChatRoom chatRoom) {
         if(postDto.getPostType().equals(PostType.WORK.getName())){
@@ -93,14 +93,11 @@ public class ChatRoomCommandService {
         chatRoomRepository.save(chatRoom);
         return chatRoom;
     }
-    private GetChatRoomDto makeChatRoomDto(User PostUser, ChatRoom chatRoom) {
-        GetChatRoomDto getChatRoomDto = GetChatRoomDto.builder()
-                .roomName(PostUser.getName())
-                .uuid(chatRoom.getRoomUuid())
-                .image(PostUser.getPicture())
-                .postType(chatRoom.getPostType().getName())
+    private GetCreatedChatRoomDto makeChatRoomDto( ChatRoom chatRoom) {
+        GetCreatedChatRoomDto getCreatedChatRoomDto = GetCreatedChatRoomDto.builder()
+                .roomUuid(chatRoom.getRoomUuid())
                 .build();
-        return getChatRoomDto;
+        return getCreatedChatRoomDto;
     }
 
     private ChatRoom checkIfUserIsAlreadyChatting(User user, List<ChatRoom> postChatRooms) {
