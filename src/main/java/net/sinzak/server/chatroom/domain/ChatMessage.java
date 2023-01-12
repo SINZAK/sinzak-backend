@@ -30,13 +30,6 @@ public class ChatMessage extends BaseTimeEntity {
     @Setter
     @Lob private String message; //모든 언어에 다 있는 byte[]
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    @JoinColumn(name ="CHATROOM_ID")
-    private ChatRoom chatRoom;
-
-
-
-
 
     public void setSender(String sender){
         this.sender =sender;

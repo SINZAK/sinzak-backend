@@ -3,6 +3,7 @@ package net.sinzak.server.product.domain;
 import lombok.Builder;
 import lombok.Getter;
 import net.sinzak.server.BaseTimeEntity;
+import net.sinzak.server.chatroom.domain.ChatRoom;
 import net.sinzak.server.user.domain.embed.Size;
 import net.sinzak.server.user.domain.User;
 
@@ -81,6 +82,9 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
     private List<ProductWish> productWishList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "product",cascade = CascadeType.REMOVE)
+    private List<ChatRoom> chatRooms = new ArrayList<>();
+
     @Builder
     public Product(String title, String content, String category, int price, boolean suggest, String author, String univ, Size size) {
         this.title = title;
@@ -102,6 +106,11 @@ public class Product extends BaseTimeEntity { /** 작품 **/
         this.topPrice = topPrice;
     }
 
+    public void addChatRoom(ChatRoom chatRoom){
+        chatRoom.setProduct(this);
+        this.chatRooms.add(chatRoom);
+        this.chatCnt++;
+    }
     public void addImage(ProductImage image) {
         this.getImages().add(image);
     }
