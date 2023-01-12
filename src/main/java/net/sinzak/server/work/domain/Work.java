@@ -3,7 +3,9 @@ package net.sinzak.server.work.domain;
 import lombok.Builder;
 import lombok.Getter;
 import net.sinzak.server.BaseTimeEntity;
+import net.sinzak.server.chatroom.domain.ChatRoom;
 import net.sinzak.server.user.domain.User;
+import org.json.simple.JSONArray;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -78,6 +80,9 @@ public class Work extends BaseTimeEntity { /** 외주 **/
     @OneToMany(mappedBy = "work", cascade = CascadeType.REMOVE)
     private List<WorkWish> workWishList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "work",cascade = CascadeType.REMOVE)
+    private List<ChatRoom> chatRooms = new ArrayList<>();
+
     @Builder
     public Work(String title, String content, String category, int price, boolean suggest, String author, String univ, boolean employment) {
         this.title = title;
@@ -103,6 +108,11 @@ public class Work extends BaseTimeEntity { /** 외주 **/
     public void minusLikesCnt() {if(likesCnt>0)this.likesCnt--;this.popularity-=10;}
     protected Work() {}
 
+    public void addChatRoom(ChatRoom chatRoom){
+        chatRoom.setWork(this);
+        this.chatRooms.add(chatRoom);
+        this.chatCnt++;
+    }
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
     }

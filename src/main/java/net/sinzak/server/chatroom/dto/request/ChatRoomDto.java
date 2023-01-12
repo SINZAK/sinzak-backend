@@ -1,4 +1,4 @@
-package net.sinzak.server.chatroom.dto;
+package net.sinzak.server.chatroom.dto.request;
 
 
 import lombok.AllArgsConstructor;
@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatRoomDto {
-    private UUID uuid;
+    private UUID roomUuid;
     private String roomName;
     private String image;
 }
