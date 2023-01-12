@@ -15,8 +15,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.UUID;
 
-@Api("채팅-조회")
+
+@Api(tags = "채팅-조회")
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -50,7 +52,7 @@ public class ChatRoomQueryController {
 
     @PostMapping(value = "/rooms/{uuid}")
     @ApiOperation(value ="채팅방 정보 조회 ")
-    public JSONObject getChatRoom(@PathVariable String roomUuid,@AuthenticationPrincipal User user){
+    public JSONObject getChatRoom(@PathVariable("uuid") String roomUuid, @AuthenticationPrincipal User user){
         return chatRoomQueryService.getChatRoom(roomUuid,user);
     }
 
