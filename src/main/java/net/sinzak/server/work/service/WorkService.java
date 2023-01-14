@@ -55,7 +55,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
                 .author(user.getNickName())
                 .univ(user.getUniv())
                 .category(postDto.getCategory())
-                .price(postDto.getPay())
+                .price(postDto.getPrice())
                 .suggest(postDto.isSuggest())
                 .employment(postDto.isEmployment()).build();
         work.setUser(user);

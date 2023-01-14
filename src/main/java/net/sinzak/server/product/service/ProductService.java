@@ -112,6 +112,35 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         imageRepository.save(image);
     }
 
+    @Transactional(rollbackFor = {Exception.class})
+    public JSONObject editPost(User User, Long productId, ProductEditDto editDto){   // 글 생성
+        User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        Product product = productRepository.findById(productId).orElseThrow(InstanceNotFoundException::new);
+        if(!user.getId().equals(product.getUser().getId()))
+            return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
+
+        product.editPost(editDto);
+        productRepository.save(product);
+        return PropertyUtil.response(true);
+    }
+
+    @Transactional(rollbackFor = {Exception.class})
+    public JSONObject deletePost(User User, Long productId){   // 글 생성
+        User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        Product product = productRepository.findById(productId).orElseThrow(InstanceNotFoundException::new);
+        if(!user.getId().equals(product.getUser().getId()))
+            return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
+        deleteImagesInPost(product);
+        productRepository.delete(product);
+        return PropertyUtil.response(true);
+    }
+
+    private void deleteImagesInPost(Product product) {
+        for (ProductImage image : product.getImages()) {
+            s3Service.deleteImage(image.getImageUrl());
+        }
+    }
+
     @Transactional
     public JSONObject showDetail(Long id, User User){   // 글 상세 확인
         User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow();

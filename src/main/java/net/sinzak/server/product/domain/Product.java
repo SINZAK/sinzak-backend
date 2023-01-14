@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import net.sinzak.server.BaseTimeEntity;
 import net.sinzak.server.chatroom.domain.ChatRoom;
+import net.sinzak.server.product.dto.ProductEditDto;
 import net.sinzak.server.user.domain.embed.Size;
 import net.sinzak.server.user.domain.User;
 
@@ -100,6 +101,13 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     public void setUser(User user) {
         user.getProductPostList().add(this);
         this.user = user;
+    }
+
+    public void editPost(ProductEditDto dto){
+        this.title = dto.getTitle();
+        this.content = dto.getContent();
+        this.price = dto.getPrice();
+        this.suggest = dto.isSuggest();
     }
 
     public void setTopPrice(int topPrice) {

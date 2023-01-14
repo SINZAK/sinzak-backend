@@ -37,7 +37,7 @@ public class ProductController {
     @ApiOperation(value = "작품 판매 글 생성",notes = "{\"success\":true, \"id\":52}\n해당 글의 id를 전해드리니 이 /products/{id}/image 에 넘겨주세요\n" +
             "category = painting,orient,sculpture,print,craft,other")
     @PostMapping(value = "/products/build", consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public JSONObject makeProductPost(@AuthenticationPrincipal User user, @RequestBody ProductPostDto buildDto) {
+    public JSONObject makePost(@AuthenticationPrincipal User user, @RequestBody ProductPostDto buildDto) {
         return productService.makePost(user, buildDto);
     }
 
@@ -46,7 +46,7 @@ public class ProductController {
     @PostMapping(value = "/products/{id}/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @ApiImplicitParam(name = "multipartFile", dataType = "multipartFile",
             value = "파일 보내주시면 파일 s3서버에 저장 및, 해당 파일이 저장되어 있는 URL을 디비에 저장합니다")
-    public JSONObject makeProductPost(@AuthenticationPrincipal User user, @PathVariable("id") Long productId, @RequestPart List<MultipartFile> multipartFile) {
+    public JSONObject makePost(@AuthenticationPrincipal User user, @PathVariable("id") Long productId, @RequestPart List<MultipartFile> multipartFile) {
         return productService.saveImageInS3AndProduct(user, multipartFile, productId);
     }
 
@@ -56,6 +56,21 @@ public class ProductController {
     public JSONObject deleteProductImage(@AuthenticationPrincipal User user, @PathVariable("id") Long productId, @RequestBody ImageUrlDto dto) {
         return productService.deleteImage(user, productId, dto.getUrl());
     }
+
+    @ApiDocumentResponse
+    @ApiOperation(value = "작품 수정")
+    @PostMapping(value = "/products/{id}/edit")
+    public JSONObject editPost(@AuthenticationPrincipal User user, @PathVariable("id") Long productId, @RequestBody ProductEditDto editDto) {
+        return productService.editPost(user, productId, editDto);
+    }
+
+    @ApiDocumentResponse
+    @ApiOperation(value = "작품 삭제")
+    @PostMapping(value = "/products/{id}/delete")
+    public JSONObject editPost(@AuthenticationPrincipal User user, @PathVariable("id") Long productId) {
+        return productService.deletePost(user, productId);
+    }
+
 
     @PostMapping("/products/{id}")
     @ApiOperation(value = "작품 상세 조회")
