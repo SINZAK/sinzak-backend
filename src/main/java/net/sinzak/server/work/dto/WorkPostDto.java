@@ -14,7 +14,7 @@ public class WorkPostDto {
     @ApiModelProperty(example = "외주 카테고리")
     private String category;
     @ApiModelProperty(value ="페이",example = "100000",notes = "int 값 이상 안들어오게 프론트라인 체크 필수")
-    private int pay;
+    private int price;
     @ApiModelProperty(value = "외주 모집글 가격 제안 여부 true/false", example = "true", notes = "true -> 체크 한 사람(제안 받겠다는 사람)")
     private boolean suggest;
     @ApiModelProperty(value = "true : 고용자, false : 피고용자", example = "true 시 고용자, false 시 피고용자")
@@ -26,6 +26,4 @@ public class WorkPostDto {
         this.content = content;
     }
 
-    public WorkPostDto() {
-    }
 }

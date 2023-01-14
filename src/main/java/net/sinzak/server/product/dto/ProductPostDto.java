@@ -18,7 +18,7 @@ public class ProductPostDto {
     @ApiModelProperty(value = "작품 모집글 가격 제안 여부", example = "false" ,notes = "true -> 체크 한 사람(가격 제안 받겠다는 사람)")
     private boolean suggest;
 
-    @ApiModelProperty(value = "가로 사이즈",example ="120")
+    @ApiModelProperty(value = "가로 사이즈 1m50cm -> 150",example ="150")
     private int width;
     @ApiModelProperty(value = "세로 사이즈",example ="150")
     private int vertical;
