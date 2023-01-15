@@ -3,6 +3,7 @@ package net.sinzak.server.product.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.common.PostService;
+import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.common.dto.SuggestDto;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
@@ -14,6 +15,7 @@ import net.sinzak.server.product.repository.*;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.domain.embed.Size;
 import net.sinzak.server.common.dto.ActionForm;
+import net.sinzak.server.user.repository.SearchHistoryRepository;
 import net.sinzak.server.user.repository.UserRepository;
 import org.json.simple.JSONObject;
 import org.springframework.data.domain.Page;
@@ -39,6 +41,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     private final ProductLikesRepository likesRepository;
     private final S3Service s3Service;
     private final ProductQDSLRepositoryImpl QDSLRepository;
+    private final SearchHistoryRepository historyRepository;
 
     private final int HOME_OBJECTS = 10;
     private final int HOME_DETAIL_OBJECTS = 50;
@@ -467,17 +470,25 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return PropertyUtil.response(true);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public PageImpl<ShowForm> productListForUser(User User, String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
-        User user  = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow();
+        User user  = userRepository.findByEmailFetchHistoryAndLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
         Page<Product> productList;
+        if(!keyword.isEmpty())
+            saveSearchHistory(keyword, user);
         if(categories.size()==0)
-            productList = QDSLRepository.findAllByCompletePopularityDesc(complete, keyword, pageable); /** QueryDSL 최적화 완료 **/
+            productList = QDSLRepository.findAllByCompletePopularityDesc(complete, keyword, pageable);
         else
             productList = QDSLRepository.findNByCategoriesDesc(categories, keyword, pageable);  //파라미터 입력받았을 경우
         List<ShowForm> showList = makeDetailHomeShowFormList(user.getProductLikesList(), productList.getContent());
         standardAlign(align, showList);  /** 선택한 기준대로 정렬 **/
         return new PageImpl<>(showList, pageable, productList.getTotalElements());
+    }
+
+
+    public void saveSearchHistory(String keyword, User user) {
+            SearchHistory history = SearchHistory.addSearchHistory(keyword, user);
+            historyRepository.save(history);
     }
 
     @Transactional(readOnly = true)

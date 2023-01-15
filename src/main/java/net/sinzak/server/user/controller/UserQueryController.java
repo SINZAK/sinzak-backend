@@ -3,11 +3,13 @@ package net.sinzak.server.user.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.dto.request.UserIdDto;
 import net.sinzak.server.user.dto.respond.GetFollowDto;
 import net.sinzak.server.user.dto.respond.UserDto;
 import net.sinzak.server.user.service.UserQueryService;
+import org.json.simple.JSONObject;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -46,12 +48,11 @@ public class UserQueryController {
                 userQueryService.getFollowingDtoList(userId);
         return getFollowDtos;
     }
-    //    @ApiOperation(value ="팔로워리스트")
-//    @GetMapping(value ="/users/{userId}/followers")
-//    public List<GetFollowDto> getFollowerList2(@PathVariable("userId") Long userId) {
-//        return userQueryService.getFollowerDtoList(userId);
-//    }
 
-
+    @ApiOperation(value = "검색기록 출력")
+    @GetMapping(value = "/users/history")
+    public JSONObject showHistory(@AuthenticationPrincipal User user) {
+        return userQueryService.showSearchHistory(user);
+    }
 
 }

@@ -2,15 +2,16 @@ package net.sinzak.server.user.service;
 
 
 import lombok.RequiredArgsConstructor;
+
 import net.sinzak.server.user.domain.Report;
 import net.sinzak.server.user.dto.request.ReportDto;
 import net.sinzak.server.user.dto.request.UpdateUserDto;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.user.repository.ReportRepository;
+
 import net.sinzak.server.user.repository.UserRepository;
 import net.sinzak.server.common.PropertyUtil;
-import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import java.util.Optional;
 public class UserCommandService {
     private final UserRepository userRepository;
     private final ReportRepository reportRepository;
+
 
     public JSONObject updateUser(UpdateUserDto dto, User loginUser){
         if(loginUser ==null){
@@ -85,6 +87,8 @@ public class UserCommandService {
         reportRepository.save(connect);
         return PropertyUtil.response(true);
     }
+
+
 
     private boolean checkAlreadyReport(Long id, User loginUser) {
         for (Report report : loginUser.getReportList()) {
