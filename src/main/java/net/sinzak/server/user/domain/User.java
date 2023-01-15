@@ -106,6 +106,9 @@ public class User extends BaseTimeEntity implements UserDetails {
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     private List<UserChatRoom> userChatRooms = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE)
+    private List<Report> reportList = new ArrayList<>();
+
 
     @ElementCollection
     @CollectionTable(name = "FOLLOWING_LIST", joinColumns = @JoinColumn(name = "user_id"))

@@ -81,22 +81,31 @@ public class UserCommandController {
     @ApiDocumentResponse
     @ApiOperation(value = "유저 정보변경", notes = "이름,한줄 소개, 학교(보류) ")
     @PostMapping(value = "/users/edit")
-    public JSONObject updateUser( @RequestBody UpdateUserDto dto , @ApiIgnore @AuthenticationPrincipal User user) {
+    public JSONObject updateUser( @RequestBody UpdateUserDto dto , @AuthenticationPrincipal User user) {
         return userCommandService.updateUser(dto,user);
     }
     @ApiDocumentResponse
     @ApiOperation(value = "팔로우하기")
     @PostMapping(value = "/users/follow")
-    public JSONObject followUser(@RequestBody UserIdDto userIdDto, @ApiIgnore @AuthenticationPrincipal User user){
-        return userCommandService.follow(userIdDto,user);
+    public JSONObject followUser(@RequestBody UserIdDto userIdDto, @AuthenticationPrincipal User user){
+        return userCommandService.follow(userIdDto.getUserId(),user);
     }
 
     @ApiDocumentResponse
     @ApiOperation(value = "언팔로우하기")
     @PostMapping(value = "/users/unfollow")
-    public JSONObject unFollowUser(@RequestBody UserIdDto userIdDto,@ApiIgnore @AuthenticationPrincipal User user){
-        return userCommandService.unFollow(userIdDto,user);
+    public JSONObject unFollowUser(@RequestBody UserIdDto userIdDto, @AuthenticationPrincipal User user){
+        return userCommandService.unFollow(userIdDto.getUserId(),user);
     }
+
+    @ApiDocumentResponse
+    @ApiOperation(value = "신고하기")
+    @PostMapping(value = "/users/report")
+    public JSONObject report(@RequestBody ReportDto reportDto, @AuthenticationPrincipal User user){
+        return userCommandService.report(reportDto, user);
+    }
+
+
 
 
 
