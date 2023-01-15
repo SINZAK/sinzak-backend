@@ -1,11 +1,16 @@
 package net.sinzak.server.user.service;
 
 import lombok.RequiredArgsConstructor;
+import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
+import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.user.dto.respond.GetFollowDto;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.dto.respond.UserDto;
+import net.sinzak.server.user.repository.SearchHistoryRepository;
 import net.sinzak.server.user.repository.UserRepository;
+import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +25,7 @@ import java.util.Set;
 public class UserQueryService {
 
     private final UserRepository userRepository;
-
+    private final SearchHistoryRepository historyRepository;
 //    @PostConstruct
 //    public void makeMockData(){
 //        User user = new User("insi2000@naver.com","송인서","그림2");
@@ -105,10 +110,14 @@ public class UserQueryService {
         return getFollowingDtoList;
     }
 
-
-    ////methods
-
-
-
+    @Transactional(readOnly = true)
+    public JSONObject showSearchHistory(User User){
+        User user = historyRepository.findByEmailFetchHistoryList(User.getEmail()).orElseThrow(InstanceNotFoundException::new);
+        JSONObject obj = new JSONObject();
+        for (SearchHistory history : user.getHistoryList()) {
+            obj.put(String.valueOf(history.getId()),history.getWord());
+        }
+        return PropertyUtil.response(obj);
+    }
 
 }
