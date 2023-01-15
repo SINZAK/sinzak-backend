@@ -33,4 +33,11 @@ public class BannerController {
     public JSONObject makeProductPost(@PathVariable("id") Long bannerId, @RequestPart MultipartFile multipartFile) {
         return bannerService.saveImage(bannerId, multipartFile);
     }
+
+    @ApiDocumentResponse
+    @ApiOperation(value = "배너 정보 출력")
+    @GetMapping(value = "/banner")
+    public JSONObject showBannerList() {
+        return bannerService.getList();
+    }
 }

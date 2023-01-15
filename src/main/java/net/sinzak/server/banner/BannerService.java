@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class BannerService {
     private final BannerRepository bannerRepository;
     private final S3Service s3Service;
+
     @Transactional(rollbackFor = {Exception.class})
     public JSONObject make(BannerDto dto){   // 글 생성
         Banner banner = Banner.builder()
@@ -28,12 +29,17 @@ public class BannerService {
     public JSONObject saveImage(Long id, MultipartFile file){   // 글 생성
         Banner banner = bannerRepository.findById(id).orElseThrow(InstanceNotFoundException::new);
         uploadImageAndSetThumbnail(banner, file);
-        return PropertyUtil.response(id);
+        return PropertyUtil.response(true);
     }
 
     private String uploadImageAndSetThumbnail(Banner banner, MultipartFile file) {
         String url = s3Service.uploadImage(file);
         banner.setImageUrl(url);
         return url;
+    }
+
+    @Transactional(readOnly = true)
+    public JSONObject getList(){
+        return PropertyUtil.response(bannerRepository.findAll());
     }
 }
