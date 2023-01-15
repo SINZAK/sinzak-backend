@@ -104,12 +104,12 @@ public class WorkController {
                             "label\n" +
                             "other", defaultValue = "")
     })
-    public PageImpl<ShowForm> showWorks(@AuthenticationPrincipal User user, @RequestParam(required=false, defaultValue="") List<String> categories, @RequestParam(required=false, defaultValue="recent") String align, @RequestParam(required=false, defaultValue="true") Boolean employment, @ApiIgnore Pageable pageable) {
+    public PageImpl<ShowForm> showWorks(@AuthenticationPrincipal User user, @RequestParam(required=false, defaultValue="") String search, @RequestParam(required=false, defaultValue="") List<String> categories, @RequestParam(required=false, defaultValue="recent") String align, @RequestParam(required=false, defaultValue="true") Boolean employment, @ApiIgnore Pageable pageable) {
         try{
-            return workService.workListForUser(user, categories, align, employment, pageable);
+            return workService.workListForUser(user, search, categories, align, employment, pageable);
         }
         catch (NullPointerException e){
-            return workService.workListForGuest(categories,align, employment, pageable);
+            return workService.workListForGuest(search, categories,align, employment, pageable);
         }
     }
 

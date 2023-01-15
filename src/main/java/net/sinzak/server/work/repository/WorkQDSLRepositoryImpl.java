@@ -1,6 +1,7 @@
 package net.sinzak.server.work.repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static net.sinzak.server.product.domain.QProduct.product;
 import static net.sinzak.server.work.domain.QWork.work;
 
 
@@ -22,20 +24,10 @@ public class WorkQDSLRepositoryImpl implements QDSLRepository<Work> {
 
     private final JPAQueryFactory queryFactory;
 
-    @Override
-    public Page<Work> findAllByCompletePopularityDesc(boolean complete, Pageable pageable) {
-        return null;
-    }
-
-    @Override
-    public Page<Work> findNByCategoriesDesc(List<String> categories, Pageable pageable) {
-        return null;
-    }
-
-    public Page<Work> findNByCategoriesDesc(List<String> categories, boolean employment, Pageable pageable) {
+    public Page<Work> findNByCategoriesDesc(String keyword, List<String> categories, boolean employment, Pageable pageable) {
         List<Work> result = queryFactory
                 .selectFrom(work)
-                .where(eqCategories(categories),work.employment.eq(employment))
+                .where(eqCategories(categories),work.employment.eq(employment), eqSearch(keyword))
                 .orderBy(work.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -58,6 +50,21 @@ public class WorkQDSLRepositoryImpl implements QDSLRepository<Work> {
         }
 
         return builder;
+    }
+
+    private BooleanExpression eqSearch(String keyword) { //complete 가 true면   where complete = false 로 가져온다.
+        if (keyword.isEmpty()){
+            return null;
+        }
+        return product.content.contains(keyword);
+    }
+
+    @Override
+    public Page<Work> findAllByCompletePopularityDesc(boolean complete, String keyword, Pageable pageable) {return null;}
+
+    @Override
+    public Page<Work> findNByCategoriesDesc(List<String> categories, String keyword, Pageable pageable) {
+        return null;
     }
 
 }

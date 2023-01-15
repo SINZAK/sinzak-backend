@@ -299,25 +299,25 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
 
 
     @Transactional(readOnly = true)
-    public PageImpl<ShowForm> workListForUser(User User, List<String> categories, String align, boolean employment, Pageable pageable){
+    public PageImpl<ShowForm> workListForUser(User User, String keyword, List<String> categories, String align, boolean employment, Pageable pageable){
         User user  = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow();
         Page<Work> workList;
-        if(categories.size()==0)
-            workList = workRepository.findAll(employment, pageable);
+        if(categories.size()==0 && !keyword.isEmpty())
+            workList = workRepository.findAll(keyword, employment, pageable);
         else
-            workList = QDSLRepository.findNByCategoriesDesc(categories, employment, pageable);  //파라미터 입력받았을 경우
+            workList = QDSLRepository.findNByCategoriesDesc(keyword, categories, employment, pageable);
         List<ShowForm> showList = makeShowFormList(user.getWorkLikesList(), workList.getContent());
         standardAlign(align, showList);  /** 선택한 기준대로 정렬 **/
         return new PageImpl(showList, pageable, workList.getTotalElements());
     }
 
     @Transactional(readOnly = true)
-    public PageImpl<ShowForm> workListForGuest(List<String> categories, String align, boolean employment, Pageable pageable){
+    public PageImpl<ShowForm> workListForGuest(String keyword, List<String> categories, String align, boolean employment, Pageable pageable){
         Page<Work> workList;
-        if(categories.size()==0)
-            workList = workRepository.findAll(employment, pageable);
+        if(categories.size()==0 && !keyword.isEmpty())
+            workList = workRepository.findAll(keyword, employment, pageable);
         else
-            workList = QDSLRepository.findNByCategoriesDesc(categories, employment, pageable);;  //파라미터 입력받았을 경우
+            workList = QDSLRepository.findNByCategoriesDesc(keyword, categories, employment, pageable);
 
         List<ShowForm> showList = new ArrayList<>();
         for (Work work : workList.getContent()) {
