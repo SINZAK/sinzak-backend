@@ -468,25 +468,25 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional(readOnly = true)
-    public PageImpl<ShowForm> productListForUser(User User, List<String> categories, String align, boolean complete, Pageable pageable){
+    public PageImpl<ShowForm> productListForUser(User User, String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
         User user  = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow();
         Page<Product> productList;
         if(categories.size()==0)
-            productList = QDSLRepository.findAllByCompletePopularityDesc(complete, pageable); /** QueryDSL 최적화 완료 **/
+            productList = QDSLRepository.findAllByCompletePopularityDesc(complete, keyword, pageable); /** QueryDSL 최적화 완료 **/
         else
-            productList = QDSLRepository.findNByCategoriesDesc(categories, pageable);  //파라미터 입력받았을 경우
+            productList = QDSLRepository.findNByCategoriesDesc(categories, keyword, pageable);  //파라미터 입력받았을 경우
         List<ShowForm> showList = makeDetailHomeShowFormList(user.getProductLikesList(), productList.getContent());
         standardAlign(align, showList);  /** 선택한 기준대로 정렬 **/
         return new PageImpl<>(showList, pageable, productList.getTotalElements());
     }
 
     @Transactional(readOnly = true)
-    public PageImpl<ShowForm> productListForGuest(List<String> categories, String align, boolean complete, Pageable pageable){
+    public PageImpl<ShowForm> productListForGuest(String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
         Page<Product> productList;
         if(categories.size()==0)
-            productList = QDSLRepository.findAllByCompletePopularityDesc(complete, pageable); /** QueryDSL 최적화 완료 **/
+            productList = QDSLRepository.findAllByCompletePopularityDesc(complete, keyword, pageable); /** QueryDSL 최적화 완료 **/
         else
-            productList = QDSLRepository.findNByCategoriesDesc(categories, pageable);  //파라미터 입력받았을 경우
+            productList = QDSLRepository.findNByCategoriesDesc(categories, keyword, pageable);  //파라미터 입력받았을 경우
 
         List<ShowForm> showList = new ArrayList<>();
         for (Product product : productList.getContent()) {

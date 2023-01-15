@@ -24,10 +24,10 @@ public class ProductQDSLRepositoryImpl implements QDSLRepository<Product> {
 
     private final JPAQueryFactory queryFactory;
 
-    public Page<Product> findAllByCompletePopularityDesc(boolean complete, Pageable pageable) {
+    public Page<Product> findAllByCompletePopularityDesc(boolean complete, String keyword, Pageable pageable) {
         List<Product> result = queryFactory
                 .selectFrom(product)
-                .where(eqComplete(complete))
+                .where(eqComplete(complete),eqSearch(keyword))
                 .orderBy(product.popularity.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -51,11 +51,18 @@ public class ProductQDSLRepositoryImpl implements QDSLRepository<Product> {
         return product.complete.eq(false);
     }
 
+    private BooleanExpression eqSearch(String keyword) { //complete 가 true면   where complete = false 로 가져온다.
+        if (keyword.isEmpty()){
+            return null;
+        }
+        return product.content.contains(keyword);
+    }
 
-    public Page<Product> findNByCategoriesDesc(List<String> categories, Pageable pageable) {
+
+    public Page<Product> findNByCategoriesDesc(List<String> categories, String keyword, Pageable pageable) {
         List<Product> result = queryFactory
                 .selectFrom(product)
-                .where(eqCategories(categories))
+                .where(eqCategories(categories),eqSearch(keyword))
                 .orderBy(product.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
