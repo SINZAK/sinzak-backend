@@ -10,9 +10,7 @@ import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.image.S3Service;
 import net.sinzak.server.common.dto.SuggestDto;
 import net.sinzak.server.product.dto.ShowForm;
-import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.user.domain.User;
-import net.sinzak.server.user.repository.SearchHistoryRepository;
 import net.sinzak.server.user.repository.UserRepository;
 import net.sinzak.server.work.domain.*;
 import net.sinzak.server.work.dto.DetailWorkForm;
@@ -21,7 +19,6 @@ import net.sinzak.server.work.dto.WorkPostDto;
 import net.sinzak.server.work.repository.*;
 
 
-import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -47,7 +44,6 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     private final WorkLikesRepository likesRepository;
     private final WorkSuggestRepository suggestRepository;
     private final WorkQDSLRepositoryImpl QDSLRepository;
-    private final SearchHistoryRepository historyRepository;
     private final S3Service s3Service;
 
     @Transactional(rollbackFor = {Exception.class})
@@ -355,9 +351,6 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     public PageImpl<ShowForm> workListForUser(User User, String keyword, List<String> categories, String align, boolean employment, Pageable pageable){
         User user  = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow();
         Page<Work> workList;
-        if(!keyword.isEmpty())
-            saveSearchHistory(keyword, user);
-
         if(categories.size()==0 && !keyword.isEmpty())
             workList = workRepository.findAll(keyword, employment, pageable);
         else
@@ -375,14 +368,12 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         else
             workList = QDSLRepository.findNByCategoriesDesc(keyword, categories, employment, pageable);
 
-        List<ShowForm> showList = makeShowFormList(workList);
+        List<ShowForm> showList = new ArrayList<>();
+        for (Work work : workList.getContent()) {
+            addWorkInJSONFormat(showList, work, false);
+        }
         standardAlign(align, showList);  /** 선택한 기준대로 정렬 **/
         return new PageImpl<>(showList, pageable, workList.getTotalElements());
-    }
-
-    private void saveSearchHistory(String keyword, User user) {
-        SearchHistory history = SearchHistory.addSearchHistory(keyword, user);
-        historyRepository.save(history);
     }
 
 
@@ -391,7 +382,6 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         else if (align.equals("recommend"))  /** 인기순 **/
             showList.sort((o1, o2) -> o2.getPopularity() - o1.getPopularity());
     }
-
     private List<ShowForm> makeShowFormList(List<WorkLikes> userLikesList, List<Work> workList) {
         List<ShowForm> showFormList = new ArrayList<>();
         for (Work work : workList) { /** 추천 목록 중 좋아요 누른거 체크 후 ShowForm 으로 담기 **/
@@ -399,14 +389,6 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
             addWorkInJSONFormat(showFormList, work, isLike);
         }
         return showFormList;
-    }
-
-    private List<ShowForm> makeShowFormList(Page<Work> workList) {
-        List<ShowForm> showList = new ArrayList<>();
-        for (Work work : workList.getContent()) {
-            addWorkInJSONFormat(showList, work, false);
-        }
-        return showList;
     }
 
     private void addWorkInJSONFormat(List<ShowForm> showFormList, Work work, boolean isLike) {

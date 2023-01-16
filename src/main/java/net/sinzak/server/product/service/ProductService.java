@@ -89,7 +89,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         Product product = productRepository.findById(id).orElseThrow(InstanceNotFoundException::new);
         if(!user.getId().equals(product.getUser().getId()))
             return PropertyUtil.responseMessage("잘못된 접근입니다.");
-        for (MultipartFile img : multipartFiles) {  /** 이미지 추가, s3에 저장 **/
+        for (MultipartFile img : multipartFiles) {
             try{
                 String url = uploadImageAndSetThumbnail(multipartFiles, product, img);
                 saveImageUrl(product, url);
@@ -146,8 +146,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     @Transactional
     public JSONObject showDetail(Long id, User User){   // 글 상세 확인
-        User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow();
-        Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow();
+        User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(InstanceNotFoundException::new);
         DetailProductForm detailForm = DetailProductForm.builder()
                 .id(product.getId())
                 .userId(product.getUser().getId())
@@ -157,7 +157,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                 .cert_uni(product.getUser().isCert_uni())
                 .cert_celeb(product.getUser().isCert_celeb())
                 .followerNum(product.getUser().getFollowerNum())
-                .images(getImages(product))  /** 이미지 엔티티에서 url만 빼오기 **/
+                .images(getImages(product))
                 .title(product.getTitle())
                 .price(product.getPrice())
                 .category(product.getCategory())
@@ -177,7 +177,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         boolean isLike = checkIsLikes(user.getProductLikesList(), product);
         boolean isWish = checkIsWish(user, product.getProductWishList());
         boolean isFollowing  = checkIsFollowing(user.getFollowingList(), product);
-        detailForm.setUserAction(isLike, isWish, isFollowing); /** 유저의 좋아요, 찜, 팔로우여부 **/
+        detailForm.setUserAction(isLike, isWish, isFollowing);
         product.addViews();
         return PropertyUtil.response(detailForm);
     }
@@ -217,8 +217,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     @Transactional
     public JSONObject showDetail(Long id){   // 비회원 글 보기
-        Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow();
-        List<String> imagesUrl = getImages(product);  /** 이미지 엔티티에서 url만 빼오기 **/
+        Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(InstanceNotFoundException::new);
+        List<String> imagesUrl = getImages(product);
         DetailProductForm detailForm = DetailProductForm.builder()
                 .id(product.getId())
                 .userId(product.getUser().getId())
@@ -254,7 +254,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     @Transactional(readOnly = true)
     public JSONObject showHome(User User){
         JSONObject obj = new JSONObject();
-        User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow();
+        User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
         List<String> userCategories = Arrays.asList(user.getCategoryLike().split(","));
 
         List<Product> productList = productRepository.findAll();
@@ -305,7 +305,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     @Transactional(readOnly = true)
     public JSONObject showRecommendDetail(User User){
 
-        User user = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow();
+        User user = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
         List<String> userCategories = Arrays.asList(user.getCategoryLike().split(","));
 
         List<Product> recommendList = QDSLRepository.findCountByCategoriesDesc(userCategories, HOME_DETAIL_OBJECTS);
@@ -316,7 +316,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     @Transactional(readOnly = true)
     public JSONObject showFollowingDetail(User User){
-        User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow();
+        User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
         List<Product> productList = productRepository.findAll();
 
         List<Product> followingList = getFollowingList(user, productList, HOME_DETAIL_OBJECTS);
@@ -381,17 +381,17 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional
-    public JSONObject likes(User User, @RequestBody ActionForm form){   // 좋아요
+    public JSONObject likes(User User, @RequestBody ActionForm form){
         JSONObject obj = new JSONObject();
-        User user = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow(); // 작품 좋아요까지 페치 조인
-        List<ProductLikes> userLikesList = user.getProductLikesList(); //userLikesList == 유저의 좋아요 리스트
+        User user = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        List<ProductLikes> userLikesList = user.getProductLikesList();
         boolean isLike=false;
         Optional<Product> Product = productRepository.findById(form.getId());
         if(Product.isPresent()){
             Product product = Product.get();
-            if(userLikesList.size()!=0){ /** 유저가 좋아요룰 누른 적이 있다면 이미 누른 작품인지 비교 **/
-                for (ProductLikes like : userLikesList) { //유저의 찜목록과 현재 누른 작품의 찜과 비교
-                    if(product.equals(like.getProduct())) {  //같으면 이미 찜 누른 항목
+            if(userLikesList.size()!=0){
+                for (ProductLikes like : userLikesList) {
+                    if(product.equals(like.getProduct())) {
                         isLike = true;
                         break;
                     }
@@ -407,8 +407,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
             }
             else if(!form.isMode() && isLike){
                 product.minusLikesCnt();
-                for (ProductLikes like : userLikesList) { //유저의 찜목록과 현재 누른 작품의 찜과 비교
-                    if(product.equals(like.getProduct())) {  //같으면 이미 찜 누른 항목
+                for (ProductLikes like : userLikesList) {
+                    if(product.equals(like.getProduct())) {
                         likesRepository.delete(like);
                         isLike = false;
                         break;
@@ -425,41 +425,37 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional
-    public JSONObject trading(@RequestBody ActionForm form){   // 거래중
+    public JSONObject trading(@RequestBody ActionForm form){
         JSONObject obj = new JSONObject();
         boolean isTrading;
-        Optional<Product> Product = productRepository.findById(form.getId());
-        if(Product.isPresent()){
-            Product product = Product.get();
-            isTrading = product.isTrading();
-            if (form.isMode() && !isTrading){
-                product.setTrading(true);
-                isTrading=true;
-                obj.put("success",true);
-            }
-            else if(!form.isMode() && isTrading){
-                product.setTrading(false);
-                obj.put("success",true);
-            }
-            else
-                obj.put("success",false);
-            obj.put("isTrading",isTrading);
-            return obj;
+        Product product = productRepository.findById(form.getId()).orElseThrow(InstanceNotFoundException::new);
+        isTrading = product.isTrading();
+        if (form.isMode() && !isTrading){
+            product.setTrading(true);
+            isTrading=true;
+            obj.put("success",true);
         }
-        return PropertyUtil.responseMessage("존재하지 않는 작품에 요청된 좋아요");
+        else if(!form.isMode() && isTrading){
+            product.setTrading(false);
+            obj.put("success",true);
+        }
+        else
+            obj.put("success",false);
+        obj.put("isTrading",isTrading);
+        return obj;
     }
 
     @Transactional
-    public JSONObject sell(User User, @RequestBody SellDto dto){   // 판매완료시
-        User user = userRepository.findByEmailFetchProductSellList(User.getEmail()).orElseThrow();
-        Product product = productRepository.findById(dto.getProductId()).orElseThrow();
+    public JSONObject sell(User User, @RequestBody SellDto dto){
+        User user = userRepository.findByEmailFetchProductSellList(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        Product product = productRepository.findById(dto.getProductId()).orElseThrow(InstanceNotFoundException::new);
         ProductSell connect = ProductSell.createConnect(product, user);
         productSellRepository.save(connect);
         return PropertyUtil.response(true);
     }
 
     @Transactional
-    public JSONObject suggest(User User, @RequestBody SuggestDto dto){   // 판매완료시
+    public JSONObject suggest(User User, @RequestBody SuggestDto dto){
         User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
         if(suggestRepository.findByUserIdAndProductId(user.getId(),dto.getId()).isPresent())
             return PropertyUtil.responseMessage("이미 제안을 하신 작품입니다.");
@@ -481,7 +477,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         else
             productList = QDSLRepository.findNByCategoriesDesc(categories, keyword, pageable);  //파라미터 입력받았을 경우
         List<ShowForm> showList = makeDetailHomeShowFormList(user.getProductLikesList(), productList.getContent());
-        standardAlign(align, showList);  /** 선택한 기준대로 정렬 **/
+        standardAlign(align, showList);
         return new PageImpl<>(showList, pageable, productList.getTotalElements());
     }
 

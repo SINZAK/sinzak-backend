@@ -6,6 +6,8 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
 import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.error.ErrorResponse;
+import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.config.auth.SecurityService;
@@ -128,7 +130,11 @@ public class UserCommandController {
     @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(HttpStatus.OK)
     protected JSONObject handleUserNotFoundException() {
-        return PropertyUtil.responseMessage("가입되지 않은 ID입니다.");
+        return PropertyUtil.responseMessage("존재하지 않는 유저입니다.");
     }
+
+    @ExceptionHandler(InstanceNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected JSONObject handleInstanceNotFoundException() {return PropertyUtil.responseMessage("존재하지 않는 객체입니다.");}
 }
 
