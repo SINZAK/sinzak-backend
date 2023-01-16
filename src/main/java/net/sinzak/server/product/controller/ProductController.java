@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.dto.DetailForm;
 import net.sinzak.server.common.dto.SuggestDto;
+import net.sinzak.server.common.error.ErrorResponse;
+import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.product.dto.*;
@@ -179,21 +181,15 @@ public class ProductController {
         }
     }
 
-//    @ExceptionHandler(NullPointerException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    protected ErrorResponse handleException1() {
-//        return ErrorResponse.of(HttpStatus.BAD_REQUEST, "존재하지 않는 유저");
-//    }
-//
-//    @ExceptionHandler(NoSuchElementException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    protected ErrorResponse handleException2() {
-//        return ErrorResponse.of(HttpStatus.BAD_REQUEST, "존재하지 않는 값을 조회중입니다.");
-//    }
+
     @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(HttpStatus.OK)
     protected JSONObject handleUserNotFoundException() {
-        return PropertyUtil.responseMessage("존재하지 않는 유저입니다.");
-    }
+    return PropertyUtil.responseMessage("존재하지 않는 유저입니다.");
+}
+
+    @ExceptionHandler(InstanceNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected JSONObject handleInstanceNotFoundException() {return PropertyUtil.responseMessage("존재하지 않는 객체입니다.");}
 
 }
