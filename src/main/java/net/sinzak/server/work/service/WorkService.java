@@ -14,6 +14,7 @@ import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.repository.UserRepository;
 import net.sinzak.server.work.domain.*;
 import net.sinzak.server.work.dto.DetailWorkForm;
+import net.sinzak.server.work.dto.WorkEditDto;
 import net.sinzak.server.work.dto.WorkPostDto;
 import net.sinzak.server.work.repository.*;
 
@@ -90,6 +91,54 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         WorkImage image = new WorkImage(url, work);
         work.addImage(image);
         imageRepository.save(image);
+    }
+
+    @Transactional(rollbackFor = {Exception.class})
+    public JSONObject deleteImage(User User, Long workId, String url){   // 글 생성
+        Work work = workRepository.findById(workId).orElseThrow(InstanceNotFoundException::new);
+        if(!User.getId().equals(work.getUser().getId()))
+            return PropertyUtil.responseMessage("해당 작품의 작가가 아닙니다.");
+        if(work.getImages().size()==1)
+            return PropertyUtil.responseMessage("최소 1개 이상의 이미지를 보유해야 합니다.");
+
+        for (WorkImage image : work.getImages()) {
+            if(image.getImageUrl().equals(url)){
+                imageRepository.delete(image);
+                work.getImages().remove(image);
+                break;
+            }
+        }
+        s3Service.deleteImage(url);
+        return PropertyUtil.response(workId);
+    }
+
+    @Transactional(rollbackFor = {Exception.class})
+    public JSONObject editPost(User User, Long workId, WorkEditDto editDto){   // 글 생성
+        User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        Work work = workRepository.findById(workId).orElseThrow(InstanceNotFoundException::new);
+        if(!user.getId().equals(work.getUser().getId()))
+            return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
+
+        work.editPost(editDto);
+        workRepository.save(work);
+        return PropertyUtil.response(true);
+    }
+
+    @Transactional(rollbackFor = {Exception.class})
+    public JSONObject deletePost(User User, Long workId){   // 글 생성
+        User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        Work work = workRepository.findById(workId).orElseThrow(InstanceNotFoundException::new);
+        if(!user.getId().equals(work.getUser().getId()))
+            return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
+        deleteImagesInPost(work);
+        workRepository.delete(work);
+        return PropertyUtil.response(true);
+    }
+
+    private void deleteImagesInPost(Work work) {
+        for (WorkImage image : work.getImages()) {
+            s3Service.deleteImage(image.getImageUrl());
+        }
     }
 
     @Transactional
@@ -314,7 +363,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     @Transactional(readOnly = true)
     public PageImpl<ShowForm> workListForGuest(String keyword, List<String> categories, String align, boolean employment, Pageable pageable){
         Page<Work> workList;
-        if(categories.size()==0 && !keyword.isEmpty())
+        if(categories.size() == 0 && !keyword.isEmpty())
             workList = workRepository.findAll(keyword, employment, pageable);
         else
             workList = QDSLRepository.findNByCategoriesDesc(keyword, categories, employment, pageable);

@@ -67,7 +67,7 @@ public class ProductController {
     @ApiDocumentResponse
     @ApiOperation(value = "작품 삭제")
     @PostMapping(value = "/products/{id}/delete")
-    public JSONObject editPost(@AuthenticationPrincipal User user, @PathVariable("id") Long productId) {
+    public JSONObject deletePost(@AuthenticationPrincipal User user, @PathVariable("id") Long productId) {
         return productService.deletePost(user, productId);
     }
 
@@ -121,7 +121,7 @@ public class ProductController {
     @ApiDocumentResponse
     @ApiOperation(value = "작품 홈")
     @PostMapping("/home/products")
-    public JSONObject showHomeProduct(@ApiIgnore @AuthenticationPrincipal User user) {
+    public JSONObject showHomeProduct(@AuthenticationPrincipal User user) {
         try {
             return productService.showHome(user);
         }

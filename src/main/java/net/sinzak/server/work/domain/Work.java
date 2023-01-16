@@ -4,7 +4,9 @@ import lombok.Builder;
 import lombok.Getter;
 import net.sinzak.server.BaseTimeEntity;
 import net.sinzak.server.chatroom.domain.ChatRoom;
+import net.sinzak.server.product.dto.ProductEditDto;
 import net.sinzak.server.user.domain.User;
+import net.sinzak.server.work.dto.WorkEditDto;
 import org.json.simple.JSONArray;
 
 import javax.persistence.*;
@@ -98,6 +100,12 @@ public class Work extends BaseTimeEntity { /** 외주 **/
     public void setUser(User user) {
         user.getWorkPostList().add(this);
         this.user = user;
+    }
+    public void editPost(WorkEditDto dto){
+        this.title = dto.getTitle();
+        this.content = dto.getContent();
+        this.price = dto.getPrice();
+        this.suggest = dto.isSuggest();
     }
 
     public void plusWishCnt() { this.wishCnt++; }
