@@ -6,8 +6,8 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.common.PropertyUtil;
-import net.sinzak.server.common.dto.DetailForm;
 import net.sinzak.server.common.dto.SuggestDto;
+import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.product.dto.*;
@@ -146,7 +146,7 @@ public class ProductController {
     @PostMapping("/products")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
-                    value = "파라미터 형식으로 전달해주세요 (0..N) \nex) http://localhost:8080/products?page=3&size=5&stacks=orient,western\nhttp://localhost:8080/products?page=0&size=5&stacks=orient&stacks=western&sale=true  둘 다 가능합니다", defaultValue = "0"),
+                    value = "파라미터 형식으로 전달해주세요 (0..N) \nex) http://localhost:8080/api/products?page=3&size=5&stacks=orient,western\nhttp://localhost:8080/api/products?page=0&size=5&stacks=orient&stacks=western&sale=true  둘 다 가능합니다", defaultValue = "0"),
             @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
                     value = "3", defaultValue = "5"),
             @ApiImplicitParam(name = "align", dataType = "string", paramType = "query",
@@ -179,21 +179,15 @@ public class ProductController {
         }
     }
 
-//    @ExceptionHandler(NullPointerException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    protected ErrorResponse handleException1() {
-//        return ErrorResponse.of(HttpStatus.BAD_REQUEST, "존재하지 않는 유저");
-//    }
-//
-//    @ExceptionHandler(NoSuchElementException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    protected ErrorResponse handleException2() {
-//        return ErrorResponse.of(HttpStatus.BAD_REQUEST, "존재하지 않는 값을 조회중입니다.");
-//    }
+
     @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(HttpStatus.OK)
     protected JSONObject handleUserNotFoundException() {
-        return PropertyUtil.responseMessage("존재하지 않는 유저입니다.");
-    }
+    return PropertyUtil.responseMessage("존재하지 않는 유저입니다.");
+}
+
+    @ExceptionHandler(InstanceNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected JSONObject handleInstanceNotFoundException() {return PropertyUtil.responseMessage("존재하지 않는 객체입니다.");}
 
 }

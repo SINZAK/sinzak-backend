@@ -5,18 +5,17 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.dto.SuggestDto;
 import net.sinzak.server.common.error.InstanceNotFoundException;
+import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.common.dto.ActionForm;
 import net.sinzak.server.product.dto.ImageUrlDto;
-import net.sinzak.server.product.dto.ProductEditDto;
 import net.sinzak.server.product.dto.ShowForm;
 import net.sinzak.server.user.domain.User;
-import net.sinzak.server.work.dto.DetailWorkForm;
 import net.sinzak.server.work.dto.WorkEditDto;
 import net.sinzak.server.work.dto.WorkPostDto;
-import net.sinzak.server.common.error.ErrorResponse;
 import net.sinzak.server.work.service.WorkService;
 import org.json.simple.JSONObject;
 import org.springframework.data.domain.PageImpl;
@@ -126,7 +125,9 @@ public class WorkController {
                             "design\n" +
                             "editorial\n" +
                             "label\n" +
-                            "other", defaultValue = "")
+                            "other", defaultValue = ""),
+            @ApiImplicitParam(name = "search", dataType = "string", paramType = "query",
+                    value = "String 값으로 주시고 최소 2글자 이상은 받아야 합니다. contain 메서드로 db에서 검색할 예정.")
     })
     public PageImpl<ShowForm> showWorks(@AuthenticationPrincipal User user, @RequestParam(required=false, defaultValue="") String search, @RequestParam(required=false, defaultValue="") List<String> categories, @RequestParam(required=false, defaultValue="recent") String align, @RequestParam(required=false, defaultValue="true") Boolean employment, @ApiIgnore Pageable pageable) {
         try{
@@ -138,15 +139,13 @@ public class WorkController {
     }
 
 
-    @ExceptionHandler(NullPointerException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected ErrorResponse handleException1() {
-        return ErrorResponse.of(HttpStatus.BAD_REQUEST, "존재하지 않는 유저");
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.OK)
+    protected JSONObject handleUserNotFoundException() {
+        return PropertyUtil.responseMessage("존재하지 않는 유저입니다.");
     }
 
     @ExceptionHandler(InstanceNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected ErrorResponse handleException2() {
-        return ErrorResponse.of(HttpStatus.BAD_REQUEST, "존재하지 않는 객체를 조회중입니다.");
-    }
+    protected JSONObject handleInstanceNotFoundException() {return PropertyUtil.responseMessage("존재하지 않는 객체입니다.");}
 }
