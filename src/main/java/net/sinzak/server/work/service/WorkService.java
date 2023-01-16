@@ -149,8 +149,8 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
 
     @Transactional
     public JSONObject showDetail(Long id, User User){   // 글 상세 확인
-        User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow();
-        Work work = workRepository.findByIdFetchWorkWishAndUser(id).orElseThrow();
+        User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        Work work = workRepository.findByIdFetchWorkWishAndUser(id).orElseThrow(InstanceNotFoundException::new);
 
         DetailWorkForm detailForm = DetailWorkForm.builder()
                 .id(work.getId())
@@ -161,7 +161,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
                 .cert_uni(work.getUser().isCert_uni())
                 .cert_celeb(work.getUser().isCert_celeb())
                 .followerNum(work.getUser().getFollowerNum())
-                .images(getImages(work))  /** 이미지 엔티티에서 url만 빼오기 **/
+                .images(getImages(work))
                 .title(work.getTitle())
                 .price(work.getPrice())
                 .category(work.getCategory())
@@ -179,7 +179,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         boolean isWish = checkIsWish(user, work.getWorkWishList());
         boolean isFollowing  = checkIsFollowing(user.getFollowingList(), work);
 
-        detailForm.setUserAction(isLike, isWish, isFollowing); /** 유저의 좋아요, 찜, 팔로우여부 **/
+        detailForm.setUserAction(isLike, isWish, isFollowing);
         work.addViews();
         return PropertyUtil.response(detailForm);
     }
@@ -257,16 +257,16 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     }
 
     @Transactional
-    public JSONObject wish(User User, @RequestBody ActionForm form){   // 찜
+    public JSONObject wish(User User, @RequestBody ActionForm form){
         JSONObject obj = new JSONObject();
-        User user = userRepository.findByEmailFetchWorkWishList(User.getEmail()).orElseThrow(UserNotFoundException::new); // 외주 찜까지 페치 조인
-        List<WorkWish> wishList = user.getWorkWishList(); //wishList == 유저의 외주 찜 리스트
+        User user = userRepository.findByEmailFetchWorkWishList(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        List<WorkWish> wishList = user.getWorkWishList();
         boolean isWish=false;
         Work work = workRepository.findById(form.getId()).orElseThrow(InstanceNotFoundException::new);
 
-        if(wishList.size()!=0){ /** 유저가 찜이 누른 적이 있다면 이미 누른 작품인지 비교 **/
-            for (WorkWish wish : wishList) { //유저의 찜목록과 현재 누른 작품의 찜과 비교
-                if(work.equals(wish.getWork())) {  //같으면 이미 찜 누른 항목
+        if(wishList.size()!=0){
+            for (WorkWish wish : wishList) {
+                if(work.equals(wish.getWork())) {
                     isWish = true;
                     break;
                 }
@@ -282,8 +282,8 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         }
         else if(!form.isMode() && isWish){
             work.minusWishCnt();
-            for (WorkWish wish : wishList) { //유저의 찜목록과 현재 누른 작품의 찜과 비교
-                if(work.equals(wish.getWork())) {  //같으면 이미 찜 누른 항목
+            for (WorkWish wish : wishList) {
+                if(work.equals(wish.getWork())) {
                     workWishRepository.delete(wish);
                     isWish = false;
                     break;
@@ -299,16 +299,16 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     }
 
     @Transactional
-    public JSONObject likes(User User, @RequestBody ActionForm form){   // 좋아요
+    public JSONObject likes(User User, @RequestBody ActionForm form){
         JSONObject obj = new JSONObject();
-        User user = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow(); // 작품 좋아요까지 페치 조인
-        List<WorkLikes> userLikesList = user.getWorkLikesList(); //userLikesList == 유저의 좋아요 리스트
+        User user = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        List<WorkLikes> userLikesList = user.getWorkLikesList();
         boolean isLike=false;
         Work work = workRepository.findById(form.getId()).orElseThrow(InstanceNotFoundException::new);
 
         if(userLikesList.size()!=0){
-            for (WorkLikes like : userLikesList) { //유저의 찜목록과 현재 누른 작품의 찜과 비교
-                if(work.equals(like.getWork())) {  //같으면 이미 찜 누른 항목
+            for (WorkLikes like : userLikesList) {
+                if(work.equals(like.getWork())) {
                     isLike = true;
                     break;
                 }
@@ -340,7 +340,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     }
 
     @Transactional
-    public JSONObject suggest(User User, @RequestBody SuggestDto dto){   // 판매완료시
+    public JSONObject suggest(User User, @RequestBody SuggestDto dto){
         User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
         if(suggestRepository.findByUserIdAndWorkId(user.getId(),dto.getId()).isPresent())
             return PropertyUtil.responseMessage("이미 제안을 하신 작품입니다.");
@@ -391,7 +391,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
 
 
     private void standardAlign(String align, List<ShowForm> showList) {
-        if (align.equals("recent")) {} //default
+        if (align.equals("recent")) {}
         else if (align.equals("recommend"))  /** 인기순 **/
             showList.sort((o1, o2) -> o2.getPopularity() - o1.getPopularity());
     }
