@@ -486,7 +486,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
 
-    public void saveSearchHistory(String keyword, User user) {
+    private void saveSearchHistory(String keyword, User user) {
             SearchHistory history = SearchHistory.addSearchHistory(keyword, user);
             historyRepository.save(history);
     }

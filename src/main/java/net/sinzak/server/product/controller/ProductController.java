@@ -146,7 +146,7 @@ public class ProductController {
     @PostMapping("/products")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
-                    value = "파라미터 형식으로 전달해주세요 (0..N) \nex) http://localhost:8080/products?page=3&size=5&stacks=orient,western\nhttp://localhost:8080/products?page=0&size=5&stacks=orient&stacks=western&sale=true  둘 다 가능합니다", defaultValue = "0"),
+                    value = "파라미터 형식으로 전달해주세요 (0..N) \nex) http://localhost:8080/api/products?page=3&size=5&stacks=orient,western\nhttp://localhost:8080/api/products?page=0&size=5&stacks=orient&stacks=western&sale=true  둘 다 가능합니다", defaultValue = "0"),
             @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
                     value = "3", defaultValue = "5"),
             @ApiImplicitParam(name = "align", dataType = "string", paramType = "query",

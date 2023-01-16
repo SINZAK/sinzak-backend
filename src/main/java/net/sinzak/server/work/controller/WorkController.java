@@ -87,7 +87,7 @@ public class WorkController {
     @PostMapping("/works")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
-                    value = "파라미터 형식으로 전달해주세요 (0..N) \nex) http://localhost:8080/works?page=3&size=5&stacks=logo,design\nhttp://localhost:8080/works?page=0&size=5&stacks=design&stacks=logo  둘 다 가능합니다", defaultValue = "0"),
+                    value = "파라미터 형식으로 전달해주세요 (0..N) \nex) http://localhost:8080/api/works?page=3&size=5&stacks=logo,design\nhttp://localhost:8080/api/works?page=0&size=5&stacks=design&stacks=logo  둘 다 가능합니다", defaultValue = "0"),
             @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
                     value = "3", defaultValue = "5"),
             @ApiImplicitParam(name = "align", dataType = "string", paramType = "query",
@@ -102,7 +102,9 @@ public class WorkController {
                             "design\n" +
                             "editorial\n" +
                             "label\n" +
-                            "other", defaultValue = "")
+                            "other", defaultValue = ""),
+            @ApiImplicitParam(name = "search", dataType = "string", paramType = "query",
+                    value = "String 값으로 주시고 최소 2글자 이상은 받아야 합니다. contain 메서드로 db에서 검색할 예정.")
     })
     public PageImpl<ShowForm> showWorks(@AuthenticationPrincipal User user, @RequestParam(required=false, defaultValue="") String search, @RequestParam(required=false, defaultValue="") List<String> categories, @RequestParam(required=false, defaultValue="recent") String align, @RequestParam(required=false, defaultValue="true") Boolean employment, @ApiIgnore Pageable pageable) {
         try{
