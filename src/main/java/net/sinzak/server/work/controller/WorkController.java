@@ -126,7 +126,9 @@ public class WorkController {
                             "design\n" +
                             "editorial\n" +
                             "label\n" +
-                            "other", defaultValue = "")
+                            "other", defaultValue = ""),
+            @ApiImplicitParam(name = "search", dataType = "string", paramType = "query",
+                    value = "String 값으로 주시고 최소 2글자 이상은 받아야 합니다. contain 메서드로 db에서 검색할 예정.")
     })
     public PageImpl<ShowForm> showWorks(@AuthenticationPrincipal User user, @RequestParam(required=false, defaultValue="") String search, @RequestParam(required=false, defaultValue="") List<String> categories, @RequestParam(required=false, defaultValue="recent") String align, @RequestParam(required=false, defaultValue="true") Boolean employment, @ApiIgnore Pageable pageable) {
         try{
