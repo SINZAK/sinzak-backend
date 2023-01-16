@@ -3,6 +3,7 @@ package net.sinzak.server.user.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import net.sinzak.server.common.dto.IdDto;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.dto.request.UserIdDto;
@@ -23,13 +24,13 @@ public class UserQueryController {
 
     @ApiOperation(value ="내 프로필 보기")
     @GetMapping(value ="/users/my-profile")
-    public UserDto getMyProfile(@ApiIgnore @AuthenticationPrincipal User user){
+    public UserDto getMyProfile(@AuthenticationPrincipal User user){
         return userQueryService.getMyProfile(user);
     }
 
     @ApiOperation(value ="유저 프로필 보기")
     @GetMapping(value ="/users/{userId}/profile")
-    public UserDto getUserProfile(@PathVariable Long userId, @ApiIgnore @AuthenticationPrincipal User user){
+    public UserDto getUserProfile(@PathVariable Long userId, @AuthenticationPrincipal User user){
         UserDto userDto = userQueryService.getUserProfile(userId, user);
         return userDto;
     }
@@ -49,10 +50,10 @@ public class UserQueryController {
         return getFollowDtos;
     }
 
-    @ApiOperation(value = "검색기록 출력")
+    @ApiOperation(value = "검색기록 출력", notes = "해당 기록의 id 포스트로 주시면 삭제합니다.")
     @GetMapping(value = "/users/history")
-    public JSONObject showHistory(@AuthenticationPrincipal User user) {
-        return userQueryService.showSearchHistory(user);
+    public JSONObject showHistory(@RequestBody IdDto idDto, @AuthenticationPrincipal User user) {
+        return userQueryService.deleteSearchHistory(idDto.getId(), user);
     }
 
 }
