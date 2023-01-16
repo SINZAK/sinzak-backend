@@ -10,7 +10,9 @@ import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.image.S3Service;
 import net.sinzak.server.common.dto.SuggestDto;
 import net.sinzak.server.product.dto.ShowForm;
+import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.user.domain.User;
+import net.sinzak.server.user.repository.SearchHistoryRepository;
 import net.sinzak.server.user.repository.UserRepository;
 import net.sinzak.server.work.domain.*;
 import net.sinzak.server.work.dto.DetailWorkForm;
@@ -44,12 +46,12 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     private final WorkLikesRepository likesRepository;
     private final WorkSuggestRepository suggestRepository;
     private final WorkQDSLRepositoryImpl QDSLRepository;
+    private final SearchHistoryRepository historyRepository;
     private final S3Service s3Service;
 
     @Transactional(rollbackFor = {Exception.class})
     public JSONObject makePost(User User, WorkPostDto postDto){
-        User user = userRepository.findByEmailFetchWorkPostList(User.getEmail()).orElseThrow(UserNotFoundException::new); //해당 유저의 외주 글 리스트까지 fetch해서 가져오기.
-                            /** 존재 하지 않는 유저면 NullPointer 에러 뜰거고, 핸들러가 처리 할 예정 **/
+        User user = userRepository.findByEmailFetchWorkPostList(User.getEmail()).orElseThrow(UserNotFoundException::new);
         Work work = Work.builder()
                 .title(postDto.getTitle())
                 .content(postDto.getContent())
@@ -67,17 +69,21 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     public JSONObject saveImageInS3AndWork(User user, List<MultipartFile> multipartFiles, Long id) {
         Work work = workRepository.findById(id).orElseThrow(InstanceNotFoundException::new);
         if(!user.getId().equals(work.getUser().getId()))
-            return PropertyUtil.responseMessage("잘못된 접근입니다.");
-        for (MultipartFile img : multipartFiles) {  /** 이미지 추가, s3에 저장 **/
+            return PropertyUtil.responseMessage("작성자가 아닙니다.");
+        for (MultipartFile img : multipartFiles) {
             try{
-                String url = uploadImageAndSetThumbnail(multipartFiles, work, img);
-                saveImageUrl(work, url);
+                uploadImageAndSaveUrl(multipartFiles, work, img);
             }
             catch (Exception e){
                 return PropertyUtil.responseMessage("이미지 저장 실패");
             }
         }
         return PropertyUtil.response(true);
+    }
+
+    private void uploadImageAndSaveUrl(List<MultipartFile> multipartFiles, Work work, MultipartFile img) {
+        String url = uploadImageAndSetThumbnail(multipartFiles, work, img);
+        saveImageUrl(work, url);
     }
 
     private String uploadImageAndSetThumbnail(List<MultipartFile> multipartFiles, Work work, MultipartFile img) {
@@ -113,7 +119,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     }
 
     @Transactional(rollbackFor = {Exception.class})
-    public JSONObject editPost(User User, Long workId, WorkEditDto editDto){   // 글 생성
+    public JSONObject editPost(User User, Long workId, WorkEditDto editDto){
         User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
         Work work = workRepository.findById(workId).orElseThrow(InstanceNotFoundException::new);
         if(!user.getId().equals(work.getUser().getId()))
@@ -213,8 +219,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
 
     @Transactional
     public JSONObject showDetail(Long id){   // 글 상세 확인
-        Work work = workRepository.findByIdFetchWorkWishAndUser(id).orElseThrow();
-
+        Work work = workRepository.findByIdFetchWorkWishAndUser(id).orElseThrow(InstanceNotFoundException::new);
         DetailWorkForm detailForm = DetailWorkForm.builder()
                 .id(work.getId())
                 .userId(work.getUser().getId())
@@ -224,7 +229,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
                 .cert_uni(work.getUser().isCert_uni())
                 .cert_celeb(work.getUser().isCert_celeb())
                 .followerNum(work.getUser().getFollowerNum())
-                .images(getImages(work))  /** 이미지 엔티티에서 url만 빼오기 **/
+                .images(getImages(work))
                 .title(work.getTitle())
                 .price(work.getPrice())
                 .category(work.getCategory())
@@ -241,6 +246,14 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         detailForm.setUserAction(false,false,false);
         work.addViews();
         return PropertyUtil.response(detailForm);
+    }
+
+    public List<String> getImages(Work work) {
+        List<String> imagesUrl = new ArrayList<>();
+        for (WorkImage image : work.getImages()) {
+            imagesUrl.add(image.getImageUrl());
+        }
+        return imagesUrl;
     }
 
     @Transactional
@@ -293,7 +306,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         boolean isLike=false;
         Work work = workRepository.findById(form.getId()).orElseThrow(InstanceNotFoundException::new);
 
-        if(userLikesList.size()!=0){ /** 유저가 좋아요룰 누른 적이 있다면 이미 누른 작품인지 비교 **/
+        if(userLikesList.size()!=0){
             for (WorkLikes like : userLikesList) { //유저의 찜목록과 현재 누른 작품의 찜과 비교
                 if(work.equals(like.getWork())) {  //같으면 이미 찜 누른 항목
                     isLike = true;
@@ -338,26 +351,26 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         return PropertyUtil.response(true);
     }
 
-    public List<String> getImages(Work work) {
-        List<String> imagesUrl = new ArrayList<>();
-        for (WorkImage image : work.getImages()) {
-            imagesUrl.add(image.getImageUrl());  /** 이미지 엔티티에서 url만 빼오기 **/
-        }
-        return imagesUrl;
-    }
 
 
     @Transactional(readOnly = true)
     public PageImpl<ShowForm> workListForUser(User User, String keyword, List<String> categories, String align, boolean employment, Pageable pageable){
-        User user  = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow();
+        User user  = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
         Page<Work> workList;
+        if(!keyword.isEmpty())
+            saveSearchHistory(keyword, user);
         if(categories.size()==0 && !keyword.isEmpty())
             workList = workRepository.findAll(keyword, employment, pageable);
         else
             workList = QDSLRepository.findNByCategoriesDesc(keyword, categories, employment, pageable);
         List<ShowForm> showList = makeShowFormList(user.getWorkLikesList(), workList.getContent());
-        standardAlign(align, showList);  /** 선택한 기준대로 정렬 **/
+        standardAlign(align, showList);
         return new PageImpl(showList, pageable, workList.getTotalElements());
+    }
+
+    public void saveSearchHistory(String keyword, User user) {
+        SearchHistory history = SearchHistory.addSearchHistory(keyword, user);
+        historyRepository.save(history);
     }
 
     @Transactional(readOnly = true)
@@ -372,7 +385,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         for (Work work : workList.getContent()) {
             addWorkInJSONFormat(showList, work, false);
         }
-        standardAlign(align, showList);  /** 선택한 기준대로 정렬 **/
+        standardAlign(align, showList);
         return new PageImpl<>(showList, pageable, workList.getTotalElements());
     }
 
@@ -384,7 +397,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     }
     private List<ShowForm> makeShowFormList(List<WorkLikes> userLikesList, List<Work> workList) {
         List<ShowForm> showFormList = new ArrayList<>();
-        for (Work work : workList) { /** 추천 목록 중 좋아요 누른거 체크 후 ShowForm 으로 담기 **/
+        for (Work work : workList) {
             boolean isLike = checkIsLikes(userLikesList, work);
             addWorkInJSONFormat(showFormList, work, isLike);
         }
