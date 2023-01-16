@@ -12,7 +12,6 @@ import net.sinzak.server.user.service.UserQueryService;
 import org.json.simple.JSONObject;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 @Api(tags = "유저-조회")
@@ -23,13 +22,13 @@ public class UserQueryController {
 
     @ApiOperation(value ="내 프로필 보기")
     @GetMapping(value ="/users/my-profile")
-    public UserDto getMyProfile(@ApiIgnore @AuthenticationPrincipal User user){
+    public UserDto getMyProfile(@AuthenticationPrincipal User user){
         return userQueryService.getMyProfile(user);
     }
 
     @ApiOperation(value ="유저 프로필 보기")
     @GetMapping(value ="/users/{userId}/profile")
-    public UserDto getUserProfile(@PathVariable Long userId, @ApiIgnore @AuthenticationPrincipal User user){
+    public UserDto getUserProfile(@PathVariable Long userId, @AuthenticationPrincipal User user){
         UserDto userDto = userQueryService.getUserProfile(userId, user);
         return userDto;
     }
