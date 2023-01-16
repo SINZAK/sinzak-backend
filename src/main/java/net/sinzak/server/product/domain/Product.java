@@ -108,6 +108,9 @@ public class Product extends BaseTimeEntity { /** 작품 **/
         this.content = dto.getContent();
         this.price = dto.getPrice();
         this.suggest = dto.isSuggest();
+        this.size.height = dto.getHeight();
+        this.size.vertical = dto.getVertical();
+        this.size.width = dto.getWidth();
     }
 
     public void setTopPrice(int topPrice) {

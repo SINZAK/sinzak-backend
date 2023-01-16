@@ -2,13 +2,10 @@ package net.sinzak.server.user.controller;
 
 
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
 import net.sinzak.server.common.PropertyUtil;
-import net.sinzak.server.common.error.ErrorResponse;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.config.auth.SecurityService;
@@ -19,11 +16,8 @@ import net.sinzak.server.user.dto.request.*;
 import net.sinzak.server.user.service.UserCommandService;
 import org.json.simple.JSONObject;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.NoSuchElementException;
 
