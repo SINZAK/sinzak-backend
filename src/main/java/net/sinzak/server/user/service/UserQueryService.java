@@ -120,4 +120,14 @@ public class UserQueryService {
         return PropertyUtil.response(obj);
     }
 
+    @Transactional
+    public JSONObject deleteSearchHistory(Long id, User User){
+        User user = historyRepository.findByEmailFetchHistoryList(User.getEmail()).orElseThrow(InstanceNotFoundException::new);
+        for (SearchHistory history : user.getHistoryList()) {
+            if(history.getId().equals(id))
+                historyRepository.delete(history);
+        }
+        return PropertyUtil.response(true);
+    }
+
 }
