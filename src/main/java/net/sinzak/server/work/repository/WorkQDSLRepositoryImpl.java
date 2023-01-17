@@ -59,12 +59,12 @@ public class WorkQDSLRepositoryImpl implements QDSLRepository<Work> {
         return product.content.contains(keyword);
     }
 
-    @Override
-    public Page<Work> findAllByCompletePopularityDesc(boolean complete, String keyword, Pageable pageable) {return null;}
-
-    @Override
-    public Page<Work> findNByCategoriesDesc(List<String> categories, String keyword, Pageable pageable) {
-        return null;
-    }
+//    @Override
+//    public Page<Work> findAllByCompletePopularityDesc(boolean complete, List<String> categories, String keyword, Pageable pageable) {return null;}
+//
+//    @Override
+//    public Page<Work> findNByCategoriesDesc(List<String> categories, String keyword, Pageable pageable) {
+//        return null;
+//    }
 
 }
