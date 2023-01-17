@@ -26,10 +26,10 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     private String title;
 
     @Column
-    private String content;
+    private String content="";
 
     @Column
-    private String author; //닉네임
+    private String author=""; //닉네임
 
     @Column
     private int price;

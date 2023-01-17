@@ -21,6 +21,7 @@ import net.sinzak.server.work.dto.WorkPostDto;
 import net.sinzak.server.work.repository.*;
 
 
+import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -356,15 +357,10 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     @Transactional(readOnly = true)
     public PageImpl<ShowForm> workListForUser(User User, String keyword, List<String> categories, String align, boolean employment, Pageable pageable){
         User user  = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
-        Page<Work> workList;
         if(!keyword.isEmpty())
             saveSearchHistory(keyword, user);
-        if(categories.size()==0 && !keyword.isEmpty())
-            workList = workRepository.findAll(keyword, employment, pageable);
-        else
-            workList = QDSLRepository.findNByCategoriesDesc(keyword, categories, employment, pageable);
+        Page<Work> workList = QDSLRepository.findSearchingByEmploymentAndCategoriesAligned(employment, keyword, categories, align, pageable);
         List<ShowForm> showList = makeShowFormList(user.getWorkLikesList(), workList.getContent());
-        standardAlign(align, showList);
         return new PageImpl(showList, pageable, workList.getTotalElements());
     }
 
@@ -375,26 +371,19 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
 
     @Transactional(readOnly = true)
     public PageImpl<ShowForm> workListForGuest(String keyword, List<String> categories, String align, boolean employment, Pageable pageable){
-        Page<Work> workList;
-        if(categories.size() == 0 && !keyword.isEmpty())
-            workList = workRepository.findAll(keyword, employment, pageable);
-        else
-            workList = QDSLRepository.findNByCategoriesDesc(keyword, categories, employment, pageable);
+        Page<Work> workList = QDSLRepository.findSearchingByEmploymentAndCategoriesAligned(employment, keyword, categories, align, pageable);
+        List<ShowForm> showList = makeShowForm(workList);
+        return new PageImpl<>(showList, pageable, workList.getTotalElements());
+    }
 
+    private List<ShowForm> makeShowForm(Page<Work> workList) {
         List<ShowForm> showList = new ArrayList<>();
         for (Work work : workList.getContent()) {
             addWorkInJSONFormat(showList, work, false);
         }
-        standardAlign(align, showList);
-        return new PageImpl<>(showList, pageable, workList.getTotalElements());
+        return showList;
     }
 
-
-    private void standardAlign(String align, List<ShowForm> showList) {
-        if (align.equals("recent")) {}
-        else if (align.equals("recommend"))  /** 인기순 **/
-            showList.sort((o1, o2) -> o2.getPopularity() - o1.getPopularity());
-    }
     private List<ShowForm> makeShowFormList(List<WorkLikes> userLikesList, List<Work> workList) {
         List<ShowForm> showFormList = new ArrayList<>();
         for (Work work : workList) {
