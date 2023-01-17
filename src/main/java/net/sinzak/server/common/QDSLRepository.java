@@ -11,6 +11,6 @@ import java.util.List;
 
 public interface QDSLRepository<T> {
 
-    Page<T> findAllByCompletePopularityDesc(boolean complete, String keyword, Pageable pageable);
-    Page<T> findNByCategoriesDesc(List<String> categories, String keyword, Pageable pageable);
+//    Page<T> findAllByCompletePopularityDesc(boolean complete, List<String> categories, String keyword, Pageable pageable);
+//    Page<T> findNByCategoriesDesc(List<String> categories, String keyword, Pageable pageable);
 }
