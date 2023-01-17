@@ -1,6 +1,7 @@
 package net.sinzak.server.work.repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static net.sinzak.server.product.domain.QProduct.product;
 import static net.sinzak.server.work.domain.QWork.work;
 
 
@@ -24,22 +24,22 @@ public class WorkQDSLRepositoryImpl implements QDSLRepository<Work> {
 
     private final JPAQueryFactory queryFactory;
 
-    public Page<Work> findNByCategoriesDesc(String keyword, List<String> categories, boolean employment, Pageable pageable) {
+    public Page<Work> findSearchingByEmploymentAndCategoriesAligned(boolean employment, String keyword, List<String> categories, String align, Pageable pageable) {
         List<Work> result = queryFactory
                 .selectFrom(work)
-                .where(eqCategories(categories),work.employment.eq(employment), eqSearch(keyword))
-                .orderBy(work.id.desc())
+                .where(work.employment.eq(employment), eqCategories(categories), eqSearch(keyword))
+                .orderBy(standardAlign(align))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
-
         JPAQuery<Long> countQuery = queryFactory
                 .select(work.count())
                 .from(work)
-                .where(eqCategories(categories),work.employment.eq(employment));
+                .where(work.employment.eq(employment), eqCategories(categories), eqSearch(keyword));
         return PageableExecutionUtils.getPage(result, pageable, countQuery::fetchOne) ;
-        //PageableExecutionUtils.getPage로 맨 첫 페이지 content 개수가 size 미달이거나, 마지막 page인 경우 count query 실행 X하여 !최적화!
+        //PageableExecutionUtils.getPage로 맨 첫 페이지 content 개수가 size 미달이거나, 마지막 page인 경우 count query 실행 X하여 최적화
     }
+
 
     private BooleanBuilder eqCategories(List<String> categories) {
         BooleanBuilder builder = new BooleanBuilder();
@@ -56,7 +56,16 @@ public class WorkQDSLRepositoryImpl implements QDSLRepository<Work> {
         if (keyword.isEmpty()){
             return null;
         }
-        return product.content.contains(keyword);
+        return work.content.contains(keyword);
+    }
+
+    private OrderSpecifier<? extends Number> standardAlign(String align) {
+        if (align.equals("recommend"))
+            return work.popularity.desc();
+        else if (align.equals("recent"))
+            return work.id.desc();
+
+        return work.id.desc();
     }
 
 //    @Override
