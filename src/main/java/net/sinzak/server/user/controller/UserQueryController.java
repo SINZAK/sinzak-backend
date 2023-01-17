@@ -1,5 +1,6 @@
 package net.sinzak.server.user.controller;
 
+import com.google.api.client.json.Json;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -35,18 +36,14 @@ public class UserQueryController {
     }
     @ApiOperation(value ="팔로워리스트")
     @GetMapping(value ="/users/{userId}/followers")
-    public List<GetFollowDto> getFollowerList( @PathVariable Long userId) {
-        List<GetFollowDto> getFollowDtos =
-               userQueryService.getFollowerDtoList(userId);
-        return getFollowDtos;
+    public JSONObject getFollowerList(@PathVariable Long userId) {
+        return userQueryService.getFollowerDtoList(userId);
     }
 
     @ApiOperation(value ="팔로잉리스트")
     @GetMapping(value ="/users/{userId}/followings")
-    public List<GetFollowDto> getFollowingList(@PathVariable Long userId) {
-        List<GetFollowDto> getFollowDtos =
-                userQueryService.getFollowingDtoList(userId);
-        return getFollowDtos;
+    public JSONObject  getFollowingList(@PathVariable Long userId) {
+        return userQueryService.getFollowingDtoList(userId);
     }
 
     @ApiOperation(value = "검색기록 출력", notes = "해당 기록의 id 포스트로 주시면 삭제합니다.")
