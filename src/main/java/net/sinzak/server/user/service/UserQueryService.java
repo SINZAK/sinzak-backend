@@ -1,7 +1,7 @@
 package net.sinzak.server.user.service;
 
-import com.google.api.client.json.Json;
 import lombok.RequiredArgsConstructor;
+import net.sinzak.server.CustomJSONArray;
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
@@ -11,14 +11,12 @@ import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.dto.respond.UserDto;
 import net.sinzak.server.user.repository.SearchHistoryRepository;
 import net.sinzak.server.user.repository.UserRepository;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -114,11 +112,11 @@ public class UserQueryService {
     @Transactional(readOnly = true)
     public JSONObject showSearchHistory(User User){
         User user = historyRepository.findByEmailFetchHistoryList(User.getEmail()).orElseThrow(InstanceNotFoundException::new);
-        JSONObject obj = new JSONObject();
+        List<JSONArray> arrayList = new ArrayList<>();
         for (SearchHistory history : user.getHistoryList()) {
-            obj.put(String.valueOf(history.getId()),history.getWord());
+            arrayList.add(new CustomJSONArray(Map.of(history.getId(),history.getWord())));
         }
-        return PropertyUtil.response(obj);
+        return PropertyUtil.response(arrayList);
     }
 
     @Transactional
