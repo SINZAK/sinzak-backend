@@ -1,6 +1,7 @@
 package net.sinzak.server.product.repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -24,18 +25,14 @@ public class ProductQDSLRepositoryImpl implements QDSLRepository<Product> {
 
     private final JPAQueryFactory queryFactory;
 
-    public Page<Product> findAllByCompletePopularityDesc(boolean complete, String keyword, Pageable pageable) {
+    public Page<Product> findAllByCompleteAndCategoriesAligned(boolean complete, String keyword, List<String> categories, String align, Pageable pageable) {
         List<Product> result = queryFactory
                 .selectFrom(product)
-                .where(eqComplete(complete),eqSearch(keyword))
-                .orderBy(product.popularity.desc())
+                .where(eqComplete(complete), eqCategories(categories), eqSearch(keyword))
+                .orderBy(standardAlign(align))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
-//        long count = queryFactory.select(product.count())
-//                .from(product)
-//                .where(eqComplete(complete))
-//                .fetchOne();
         JPAQuery<Long> countQuery = queryFactory
                 .select(product.count())
                 .from(product)
@@ -51,29 +48,26 @@ public class ProductQDSLRepositoryImpl implements QDSLRepository<Product> {
         return product.complete.eq(false);
     }
 
-    private BooleanExpression eqSearch(String keyword) { //complete 가 true면   where complete = false 로 가져온다.
+    private OrderSpecifier<? extends Number> standardAlign(String align) {
+        if (align.equals("recommend"))
+            return product.popularity.desc();
+        else if (align.equals("popular"))
+            return product.likesCnt.desc();
+        else if (align.equals("recent"))
+            return product.id.desc();
+        else if (align.equals("low"))
+            return product.price.asc();
+        else if (align.equals("high"))
+            return product.price.desc();
+
+        return product.id.desc();
+    }
+
+    private BooleanExpression eqSearch(String keyword) {
         if (keyword.isEmpty()){
             return null;
         }
         return product.content.contains(keyword);
-    }
-
-
-    public Page<Product> findNByCategoriesDesc(List<String> categories, String keyword, Pageable pageable) {
-        List<Product> result = queryFactory
-                .selectFrom(product)
-                .where(eqCategories(categories),eqSearch(keyword))
-                .orderBy(product.id.desc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        JPAQuery<Long> countQuery = queryFactory
-                .select(product.count())
-                .from(product)
-                .where(eqCategories(categories));
-        return PageableExecutionUtils.getPage(result, pageable, countQuery::fetchOne) ;
-        //PageableExecutionUtils.getPage로 맨 첫 페이지 content 개수가 size 미달이거나, 마지막 page인 경우 count query 실행 X하여 !최적화!
     }
 
     private BooleanBuilder eqCategories(List<String> categories) {

@@ -17,6 +17,7 @@ import net.sinzak.server.user.domain.embed.Size;
 import net.sinzak.server.common.dto.ActionForm;
 import net.sinzak.server.user.repository.SearchHistoryRepository;
 import net.sinzak.server.user.repository.UserRepository;
+import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -466,18 +467,14 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return PropertyUtil.response(true);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public PageImpl<ShowForm> productListForUser(User User, String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
         User user  = userRepository.findByEmailFetchHistoryAndLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
-        Page<Product> productList;
         if(!keyword.isEmpty())
             saveSearchHistory(keyword, user);
-        if(categories.size()==0)
-            productList = QDSLRepository.findAllByCompletePopularityDesc(complete, keyword, pageable);
-        else
-            productList = QDSLRepository.findNByCategoriesDesc(categories, keyword, pageable);  //파라미터 입력받았을 경우
+        Page<Product> productList = QDSLRepository.findAllByCompleteAndCategoriesAligned(complete, keyword, categories, align, pageable);
+
         List<ShowForm> showList = makeDetailHomeShowFormList(user.getProductLikesList(), productList.getContent());
-        standardAlign(align, showList);
         return new PageImpl<>(showList, pageable, productList.getTotalElements());
     }
 
@@ -489,18 +486,18 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     @Transactional(readOnly = true)
     public PageImpl<ShowForm> productListForGuest(String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
-        Page<Product> productList;
-        if(categories.size()==0)
-            productList = QDSLRepository.findAllByCompletePopularityDesc(complete, keyword, pageable); /** QueryDSL 최적화 완료 **/
-        else
-            productList = QDSLRepository.findNByCategoriesDesc(categories, keyword, pageable);  //파라미터 입력받았을 경우
+        Page<Product> productList = QDSLRepository.findAllByCompleteAndCategoriesAligned(complete, keyword, categories, align, pageable);
+        List<ShowForm> showList = makeShowForm(productList);
+        return new PageImpl<>(showList, pageable, productList.getTotalElements());
+    }
 
+    @NotNull
+    private List<ShowForm> makeShowForm(Page<Product> productList) {
         List<ShowForm> showList = new ArrayList<>();
-        for (Product product : productList.getContent()) {
+        for (Product product : productList) {
             addProductInJSONFormat(showList, product, false);
         }
-        standardAlign(align, showList);  /** 선택한 기준대로 정렬 **/
-        return new PageImpl<>(showList, pageable, productList.getTotalElements());
+        return showList;
     }
 
     public List<String> getImages(Product product) {
@@ -511,19 +508,6 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return imagesUrl;
     }
 
-    private void standardAlign(String align, List<ShowForm> showList) {
-        if (align.equals("recommend")) {
-              /** 신작 추천순 popularity(인기도)  내림차순 **/
-        } else if (align.equals("popular")) { /** 인기순 **/
-            showList.sort((o1, o2) -> o2.getLikesCnt() - o1.getLikesCnt());
-        } else if (align.equals("recent")) {
-            showList.sort((o1, o2) -> (int) (o2.getId() - o1.getId()));
-        } else if (align.equals("low")) {
-            showList.sort((o1, o2) -> o1.getPrice() - o2.getPrice());
-        } else if (align.equals("high")) {
-            showList.sort((o1, o2) -> o2.getPrice() - o1.getPrice());
-        }
-    }
 
     private void addProductInJSONFormat(List<ShowForm> showFormList, Product product, boolean isLike) {
         ShowForm showForm = new ShowForm(product.getId(), product.getTitle(), product.getContent(), product.getAuthor(), product.getPrice(), product.getThumbnail(), product.getCreatedDate().toString(), product.isSuggest(), isLike, product.getLikesCnt(), product.isComplete(), product.getPopularity());

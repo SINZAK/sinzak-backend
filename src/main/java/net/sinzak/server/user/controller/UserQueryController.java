@@ -1,5 +1,6 @@
 package net.sinzak.server.user.controller;
 
+import com.google.api.client.json.Json;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -35,23 +36,25 @@ public class UserQueryController {
     }
     @ApiOperation(value ="팔로워리스트")
     @GetMapping(value ="/users/{userId}/followers")
-    public List<GetFollowDto> getFollowerList( @PathVariable Long userId) {
-        List<GetFollowDto> getFollowDtos =
-               userQueryService.getFollowerDtoList(userId);
-        return getFollowDtos;
+    public JSONObject getFollowerList(@PathVariable Long userId) {
+        return userQueryService.getFollowerDtoList(userId);
     }
 
     @ApiOperation(value ="팔로잉리스트")
     @GetMapping(value ="/users/{userId}/followings")
-    public List<GetFollowDto> getFollowingList(@PathVariable Long userId) {
-        List<GetFollowDto> getFollowDtos =
-                userQueryService.getFollowingDtoList(userId);
-        return getFollowDtos;
+    public JSONObject  getFollowingList(@PathVariable Long userId) {
+        return userQueryService.getFollowingDtoList(userId);
     }
 
-    @ApiOperation(value = "검색기록 출력", notes = "해당 기록의 id 포스트로 주시면 삭제합니다.")
+    @ApiOperation(value = "검색기록 출력", notes = "GetMapping에 유의 삭제는 Post로")
     @GetMapping(value = "/users/history")
-    public JSONObject showHistory(@RequestBody IdDto idDto, @AuthenticationPrincipal User user) {
+    public JSONObject showHistory(@AuthenticationPrincipal User user) {
+        return userQueryService.showSearchHistory(user);
+    }
+
+    @ApiOperation(value = "검색기록 삭제", notes = "Post인 것에 유의하고 같은 url을 사용하려고 합니다. 해당 기록의 id를 주시면 삭제합니다.")
+    @PostMapping(value = "/users/history")
+    public JSONObject deleteHistory(@RequestBody IdDto idDto, @AuthenticationPrincipal User user) {
         return userQueryService.deleteSearchHistory(idDto.getId(), user);
     }
 
