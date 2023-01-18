@@ -55,7 +55,7 @@ public class UserQueryController {
         return userQueryService.showSearchHistory(user);
     }
 
-    @ApiOperation(value = "검색기록 출력", notes = "Post인 것에 유의하고 같은 url을 사용하려고 합니다. 해당 기록의 id를 주시면 삭제합니다.")
+    @ApiOperation(value = "검색기록 삭제", notes = "Post인 것에 유의하고 같은 url을 사용하려고 합니다. 해당 기록의 id를 주시면 삭제합니다.")
     @PostMapping(value = "/users/history")
     public JSONObject deleteHistory(@RequestBody IdDto idDto, @AuthenticationPrincipal User user) {
         return userQueryService.deleteSearchHistory(idDto.getId(), user);
