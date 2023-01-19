@@ -467,7 +467,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return PropertyUtil.response(true);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public PageImpl<ShowForm> productListForUser(User User, String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
         User user  = userRepository.findByEmailFetchHistoryAndLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
         if(!keyword.isEmpty())
