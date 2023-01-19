@@ -78,7 +78,7 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     private User user;  //수취인
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER) /** 사진은 무조건 EAGER로 같이 불러오기 **/
-    private List<ProductImage> images = new ArrayList<>();  //수취인
+    private List<ProductImage> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
     private List<ProductWish> productWishList = new ArrayList<>();

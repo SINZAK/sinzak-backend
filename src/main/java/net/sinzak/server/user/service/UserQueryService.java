@@ -112,11 +112,13 @@ public class UserQueryService {
     @Transactional(readOnly = true)
     public JSONObject showSearchHistory(User User){
         User user = historyRepository.findByEmailFetchHistoryList(User.getEmail()).orElseThrow(InstanceNotFoundException::new);
-        List<JSONArray> arrayList = new ArrayList<>();
+        List<JSONArray> searchList = new ArrayList<>();
         for (SearchHistory history : user.getHistoryList()) {
-            arrayList.add(new CustomJSONArray(Map.of(history.getId(),history.getWord())));
+            CustomJSONArray tuple = new CustomJSONArray(history.getId(),history.getWord()); /** [358,"가나"] */
+            searchList.add(tuple);
         }
-        return PropertyUtil.response(arrayList);
+        searchList.sort((o1, o2) -> (int) ((Long)o2.get(0)-(Long)o1.get(0)));
+        return PropertyUtil.response(searchList);
     }
 
     @Transactional

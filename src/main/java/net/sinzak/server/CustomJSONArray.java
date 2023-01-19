@@ -5,8 +5,9 @@ import org.json.simple.JSONArray;
 import java.util.Map;
 
 public class CustomJSONArray extends JSONArray {
-    public CustomJSONArray(Map<Long, String> map) {
+    public CustomJSONArray(Long id, String word) {
         super();
-        add(map);
+        add(id);
+        add(word);
     }
 }
