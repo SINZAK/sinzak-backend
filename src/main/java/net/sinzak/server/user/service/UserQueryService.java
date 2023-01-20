@@ -25,12 +25,7 @@ public class UserQueryService {
 
     private final UserRepository userRepository;
     private final SearchHistoryRepository historyRepository;
-//    @PostConstruct
-//    public void makeMockData(){
-//        User user = new User("insi2000@naver.com","송인서","그림2");
-//        User saved = userRepository.save(user);
-//        WorkPostDto dto = new WorkPostDto("테스트","내용테스트");
-//    }
+
     public UserDto getMyProfile(User user){
         if(user ==null){
             throw new UserNotFoundException("로그인한 유저 존재하지 않음");
@@ -109,16 +104,22 @@ public class UserQueryService {
         return PropertyUtil.response(getFollowingDtoList);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public JSONObject showSearchHistory(User User){
         User user = historyRepository.findByEmailFetchHistoryList(User.getEmail()).orElseThrow(InstanceNotFoundException::new);
+        List<SearchHistory> searchHistoryList = getUserHistoryList(user);
         List<JSONArray> searchList = new ArrayList<>();
-        for (SearchHistory history : user.getHistoryList()) {
+        for (SearchHistory history : searchHistoryList) {
             CustomJSONArray tuple = new CustomJSONArray(history.getId(),history.getWord()); /** [358,"가나"] */
             searchList.add(tuple);
         }
-        searchList.sort((o1, o2) -> (int) ((Long)o2.get(0)-(Long)o1.get(0)));
         return PropertyUtil.response(searchList);
+    }
+
+    private List<SearchHistory> getUserHistoryList(User user) {
+        List<SearchHistory> historyList = new ArrayList<>(user.getHistoryList());
+        historyList.sort((o1, o2) -> (int) (o2.getId()-o1.getId()));
+        return historyList;
     }
 
     @Transactional

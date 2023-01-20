@@ -44,6 +44,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     private final ProductQDSLRepositoryImpl QDSLRepository;
     private final SearchHistoryRepository historyRepository;
 
+    private final static int HistoryMaxCount = 10;
     private final int HOME_OBJECTS = 10;
     private final int HOME_DETAIL_OBJECTS = 50;
 
@@ -480,7 +481,14 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
 
     private void saveSearchHistory(String keyword, User user) {
-            SearchHistory history = SearchHistory.addSearchHistory(keyword, user);
+        List<SearchHistory> historyList = new ArrayList<>(user.getHistoryList());
+        if(historyList.size() >= HistoryMaxCount)
+            historyRepository.delete(historyList.get(0));
+        for (SearchHistory history : historyList) {
+            if(history.getWord().equals(keyword))
+                historyRepository.delete(history);
+        }
+        SearchHistory history = SearchHistory.addSearchHistory(keyword, user);
             historyRepository.save(history);
     }
 
