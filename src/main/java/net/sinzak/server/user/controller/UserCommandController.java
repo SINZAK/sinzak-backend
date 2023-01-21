@@ -80,6 +80,7 @@ public class UserCommandController {
     public JSONObject updateUser( @RequestBody UpdateUserDto dto , @AuthenticationPrincipal User user) {
         return userCommandService.updateUser(dto,user);
     }
+
     @ApiDocumentResponse
     @ApiOperation(value = "팔로우하기")
     @PostMapping(value = "/users/follow")
@@ -106,7 +107,7 @@ public class UserCommandController {
 //    @PostMapping(value = "/users")
 //    public JSONObject createUser( @RequestBody SessionUser user) {
 //        JSONObject obj = new JSONObject();
-//        try {
+//        try
 //            userCommandService.createUser(user);
 //            obj.put("success", true);
 //            return obj;
