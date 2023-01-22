@@ -29,12 +29,12 @@ public class ChatMessageController {
                 .build();
         chatMessageDto.setMessage(chatMessageDto.getSender()+"님이 채팅방에 참여하였습니다.");
         log.info("메시지 구독"+chatMessageDto.getRoomId());
-        template.convertAndSend("/sub/chat/room/"+chatMessage.getRoomId(),chatMessageDto);
+        template.convertAndSend("/sub/chat/rooms/"+chatMessage.getRoomId(),chatMessageDto);
     }
     @MessageMapping(value ="/chat/message")
     public void message(ChatMessageDto chatMessageDto){
         log.info("메시지 구독"+chatMessageDto.getRoomId());
-        template.convertAndSend("/sub/chat/room/"+chatMessageDto.getRoomId(),chatMessageDto);
+        template.convertAndSend("/sub/chat/rooms/"+chatMessageDto.getRoomId(),chatMessageDto);
     }
 
 
