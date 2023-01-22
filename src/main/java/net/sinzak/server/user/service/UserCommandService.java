@@ -59,12 +59,16 @@ public class UserCommandService {
         User user = userRepository.findByIdFetchFollowingList(loginUser.getId()).orElseThrow(UserNotFoundException::new);
         user.getFollowingList().remove(findUser.getId());
         findUser.getFollowerList().remove(loginUser.getId());
+        user.updateFollowNumber();
+        findUser.updateFollowNumber();
         return PropertyUtil.response(true);
     }
     public JSONObject addFollow(User findUser, User loginUser){
         User user = userRepository.findByIdFetchFollowingList(loginUser.getId()).orElseThrow(UserNotFoundException::new);
         user.getFollowingList().add(findUser.getId());
         findUser.getFollowerList().add(loginUser.getId());
+        user.updateFollowNumber();
+        findUser.updateFollowNumber();
         return PropertyUtil.response(true);
     }
 

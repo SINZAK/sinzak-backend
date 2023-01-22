@@ -43,7 +43,6 @@ public class UserQueryService {
         return makeUserDto(user,findUser);
     }
     private UserDto makeUserDto(User user, User findUser) {
-        findUser.updateFollowNumber(); //팔로우,팔로잉 숫자-> 한글
         UserDto userDto = UserDto.builder()
                 .userId(findUser.getId())
                 .name(findUser.getName())
