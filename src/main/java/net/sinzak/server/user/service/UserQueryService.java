@@ -1,6 +1,5 @@
 package net.sinzak.server.user.service;
 
-import com.google.api.client.json.Json;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.error.InstanceNotFoundException;
@@ -86,7 +85,7 @@ public class UserQueryService {
         return getGetFollowDtoList(followingList);
     }
     private JSONObject getGetFollowDtoList(Set<Long> followList) {
-        List<GetFollowDto> getFollowingDtoList = new ArrayList<>();
+        List<GetFollowDto> getFollowDtoList = new ArrayList<>();
         for(Long follow : followList){
             Optional<User> findUser = userRepository.findById(follow);
             if(findUser.isPresent()){
@@ -95,10 +94,10 @@ public class UserQueryService {
                         name(findUser.get().getName()).
                         picture(findUser.get().getPicture()).
                         build();
-                getFollowingDtoList.add(getFollowDto);
+                getFollowDtoList.add(getFollowDto);
             }
         }
-        return PropertyUtil.response(getFollowingDtoList);
+        return PropertyUtil.response(getFollowDtoList);
     }
 
     @Transactional(readOnly = true)

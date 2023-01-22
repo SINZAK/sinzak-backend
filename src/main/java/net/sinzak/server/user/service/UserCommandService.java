@@ -50,7 +50,7 @@ public class UserCommandService {
             return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
         }
         if(loginUser.getId().equals(findUser.getId())){
-            return PropertyUtil.responseMessage("본인한테는 팔로우 불가능");
+            return PropertyUtil.responseMessage("본인한테는 언팔로우 불가능");
         }
         return removeFollow(findUser,loginUser);
     }
@@ -85,8 +85,6 @@ public class UserCommandService {
         reportRepository.save(connect);
         return PropertyUtil.response(true);
     }
-
-
 
     private boolean checkAlreadyReport(Long id, User loginUser) {
         for (Report report : loginUser.getReportList()) {
