@@ -27,69 +27,59 @@ public class UserQueryService {
     private final SearchHistoryRepository historyRepository;
 
     public UserDto getMyProfile(User user){
-        if(user ==null){
-            throw new UserNotFoundException("로그인한 유저 존재하지 않음");
-        }
-        Optional<User> findUser = userRepository.findById(user.getId());
+        User findUser = userRepository.findById(user.getId()).orElseThrow(UserNotFoundException::new);
         return makeUserDto(user,findUser);
     }
     public UserDto getUserProfile(Long userId, User user) {
-        Optional<User> findUser = userRepository.findByIdFetchFollowerList(userId);
+        User findUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         //System.out.println("쿼리 수 확인");
-        return checkIfTwoUserPresent(user,findUser);
-    }
-    public UserDto checkIfTwoUserPresent(User user,Optional<User> findUser){
-        if(!findUser.isPresent()){
-            throw new UserNotFoundException();
-        }
         return makeUserDto(user,findUser);
     }
-    private UserDto makeUserDto(User user, Optional<User> findUser) {
-        findUser.get().updateFollowNumber(); //팔로우,팔로잉 숫자-> 한글
+    private UserDto makeUserDto(User user, User findUser) {
         UserDto userDto = UserDto.builder()
-                .userId(findUser.get().getId())
-                .name(findUser.get().getName())
-                .introduction(findUser.get().getIntroduction())
-                .followingNumber(findUser.get().getFollowingNum())
-                .followerNumber(findUser.get().getFollowerNum())
+                .userId(findUser.getId())
+                .name(findUser.getName())
+                .introduction(findUser.getIntroduction())
+                .followingNumber(findUser.getFollowingNum())
+                .followerNumber(findUser.getFollowerNum())
                 .myProfile(checkIfMyProfile(user,findUser))
-                .imageUrl(findUser.get().getPicture())
-                .univ(findUser.get().getUniv())
+                .imageUrl(findUser.getPicture())
+                .univ(findUser.getUniv())
                 .ifFollow(checkIfFollowFindUser(user,findUser))
-                .cert_uni(findUser.get().isCert_uni())
+                .cert_uni(findUser.isCert_uni())
                 .build();
         return userDto;
     }
-    public boolean checkIfFollowFindUser(User user,Optional<User> findUser){
+    public boolean checkIfFollowFindUser(User user,User findUser){
         if(user== null){
             return false;
         }
-        if(findUser.get().getFollowerList().contains(user.getId())){
+        if(findUser.getFollowerList().contains(user.getId())){
             return true;
         }
         return false;
     }
-    public boolean checkIfMyProfile(User user, Optional<User> findUser){
+    public boolean checkIfMyProfile(User user, User findUser){
         if(user == null){
             return false;
         }
-        if(findUser.get().getId().equals(user.getId())){
+        if(findUser.getId().equals(user.getId())){
             return true;
         }
         return false;
     }
     //팔로워가져오기
     public JSONObject getFollowerDtoList(Long userId){
-        Set<Long> followerList = userRepository.findById(userId).get().getFollowerList();
+        Set<Long> followerList = userRepository.findByIdFetchFollowerList(userId).orElseThrow(UserNotFoundException::new).getFollowerList();
         return getGetFollowDtoList(followerList);
     }
     //팔로잉가져오기
     public JSONObject getFollowingDtoList(Long userId){
-        Set<Long> followingList = userRepository.findById(userId).get().getFollowingList();
+        Set<Long> followingList = userRepository.findByIdFetchFollowingList(userId).orElseThrow(UserNotFoundException::new).getFollowingList();
         return getGetFollowDtoList(followingList);
     }
     private JSONObject getGetFollowDtoList(Set<Long> followList) {
-        List<GetFollowDto> getFollowingDtoList = new ArrayList<>();
+        List<GetFollowDto> getFollowDtoList = new ArrayList<>();
         for(Long follow : followList){
             Optional<User> findUser = userRepository.findById(follow);
             if(findUser.isPresent()){
@@ -98,10 +88,10 @@ public class UserQueryService {
                         name(findUser.get().getName()).
                         picture(findUser.get().getPicture()).
                         build();
-                getFollowingDtoList.add(getFollowDto);
+                getFollowDtoList.add(getFollowDto);
             }
         }
-        return PropertyUtil.response(getFollowingDtoList);
+        return PropertyUtil.response(getFollowDtoList);
     }
 
     @Transactional
