@@ -78,12 +78,12 @@ public class UserQueryService {
     }
     //팔로워가져오기
     public JSONObject getFollowerDtoList(Long userId){
-        Set<Long> followerList = userRepository.findById(userId).get().getFollowerList();
+        Set<Long> followerList = userRepository.findByIdFetchFollowerList(userId).orElseThrow(UserNotFoundException::new).getFollowerList();
         return getGetFollowDtoList(followerList);
     }
     //팔로잉가져오기
     public JSONObject getFollowingDtoList(Long userId){
-        Set<Long> followingList = userRepository.findById(userId).get().getFollowingList();
+        Set<Long> followingList = userRepository.findByIdFetchFollowingList(userId).orElseThrow(UserNotFoundException::new).getFollowingList();
         return getGetFollowDtoList(followingList);
     }
     private JSONObject getGetFollowDtoList(Set<Long> followList) {
