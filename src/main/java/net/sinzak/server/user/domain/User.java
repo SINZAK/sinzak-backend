@@ -95,7 +95,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     private List<ProductLikes> productLikesList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    private List<Work> workPostList = new ArrayList<>();
+    private Set<Work> workPostList = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<WorkWish> workWishList = new ArrayList<>();

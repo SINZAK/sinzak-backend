@@ -19,7 +19,7 @@ public class UserQueryController {
 
     @ApiOperation(value ="내 프로필 보기")
     @GetMapping(value ="/users/my-profile")
-    public UserDto getMyProfile(@AuthenticationPrincipal User user){
+    public JSONObject getMyProfile(@AuthenticationPrincipal User user){
         return userQueryService.getMyProfile(user);
     }
 
