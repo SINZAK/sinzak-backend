@@ -30,9 +30,10 @@ public class UserQueryService {
     private final SearchHistoryRepository historyRepository;
 
     public JSONObject getMyProfile(User user){
-        User findUser = userRepository.findByEmailFetchProductAndWorkList(user.getEmail()).orElseThrow(UserNotFoundException::new);
+        User findUser = userRepository.findByEmailFetchProductPostList(user.getEmail()).orElseThrow(UserNotFoundException::new);
         List<MyPageShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
-        List<MyPageShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList());
+        findUser = userRepository.findByEmailFetchWorkPostList(user.getEmail()).orElseThrow(UserNotFoundException::new);
+        List<MyPageShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList());  /** fetch 조인 2개 연속으로 하면 꼬여서 두개로 나눔 **/
         JSONObject obj = new JSONObject();
         obj.put("products", productShowForms);
         obj.put("works", workShowForms);
@@ -42,6 +43,7 @@ public class UserQueryService {
 
     private List<MyPageShowForm> makeProductShowForm(List<Product> productList) {
         List<MyPageShowForm> showFormList = new ArrayList<>();
+        System.out.println(productList.size());
         for (Product product : productList) {
             MyPageShowForm form = new MyPageShowForm(product.getId(), product.getThumbnail());
             showFormList.add(form);
@@ -49,12 +51,13 @@ public class UserQueryService {
         return showFormList;
     }
 
-    private List<MyPageShowForm> makeWorkShowForm(List<Work> workList) {
+    private List<MyPageShowForm> makeWorkShowForm(Set<Work> workList) {
         List<MyPageShowForm> showFormList = new ArrayList<>();
         for (Work work : workList) {
             MyPageShowForm form = new MyPageShowForm(work.getId(), work.getThumbnail());
             showFormList.add(form);
         }
+        showFormList.sort((o1, o2) -> (int) (o2.getId()-o1.getId()));
         return showFormList;
     }
 
