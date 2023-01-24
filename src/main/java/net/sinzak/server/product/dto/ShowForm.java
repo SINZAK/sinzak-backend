@@ -6,8 +6,7 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class
-ShowForm {
+public class ShowForm {
     @ApiModelProperty(example = "작품 ID")
     private Long id;
     @ApiModelProperty(example = "작품 판매글 제목")
