@@ -5,12 +5,15 @@ import net.sinzak.server.CustomJSONArray;
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
+import net.sinzak.server.product.domain.Product;
 import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.user.dto.respond.GetFollowDto;
 import net.sinzak.server.user.domain.User;
+import net.sinzak.server.user.dto.respond.MyPageShowForm;
 import net.sinzak.server.user.dto.respond.UserDto;
 import net.sinzak.server.user.repository.SearchHistoryRepository;
 import net.sinzak.server.user.repository.UserRepository;
+import net.sinzak.server.work.domain.Work;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
@@ -26,10 +29,35 @@ public class UserQueryService {
     private final UserRepository userRepository;
     private final SearchHistoryRepository historyRepository;
 
-    public UserDto getMyProfile(User user){
-        User findUser = userRepository.findById(user.getId()).orElseThrow(UserNotFoundException::new);
-        return makeUserDto(user,findUser);
+    public JSONObject getMyProfile(User user){
+        User findUser = userRepository.findByEmailFetchProductAndWorkList(user.getEmail()).orElseThrow(UserNotFoundException::new);
+        List<MyPageShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
+        List<MyPageShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList());
+        JSONObject obj = new JSONObject();
+        obj.put("products", productShowForms);
+        obj.put("works", workShowForms);
+        obj.put("profile",makeUserDto(user,findUser));
+        return PropertyUtil.response(obj);
     }
+
+    private List<MyPageShowForm> makeProductShowForm(List<Product> productList) {
+        List<MyPageShowForm> showFormList = new ArrayList<>();
+        for (Product product : productList) {
+            MyPageShowForm form = new MyPageShowForm(product.getId(), product.getThumbnail());
+            showFormList.add(form);
+        }
+        return showFormList;
+    }
+
+    private List<MyPageShowForm> makeWorkShowForm(List<Work> workList) {
+        List<MyPageShowForm> showFormList = new ArrayList<>();
+        for (Work work : workList) {
+            MyPageShowForm form = new MyPageShowForm(work.getId(), work.getThumbnail());
+            showFormList.add(form);
+        }
+        return showFormList;
+    }
+
     public UserDto getUserProfile(Long userId, User user) {
         User findUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         //System.out.println("쿼리 수 확인");
