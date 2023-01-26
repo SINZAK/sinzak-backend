@@ -1,21 +1,16 @@
 package net.sinzak.server.user.controller;
 
-import com.google.api.client.json.Json;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.common.dto.IdDto;
-import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.user.domain.User;
-import net.sinzak.server.user.dto.request.UserIdDto;
-import net.sinzak.server.user.dto.respond.GetFollowDto;
 import net.sinzak.server.user.dto.respond.UserDto;
 import net.sinzak.server.user.service.UserQueryService;
 import org.json.simple.JSONObject;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 @Api(tags = "유저-조회")
 @RestController
 @RequiredArgsConstructor
@@ -24,7 +19,7 @@ public class UserQueryController {
 
     @ApiOperation(value ="내 프로필 보기")
     @GetMapping(value ="/users/my-profile")
-    public UserDto getMyProfile(@AuthenticationPrincipal User user){
+    public JSONObject getMyProfile(@AuthenticationPrincipal User user){
         return userQueryService.getMyProfile(user);
     }
 

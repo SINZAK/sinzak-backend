@@ -16,8 +16,6 @@ import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
-import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -30,47 +28,47 @@ public class UserCommandService {
         if(loginUser ==null){
             return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
         }
-        User user = userRepository.findById(loginUser.getId()).get();
+        User user = userRepository.findById(loginUser.getId()).orElseThrow(UserNotFoundException::new);
         user.update(dto.getName(),dto.getPicture(),dto.getIntroduction());
         return PropertyUtil.response(true);
     }
 
 
     public JSONObject follow(Long userId, User loginUser){
-        Optional<User> findUser = userRepository.findById(userId);
-        JSONObject userNotExist = checkUsersExist(findUser,loginUser);
-        System.out.println((boolean)userNotExist.get(PropertyUtil.SUCCESS_WORD));
-        if(!(boolean)userNotExist.get(PropertyUtil.SUCCESS_WORD)){
-            return userNotExist;
-        }
-        User user = userRepository.findById(loginUser.getId()).get();
-        user.getFollowingList().add(userId);
-        findUser.get().getFollowerList().add(user.getId());
-        return PropertyUtil.response(true);
-    }
-    public JSONObject unFollow(Long userId,User loginUser){
-        Optional<User> findUser = userRepository.findById(userId);
-        JSONObject userNotExist = checkUsersExist(findUser,loginUser);
-        if(!(boolean)userNotExist.get(PropertyUtil.SUCCESS_WORD)){
-            return userNotExist;
-        }
-        User user = userRepository.findById(loginUser.getId()).get();
-        user.getFollowingList().remove(userId);
-        findUser.get().getFollowerList().remove(user.getId());
-        return PropertyUtil.response(true);
-    }
-
-    @Transactional(readOnly = true)
-    public JSONObject checkUsersExist(Optional<User> findUser,User user){
-        if(user ==null){
+        User findUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        if(loginUser ==null){
             return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
         }
-        if(!findUser.isPresent()){
-            return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_FOUND);
-        }
-        if(user.getId().equals(findUser.get().getId())){
+        if(loginUser.getId().equals(findUser.getId())){
             return PropertyUtil.responseMessage("본인한테는 팔로우 불가능");
         }
+        return addFollow(findUser,loginUser);
+    }
+    public JSONObject unFollow(Long userId,User loginUser){
+        User findUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        if(loginUser ==null){
+            return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
+        }
+        if(loginUser.getId().equals(findUser.getId())){
+            return PropertyUtil.responseMessage("본인한테는 언팔로우 불가능");
+        }
+        return removeFollow(findUser,loginUser);
+    }
+
+    public JSONObject removeFollow(User findUser, User loginUser){
+        User user = userRepository.findByIdFetchFollowingList(loginUser.getId()).orElseThrow(UserNotFoundException::new);
+        user.getFollowingList().remove(findUser.getId());
+        findUser.getFollowerList().remove(loginUser.getId());
+        user.updateFollowNumber();
+        findUser.updateFollowNumber();
+        return PropertyUtil.response(true);
+    }
+    public JSONObject addFollow(User findUser, User loginUser){
+        User user = userRepository.findByIdFetchFollowingList(loginUser.getId()).orElseThrow(UserNotFoundException::new);
+        user.getFollowingList().add(findUser.getId());
+        findUser.getFollowerList().add(loginUser.getId());
+        user.updateFollowNumber();
+        findUser.updateFollowNumber();
         return PropertyUtil.response(true);
     }
 
@@ -87,8 +85,6 @@ public class UserCommandService {
         reportRepository.save(connect);
         return PropertyUtil.response(true);
     }
-
-
 
     private boolean checkAlreadyReport(Long id, User loginUser) {
         for (Report report : loginUser.getReportList()) {
