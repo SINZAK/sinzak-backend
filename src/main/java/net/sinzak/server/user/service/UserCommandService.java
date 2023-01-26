@@ -3,13 +3,16 @@ package net.sinzak.server.user.service;
 
 import lombok.RequiredArgsConstructor;
 
+import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.user.domain.Report;
+import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.user.dto.request.ReportDto;
 import net.sinzak.server.user.dto.request.UpdateUserDto;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.user.repository.ReportRepository;
 
+import net.sinzak.server.user.repository.SearchHistoryRepository;
 import net.sinzak.server.user.repository.UserRepository;
 import net.sinzak.server.common.PropertyUtil;
 import org.json.simple.JSONObject;
@@ -22,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserCommandService {
     private final UserRepository userRepository;
     private final ReportRepository reportRepository;
-
+    private final SearchHistoryRepository historyRepository;
 
     public JSONObject updateUser(UpdateUserDto dto, User loginUser){
         if(loginUser ==null){
@@ -92,6 +95,23 @@ public class UserCommandService {
                 return true;
         }
         return false;
+    }
+
+    @Transactional
+    public JSONObject deleteSearchHistory(Long id, User User){
+        User user = historyRepository.findByEmailFetchHistoryList(User.getEmail()).orElseThrow(InstanceNotFoundException::new);
+        for (SearchHistory history : user.getHistoryList()) {
+            if(history.getId().equals(id))
+                historyRepository.delete(history);
+        }
+        return PropertyUtil.response(true);
+    }
+
+    @Transactional
+    public JSONObject deleteSearchHistory(User User){
+        User user = historyRepository.findByEmailFetchHistoryList(User.getEmail()).orElseThrow(InstanceNotFoundException::new);
+        historyRepository.deleteAll(user.getHistoryList());
+        return PropertyUtil.response(true);
     }
 
 }
