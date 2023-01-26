@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
 import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.dto.IdDto;
 import net.sinzak.server.common.error.ErrorResponse;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
@@ -102,26 +103,18 @@ public class UserCommandController {
         return userCommandService.report(reportDto, user);
     }
 
-    //로그인 연동이니 테스트용
-//    @ApiOperation(value = "유저생성")
-//    @PostMapping(value = "/users")
-//    public JSONObject createUser( @RequestBody SessionUser user) {
-//        JSONObject obj = new JSONObject();
-//        try
-//            userCommandService.createUser(user);
-//            obj.put("success", true);
-//            return obj;
-//        } catch (InstanceNotFoundException e) {
-//            obj.put("success", false);
-//            return obj;
-//        }
-//    }
+    @ApiOperation(value = "검색기록 삭제", notes = "Post인 것에 유의하고 같은 url을 사용하려고 합니다. 해당 기록의 id를 주시면 삭제합니다.")
+    @PostMapping(value = "/users/history")
+    public JSONObject deleteHistory(@RequestBody IdDto idDto, @AuthenticationPrincipal User user) {
+        return userCommandService.deleteSearchHistory(idDto.getId(), user);
+    }
 
-//    @ApiOperation(value = "유저생성")
-//    @PostMapping(value = "/users")
-//    public JSONObject createUser2(@RequestBody SessionUser user) {
-//        return userCommandService.createUser2(user);
-//    }
+    @ApiOperation(value = "검색기록 전체! 삭제", notes = "전체 삭제입니다")
+    @PostMapping(value = "/users/deletehistories")
+    public JSONObject deleteHistory(@AuthenticationPrincipal User user) {
+        return userCommandService.deleteSearchHistory(user);
+    }
+
     @ExceptionHandler(NoSuchElementException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     protected JSONObject handleException1() {
