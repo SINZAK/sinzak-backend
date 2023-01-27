@@ -54,7 +54,7 @@ public class ChatRoomQueryService {
         return PropertyUtil.response(chatRoomsDtos);
     }
     public Page<GetChatMessageDto> getChatRoomMessage(String roomUuid, Long messageId,Pageable pageable){
-        ChatRoom findChatRoom = chatRoomRepository.findByRoomId(roomUuid)
+        ChatRoom findChatRoom = chatRoomRepository.findByRoomUuidFetchChatMessage(roomUuid)
                 .orElseThrow(()->new InstanceNotFoundException("존재하지 않는 채팅방입니다."));
         List<GetChatMessageDto> getChatMessageDtos = findChatRoom.getChatMessages().stream().map(
                 chatMessage -> GetChatMessageDto.builder()
