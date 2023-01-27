@@ -37,8 +37,6 @@ public class ChatRoomQueryController {
     private static final int MESSAGE_PAGE_SIZE =10;
 
 
-
-
     @PostMapping("/rooms")
     @ApiOperation(value ="채팅방 목록 조회")
     public JSONObject getChatRooms(@AuthenticationPrincipal User user){
@@ -55,7 +53,7 @@ public class ChatRoomQueryController {
     public Page<GetChatMessageDto> getChatRoomMessage(
             @PathVariable("uuid") String roomUuid,
             @RequestParam(value ="messageId",defaultValue = "1") Long messageId,
-            @PageableDefault(size = MESSAGE_PAGE_SIZE,sort="id",direction = Sort.Direction.ASC)Pageable pageable){
+            @PageableDefault(size = MESSAGE_PAGE_SIZE,sort="id",direction = Sort.Direction.DESC )Pageable pageable){
         return chatRoomQueryService.getChatRoomMessage(roomUuid,messageId,pageable);
     }
 

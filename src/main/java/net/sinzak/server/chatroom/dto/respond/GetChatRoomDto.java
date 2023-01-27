@@ -11,5 +11,6 @@ public class GetChatRoomDto {
     private String productName;
     private int price;
     private String thumbnail;
-    private boolean trading;
+    private boolean complete;
+    private boolean suggest;
 }

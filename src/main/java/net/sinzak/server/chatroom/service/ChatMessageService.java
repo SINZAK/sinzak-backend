@@ -15,6 +15,7 @@ import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +33,7 @@ public class ChatMessageService {
 //        return PropertyUtil.response(true);
 //    }
 
+    @Transactional
     public void sendChatMessage(ChatMessageDto message){
         ChatRoom findChatRoom =
                 chatRoomRepository
@@ -50,7 +52,6 @@ public class ChatMessageService {
                 .sendAt(newChatMessage.getCreatedDate())
                 .build();
         template.convertAndSend("/sub/chat/rooms/"+message.getRoomId(),getChatMessageDto);
-
     }
 
 

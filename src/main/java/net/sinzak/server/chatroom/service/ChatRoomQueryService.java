@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class ChatRoomQueryService {
     private final ChatRoomRepository chatRoomRepository;
     private final UserChatRoomRepository userChatRoomRepository;
@@ -75,29 +77,42 @@ public class ChatRoomQueryService {
             if(userChatRoom.getChatRoom().getRoomUuid().equals(roomUuid)){
                 ChatRoom chatRoom = userChatRoom.getChatRoom();
                 if(chatRoom.getPostType().equals(PostType.PRODUCT)){
-                    GetChatRoomDto getChatRoomDto = GetChatRoomDto.builder()
-                            .roomName(userChatRoom.getRoomName())
-                            .productId(chatRoom.getProduct().getId())
-                            .productName(chatRoom.getProduct().getTitle())
-                            .price(chatRoom.getProduct().getPrice())
-                            .thumbnail(chatRoom.getProduct().getThumbnail())
-                            .trading(chatRoom.getProduct().isTrading())
-                            .build();
+                    GetChatRoomDto getChatRoomDto = makeProductChatRoomDto(userChatRoom, chatRoom);
                     return PropertyUtil.response(getChatRoomDto);
                 }
                 if(chatRoom.getPostType().equals(PostType.WORK)){
-                    GetChatRoomDto getChatRoomDto = GetChatRoomDto.builder()
-                            .roomName(userChatRoom.getRoomName())
-                            .productId(chatRoom.getWork().getId())
-                            .productName(chatRoom.getWork().getTitle())
-                            .price(chatRoom.getWork().getPrice())
-                            .thumbnail(chatRoom.getWork().getThumbnail())
-                            .build();
+                    GetChatRoomDto getChatRoomDto = makeWorkChatRoomDto(userChatRoom, chatRoom);
                     return PropertyUtil.response(getChatRoomDto);
                 }
             }
         }
         return PropertyUtil.responseMessage("찾는 채팅방이 없습니다.");
+    }
+
+    private GetChatRoomDto makeWorkChatRoomDto(UserChatRoom userChatRoom, ChatRoom chatRoom) {
+        GetChatRoomDto getChatRoomDto = GetChatRoomDto.builder()
+                .roomName(userChatRoom.getRoomName())
+                .productId(chatRoom.getWork().getId())
+                .productName(chatRoom.getWork().getTitle())
+                .price(chatRoom.getWork().getPrice())
+                .thumbnail(chatRoom.getWork().getThumbnail())
+                .complete(chatRoom.getWork().isComplete())
+                .suggest(chatRoom.getWork().isSuggest())
+                .build();
+        return getChatRoomDto;
+    }
+
+    private GetChatRoomDto makeProductChatRoomDto(UserChatRoom userChatRoom, ChatRoom chatRoom) {
+        GetChatRoomDto getChatRoomDto = GetChatRoomDto.builder()
+                .roomName(userChatRoom.getRoomName())
+                .productId(chatRoom.getProduct().getId())
+                .productName(chatRoom.getProduct().getTitle())
+                .price(chatRoom.getProduct().getPrice())
+                .thumbnail(chatRoom.getProduct().getThumbnail())
+                .complete(chatRoom.getProduct().isComplete())
+                .suggest(chatRoom.getProduct().isSuggest())
+                .build();
+        return getChatRoomDto;
     }
 
 //    public List<ChatRoomDto> getChatRooms(User user){
