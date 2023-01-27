@@ -70,6 +70,7 @@ public class ChatRoomCommandService {
         if (chatRoom == null) { //상대랑 해당 포스트에 대해서 대화하고 있는 채팅방이 없다면 (만들어 줘야함)
             chatRoom = makeChatRoomAndUserChatRoom(postUser, findUser);
             addChatRoomToPost(postDto, product, work, chatRoom);
+            chatRoomRepository.save(chatRoom);
         }
         GetCreatedChatRoomDto getCreatedChatRoomDto = makeChatRoomDto(chatRoom);
         return PropertyUtil.response(getCreatedChatRoomDto);

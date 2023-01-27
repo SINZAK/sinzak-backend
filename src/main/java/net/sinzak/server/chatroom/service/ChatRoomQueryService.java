@@ -6,16 +6,21 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.chatroom.domain.ChatRoom;
 import net.sinzak.server.chatroom.domain.UserChatRoom;
+import net.sinzak.server.chatroom.dto.respond.GetChatMessageDto;
 import net.sinzak.server.chatroom.dto.respond.GetChatRoomDto;
 import net.sinzak.server.chatroom.dto.respond.GetChatRoomsDto;
 import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.repository.UserChatRoomRepository;
 import net.sinzak.server.common.PostType;
 import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.product.domain.Product;
 import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -45,6 +50,19 @@ public class ChatRoomQueryService {
                 )
                 .collect(Collectors.toList());
         return PropertyUtil.response(chatRoomsDtos);
+    }
+    public Page<GetChatMessageDto> getChatRoomMessage(String roomUuid, Long messageId,Pageable pageable){
+        ChatRoom findChatRoom = chatRoomRepository.findByRoomId(roomUuid)
+                .orElseThrow(()->new InstanceNotFoundException("존재하지 않는 채팅방입니다."));
+        List<GetChatMessageDto> getChatMessageDtos = findChatRoom.getChatMessages().stream().map(
+                chatMessage -> GetChatMessageDto.builder()
+                        .senderName(chatMessage.getSenderName())
+                        .messageId(chatMessage.getId())
+                        .sendAt(chatMessage.getCreatedDate())
+                        .message(chatMessage.getMessage())
+                        .build()
+        ).collect(Collectors.toList());
+        return new PageImpl<>(getChatMessageDtos,pageable,getChatMessageDtos.size());
     }
 
     public JSONObject getChatRoom(String roomUuid,User user){

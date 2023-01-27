@@ -34,7 +34,7 @@ public class ChatMessageController {
     @MessageMapping(value ="/chat/message")
     public void message(ChatMessageDto chatMessageDto){
         log.info("메시지 구독"+chatMessageDto.getRoomId());
-        template.convertAndSend("/sub/chat/rooms/"+chatMessageDto.getRoomId(),chatMessageDto);
+        chatMessageService.sendChatMessage(chatMessageDto);
     }
 
 

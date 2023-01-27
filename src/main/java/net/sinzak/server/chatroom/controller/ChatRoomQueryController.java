@@ -6,11 +6,17 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.chatroom.domain.ChatMessage;
+import net.sinzak.server.chatroom.domain.ChatRoom;
+import net.sinzak.server.chatroom.dto.respond.GetChatMessageDto;
 import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.service.ChatRoomQueryService;
 import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,6 +34,7 @@ import java.util.UUID;
 public class ChatRoomQueryController {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomQueryService chatRoomQueryService;
+    private static final int MESSAGE_PAGE_SIZE =10;
 
 
 
@@ -44,7 +51,13 @@ public class ChatRoomQueryController {
         return chatRoomQueryService.getChatRoom(roomUuid,user);
     }
 
-    @GetMapping(value =)
+    @GetMapping(value = "/rooms/{uuid}/message")
+    public Page<GetChatMessageDto> getChatRoomMessage(
+            @PathVariable("uuid") String roomUuid,
+            @RequestParam(value ="messageId",defaultValue = "1") Long messageId,
+            @PageableDefault(size = MESSAGE_PAGE_SIZE,sort="id",direction = Sort.Direction.ASC)Pageable pageable){
+        return chatRoomQueryService.getChatRoomMessage(roomUuid,messageId,pageable);
+    }
 
 //    @ApiOperation(value ="채팅방 메시지 조회")
 //    @GetMapping(value ="/rooms/{uuid}/message")
