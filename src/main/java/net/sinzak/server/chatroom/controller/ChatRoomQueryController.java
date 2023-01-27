@@ -53,7 +53,7 @@ public class ChatRoomQueryController {
     public Page<GetChatMessageDto> getChatRoomMessage(
             @PathVariable("uuid") String roomUuid,
             @RequestParam(value ="messageId",defaultValue = "1") Long messageId,
-            @PageableDefault(size = MESSAGE_PAGE_SIZE,sort="id",direction = Sort.Direction.DESC )Pageable pageable){
+            @PageableDefault(size = MESSAGE_PAGE_SIZE,sort="messageId",direction = Sort.Direction.DESC )Pageable pageable){
         return chatRoomQueryService.getChatRoomMessage(roomUuid,messageId,pageable);
     }
 

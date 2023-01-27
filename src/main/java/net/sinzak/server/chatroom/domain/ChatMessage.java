@@ -24,6 +24,7 @@ public class ChatMessage extends BaseTimeEntity {
     private String senderName;
     private String receiver;
     private String roomId;
+    private Long senderId;
 
     @Setter
     @Lob private String message; //모든 언어에 다 있는 byte[]

@@ -37,11 +37,12 @@ public class ChatMessageService {
     public void sendChatMessage(ChatMessageDto message){
         ChatRoom findChatRoom =
                 chatRoomRepository
-                        .findByRoomId(message.getRoomId())
+                        .findByRoomUuidFetchChatMessage(message.getRoomId())
                         .orElseThrow(()->new InstanceNotFoundException("존재하지 않는 채팅방입니다."));
         ChatMessage newChatMessage = ChatMessage.builder()
                 .message(message.getMessage())
                 .senderName(message.getSenderName())
+                .senderId(message.getSenderId())
                 .build();
         findChatRoom.addChatMessage(newChatMessage);
         GetChatMessageDto getChatMessageDto = GetChatMessageDto.builder()

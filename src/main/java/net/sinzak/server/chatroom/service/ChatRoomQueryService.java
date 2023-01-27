@@ -62,6 +62,7 @@ public class ChatRoomQueryService {
                         .messageId(chatMessage.getId())
                         .sendAt(chatMessage.getCreatedDate())
                         .message(chatMessage.getMessage())
+                        .senderId(chatMessage.getSenderId())
                         .build()
         ).collect(Collectors.toList());
         return new PageImpl<>(getChatMessageDtos,pageable,getChatMessageDtos.size());
