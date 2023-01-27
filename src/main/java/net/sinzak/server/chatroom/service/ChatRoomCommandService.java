@@ -50,7 +50,7 @@ public class ChatRoomCommandService {
                 return PropertyUtil.responseMessage("없는 게시글입니다.");
             }
             postUser = findProduct.get().getUser();
-            postChatRooms = findProduct.get().getChatRooms();
+            postChatRooms = findProduct.get().getChatRooms(); //여기서 채팅방을 나중에 가져오는 것도 고려
             product = findProduct.get();
         }
         if(postDto.getPostType().equals(PostType.WORK.getName())){
@@ -62,16 +62,26 @@ public class ChatRoomCommandService {
             postChatRooms = findWork.get().getChatRooms();
             work = findWork.get();
         }
+
+        log.info("게시글 확인");
         JSONObject userStatus = checkUserStatus(user, postUser);
         if (userStatus != null) return userStatus; //만약 로그인 안 되어있거나 상대가 없다면
         User findUser = userRepository.findByEmail(user.getEmail()).get();
 
+        GetCreatedChatRoomDto getCreatedChatRoomDto =new GetCreatedChatRoomDto();
         ChatRoom chatRoom = checkIfUserIsAlreadyChatting(user, postChatRooms);
         if (chatRoom == null) { //상대랑 해당 포스트에 대해서 대화하고 있는 채팅방이 없다면 (만들어 줘야함)
+            log.info("채팅방 새로 생성");
             chatRoom = makeChatRoomAndUserChatRoom(postUser, findUser);
             addChatRoomToPost(postDto, product, work, chatRoom);
+            chatRoomRepository.save(chatRoom);
+            getCreatedChatRoomDto.setNewChatRoom(true);
         }
-        GetCreatedChatRoomDto getCreatedChatRoomDto = makeChatRoomDto(chatRoom);
+        else{
+            log.info("원래 채팅방 반환");
+            getCreatedChatRoomDto.setNewChatRoom(false);
+        }
+        getCreatedChatRoomDto.setRoomUuid(chatRoom.getRoomUuid());
         return PropertyUtil.response(getCreatedChatRoomDto);
     }
     private void addChatRoomToPost(PostDto postDto, Product product, Work work, ChatRoom chatRoom) {

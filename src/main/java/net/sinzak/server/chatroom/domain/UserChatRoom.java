@@ -5,6 +5,7 @@ import lombok.Getter;
 import net.sinzak.server.user.domain.User;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Getter
 @Entity
@@ -22,14 +23,22 @@ public class UserChatRoom {
     @JoinColumn(name="USER_ID")
     private User user;
 
+
     private String opponentUserEmail;
     private String opponentUserUniv;
     private String roomName;
     private String image;
-    @Lob private byte[] latestMessage;
+    private String latestMessage;
+    private LocalDateTime latestMessageTime;
     public UserChatRoom(){}
 
+    public void updateLatestMessage(String latestMessage){
+        this.latestMessage = latestMessage;
+        this.latestMessageTime = LocalDateTime.now();
+    }
     public UserChatRoom(User user,User opponentUser){
+        this.latestMessage = null;
+        this.latestMessageTime = null;
         this.roomName = opponentUser.getName();
         this.opponentUserEmail = opponentUser.getEmail();
         this.opponentUserUniv = opponentUser.getUniv();

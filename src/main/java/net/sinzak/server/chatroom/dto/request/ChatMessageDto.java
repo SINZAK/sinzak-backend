@@ -13,7 +13,7 @@ import net.sinzak.server.chatroom.domain.MessageType;
 public class ChatMessageDto {
     @Setter
     private String message;
-    private String sender;
+    private String senderName;
     private String roomId;
     private Long senderId;
     private MessageType messageType;
