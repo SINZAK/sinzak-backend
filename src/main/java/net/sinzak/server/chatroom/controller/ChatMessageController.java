@@ -22,12 +22,12 @@ public class ChatMessageController {
     @MessageMapping(value = "/chat/enter") //메시지 매핑은 자동으로 앞에 /pub이 붙음(config)
     public void enter(ChatMessageDto chatMessageDto) {
         ChatMessage chatMessage = ChatMessage.builder()
-                .message(chatMessageDto.getSender()+"님이 채팅방에 참여하였습니다.")
-                .sender(chatMessageDto.getSender())
+                .message(chatMessageDto.getSenderName()+"님이 채팅방에 참여하였습니다.")
+                .senderName(chatMessageDto.getSenderName())
                 .roomId(chatMessageDto.getRoomId())
                 .type(chatMessageDto.getMessageType())
                 .build();
-        chatMessageDto.setMessage(chatMessageDto.getSender()+"님이 채팅방에 참여하였습니다.");
+        chatMessageDto.setMessage(chatMessageDto.getSenderName()+"님이 채팅방에 참여하였습니다.");
         log.info("메시지 구독"+chatMessageDto.getRoomId());
         template.convertAndSend("/sub/chat/rooms/"+chatMessage.getRoomId(),chatMessageDto);
     }

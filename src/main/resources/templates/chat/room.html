@@ -13,7 +13,7 @@
 
         <div class="container">
             <div class="col-6">
-                <h1>[[${room.name}]]</h1>
+                <h1>[[${room.roomName}]]</h1>
             </div>
             <div>
                 <div id="msgArea" class="col"></div>
@@ -40,11 +40,11 @@
 <script th:inline="javascript">
     $(document).ready(function(){
 
-        var roomName = [[${room.name}]];
+        var roomName = [[${room.roomName}]];
         var roomId = [[${room.roomUuid}]];
 
 
-        console.log(roomName + ", " + roomId + ", " + "username");
+        console.log(roomName + ", " + roomId + ", " + "roomname");
 
         var sockJs = new SockJS("/stomp/chat");
         //1. SockJS를 내부에 들고있는 stomp를 내어줌

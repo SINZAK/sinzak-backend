@@ -13,6 +13,7 @@ import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -30,14 +31,10 @@ public class ChatRoomCommandController {
     public JSONObject createChatRoom(@RequestBody PostDto postDto, @AuthenticationPrincipal User user){
         return chatRoomCommandService.createUserChatRoom(postDto,user);
     }
-//    채팅방 개설
-//    @PostMapping(value = "/chat/room")
-//    public String createRoom(@RequestParam String roomName, RedirectAttributes rttr){
-//        log.info("#채팅방 개설,채팅방 이름: "+ roomName);
-//        chatRoomCommandService.makeChatRoom(roomName);
-//        rttr.addFlashAttribute("roomName",roomName);
-//        return "redirect:/chat/rooms";
-//    }
+
+    //채팅방 조회
+
+
 
 
 

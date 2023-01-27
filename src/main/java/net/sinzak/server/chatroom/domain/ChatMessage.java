@@ -1,12 +1,10 @@
 package net.sinzak.server.chatroom.domain;
 
 
-import com.fasterxml.jackson.databind.ser.Serializers;
 import lombok.*;
 import net.sinzak.server.BaseTimeEntity;
 
 import javax.persistence.*;
-import java.util.UUID;
 
 
 @Getter
@@ -23,7 +21,7 @@ public class ChatMessage extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     private MessageType type;
-    private String sender;
+    private String senderName;
     private String receiver;
     private String roomId;
 
@@ -31,8 +29,8 @@ public class ChatMessage extends BaseTimeEntity {
     @Lob private String message; //모든 언어에 다 있는 byte[]
 
 
-    public void setSender(String sender){
-        this.sender =sender;
+    public void setSenderName(String sender){
+        this.senderName =sender;
     }
 
     public void newConnect(){
