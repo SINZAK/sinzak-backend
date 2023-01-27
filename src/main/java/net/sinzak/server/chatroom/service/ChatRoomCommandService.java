@@ -50,7 +50,7 @@ public class ChatRoomCommandService {
                 return PropertyUtil.responseMessage("없는 게시글입니다.");
             }
             postUser = findProduct.get().getUser();
-            postChatRooms = findProduct.get().getChatRooms();
+            postChatRooms = findProduct.get().getChatRooms(); //여기서 채팅방을 나중에 가져오는 것도 고려
             product = findProduct.get();
         }
         if(postDto.getPostType().equals(PostType.WORK.getName())){

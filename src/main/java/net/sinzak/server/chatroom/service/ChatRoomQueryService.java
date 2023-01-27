@@ -15,7 +15,6 @@ import net.sinzak.server.common.PostType;
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
-import net.sinzak.server.product.domain.Product;
 import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
 import org.springframework.data.domain.Page;
@@ -40,7 +39,7 @@ public class ChatRoomQueryService {
             return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
         }
         List<GetChatRoomsDto> chatRoomsDtos = userChatRoomRepository
-                .findUserChatRoomByEmail(user.getEmail()).stream()
+                .findUserChatRoomByEmailFetchChatRoom(user.getEmail()).stream()
                 .map(
                         userChatRoom ->
                                 GetChatRoomsDto.builder()
@@ -48,6 +47,8 @@ public class ChatRoomQueryService {
                                         .image(userChatRoom.getImage())
                                         .univ(userChatRoom.getOpponentUserUniv())
                                         .roomUuid(userChatRoom.getChatRoom().getRoomUuid())
+                                        .latestMessage(userChatRoom.getLatestMessage())
+                                        .latestMessageTime(userChatRoom.getLatestMessageTime())
                                         .build()
                 )
                 .collect(Collectors.toList());
