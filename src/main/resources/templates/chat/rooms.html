@@ -16,7 +16,7 @@
 <div class="container">
     <div>
         <ul th:each="room : ${list}">
-            <li><a th:href="@{/chat/room(roomId=${room.getRoomUuid})}">[[${room.name}]]</a></li>
+            <li><a th:href="@{/chat/room(roomId=${room.getRoomUuid})}">[[${room.roomName}]]</a></li>
         </ul>
     </div>
 </div>
@@ -38,12 +38,12 @@
         $(".btn-create").on("click", function (e){
             e.preventDefault();
 
-            var name = $("input[name='name']").val();
-
-            if(name == "")
-                alert("이름을 입력하시오")
-            else
-                $("form").submit();
+            // var name = $("input[name='name']").val();
+            //
+            // if(name == "")
+            //     alert("이름을 입력하시오")
+            // else
+            //     $("form").submit();
         });
 
     });
