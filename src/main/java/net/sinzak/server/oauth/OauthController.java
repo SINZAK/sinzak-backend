@@ -1,5 +1,6 @@
 package net.sinzak.server.oauth;
 
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
@@ -22,6 +23,7 @@ public class OauthController {
     private static final OkHttpClient client = new OkHttpClient();
 
 
+    @ApiOperation(value = "스프링용 카카오로그인 실행",notes = "인가코드 받는 기능")
     @GetMapping("/oauth2/authorization/kakao")
     public  String kakaoLogin() throws IOException {
         String url = "https://kauth.kakao.com/oauth/authorize"
@@ -31,6 +33,7 @@ public class OauthController {
         return url;
     }
 
+    @ApiOperation(value = "인가코드 전달받고 유저정보 가져오기", notes = "웹, 안드, ios 용")
     @GetMapping(value = "/login/oauth2/code/kakao")
     public String oauthKakao(@RequestParam(value = "code", required = false) String code) throws Exception {
         log.warn("인가코드 = {}",code);
