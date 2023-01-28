@@ -29,7 +29,7 @@ public class OauthController {
     @GetMapping("/oauth2/authorization/kakao")
     public  String kakaoLogin() throws IOException {
         String url = "https://kauth.kakao.com/oauth/authorize"
-                + "?client_id=80bafa3a542e6efeb296c345fa846c71"
+                + "?client_id=3201538a34f65dfa0fb2e96b0d268ca7"
                 + "&redirect_uri=http://localhost:8080/api/login/oauth2/code/kakao"
                 + "&response_type=code";
         return url;
@@ -47,7 +47,7 @@ public class OauthController {
 
     private String getAccessToken(String code) throws IOException, ParseException {
         String url = "https://kauth.kakao.com/oauth/token"
-                + "?client_id=80bafa3a542e6efeb296c345fa846c71"
+                + "?client_id=3201538a34f65dfa0fb2e96b0d268ca7"
                 + "&redirect_uri=http://localhost:8080/api/login/oauth2/code/kakao"
                 + "&grant_type=authorization_code"
                 + "&code=" + code;
