@@ -31,7 +31,7 @@ public class OauthController {
         return url;
     }
 
-    @RequestMapping(value = "/login/oauth2/code/kakao")
+    @GetMapping(value = "/login/oauth2/code/kakao")
     public String oauthKakao(@RequestParam(value = "code", required = false) String code) throws Exception {
         log.warn("인가코드 = {}",code);
         String accessToken = getAccessToken(code);
