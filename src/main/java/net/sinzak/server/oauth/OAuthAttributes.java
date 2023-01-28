@@ -34,6 +34,7 @@ public class OAuthAttributes {
 
 
     private static OAuthAttributes ofKakao(JSONObject attributes) {
+        log.warn(attributes.toJSONString());
         JSONObject kakao_account = (JSONObject) attributes.get("kakao_account");
         JSONObject profile = (JSONObject) kakao_account.get("profile");
         return OAuthAttributes.builder()
