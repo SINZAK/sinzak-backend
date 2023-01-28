@@ -23,14 +23,15 @@ import java.util.Map;
 @Slf4j
 public class OauthController {
     private static final OkHttpClient client = new OkHttpClient();
-
+    private static final String productURL = "https://sinzak.net";
+    private static final String developURL = "http://localhost:8080";
 
     @ApiOperation(value = "스프링용 카카오로그인 실행",notes = "인가코드 받는 기능")
     @GetMapping("/oauth2/authorization/kakao")
     public  String kakaoLogin() throws IOException {
         String url = "https://kauth.kakao.com/oauth/authorize"
                 + "?client_id=3201538a34f65dfa0fb2e96b0d268ca7"
-                + "&redirect_uri=http://localhost:8080/api/login/oauth2/code/kakao"
+                + "&redirect_uri="+productURL+"/api/login/oauth2/code/kakao"
                 + "&response_type=code";
         return url;
     }
@@ -48,7 +49,7 @@ public class OauthController {
     private String getAccessToken(String code) throws IOException, ParseException {
         String url = "https://kauth.kakao.com/oauth/token"
                 + "?client_id=3201538a34f65dfa0fb2e96b0d268ca7"
-                + "&redirect_uri=http://localhost:8080/api/login/oauth2/code/kakao"
+                + "&redirect_uri="+productURL+"/api/login/oauth2/code/kakao"
                 + "&grant_type=authorization_code"
                 + "&code=" + code;
         Request.Builder builder = new Request.Builder().header("Content-type", " application/x-www-form-urlencoded")
