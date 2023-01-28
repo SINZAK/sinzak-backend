@@ -1,5 +1,6 @@
 package net.sinzak.server.oauth;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
+@Api(tags = "소셜로그인")
 @RestController
 @RequiredArgsConstructor
 @Slf4j
