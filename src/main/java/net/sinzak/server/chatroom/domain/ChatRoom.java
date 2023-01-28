@@ -58,6 +58,12 @@ public class ChatRoom extends BaseTimeEntity {
         this.userChatRooms.add(userChatRoom);
         this.participantsNumber++;
     }
+    public void addChatMessage(ChatMessage chatMessage){
+        this.chatMessages.add(chatMessage);
+        for(UserChatRoom userChatRoom :this.userChatRooms){
+            userChatRoom.updateLatestMessage(chatMessage.getMessage());
+        }
+    }
 
 //    @OneToMany(mappedBy = "chatRoom",cascade = CascadeType.ALL)
 //    private List<ChatMessage> chatMessages = new ArrayList<>();
