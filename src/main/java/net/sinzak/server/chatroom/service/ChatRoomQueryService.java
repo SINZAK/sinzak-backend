@@ -4,6 +4,7 @@ package net.sinzak.server.chatroom.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.sinzak.server.chatroom.domain.ChatMessage;
 import net.sinzak.server.chatroom.domain.ChatRoom;
 import net.sinzak.server.chatroom.domain.UserChatRoom;
 import net.sinzak.server.chatroom.dto.respond.GetChatMessageDto;
@@ -23,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,10 +56,13 @@ public class ChatRoomQueryService {
                 .collect(Collectors.toList());
         return PropertyUtil.response(chatRoomsDtos);
     }
-    public Page<GetChatMessageDto> getChatRoomMessage(String roomUuid, Long messageId,Pageable pageable){
+    public Page<GetChatMessageDto> getChatRoomMessage(String roomUuid, Pageable pageable){
         ChatRoom findChatRoom = chatRoomRepository.findByRoomUuidFetchChatMessage(roomUuid)
                 .orElseThrow(()->new InstanceNotFoundException("존재하지 않는 채팅방입니다."));
-        List<GetChatMessageDto> getChatMessageDtos = findChatRoom.getChatMessages().stream().map(
+        List<GetChatMessageDto> getChatMessageDtos = findChatRoom.getChatMessages()
+                .stream()
+                .sorted(Comparator.comparing(ChatMessage::getId).reversed())
+                .map(
                 chatMessage -> GetChatMessageDto.builder()
                         .senderName(chatMessage.getSenderName())
                         .messageId(chatMessage.getId())
@@ -66,7 +71,11 @@ public class ChatRoomQueryService {
                         .senderId(chatMessage.getSenderId())
                         .build()
         ).collect(Collectors.toList());
-        return new PageImpl<>(getChatMessageDtos,pageable,getChatMessageDtos.size());
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start+pageable.getPageSize()),getChatMessageDtos.size());
+        return new PageImpl<>(getChatMessageDtos.subList(start,end)
+                ,pageable
+                ,getChatMessageDtos.size());
     }
 
     public JSONObject getChatRoom(String roomUuid,User user){

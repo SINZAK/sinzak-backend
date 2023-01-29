@@ -51,10 +51,9 @@ public class ChatRoomQueryController {
 
     @GetMapping(value = "/rooms/{uuid}/message")
     public Page<GetChatMessageDto> getChatRoomMessage(
-            @PathVariable("uuid") String roomUuid,
-            @RequestParam(value ="messageId",defaultValue = "1") Long messageId,
-            @PageableDefault(size = MESSAGE_PAGE_SIZE,sort="messageId",direction = Sort.Direction.DESC )Pageable pageable){
-        return chatRoomQueryService.getChatRoomMessage(roomUuid,messageId,pageable);
+            @PathVariable("uuid") String roomUuid, @RequestParam(value = "page",required = false,defaultValue = "0") int page){
+        PageRequest pageRequest = PageRequest.of(page,10,Sort.by("messageId").descending());
+        return chatRoomQueryService.getChatRoomMessage(roomUuid,pageRequest);
     }
 
 //    @ApiOperation(value ="채팅방 메시지 조회")
