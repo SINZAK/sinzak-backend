@@ -34,7 +34,7 @@ import java.util.UUID;
 public class ChatRoomQueryController {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomQueryService chatRoomQueryService;
-    private static final int MESSAGE_PAGE_SIZE =10;
+    private static final int MESSAGE_PAGE_SIZE =30;
 
 
     @PostMapping("/rooms")
@@ -51,10 +51,9 @@ public class ChatRoomQueryController {
 
     @GetMapping(value = "/rooms/{uuid}/message")
     public Page<GetChatMessageDto> getChatRoomMessage(
-            @PathVariable("uuid") String roomUuid,
-            @RequestParam(value ="messageId",defaultValue = "1") Long messageId,
-            @PageableDefault(size = MESSAGE_PAGE_SIZE,sort="messageId",direction = Sort.Direction.DESC )Pageable pageable){
-        return chatRoomQueryService.getChatRoomMessage(roomUuid,messageId,pageable);
+            @PathVariable("uuid") String roomUuid, @RequestParam(value = "page",required = false,defaultValue = "0") int page){
+        PageRequest pageRequest = PageRequest.of(page,MESSAGE_PAGE_SIZE,Sort.by("messageId").descending());
+        return chatRoomQueryService.getChatRoomMessage(roomUuid,pageRequest);
     }
 
 //    @ApiOperation(value ="채팅방 메시지 조회")
