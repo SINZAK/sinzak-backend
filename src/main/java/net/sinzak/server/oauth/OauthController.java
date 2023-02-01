@@ -4,18 +4,16 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.user.dto.request.MockDto;
 import okhttp3.*;
 import okhttp3.RequestBody;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Map;
 
 @Api(tags = "소셜로그인")
 @RestController
@@ -31,26 +29,35 @@ public class OauthController {
     public  String kakaoLogin() throws IOException {
         String url = "https://kauth.kakao.com/oauth/authorize"
                 + "?client_id=3201538a34f65dfa0fb2e96b0d268ca7"
-                + "&redirect_uri="+productURL+"/api/login/oauth2/code/kakao"
+                + "&redirect_uri="+developURL+"/api/login/oauth2/code/kakao"
                 + "&response_type=code";
         return url;
     }
 
-    @ApiOperation(value = "액세스토큰 code에 넣어주세요.  유저정보 가져오기", notes = "웹, 안드, ios 용")
+    @ApiOperation(value = "스프링용 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
     @GetMapping(value = "/login/oauth2/code/kakao")
     public String oauthKakao(@RequestParam(value = "code", required = false) String code) throws Exception {
-//        log.warn("인가코드 = {}",code);
-//        String accessToken = getAccessToken(code);
-//        log.warn("액세스토큰 = {}",accessToken);
-        JSONObject info = getInfo(code);
+        log.warn("인가코드 = {}",code);
+        String accessToken = getAccessToken(code);
+        log.warn("액세스토큰 = {}",accessToken);
+//        JSONObject info = getInfo(code);
+//        OAuthAttributes OauthUser = OAuthAttributes.of("kakao", info);
+//        return OauthUser.toString();
+        return accessToken;
+    }
+
+    @ApiOperation(value = "액세스토큰 body에 넣어주세요.  유저정보 가져오기", notes = "웹, 안드, ios 용")
+    @PostMapping(value = "/oauth/get")
+    public JSONObject oauthKakao(@org.springframework.web.bind.annotation.RequestBody MockDto tokenDto) throws Exception {
+        JSONObject info = getInfo(tokenDto.getAccessToken());
         OAuthAttributes OauthUser = OAuthAttributes.of("kakao", info);
-        return OauthUser.toString();
+        return PropertyUtil.response(OauthUser);
     }
 
     private String getAccessToken(String code) throws IOException, ParseException {
         String url = "https://kauth.kakao.com/oauth/token"
                 + "?client_id=3201538a34f65dfa0fb2e96b0d268ca7"
-                + "&redirect_uri="+productURL+"/api/login/oauth2/code/kakao"
+                + "&redirect_uri="+developURL+"/api/login/oauth2/code/kakao"
                 + "&grant_type=authorization_code"
                 + "&code=" + code;
         Request.Builder builder = new Request.Builder().header("Content-type", " application/x-www-form-urlencoded")
