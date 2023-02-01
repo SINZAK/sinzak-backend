@@ -41,6 +41,7 @@ public class OauthController {
     public String oauthKakao(@RequestParam(value = "code", required = false) String code) throws Exception {
         log.warn("인가코드 = {}",code);
         String accessToken = getAccessToken(code);
+        log.warn("액세스토큰 = {}",accessToken);
         JSONObject info = getInfo(accessToken);
         OAuthAttributes OauthUser = OAuthAttributes.of("kakao", info);
         return OauthUser.toString();
