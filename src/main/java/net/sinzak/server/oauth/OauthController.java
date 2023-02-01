@@ -36,13 +36,13 @@ public class OauthController {
         return url;
     }
 
-    @ApiOperation(value = "인가코드 전달받고 유저정보 가져오기", notes = "웹, 안드, ios 용")
+    @ApiOperation(value = "액세스토큰 code에 넣어주세요.  유저정보 가져오기", notes = "웹, 안드, ios 용")
     @GetMapping(value = "/login/oauth2/code/kakao")
     public String oauthKakao(@RequestParam(value = "code", required = false) String code) throws Exception {
-        log.warn("인가코드 = {}",code);
-        String accessToken = getAccessToken(code);
-        log.warn("액세스토큰 = {}",accessToken);
-        JSONObject info = getInfo(accessToken);
+//        log.warn("인가코드 = {}",code);
+//        String accessToken = getAccessToken(code);
+//        log.warn("액세스토큰 = {}",accessToken);
+        JSONObject info = getInfo(code);
         OAuthAttributes OauthUser = OAuthAttributes.of("kakao", info);
         return OauthUser.toString();
     }
