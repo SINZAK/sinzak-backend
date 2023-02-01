@@ -44,7 +44,12 @@ public class UserQueryService {
         List<ProfileShowForm> showFormList = new ArrayList<>();
         System.out.println(productList.size());
         for (Product product : productList) {
-            ProfileShowForm form = new ProfileShowForm(product.getId(), product.getThumbnail());
+            ProfileShowForm form = ProfileShowForm.builder()
+                    .id(product.getId())
+                    .complete(product.isComplete())
+                    .createdAt(product.getCreatedDate())
+                    .thumbnail(product.getThumbnail())
+                    .title(product.getTitle()).build();
             showFormList.add(form);
         }
         return showFormList;
@@ -53,7 +58,12 @@ public class UserQueryService {
     private List<ProfileShowForm> makeWorkShowForm(Set<Work> workList) {
         List<ProfileShowForm> showFormList = new ArrayList<>();
         for (Work work : workList) {
-            ProfileShowForm form = new ProfileShowForm(work.getId(), work.getThumbnail());
+            ProfileShowForm form = ProfileShowForm.builder()
+                    .id(work.getId())
+                    .complete(work.isComplete())
+                    .createdAt(work.getCreatedDate())
+                    .thumbnail(work.getThumbnail())
+                    .title(work.getTitle()).build();
             showFormList.add(form);
         }
         showFormList.sort((o1, o2) -> (int) (o2.getId()-o1.getId()));
