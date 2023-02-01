@@ -61,10 +61,10 @@ public class UserQueryService {
         return showFormList;
     }
 
-    public UserDto getUserProfile(Long userId, User user) {
+    public JSONObject getUserProfile(Long userId, User user) {
         User findUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         //System.out.println("쿼리 수 확인");
-        return makeUserDto(user,findUser);
+        return PropertyUtil.response( makeUserDto(user,findUser));
     }
     private UserDto makeUserDto(User user, User findUser) {
         UserDto userDto = UserDto.builder()
