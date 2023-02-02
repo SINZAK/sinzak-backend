@@ -31,7 +31,6 @@ public class UserCommandController {
     private final UserCommandService userCommandService;
     private final SecurityService securityService;
 
-
     @ApiDocumentResponse
     @ApiOperation(value = "회원가입", notes = "카테고리는 {\"category_like\" : \"orient, painting\"} 처럼 콤마로 구분해서 보내주세요\n 1)로그인 성공 시 하단과 같이 반환됩니다\n" +
             "{\n" +
