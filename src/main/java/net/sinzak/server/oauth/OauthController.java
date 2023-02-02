@@ -92,10 +92,7 @@ public class OauthController {
         log.warn("인가코드 = {}",code);
         JSONObject obj = getGoogleAccessToken(code);
         log.warn("액세스토큰 = {}",obj.get("access_token").toString());
-        JSONObject info = getGoogleInfo(obj);
-//        OAuthAttributes OauthUser = OAuthAttributes.of("kakao", info);
-//        return OauthUser.toString();
-        return info.toJSONString();
+        return obj.toJSONString();
     }
 
     private JSONObject getGoogleAccessToken(String code) throws IOException, ParseException {
@@ -119,10 +116,10 @@ public class OauthController {
         return response;
     }
 
-    private JSONObject getGoogleInfo(JSONObject obj) throws IOException, ParseException {
-        String url = "https://oauth2.googleapis.com/tokeninfo?id_token="+obj.get("id_token");
+    private JSONObject getGoogleInfo(OauthDto dto) throws IOException, ParseException {
+        String url = "https://oauth2.googleapis.com/tokeninfo?id_token="+dto.getIdToken();
         Request.Builder builder = new Request.Builder()
-                .header("Authorization","Bearer "+obj.get("access_token"))
+                .header("Authorization","Bearer "+dto.getAccessToken())
                 .header("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
                 .url(url);
         Request request = builder.build();
@@ -147,8 +144,8 @@ public class OauthController {
         return response;
     }
 
-    @ApiOperation(value = "액세스토큰 body에 넣어주세요.  유저정보 가져오기", notes = "웹, 안드, ios 용")
-    @PostMapping(value = "/oauth/get")
+    @ApiOperation(value = "(카카오) 액세스토큰 body에 넣어주세요.  유저정보 가져오기", notes = "웹, 안드, ios 용")
+    @PostMapping(value = "/oauth/get/kakao")
     public JSONObject oauthKakao(@org.springframework.web.bind.annotation.RequestBody OauthDto tokenDto) throws Exception {
         JSONObject info = getKakaoInfo(tokenDto.getAccessToken());
         OAuthAttributes OauthUser = OAuthAttributes.of("kakao", info);
@@ -156,6 +153,19 @@ public class OauthController {
 
         return PropertyUtil.response(jwtToken);
     }
+
+    @ApiOperation(value = "(구글) 액세스토큰과 idToken을 body에 넣어주세요.  유저정보 가져오기", notes = "웹, 안드, ios 용")
+    @PostMapping(value = "/oauth/get/google")
+    public JSONObject oauthGoogle(@org.springframework.web.bind.annotation.RequestBody OauthDto tokenDto) throws Exception {
+        JSONObject info = getGoogleInfo(tokenDto);
+        OAuthAttributes OauthUser = OAuthAttributes.of("google", info);
+        log.error(OauthUser.toString());
+        TokenDto jwtToken = securityService.login(new EmailDto(OauthUser.getEmail()));
+
+        return PropertyUtil.response(jwtToken);
+    }
+
+
 
 //    @GetMapping("/oauth2/authorization/kakao")
 //    public void kakaoLogin() throws IOException {
