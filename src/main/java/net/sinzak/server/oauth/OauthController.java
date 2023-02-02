@@ -75,7 +75,7 @@ public class OauthController {
         return response.get("access_token").toString();
     }
 
-    @ApiOperation(value = "스프링용 구글로그인 실행",notes = "로컬환경 : https://accounts.google.com/o/oauth2/v2/auth?client_id=725362946704-p0fr9q566ph10pl0is8dm8e3jq5klfe7.apps.googleusercontent.com" +
+    @ApiOperation(value = "스프링용 구글로그인 실행",notes = "로컬환경 : https://accounts.google.com/o/oauth2/v2/auth?client_id=782966145872-6shnmrvqi0q4sihr8etu9nrvh9jv43dh.apps.googleusercontent.com" +
             "&redirect_uri=http://localhost:8080/api/login/oauth2/code/google&response_type=code&scope=profile%20email&include_granted_scopes=true"+'\n'+
             "배포환경 : https://accounts.google.com/o/oauth2/v2/auth?client_id=782966145872-6shnmrvqi0q4sihr8etu9nrvh9jv43dh.apps.googleusercontent.com" +
             "&redirect_uri=https://sinzak.net/api/login/oauth2/code/google&response_type=code&scope=profile%20email&include_granted_scopes=true")
@@ -97,8 +97,8 @@ public class OauthController {
 
     private JSONObject getGoogleAccessToken(String code) throws IOException, ParseException {
         String url = "https://oauth2.googleapis.com/token"
-                + "?client_id=725362946704-p0fr9q566ph10pl0is8dm8e3jq5klfe7.apps.googleusercontent.com"
-                + "&client_secret=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"
+                + "?client_id=782966145872-6shnmrvqi0q4sihr8etu9nrvh9jv43dh.apps.googleusercontent.com"
+                + "&client_secret=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"
                 + "&redirect_uri="+productURL+"/api/login/oauth2/code/google"
                 + "&grant_type=authorization_code"
                 + "&code=" + code;
