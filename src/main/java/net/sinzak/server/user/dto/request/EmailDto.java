@@ -8,4 +8,8 @@ public class EmailDto {
 
     @ApiModelProperty(example = "이메일 or 토큰id(애플로그인)")
     private String email;
+
+    public EmailDto(String email) {
+        this.email = email;
+    }
 }

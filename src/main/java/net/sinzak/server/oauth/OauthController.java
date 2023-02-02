@@ -5,7 +5,11 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.common.PropertyUtil;
-import net.sinzak.server.user.dto.request.MockDto;
+import net.sinzak.server.config.auth.SecurityService;
+import net.sinzak.server.config.auth.jwt.TokenDto;
+import net.sinzak.server.user.dto.request.EmailDto;
+import net.sinzak.server.user.dto.request.OauthDto;
+import net.sinzak.server.user.service.UserQueryService;
 import okhttp3.*;
 import okhttp3.RequestBody;
 import org.json.simple.JSONObject;
@@ -23,6 +27,8 @@ public class OauthController {
     private static final OkHttpClient client = new OkHttpClient();
     private static final String productURL = "https://sinzak.net";
     private static final String developURL = "http://localhost:8080";
+    private final UserQueryService userQueryService;
+    private final SecurityService securityService;
 
     @ApiOperation(value = "스프링용 카카오로그인 실행",notes = "배포환경 : https://kauth.kakao.com/oauth/authorize?client_id=3201538a34f65dfa0fb2e96b0d268ca7&redirect_uri=" +
             "https://sinzak.net/api/login/oauth2/code/kakao&response_type=code\n" +
@@ -37,11 +43,11 @@ public class OauthController {
         return url;
     }
 
-    @ApiOperation(value = "스프링용 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
+    @ApiOperation(value = "스프링용 카카오 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
     @GetMapping(value = "/login/oauth2/code/kakao")
     public String oauthKakao(@RequestParam(value = "code", required = false) String code) throws Exception {
         log.warn("인가코드 = {}",code);
-        String accessToken = getAccessToken(code);
+        String accessToken = getKakaoAccessToken(code);
         log.warn("액세스토큰 = {}",accessToken);
 //        JSONObject info = getInfo(code);
 //        OAuthAttributes OauthUser = OAuthAttributes.of("kakao", info);
@@ -49,15 +55,7 @@ public class OauthController {
         return accessToken;
     }
 
-    @ApiOperation(value = "액세스토큰 body에 넣어주세요.  유저정보 가져오기", notes = "웹, 안드, ios 용")
-    @PostMapping(value = "/oauth/get")
-    public JSONObject oauthKakao(@org.springframework.web.bind.annotation.RequestBody MockDto tokenDto) throws Exception {
-        JSONObject info = getInfo(tokenDto.getAccessToken());
-        OAuthAttributes OauthUser = OAuthAttributes.of("kakao", info);
-        return PropertyUtil.response(OauthUser);
-    }
-
-    private String getAccessToken(String code) throws IOException, ParseException {
+    private String getKakaoAccessToken(String code) throws IOException, ParseException {
         String url = "https://kauth.kakao.com/oauth/token"
                 + "?client_id=3201538a34f65dfa0fb2e96b0d268ca7"
                 + "&redirect_uri="+productURL+"/api/login/oauth2/code/kakao"
@@ -77,7 +75,65 @@ public class OauthController {
         return response.get("access_token").toString();
     }
 
-    private JSONObject getInfo(String accessToken) throws IOException, ParseException {
+    @ApiOperation(value = "스프링용 구글로그인 실행",notes = "로컬환경 : https://accounts.google.com/o/oauth2/v2/auth?client_id=725362946704-p0fr9q566ph10pl0is8dm8e3jq5klfe7.apps.googleusercontent.com" +
+            "&redirect_uri=http://localhost:8080/api/login/oauth2/code/google&response_type=code&scope=profile%20email&include_granted_scopes=true"+'\n'+
+            "배포환경 : https://accounts.google.com/o/oauth2/v2/auth?client_id=782966145872-6shnmrvqi0q4sihr8etu9nrvh9jv43dh.apps.googleusercontent.com" +
+            "&redirect_uri=https://sinzak.net/api/login/oauth2/code/google")
+    @GetMapping("/test2")
+    public String googleLogin() throws IOException {
+        String url = "https://accounts.google.com/o/oauth2/v2/auth?client_id=782966145872-6shnmrvqi0q4sihr8etu9nrvh9jv43dh.apps.googleusercontent.com" +
+                "&redirect_uri="+ developURL +"/api/login/oauth2/code/google";
+        return url;
+    }
+
+    @ApiOperation(value = "스프링용 구글 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
+    @GetMapping(value = "/login/oauth2/code/google")
+    public String oauthGoogle(@RequestParam(value = "code", required = false) String code) throws Exception {
+        log.warn("인가코드 = {}",code);
+        JSONObject obj = getGoogleAccessToken(code);
+        log.warn("액세스토큰 = {}",obj.get("access_token").toString());
+        JSONObject info = getGoogleInfo(obj);
+//        OAuthAttributes OauthUser = OAuthAttributes.of("kakao", info);
+//        return OauthUser.toString();
+        return info.toJSONString();
+    }
+
+    private JSONObject getGoogleAccessToken(String code) throws IOException, ParseException {
+        String url = "https://oauth2.googleapis.com/token"
+                + "?client_id=725362946704-p0fr9q566ph10pl0is8dm8e3jq5klfe7.apps.googleusercontent.com"
+                + "&client_secret=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"
+                + "&redirect_uri="+developURL+"/api/login/oauth2/code/google"
+                + "&grant_type=authorization_code"
+                + "&code=" + code;
+        Request.Builder builder = new Request.Builder().header("Content-type", " application/x-www-form-urlencoded")
+                .url(url);
+        JSONObject postObj = new JSONObject();
+        RequestBody requestBody = RequestBody.create(postObj.toJSONString().getBytes());
+        builder.post(requestBody);
+        Request request = builder.build();
+
+        Response responseHTML = client.newCall(request).execute();
+        JSONParser parser = new JSONParser();
+        JSONObject response = (JSONObject) parser.parse(responseHTML.body().string());
+        log.warn(response.toJSONString());
+        return response;
+    }
+
+    private JSONObject getGoogleInfo(JSONObject obj) throws IOException, ParseException {
+        String url = "https://oauth2.googleapis.com/tokeninfo?id_token="+obj.get("id_token");
+        Request.Builder builder = new Request.Builder()
+                .header("Authorization","Bearer "+obj.get("access_token"))
+                .header("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
+                .url(url);
+        Request request = builder.build();
+
+        Response responseHTML = client.newCall(request).execute();
+        JSONParser parser = new JSONParser();
+        JSONObject response = (JSONObject) parser.parse(responseHTML.body().string());
+        return response;
+    }
+
+    private JSONObject getKakaoInfo(String accessToken) throws IOException, ParseException {
         String url = "https://kapi.kakao.com/v2/user/me";
         Request.Builder builder = new Request.Builder()
                 .header("Authorization","Bearer "+accessToken)
@@ -91,6 +147,15 @@ public class OauthController {
         return response;
     }
 
+    @ApiOperation(value = "액세스토큰 body에 넣어주세요.  유저정보 가져오기", notes = "웹, 안드, ios 용")
+    @PostMapping(value = "/oauth/get")
+    public JSONObject oauthKakao(@org.springframework.web.bind.annotation.RequestBody OauthDto tokenDto) throws Exception {
+        JSONObject info = getKakaoInfo(tokenDto.getAccessToken());
+        OAuthAttributes OauthUser = OAuthAttributes.of("kakao", info);
+        TokenDto jwtToken = securityService.login(new EmailDto(OauthUser.getEmail()));
+
+        return PropertyUtil.response(jwtToken);
+    }
 
 //    @GetMapping("/oauth2/authorization/kakao")
 //    public void kakaoLogin() throws IOException {
