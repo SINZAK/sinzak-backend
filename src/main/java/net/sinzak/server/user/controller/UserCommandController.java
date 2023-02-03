@@ -21,6 +21,7 @@ import org.json.simple.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.NoSuchElementException;
 
@@ -80,6 +81,12 @@ public class UserCommandController {
     public JSONObject updateUser( @RequestBody UpdateUserDto dto , @AuthenticationPrincipal User user) {
         return userCommandService.updateUser(dto,user);
     }
+    @ApiDocumentResponse
+    @ApiOperation(value ="/users/edit/image")
+    public JSONObject updateUserImage(@AuthenticationPrincipal User user,@RequestPart MultipartFile multipartFile){
+        return userCommandService.updateUserImage(user,multipartFile);
+    }
+
 
     @ApiDocumentResponse
     @ApiOperation(value = "팔로우하기")

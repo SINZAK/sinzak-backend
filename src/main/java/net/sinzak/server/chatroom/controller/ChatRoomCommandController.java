@@ -1,6 +1,7 @@
 package net.sinzak.server.chatroom.controller;
 
 
+import com.google.api.client.json.Json;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,12 @@ public class ChatRoomCommandController {
     public JSONObject createChatRoom(@RequestBody PostDto postDto, @AuthenticationPrincipal User user){
         return chatRoomCommandService.createUserChatRoom(postDto,user);
     }
+
+//    @PostMapping(value ="/chat/rooms/{uuid}/leave")
+//    @ApiOperation(value ="채팅방 나가기")
+//    public JSONObject leaveChatRoom(@PathVariable("uuid") String roomUuid,@AuthenticationPrincipal User user){
+//        return chatRoomCommandService.leaveChatRoom(user,roomUuid);
+//    }
 
     //채팅방 조회
 
