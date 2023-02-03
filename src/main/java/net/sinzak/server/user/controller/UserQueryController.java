@@ -25,9 +25,9 @@ public class UserQueryController {
 
     @ApiOperation(value ="유저 프로필 보기")
     @GetMapping(value ="/users/{userId}/profile")
-    public UserDto getUserProfile(@PathVariable Long userId, @AuthenticationPrincipal User user){
-        UserDto userDto = userQueryService.getUserProfile(userId, user);
-        return userDto;
+    public JSONObject getUserProfile(@PathVariable Long userId, @AuthenticationPrincipal User user){
+       return userQueryService.getUserProfile(userId, user);
+
     }
     @ApiOperation(value ="팔로워리스트")
     @GetMapping(value ="/users/{userId}/followers")
