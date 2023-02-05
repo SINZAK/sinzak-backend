@@ -16,9 +16,4 @@ public class ProfileShowForm {
     private String title;
     private LocalDateTime createdAt;
     private boolean complete;
-
-    public ProfileShowForm(Long id, String thumbnail) {
-        this.id = id;
-        this.thumbnail = thumbnail;
-    }
 }
