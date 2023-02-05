@@ -33,7 +33,6 @@ public class SecurityService {
 
     @Transactional
     public TokenDto login(String email) {
-
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("가입되지 않은 ID 입니다."));
         TokenDto tokenDto = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
