@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.dto.IdDto;
-import net.sinzak.server.common.error.ErrorResponse;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
