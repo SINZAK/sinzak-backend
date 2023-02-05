@@ -45,6 +45,13 @@ public class PropertyUtil implements EnvironmentAware {
         return obj;
     }
 
+    public static JSONObject response(Object data, boolean bl){
+        JSONObject obj = new JSONObject();
+        obj.put(SUCCESS_WORD,bl);
+        obj.put("data",data);
+        return obj;
+    }
+
     public static JSONObject response(Long id){
         JSONObject obj = new JSONObject();
         obj.put("id",id);
