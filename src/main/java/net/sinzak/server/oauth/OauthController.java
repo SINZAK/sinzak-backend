@@ -5,13 +5,16 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.config.auth.SecurityService;
 import net.sinzak.server.config.auth.jwt.TokenDto;
-import net.sinzak.server.user.dto.request.EmailDto;
+import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.dto.request.OauthDto;
-import net.sinzak.server.user.service.UserQueryService;
-import okhttp3.*;
+import net.sinzak.server.user.service.UserCommandService;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -27,8 +30,39 @@ public class OauthController {
     private static final OkHttpClient client = new OkHttpClient();
     private static final String productURL = "https://sinzak.net";
     private static final String developURL = "http://localhost:8080";
-    private final UserQueryService userQueryService;
     private final SecurityService securityService;
+    private final UserCommandService userService;
+// TODO 리팩토링 예정.
+
+    @ApiOperation(value = "액세스토큰 body에 넣어주세요.  유저정보 가져오기", notes = "구글은 idToken 값까지 같이주기. 나머지 origin들은 생략")
+    @PostMapping(value = "/oauth/get")
+    public JSONObject getOauthToken(@org.springframework.web.bind.annotation.RequestBody OauthDto tokenDto) throws Exception {
+        JSONObject OauthInfo = getInfo(tokenDto);
+        OAuthAttributes OauthUser = OAuthAttributes.of(tokenDto.getOrigin(), OauthInfo);
+
+        TokenDto jwtToken;
+        try{
+            jwtToken = securityService.login(OauthUser.getEmail());
+        }
+        catch(UserNotFoundException e){
+            User savedUser = userService.saveTempUser(new User(OauthUser.getEmail(), OauthUser.getName(), OauthUser.getPicture()));
+            jwtToken = securityService.login(savedUser);
+        }
+        return PropertyUtil.response(jwtToken);
+    }
+
+    private JSONObject getInfo(OauthDto tokenDto) throws IOException, ParseException {
+        JSONObject OauthInfo = new JSONObject();
+        if(tokenDto.getOrigin().equals("google"))
+            OauthInfo = getGoogleInfo(tokenDto);
+        else if(tokenDto.getOrigin().equals("kakao"))
+            OauthInfo = getKakaoInfo(tokenDto.getAccessToken());
+        else if(tokenDto.getOrigin().equals("naver"))
+            OauthInfo = null;
+
+        return OauthInfo;
+    }
+
 
     @ApiOperation(value = "스프링용 카카오로그인 실행",notes = "배포환경 : https://kauth.kakao.com/oauth/authorize?client_id=3201538a34f65dfa0fb2e96b0d268ca7&redirect_uri=" +
             "https://sinzak.net/api/login/oauth2/code/kakao&response_type=code\n" +
@@ -143,44 +177,6 @@ public class OauthController {
         JSONObject response = (JSONObject) parser.parse(responseHTML.body().string());
         return response;
     }
-
-    @ApiOperation(value = "(카카오) 액세스토큰 body에 넣어주세요.  유저정보 가져오기", notes = "웹, 안드, ios 용")
-    @PostMapping(value = "/oauth/get/kakao")
-    public JSONObject oauthKakao(@org.springframework.web.bind.annotation.RequestBody OauthDto tokenDto) throws Exception {
-        JSONObject info = getKakaoInfo(tokenDto.getAccessToken());
-        OAuthAttributes OauthUser = OAuthAttributes.of("kakao", info);
-        TokenDto jwtToken = securityService.login(new EmailDto(OauthUser.getEmail()));
-
-        return PropertyUtil.response(jwtToken);
-    }
-
-    @ApiOperation(value = "(구글) 액세스토큰과 idToken을 body에 넣어주세요.  유저정보 가져오기", notes = "웹, 안드, ios 용")
-    @PostMapping(value = "/oauth/get/google")
-    public JSONObject oauthGoogle(@org.springframework.web.bind.annotation.RequestBody OauthDto tokenDto) throws Exception {
-        JSONObject info = getGoogleInfo(tokenDto);
-        OAuthAttributes OauthUser = OAuthAttributes.of("google", info);
-        log.error(OauthUser.toString());
-        TokenDto jwtToken = securityService.login(new EmailDto(OauthUser.getEmail()));
-
-        return PropertyUtil.response(jwtToken);
-    }
-
-
-
-//    @GetMapping("/oauth2/authorization/kakao")
-//    public void kakaoLogin() throws IOException {
-//        String id = "80bafa3a542e6efeb296c345fa846c71";
-//        String redirect_uri = "http://localhost:8080/login/oauth2/code/kakao";
-//        String url = "https://kauth.kakao.com/oauth/authorize";
-//        HttpUrl.Builder http = HttpUrl.get(url).newBuilder()
-//                .addQueryParameter("response_type", "code")
-//                .addQueryParameter("client_id", id)
-//                .addQueryParameter("redirect_uri", redirect_uri);
-//        Request.Builder builder = new Request.Builder().url(http.build()).get();
-//        Request request = builder.build();
-//        Response responseHTML = client.newCall(request).execute();
-//        System.out.println(responseHTML.body().string());
-//    }
 
 
 

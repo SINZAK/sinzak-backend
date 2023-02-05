@@ -24,12 +24,16 @@ configurations {
 
 repositories {
 	mavenCentral()
+	maven{
+		url 'https://jitpack.io'
+	}
 }
 jar{
 	enabled = false
 }
 
 dependencies {
+	implementation 'com.github.in-seo:UnivCert-JitPack:50c23ec9'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.security:spring-security-test'

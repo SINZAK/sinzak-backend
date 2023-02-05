@@ -29,11 +29,12 @@ public class SecurityService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtProvider;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final JoinTermsRepository joinTermsRepository;
 
     @Transactional
-    public TokenDto login(EmailDto dto) {
+    public TokenDto login(String email) {
 
-        User user = userRepository.findByEmail(dto.getEmail())
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("가입되지 않은 ID 입니다."));
         TokenDto tokenDto = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
         //리프레시 토큰 저장
@@ -45,7 +46,19 @@ public class SecurityService {
         return tokenDto;
     }
 
-    private final JoinTermsRepository joinTermsRepository;
+    @Transactional
+    public TokenDto login(User user) {
+        TokenDto tokenDto = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
+        //리프레시 토큰 저장
+        RefreshToken refreshToken = RefreshToken.builder()
+                .key(user.getId())
+                .token(tokenDto.getRefreshToken())
+                .build();
+        refreshTokenRepository.save(refreshToken);
+        return tokenDto;
+    }
+
+
 
     @Transactional(rollbackFor = Exception.class)
     public JSONObject join(@RequestBody JoinDto dto) {
