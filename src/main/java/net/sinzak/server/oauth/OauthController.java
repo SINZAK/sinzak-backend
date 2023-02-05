@@ -34,7 +34,8 @@ public class OauthController {
     private final UserCommandService userService;
 // TODO 리팩토링 예정.
 
-    @ApiOperation(value = "액세스토큰 body에 넣어주세요.  유저정보 가져오기", notes = "구글은 idToken 값까지 같이주기. 나머지 origin들은 생략")
+    @ApiOperation(value = "액세스토큰 body에 넣어주세요.  유저정보 가져오기", notes = "구글은 idToken 값까지 같이주기. 나머지 origin들은 생략\n" +
+            "data 안에는 공통적으로 토큰이, success = true -> 홈으로 보내면되고, success = false 면 /join api 처리할 수 있게 회원가입 창으로 보내주시면 될 것 같아여")
     @PostMapping(value = "/oauth/get")
     public JSONObject getOauthToken(@org.springframework.web.bind.annotation.RequestBody OauthDto tokenDto) throws Exception {
         JSONObject OauthInfo = getInfo(tokenDto);
@@ -47,6 +48,7 @@ public class OauthController {
         catch(UserNotFoundException e){
             User savedUser = userService.saveTempUser(new User(OauthUser.getEmail(), OauthUser.getName(), OauthUser.getPicture()));
             jwtToken = securityService.login(savedUser);
+            return PropertyUtil.response(jwtToken, false); /** 추가 정보 받기 위해 회원가입창으로 보내기 **/
         }
         return PropertyUtil.response(jwtToken);
     }

@@ -158,9 +158,9 @@ public class User extends BaseTimeEntity implements UserDetails {
         return this.role.getKey();
     }
 
-    public void updateCertifiedUniv(String univ, String univ_email) {
+    public void updateCertifiedUniv(String univName, String univ_email) {
         this.univ_email = univ_email;
-        this.univ = univ;
+        this.univ = univName;
         this.cert_uni = true;
     }
 
