@@ -9,6 +9,6 @@ public class OauthDto {
     private String accessToken;
     @ApiModelProperty(example = "구글전용")
     private String idToken;
-    @ApiModelProperty(example = "소셜 로그인 origin")
+    @ApiModelProperty(example = "소셜 로그인 origin 소문자")
     private String origin;
 }
