@@ -27,6 +27,10 @@ public class UserCommandService {
     private final ReportRepository reportRepository;
     private final SearchHistoryRepository historyRepository;
 
+    public User saveTempUser(User user){
+        return userRepository.save(user);
+    }
+
     public JSONObject updateUser(UpdateUserDto dto, User loginUser){
         if(loginUser ==null){
             return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);

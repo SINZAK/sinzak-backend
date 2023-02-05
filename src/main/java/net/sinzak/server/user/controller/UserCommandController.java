@@ -32,23 +32,9 @@ public class UserCommandController {
     private final SecurityService securityService;
 
     @ApiDocumentResponse
-    @ApiOperation(value = "회원가입", notes = "카테고리는 {\"category_like\" : \"orient, painting\"} 처럼 콤마로 구분해서 보내주세요\n 1)로그인 성공 시 하단과 같이 반환됩니다\n" +
-            "{\n" +
-            "        \"success\": true,\n" +
-            "            \"token\": {\n" +
-            "        \"grantType\": \"bearer\",\n" +
-            "                \"accessToken\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpbnNlbzUxMkBuYXZlci5jb20iLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNjcyNzE3ODQ1LCJleHAiOjE2NzI3MTk2NDV9.iRfb5SkbOiGuBBsGuXmP-R9WeH4T-npQM1I7ROZ9DVk\",\n" +
-            "                \"refreshToken\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NzM5Mjc0NDV9.WOaxJZI1292s5IcNHwhCazmT9izRC1TFfc3NBaCDhIg\",\n" +
-            "                \"accessTokenExpireDate\": 1800000\n" +
-            "    }\n" +
-            "    }" +
-            "\n\n\n\n 2) 이메일 중복 시 에는 하단과 같이 반환됩니다 :\n{\n" +
-            "  \"success\": false,\n" +
-            "  \"message\": \"이미 가입된 이메일입니다.\"\n" +
-            "}")
-
+    @ApiOperation(value = "회원가입", notes = "카테고리는 {\"category_like\" : \"orient,painting\"} 처럼 콤마로만 구분해서 보내주세요")
     @PostMapping("/join")
-    public JSONObject join(@RequestBody JoinDto dto) {
+    public JSONObject join(@AuthenticationPrincipal User user, @RequestBody JoinDto dto) {
         return securityService.join(dto);
     }
 
@@ -65,7 +51,7 @@ public class UserCommandController {
     @ApiOperation(value = "로그인테스트 \"email\" : \"insi2000@naver.com\" 과 같은 형식으로 보내주세요", notes = "성공시 jwt 토큰을 헤더에 넣어서 반환합니다. Authorization 헤더에 액세스토큰을 넣어주세요")
     @PostMapping("/login")
     public TokenDto login(@RequestBody EmailDto dto) {
-        return securityService.login(dto);
+        return securityService.login(dto.getEmail());
     }
 
     @ApiOperation(value = "토큰 만료시 재발급, access,refresh 둘 다 보내주세요")
