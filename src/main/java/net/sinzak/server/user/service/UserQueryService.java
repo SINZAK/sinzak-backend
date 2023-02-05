@@ -9,7 +9,7 @@ import net.sinzak.server.product.domain.Product;
 import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.user.dto.respond.GetFollowDto;
 import net.sinzak.server.user.domain.User;
-import net.sinzak.server.user.dto.respond.MyPageShowForm;
+import net.sinzak.server.user.dto.respond.ProfileShowForm;
 import net.sinzak.server.user.dto.respond.UserDto;
 import net.sinzak.server.user.repository.SearchHistoryRepository;
 import net.sinzak.server.user.repository.UserRepository;
@@ -30,41 +30,56 @@ public class UserQueryService {
     private final SearchHistoryRepository historyRepository;
 
     public JSONObject getMyProfile(User user){
-        User findUser = userRepository.findByEmailFetchProductPostList(user.getEmail()).orElseThrow(UserNotFoundException::new);
-        List<MyPageShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
-        findUser = userRepository.findByEmailFetchWorkPostList(user.getEmail()).orElseThrow(UserNotFoundException::new);
-        List<MyPageShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList());  /** fetch 조인 2개 연속으로 하면 꼬여서 두개로 나눔 **/
         JSONObject obj = new JSONObject();
+        User findUser = userRepository.findByEmailFetchProductPostList(user.getEmail()).orElseThrow(UserNotFoundException::new);
+        List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
         obj.put("products", productShowForms);
+        List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList());
         obj.put("works", workShowForms);
         obj.put("profile",makeUserDto(user,findUser));
         return PropertyUtil.response(obj);
     }
 
-    private List<MyPageShowForm> makeProductShowForm(List<Product> productList) {
-        List<MyPageShowForm> showFormList = new ArrayList<>();
+    private List<ProfileShowForm> makeProductShowForm(List<Product> productList) {
+        List<ProfileShowForm> showFormList = new ArrayList<>();
         System.out.println(productList.size());
         for (Product product : productList) {
-            MyPageShowForm form = new MyPageShowForm(product.getId(), product.getThumbnail());
+            ProfileShowForm form = ProfileShowForm.builder()
+                    .id(product.getId())
+                    .complete(product.isComplete())
+                    .createdAt(product.getCreatedDate())
+                    .thumbnail(product.getThumbnail())
+                    .title(product.getTitle()).build();
             showFormList.add(form);
         }
         return showFormList;
     }
 
-    private List<MyPageShowForm> makeWorkShowForm(Set<Work> workList) {
-        List<MyPageShowForm> showFormList = new ArrayList<>();
+    private List<ProfileShowForm> makeWorkShowForm(Set<Work> workList) {
+        List<ProfileShowForm> showFormList = new ArrayList<>();
         for (Work work : workList) {
-            MyPageShowForm form = new MyPageShowForm(work.getId(), work.getThumbnail());
+            ProfileShowForm form = ProfileShowForm.builder()
+                    .id(work.getId())
+                    .complete(work.isComplete())
+                    .createdAt(work.getCreatedDate())
+                    .thumbnail(work.getThumbnail())
+                    .title(work.getTitle()).build();
             showFormList.add(form);
         }
         showFormList.sort((o1, o2) -> (int) (o2.getId()-o1.getId()));
         return showFormList;
     }
 
-    public UserDto getUserProfile(Long userId, User user) {
-        User findUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    public JSONObject getUserProfile(Long userId, User user) {
+        JSONObject obj = new JSONObject();
+        User findUser = userRepository.findByIdFetchProductPostList(userId).orElseThrow(UserNotFoundException::new);
+        List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
+        obj.put("products", productShowForms);
+        List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList());
+        obj.put("works", workShowForms);
+        obj.put("profile",makeUserDto(user,findUser));
         //System.out.println("쿼리 수 확인");
-        return makeUserDto(user,findUser);
+        return obj;
     }
     private UserDto makeUserDto(User user, User findUser) {
         UserDto userDto = UserDto.builder()

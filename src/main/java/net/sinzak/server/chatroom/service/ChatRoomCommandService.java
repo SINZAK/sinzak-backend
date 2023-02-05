@@ -11,6 +11,7 @@ import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.repository.UserChatRoomRepository;
 import net.sinzak.server.common.PostType;
 import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.product.domain.Product;
 import net.sinzak.server.product.repository.ProductRepository;
@@ -92,6 +93,11 @@ public class ChatRoomCommandService {
             product.addChatRoom(chatRoom);
         }
     }
+//    public JSONObject leaveChatRoom(User user,String roomUuid){
+//        ChatRoom findChatRoom = chatRoomRepository.findByRoomId(roomUuid).orElseThrow(()->new InstanceNotFoundException("존재하지 않는 채팅방입니다."));
+//        List<UserChatRoom> userCha
+//
+//    }
 
     @NotNull
     private ChatRoom makeChatRoomAndUserChatRoom(User invitedUser, User findUser) {

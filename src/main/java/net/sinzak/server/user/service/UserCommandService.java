@@ -4,6 +4,7 @@ package net.sinzak.server.user.service;
 import lombok.RequiredArgsConstructor;
 
 import net.sinzak.server.common.error.InstanceNotFoundException;
+import net.sinzak.server.image.S3Service;
 import net.sinzak.server.user.domain.Report;
 import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.user.dto.request.ReportDto;
@@ -18,6 +19,7 @@ import net.sinzak.server.common.PropertyUtil;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +28,7 @@ public class UserCommandService {
     private final UserRepository userRepository;
     private final ReportRepository reportRepository;
     private final SearchHistoryRepository historyRepository;
+    private final S3Service s3Service;
 
     public User saveTempUser(User user){
         return userRepository.save(user);
@@ -37,6 +40,19 @@ public class UserCommandService {
         }
         User user = userRepository.findById(loginUser.getId()).orElseThrow(UserNotFoundException::new);
         user.update(dto.getName(),dto.getPicture(),dto.getIntroduction());
+        return PropertyUtil.response(true);
+    }
+
+    public JSONObject updateUserImage(User loginUser, MultipartFile multipartFile){
+        User findUser = userRepository.findByEmail(loginUser.getEmail()).orElseThrow(UserNotFoundException::new);
+        try{
+            String url = s3Service.uploadImage(multipartFile);
+            findUser.setPicture(url);
+        }
+        catch (Exception e){
+            return PropertyUtil.responseMessage("이미지 저장 실패");
+        }
+
         return PropertyUtil.response(true);
     }
 

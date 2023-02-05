@@ -2,6 +2,7 @@ package net.sinzak.server.user.domain;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import net.sinzak.server.BaseTimeEntity;
 import net.sinzak.server.chatroom.domain.UserChatRoom;
 import net.sinzak.server.product.domain.ProductLikes;
@@ -44,6 +45,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     private String nickName; //얘는 안 쓸 수도있음
 
     @Column
+    @Setter
     private String picture; //대표 사진
 
     @Column
