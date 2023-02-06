@@ -79,7 +79,7 @@ public class UserQueryService {
         obj.put("works", workShowForms);
         obj.put("profile",makeUserDto(user,findUser));
         //System.out.println("쿼리 수 확인");
-        return obj;
+        return PropertyUtil.response(obj);
     }
     private UserDto makeUserDto(User user, User findUser) {
         UserDto userDto = UserDto.builder()

@@ -1,6 +1,7 @@
 package net.sinzak.server.user.dto.respond;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -17,8 +18,4 @@ public class ProfileShowForm {
     private LocalDateTime createdAt;
     private boolean complete;
 
-    public ProfileShowForm(Long id, String thumbnail) {
-        this.id = id;
-        this.thumbnail = thumbnail;
-    }
 }
