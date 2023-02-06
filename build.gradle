@@ -20,16 +20,21 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
+	querydsl.extendsFrom compileClasspath
 }
 
 repositories {
 	mavenCentral()
+	maven{
+		url 'https://jitpack.io'
+	}
 }
 jar{
 	enabled = false
 }
 
 dependencies {
+	implementation 'com.github.in-seo:UnivCert-JitPack:7f144f79'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.security:spring-security-test'
@@ -45,8 +50,9 @@ dependencies {
 	implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
 	//querydsl 추가
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
-	annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
+	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
 
+	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.2.0'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	compileOnly 'org.projectlombok:lombok'
 	compileOnly 'org.apache.tomcat.embed:tomcat-embed-jasper'

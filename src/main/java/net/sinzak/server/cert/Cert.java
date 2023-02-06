@@ -15,33 +15,28 @@ public class Cert extends BaseTimeEntity {
     private Long id;
 
     @Column
-    private String univ_email;  //대학 메일
+    private String email;
 
     @Column
-    private String code;  //메일 인증번호
+    private String univName;
 
     @Column
-    private String imageUrl;  //학생증 url
+    private String univCardUrl;  //학생증 url
 
     @Column
-    private boolean verified;  //메일 인증여부
+    private boolean verified = false;
 
-    public Cert(String univ_email, String code, String imageUrl, boolean verified) {
-        this.univ_email = univ_email;
-        this.code = code;
-        this.imageUrl = imageUrl;
+    public Cert(String email, String univName, String univCardUrl, boolean verified) {
+        this.email = email;
+        this.univName = univName;
+        this.univCardUrl = univCardUrl;
         this.verified = verified;
     }
 
-    protected Cert() {
-    }
-
-    public void updateKey(String code) {
-        this.code = code;
-    }
+    protected Cert() {}
 
     public void updateImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+        this.univCardUrl = imageUrl;
     }
 
     public void setVerified() {

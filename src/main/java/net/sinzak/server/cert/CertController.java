@@ -1,5 +1,6 @@
 package net.sinzak.server.cert;
 
+import com.univcert.api.UnivCert;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.common.PropertyUtil;
@@ -15,27 +16,45 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Map;
+
 @Api(tags = "인증")
 @RestController
 @RequiredArgsConstructor
 public class CertController {
-
     private final CertService certService;
+    private final static String API_KEY ="df6ea145-4134-40a3-a298-764cd7d5d7bb";
 
-    @ApiOperation(value = "대학 메일 인증 시작", notes = "유저 토큰은 필요없고, address, univ만 주시면 됩니다  1000~9999의 인증번호 메일전송예정")
+    @ApiDocumentResponse
+    @ApiOperation(value = "대학 메일 인증 시작", notes = "인증코드는 아예 생략하시고, address, univ만 주시면 됩니다  1000~9999의 인증번호 메일전송 예정 \n" +
+            "success : true 로 올 경우 메일 발송된 것.")
     @PostMapping("/certify/mail/send")
-    public JSONObject sendMail(@RequestBody MailDto mailDto) {
-        return certService.sendMail(mailDto);
-    }
+    public JSONObject sendUnivCertMail(@AuthenticationPrincipal User user, @RequestBody MailDto mailDto) throws IOException {
+        Map<String, Object> response = UnivCert.certify(API_KEY, mailDto.getAddress(), mailDto.getUniv(), false);
+        boolean success = (boolean) response.get("success");
+        if(success)
+            certService.updateCertified(user, mailDto.getUniv(), mailDto.getAddress());
 
-    @ApiOperation(value = "인증코드 확인", notes = "\"success\" : false 를 받았다면 학생증 인증도 있다는 걸 안내해야됩니다.\n ")
-    @PostMapping("/certify/mail/receive")
-    public JSONObject receiveMail(@AuthenticationPrincipal User user, @RequestBody MailDto mailDto) {
-        return certService.receiveMail(user, mailDto);
+        return PropertyUtil.response(success);
     }
 
     @ApiDocumentResponse
-    @ApiOperation(value = "대학교 학생증 인증",notes = "{\"success\":true, \"id\":3}\n해당 유저의 id를 전해드리니 이 /certify/{id}/univ 에 넘겨주세요)")
+    @ApiOperation(value = "대학 메일 인증 시작", notes = "인증코드 필수, 1000~9999의 인증번호 양식준수 \n" +
+            "success : true 면 끝이고 아니면 학생증 인증이나 나중에 하기 버튼 클릭 유도")
+    @PostMapping("/certify/mail/receive")
+    public JSONObject receiveUnivCertMail(@AuthenticationPrincipal User user, @RequestBody MailDto mailDto) throws IOException {
+        Map<String, Object> response = UnivCert.certifyCode(API_KEY, mailDto.getAddress(), mailDto.getUniv(), mailDto.getCode());
+        boolean success = (boolean) response.get("success");
+        if(success)
+            certService.updateCertified(user, mailDto.getUniv(), mailDto.getAddress());
+
+        return PropertyUtil.response(success);
+    }
+
+
+    @ApiDocumentResponse
+    @ApiOperation(value = "대학교 학생증 인증", notes = "{\"success\":true, \"id\":3}\n해당 유저의 id를 전해드리니 이 /certify/{id}/univ 에 넘겨주세요)")
     @PostMapping(value = "/certify/univ", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public JSONObject certifyUniv(@AuthenticationPrincipal User user, @RequestBody UnivDto univDto) {
         return certService.certifyUniv(user, univDto);
@@ -58,5 +77,7 @@ public class CertController {
 
     @ExceptionHandler(InstanceNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected JSONObject handleInstanceNotFoundException() {return PropertyUtil.responseMessage("존재하지 않는 객체입니다.");}
+    protected JSONObject handleInstanceNotFoundException() {
+        return PropertyUtil.responseMessage("존재하지 않는 객체입니다.");
+    }
 }
