@@ -65,6 +65,16 @@ public class ChatRoom extends BaseTimeEntity {
         }
     }
 
+    public UserChatRoom leaveChatRoom(String userEmail){
+        for(UserChatRoom userChatRoom :this.userChatRooms){
+            if(userChatRoom.getUser().getEmail().equals(userEmail)){
+                this.participantsNumber--;
+                return userChatRoom;
+            }
+        }
+        return null;
+    }
+
 //    @OneToMany(mappedBy = "chatRoom",cascade = CascadeType.ALL)
 //    private List<ChatMessage> chatMessages = new ArrayList<>();
 //    @OneToMany(mappedBy = "chatRoom",cascade = CascadeType.ALL)
