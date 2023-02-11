@@ -4,7 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import net.sinzak.server.chatroom.domain.MessageType;
+
+
 
 import java.time.LocalDateTime;
 
