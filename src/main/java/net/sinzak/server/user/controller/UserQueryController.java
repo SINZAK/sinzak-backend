@@ -47,5 +47,11 @@ public class UserQueryController {
         return userQueryService.showSearchHistory(user);
     }
 
+    @ApiOperation(value ="스크랩 목록 ")
+    @GetMapping(value ="/users/{userId}/wish")
+    public JSONObject showWish(@PathVariable Long userId){
+        return userQueryService.getWishList(userId);
+    }
+
 
 }
