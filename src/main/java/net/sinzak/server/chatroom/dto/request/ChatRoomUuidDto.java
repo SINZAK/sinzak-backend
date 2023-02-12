@@ -4,5 +4,5 @@ import lombok.Getter;
 
 @Getter
 public class ChatRoomUuidDto {
-    private String roomUuid;
+    private String roomId;
 }

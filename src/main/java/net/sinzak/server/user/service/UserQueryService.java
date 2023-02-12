@@ -6,14 +6,20 @@ import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.product.domain.Product;
+import net.sinzak.server.product.domain.ProductWish;
+import net.sinzak.server.product.repository.ProductWishRepository;
 import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.user.dto.respond.GetFollowDto;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.dto.respond.ProfileShowForm;
 import net.sinzak.server.user.dto.respond.UserDto;
+import net.sinzak.server.user.dto.respond.WishShowForm;
 import net.sinzak.server.user.repository.SearchHistoryRepository;
 import net.sinzak.server.user.repository.UserRepository;
 import net.sinzak.server.work.domain.Work;
+import net.sinzak.server.work.domain.WorkWish;
+import net.sinzak.server.work.repository.WorkWishRepository;
+import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
@@ -28,16 +34,70 @@ public class UserQueryService {
 
     private final UserRepository userRepository;
     private final SearchHistoryRepository historyRepository;
+    private final WorkWishRepository workWishRepository;
+    private final ProductWishRepository productWishRepository;
 
     public JSONObject getMyProfile(User user){
         JSONObject obj = new JSONObject();
         User findUser = userRepository.findByEmailFetchProductPostList(user.getEmail()).orElseThrow(UserNotFoundException::new);
         List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
         obj.put("products", productShowForms);
-        List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList());
+        List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList(),false);
         obj.put("works", workShowForms);
         obj.put("profile",makeUserDto(user,findUser));
         return PropertyUtil.response(obj);
+    }
+    public JSONObject getWishList(Long userId){
+        List<WorkWish> workWishes= workWishRepository.findByUserIdFetchWork(userId);
+        List<ProductWish> productWishes = productWishRepository.findByUserIdFetchProduct(userId);
+        JSONObject obj = new JSONObject();
+        List<WishShowForm> workWishShowForms = makeWorkWishShowForms(workWishes);
+        obj.put("workWishes",workWishShowForms);
+        List<WishShowForm> productWishShowForms = makeProductWishShowForms(productWishes);
+        obj.put("productWishes",productWishShowForms);
+        return PropertyUtil.response(obj);
+    }
+
+    public JSONObject getWorkEmploys(User user){
+        JSONObject obj = new JSONObject();
+        User findUser = userRepository.findByEmailFetchWorkPostList(user.getEmail()).orElseThrow(UserNotFoundException::new);
+        List<ProfileShowForm> workEmploys=  makeWorkShowForm(findUser.getWorkPostList(),true);
+        obj.put("workEmploys",workEmploys);
+        return PropertyUtil.response(obj);
+    }
+
+    @NotNull
+    private List<WishShowForm> makeProductWishShowForms(List<ProductWish> productWishes) {
+        List<WishShowForm> productWishShowForms = new ArrayList<>();
+        for(ProductWish productWish : productWishes){
+            Product product = productWish.getProduct();
+            WishShowForm wishShowForm = WishShowForm.builder()
+                    .id(product.getId())
+                    .thumbnail(product.getThumbnail())
+                    .complete(product.isComplete())
+                    .title(product.getTitle())
+                    .price(product.getPrice())
+                    .build();
+            productWishShowForms.add(wishShowForm);
+        }
+        return productWishShowForms;
+    }
+
+    @NotNull
+    private List<WishShowForm> makeWorkWishShowForms(List<WorkWish> workWishes) {
+        List<WishShowForm> workWishShowForms = new ArrayList<>();
+        for(WorkWish workWish : workWishes){
+            Work work = workWish.getWork();
+            WishShowForm wishShowForm = WishShowForm.builder()
+                    .id(work.getId())
+                    .complete(work.isComplete())
+                    .price(work.getPrice())
+                    .title(work.getTitle())
+                    .thumbnail(work.getThumbnail())
+                    .build();
+            workWishShowForms.add(wishShowForm);
+        }
+        return workWishShowForms;
     }
 
     private List<ProfileShowForm> makeProductShowForm(List<Product> productList) {
@@ -55,16 +115,18 @@ public class UserQueryService {
         return showFormList;
     }
 
-    private List<ProfileShowForm> makeWorkShowForm(Set<Work> workList) {
+    private List<ProfileShowForm> makeWorkShowForm(Set<Work> workList,boolean isEmploy) {
         List<ProfileShowForm> showFormList = new ArrayList<>();
         for (Work work : workList) {
-            ProfileShowForm form = ProfileShowForm.builder()
-                    .id(work.getId())
-                    .complete(work.isComplete())
-                    .createdAt(work.getCreatedDate())
-                    .thumbnail(work.getThumbnail())
-                    .title(work.getTitle()).build();
-            showFormList.add(form);
+            if(work.isEmployment()==isEmploy){
+                ProfileShowForm form = ProfileShowForm.builder()
+                        .id(work.getId())
+                        .complete(work.isComplete())
+                        .createdAt(work.getCreatedDate())
+                        .thumbnail(work.getThumbnail())
+                        .title(work.getTitle()).build();
+                showFormList.add(form);
+            }
         }
         showFormList.sort((o1, o2) -> (int) (o2.getId()-o1.getId()));
         return showFormList;
@@ -75,7 +137,7 @@ public class UserQueryService {
         User findUser = userRepository.findByIdFetchProductPostList(userId).orElseThrow(UserNotFoundException::new);
         List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
         obj.put("products", productShowForms);
-        List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList());
+        List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList(),false);
         obj.put("works", workShowForms);
         obj.put("profile",makeUserDto(user,findUser));
         //System.out.println("쿼리 수 확인");
