@@ -17,6 +17,5 @@ public class ProfileShowForm {
     private String title;
     private LocalDateTime createdAt;
     private boolean complete;
-    
-}
 
+}
