@@ -14,7 +14,6 @@ import net.sinzak.server.chatroom.domain.UserChatRoom;
 import net.sinzak.server.chatroom.dto.request.ChatMessageDto;
 import net.sinzak.server.chatroom.dto.request.ChatRoomUuidDto;
 import net.sinzak.server.chatroom.dto.respond.GetChatMessageDto;
-import net.sinzak.server.chatroom.dto.respond.GetChatRoomDto;
 import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.repository.UserChatRoomRepository;
 import net.sinzak.server.common.error.InstanceNotFoundException;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -67,7 +65,7 @@ public class ChatMessageService {
     }
     @Transactional
     public void leaveChatRoom(User user, ChatRoomUuidDto chatRoomUuidDto){
-        ChatRoom findChatroom = chatRoomRepository.findByRoomUuidFetchUserChatRoom(chatRoomUuidDto.getRoomUuid())
+        ChatRoom findChatroom = chatRoomRepository.findByRoomUuidFetchUserChatRoom(chatRoomUuidDto.getRoomId())
                 .orElseThrow(()->new InstanceNotFoundException("존재하지 않는 채팅방입니다."));
         UserChatRoom userChatRoom = findChatroom.leaveChatRoom(user.getEmail());
         if(userChatRoom ==null){
