@@ -48,9 +48,14 @@ public class UserQueryController {
     }
 
     @ApiOperation(value ="스크랩 목록 ")
-    @GetMapping(value ="/users/{userId}/wish")
-    public JSONObject showWish(@PathVariable Long userId){
-        return userQueryService.getWishList(userId);
+    @GetMapping(value ="/users/wish")
+    public JSONObject showWish(@AuthenticationPrincipal User user){
+        return userQueryService.getWishList(user.getId());
+    }
+    @ApiOperation(value ="의뢰해요 목록")
+    @GetMapping(value ="/users/work-employ")
+    public JSONObject showWorkEmploy(@AuthenticationPrincipal User user){
+        return userQueryService.getWorkEmploys(user);
     }
 
 

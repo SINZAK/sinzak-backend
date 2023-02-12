@@ -42,7 +42,7 @@ public class UserQueryService {
         User findUser = userRepository.findByEmailFetchProductPostList(user.getEmail()).orElseThrow(UserNotFoundException::new);
         List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
         obj.put("products", productShowForms);
-        List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList());
+        List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList(),false);
         obj.put("works", workShowForms);
         obj.put("profile",makeUserDto(user,findUser));
         return PropertyUtil.response(obj);
@@ -55,6 +55,14 @@ public class UserQueryService {
         obj.put("workWishes",workWishShowForms);
         List<WishShowForm> productWishShowForms = makeProductWishShowForms(productWishes);
         obj.put("productWishes",productWishShowForms);
+        return PropertyUtil.response(obj);
+    }
+
+    public JSONObject getWorkEmploys(User user){
+        JSONObject obj = new JSONObject();
+        User findUser = userRepository.findByEmailFetchWorkPostList(user.getEmail()).orElseThrow(UserNotFoundException::new);
+        List<ProfileShowForm> workEmploys=  makeWorkShowForm(findUser.getWorkPostList(),true);
+        obj.put("workEmploys",workEmploys);
         return PropertyUtil.response(obj);
     }
 
@@ -107,16 +115,18 @@ public class UserQueryService {
         return showFormList;
     }
 
-    private List<ProfileShowForm> makeWorkShowForm(Set<Work> workList) {
+    private List<ProfileShowForm> makeWorkShowForm(Set<Work> workList,boolean isEmploy) {
         List<ProfileShowForm> showFormList = new ArrayList<>();
         for (Work work : workList) {
-            ProfileShowForm form = ProfileShowForm.builder()
-                    .id(work.getId())
-                    .complete(work.isComplete())
-                    .createdAt(work.getCreatedDate())
-                    .thumbnail(work.getThumbnail())
-                    .title(work.getTitle()).build();
-            showFormList.add(form);
+            if(work.isEmployment()==isEmploy){
+                ProfileShowForm form = ProfileShowForm.builder()
+                        .id(work.getId())
+                        .complete(work.isComplete())
+                        .createdAt(work.getCreatedDate())
+                        .thumbnail(work.getThumbnail())
+                        .title(work.getTitle()).build();
+                showFormList.add(form);
+            }
         }
         showFormList.sort((o1, o2) -> (int) (o2.getId()-o1.getId()));
         return showFormList;
@@ -127,7 +137,7 @@ public class UserQueryService {
         User findUser = userRepository.findByIdFetchProductPostList(userId).orElseThrow(UserNotFoundException::new);
         List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
         obj.put("products", productShowForms);
-        List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList());
+        List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList(),false);
         obj.put("works", workShowForms);
         obj.put("profile",makeUserDto(user,findUser));
         //System.out.println("쿼리 수 확인");
