@@ -47,12 +47,12 @@ public class ChatMessageService {
                 chatRoomRepository
                         .findByRoomUuidFetchChatMessage(message.getRoomId())
                         .orElseThrow(()->new InstanceNotFoundException("존재하지 않는 채팅방입니다."));
-        ChatMessage newChatMessage = ChatMessage.builder()
-                .message(message.getMessage())
-                .senderName(message.getSenderName())
-                .senderId(message.getSenderId())
-                .build();
-        findChatRoom.addChatMessage(newChatMessage);
+        ChatMessage newChatMessage = addChatMessageToChatRoom(message, findChatRoom);
+        GetChatMessageDto getChatMessageDto = makeMessageDto(message, newChatMessage);
+        template.convertAndSend("/sub/chat/rooms/"+message.getRoomId(),getChatMessageDto);
+    }
+
+    private GetChatMessageDto makeMessageDto(ChatMessageDto message, ChatMessage newChatMessage) {
         GetChatMessageDto getChatMessageDto = GetChatMessageDto.builder()
                 .message(message.getMessage())
                 .messageId(newChatMessage.getId())
@@ -61,8 +61,19 @@ public class ChatMessageService {
                 .sendAt(newChatMessage.getCreatedDate())
                 .messageType(MessageType.TEXT.name())
                 .build();
-        template.convertAndSend("/sub/chat/rooms/"+message.getRoomId(),getChatMessageDto);
+        return getChatMessageDto;
     }
+
+    private ChatMessage addChatMessageToChatRoom(ChatMessageDto message, ChatRoom findChatRoom) {
+        ChatMessage newChatMessage = ChatMessage.builder()
+                .message(message.getMessage())
+                .senderName(message.getSenderName())
+                .senderId(message.getSenderId())
+                .build();
+        findChatRoom.addChatMessage(newChatMessage);
+        return newChatMessage;
+    }
+
     @Transactional
     public void leaveChatRoom(User user, ChatRoomUuidDto chatRoomUuidDto){
         ChatRoom findChatroom = chatRoomRepository.findByRoomUuidFetchUserChatRoom(chatRoomUuidDto.getRoomId())
@@ -71,20 +82,38 @@ public class ChatMessageService {
         if(userChatRoom ==null){
             throw new InstanceNotFoundException("존재하지 않는 채팅방입니다.");
         }
-        userChatRoomRepository.delete(userChatRoom);
-        if(findChatroom.getParticipantsNumber()==0){
-            chatRoomRepository.delete(findChatroom);
-        }
+        deleteChatRoom(findChatroom, userChatRoom);
+        addLeaveChatMessageToChatRoom(user, findChatroom);
+        GetChatMessageDto getChatMessageDto = makeLeaveChatMessageDto(user);
+        template.convertAndSend("/sub/chat/rooms/"+chatRoomUuidDto,getChatMessageDto);
+        return;
+    }
+
+    private GetChatMessageDto makeLeaveChatMessageDto(User user) {
         GetChatMessageDto getChatMessageDto = GetChatMessageDto.builder()
                 .message("님이 채팅방을 나가셨습니다")
                 .senderName(user.getName())
                 .sendAt(LocalDateTime.now())
                 .messageType(MessageType.LEAVE.name())
                 .build();
-        template.convertAndSend("/sub/chat/rooms/"+chatRoomUuidDto,getChatMessageDto);
-        return;
+        return getChatMessageDto;
     }
 
+    private void deleteChatRoom(ChatRoom findChatroom, UserChatRoom userChatRoom) {
+        userChatRoomRepository.delete(userChatRoom);
+        if(findChatroom.getParticipantsNumber()==0){
+            chatRoomRepository.delete(findChatroom);
+        }
+    }
+
+    private void addLeaveChatMessageToChatRoom(User user, ChatRoom findChatroom) {
+        ChatMessage leaveChatMessage = ChatMessage.builder()
+                .message(user.getName()+"님이 채팅방을 나가셨습니다")
+                .senderName(user.getName())
+                .senderId(user.getId())
+                .build();
+        findChatroom.addChatMessage(leaveChatMessage);
+    }
 
 
 //    public ChatMessage getChatMessage(String id) throws Exception{
