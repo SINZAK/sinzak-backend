@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+
+
 import java.time.LocalDateTime;
 
 @Builder
@@ -17,4 +19,5 @@ public class GetChatMessageDto {
     private String message;
     private String senderName;
     private LocalDateTime sendAt;
+    private String messageType;
 }

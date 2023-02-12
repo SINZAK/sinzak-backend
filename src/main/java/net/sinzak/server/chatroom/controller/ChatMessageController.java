@@ -5,9 +5,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.chatroom.domain.ChatMessage;
 import net.sinzak.server.chatroom.dto.request.ChatMessageDto;
+import net.sinzak.server.chatroom.dto.request.ChatRoomUuidDto;
 import net.sinzak.server.chatroom.service.ChatMessageService;
+import net.sinzak.server.user.domain.User;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -35,6 +38,11 @@ public class ChatMessageController {
     public void message(ChatMessageDto chatMessageDto){
         log.info("메시지 구독"+chatMessageDto.getRoomId());
         chatMessageService.sendChatMessage(chatMessageDto);
+    }
+
+    @MessageMapping(value = "/chat/leave")
+    public void leave(@AuthenticationPrincipal User user, ChatRoomUuidDto chatRoomUuidDto){
+        chatMessageService.leaveChatRoom(user,chatRoomUuidDto);
     }
 
 
