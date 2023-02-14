@@ -44,6 +44,8 @@ public class UserQueryService {
         obj.put("products", productShowForms);
         List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList(),false);
         obj.put("works", workShowForms);
+        List<ProfileShowForm> workEmployShowForms = makeWorkShowForm(findUser.getWorkPostList(),true);
+        obj.put("workEmploys",workEmployShowForms);
         obj.put("profile",makeUserDto(user,findUser));
         return PropertyUtil.response(obj);
     }
@@ -107,7 +109,7 @@ public class UserQueryService {
             ProfileShowForm form = ProfileShowForm.builder()
                     .id(product.getId())
                     .complete(product.isComplete())
-                    .createdAt(product.getCreatedDate())
+                    .date(product.getCreatedDate())
                     .thumbnail(product.getThumbnail())
                     .title(product.getTitle()).build();
             showFormList.add(form);
@@ -122,7 +124,7 @@ public class UserQueryService {
                 ProfileShowForm form = ProfileShowForm.builder()
                         .id(work.getId())
                         .complete(work.isComplete())
-                        .createdAt(work.getCreatedDate())
+                        .date(work.getCreatedDate())
                         .thumbnail(work.getThumbnail())
                         .title(work.getTitle()).build();
                 showFormList.add(form);
