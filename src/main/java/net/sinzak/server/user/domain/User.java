@@ -42,7 +42,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     private String name;
 
     @Column
-    private String nickName; //얘는 안 쓸 수도있음
+    private String nickName=""; //얘는 안 쓸 수도있음
 
     @Column
     @Setter
@@ -52,7 +52,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     private String introduction=""; //한 줄 소개
 
     @Column
-    private String univ;
+    private String univ="";
 
     @Column
     private String major;
@@ -67,13 +67,13 @@ public class User extends BaseTimeEntity implements UserDetails {
     private String stack;  //전문 분야
 
     @Column
-    private String categoryLike;  //관심 장르
+    private String categoryLike="";  //관심 장르
 
     @Column
-    private boolean cert_uni; //대학 인증여부
+    private boolean cert_uni=false; //대학 인증여부
 
     @Column
-    private boolean cert_celeb; //인플루언서 인증여부
+    private boolean cert_celeb=false; //인플루언서 인증여부
 
     @Column
     private int popularity=0;  //'지금 뜨는 아티스트' 때문에 만듦
