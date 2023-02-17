@@ -48,9 +48,8 @@ public class OauthController {
         catch(UserNotFoundException e){
             User savedUser = userService.saveTempUser(new User(OauthUser.getEmail(), OauthUser.getName(), OauthUser.getPicture()));
             jwtToken = securityService.login(savedUser);
-            return PropertyUtil.response(jwtToken, false); /** 추가 정보 받기 위해 회원가입창으로 보내기 **/
         }
-        return PropertyUtil.response(jwtToken);
+        return PropertyUtil.response(jwtToken, jwtToken.isJoined());
     }
 
     private JSONObject getInfo(OauthDto tokenDto) throws IOException, ParseException {
@@ -94,7 +93,7 @@ public class OauthController {
     private String getKakaoAccessToken(String code) throws IOException, ParseException {
         String url = "https://kauth.kakao.com/oauth/token"
                 + "?client_id=3201538a34f65dfa0fb2e96b0d268ca7"
-                + "&redirect_uri="+productURL+"/api/login/oauth2/code/kakao"
+                + "&redirect_uri="+developURL+"/api/login/oauth2/code/kakao"
                 + "&grant_type=authorization_code"
                 + "&code=" + code;
         Request.Builder builder = new Request.Builder().header("Content-type", " application/x-www-form-urlencoded")

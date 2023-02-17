@@ -3,7 +3,6 @@ package net.sinzak.server.config.auth.jwt;
 import lombok.*;
 
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,4 +11,9 @@ public class TokenDto {
     private String accessToken;
     private String refreshToken;
     private Long accessTokenExpireDate;
+    private boolean joined = true;
+
+    public void setIsJoined(boolean joined) {
+        this.joined = joined;
+    }
 }
