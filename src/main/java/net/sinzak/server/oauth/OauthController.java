@@ -93,7 +93,7 @@ public class OauthController {
     private String getKakaoAccessToken(String code) throws IOException, ParseException {
         String url = "https://kauth.kakao.com/oauth/token"
                 + "?client_id=3201538a34f65dfa0fb2e96b0d268ca7"
-                + "&redirect_uri="+developURL+"/api/login/oauth2/code/kakao"
+                + "&redirect_uri="+productURL+"/api/login/oauth2/code/kakao"
                 + "&grant_type=authorization_code"
                 + "&code=" + code;
         Request.Builder builder = new Request.Builder().header("Content-type", " application/x-www-form-urlencoded")
