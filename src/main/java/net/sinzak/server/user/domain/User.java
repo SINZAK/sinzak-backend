@@ -154,6 +154,9 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.introduction = introduction;
         return this;
     }
+    public void updateCategoryLike(String categoryLike){
+        this.categoryLike = categoryLike;
+    }
     public String getRoleKey(){
         return this.role.getKey();
     }
