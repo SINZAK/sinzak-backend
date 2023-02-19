@@ -117,7 +117,7 @@ public class OauthController {
     @GetMapping("/test2")
     public String googleLogin() throws IOException {
         String url = "https://accounts.google.com/o/oauth2/v2/auth?client_id=782966145872-6shnmrvqi0q4sihr8etu9nrvh9jv43dh.apps.googleusercontent.com" +
-                "&redirect_uri="+ developURL +"/api/login/oauth2/code/google";
+                "&redirect_uri="+ productURL +"/api/login/oauth2/code/google";
         return url;
     }
 
@@ -134,7 +134,7 @@ public class OauthController {
         String url = "https://oauth2.googleapis.com/token"
                 + "?client_id=782966145872-6shnmrvqi0q4sihr8etu9nrvh9jv43dh.apps.googleusercontent.com"
                 + "&client_secret=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"
-                + "&redirect_uri="+developURL+"/api/login/oauth2/code/google"
+                + "&redirect_uri="+productURL+"/api/login/oauth2/code/google"
                 + "&grant_type=authorization_code"
                 + "&code=" + code;
         Request.Builder builder = new Request.Builder().header("Content-type", " application/x-www-form-urlencoded")
