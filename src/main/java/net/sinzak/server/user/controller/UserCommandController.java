@@ -32,10 +32,10 @@ public class UserCommandController {
     private final SecurityService securityService;
 
     @ApiDocumentResponse
-    @ApiOperation(value = "회원가입", notes = "카테고리는 {\"category_like\" : \"orient,painting\"} 처럼 콤마로만 구분해서 보내주세요")
+    @ApiOperation(value = "회원가입", notes = "카테고리는 {\"category_like\" : \"orient,painting\"} 처럼 콤마로만 구분해서 보내주세요\n 메일 인증 단계 이후에 한꺼번에 보내주세요 디스코드에 기재해놓겠습니다.")
     @PostMapping("/join")
     public JSONObject join(@AuthenticationPrincipal User user, @RequestBody JoinDto dto) {
-        return securityService.join(dto);
+        return securityService.join(user, dto);
     }
 
     @ApiDocumentResponse

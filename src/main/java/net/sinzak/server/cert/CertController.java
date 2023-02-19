@@ -30,11 +30,14 @@ public class CertController {
     @ApiOperation(value = "대학 메일 인증 시작", notes = "인증코드는 아예 생략하시고, address, univ만 주시면 됩니다  1000~9999의 인증번호 메일전송 예정 \n" +
             "success : true 로 올 경우 메일 발송된 것.")
     @PostMapping("/certify/mail/send")
-    public JSONObject sendUnivCertMail(@AuthenticationPrincipal User user, @RequestBody MailDto mailDto) throws IOException {
-        Map<String, Object> response = UnivCert.certify(API_KEY, mailDto.getAddress(), mailDto.getUniv(), false);
+    public JSONObject sendUnivCertMail(@RequestBody MailDto mailDto) throws IOException {
+        boolean univ_check = false;
+        Map<String, Object> check = UnivCert.check(mailDto.getUnivName());
+        if((boolean) check.get("success"))
+            univ_check = true;
+        Map<String, Object> response = UnivCert.certify(API_KEY, mailDto.getUniv_email(), mailDto.getUnivName(), univ_check);
+
         boolean success = (boolean) response.get("success");
-        if(success)
-            certService.updateCertified(user, mailDto.getUniv(), mailDto.getAddress());
 
         return PropertyUtil.response(success);
     }
@@ -43,11 +46,9 @@ public class CertController {
     @ApiOperation(value = "대학 메일 인증 시작", notes = "인증코드 필수, 1000~9999의 인증번호 양식준수 \n" +
             "success : true 면 끝이고 아니면 학생증 인증이나 나중에 하기 버튼 클릭 유도")
     @PostMapping("/certify/mail/receive")
-    public JSONObject receiveUnivCertMail(@AuthenticationPrincipal User user, @RequestBody MailDto mailDto) throws IOException {
-        Map<String, Object> response = UnivCert.certifyCode(API_KEY, mailDto.getAddress(), mailDto.getUniv(), mailDto.getCode());
+    public JSONObject receiveUnivCertMail(@RequestBody MailDto mailDto) throws IOException {
+        Map<String, Object> response = UnivCert.certifyCode(API_KEY, mailDto.getUniv_email(), mailDto.getUnivName(), mailDto.getCode());
         boolean success = (boolean) response.get("success");
-        if(success)
-            certService.updateCertified(user, mailDto.getUniv(), mailDto.getAddress());
 
         return PropertyUtil.response(success);
     }
