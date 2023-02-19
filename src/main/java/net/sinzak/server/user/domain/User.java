@@ -1,5 +1,6 @@
 package net.sinzak.server.user.domain;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -141,14 +142,22 @@ public class User extends BaseTimeEntity implements UserDetails {
     }
 
     @Builder
-    public User(String email, String name, String picture) {
+    public User(String email, String name, String picture, String origin) {
         this.email = email;
         this.name = name;
         this.picture = picture;
+        this.origin = origin;
         this.categoryLike = "";
     }
 
-    public User update(String name, String picture,String introduction){
+
+    public void saveJoinInfo(String nickName, String categoryLike) {
+        this.nickName = nickName;
+        this.categoryLike = categoryLike;
+    }
+
+
+    public User update(String name, String picture, String introduction){
         this.name =name;
         this.picture = picture;
         this.introduction = introduction;

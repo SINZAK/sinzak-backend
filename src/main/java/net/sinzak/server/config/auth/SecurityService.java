@@ -63,32 +63,26 @@ public class SecurityService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public JSONObject join(@RequestBody JoinDto dto) {
+    public JSONObject join(User User, @RequestBody JoinDto dto) {
         JSONObject obj = new JSONObject();
-        Optional<User> existUser = userRepository.findByEmail(dto.getEmail());
-        if(existUser.isPresent())
-            return PropertyUtil.responseMessage("이미 가입된 이메일입니다.");
-        User user = User.builder()
-                .name(dto.getName())
-                .email(dto.getEmail())
-                .origin(dto.getOrigin())
-                .categoryLike(dto.getCategory_like())
-                .nickName(dto.getNickName()).build();
-        if(dto.getOrigin().equals("apple"))
-            user.updateEmailForAppleUser(dto.getTokenId());  /** 애플로그인은 이메일을 토큰 ID로써야함  --> 왜냐면 이후에 애플 로그인시 프론트에서 이메일 못받아옴 **/
-        User savedUser = userRepository.save(user);
+        User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        user.saveJoinInfo(dto.getNickName(), dto.getCategory_like());
+        if(dto.isCertified())
+            user.updateCertifiedUniv(dto.getUnivName(), dto.getUniv_email());
+//        if(user.getOrigin().equals("apple"))
+//            user.updateEmailForAppleUser();  /** 애플로그인은 이메일을 토큰 ID로써야함  --> 왜냐면 이후에 애플 로그인시 프론트에서 이메일 못받아옴 **/
         JoinTerms terms = new JoinTerms(dto.isTerm());
-        terms.setUser(savedUser);
+        terms.setUser(user);
         JoinTerms saveTerms = joinTermsRepository.save(terms);
-        if(savedUser.getId() == null || saveTerms.getId() == null)
+        if(user.getId() == null || saveTerms.getId() == null)
             throw new InstanceNotFoundException("서버 오류로 저장되지 않았습니다.");
         TokenDto tokenDto = jwtProvider.createToken(user.getUsername(), user.getId(), user.getRoles());
-        //리프레시 토큰 저장
+        tokenDto.setIsJoined(true);
+
         RefreshToken refreshToken = RefreshToken.builder()
                 .key(user.getId())
                 .token(tokenDto.getRefreshToken())
                 .build();
-        log.warn("회원가입 완료 access token = "+tokenDto.getAccessToken());
         refreshTokenRepository.save(refreshToken);
         obj.put("token",tokenDto);
         obj.put("success",true);

@@ -49,13 +49,6 @@ public class CertService {
         return PropertyUtil.response(true);
     }
 
-    @Transactional
-    public JSONObject updateCertified(User User, String univName, String email){
-        User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
-        user.updateCertifiedUniv(univName, email);
-        return PropertyUtil.response(true);
-    }
-
 
 
 

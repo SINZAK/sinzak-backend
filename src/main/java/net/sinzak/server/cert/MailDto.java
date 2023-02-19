@@ -6,9 +6,9 @@ import lombok.Getter;
 @Getter
 public class MailDto {
     @ApiModelProperty(value = "이메일 주소")
-    private String address;
+    private String univ_email;
     @ApiModelProperty(value = "인증코드", notes = "receive 에서 사용, send에선 생략")
     private int code;
     @ApiModelProperty(value = "선택한 대학교", example = "홍익대학교")
-    private String univ;
+    private String univName;
 }
