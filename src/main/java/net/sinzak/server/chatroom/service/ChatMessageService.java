@@ -47,6 +47,9 @@ public class ChatMessageService {
                 chatRoomRepository
                         .findByRoomUuidFetchChatMessage(message.getRoomId())
                         .orElseThrow(()->new InstanceNotFoundException("존재하지 않는 채팅방입니다."));
+        if(findChatRoom.isBlocked()){
+            throw new IllegalArgumentException("차단된 상대입니다.");
+        }
         ChatMessage newChatMessage = addChatMessageToChatRoom(message, findChatRoom);
         GetChatMessageDto getChatMessageDto = makeMessageDto(message, newChatMessage);
         template.convertAndSend("/sub/chat/rooms/"+message.getRoomId(),getChatMessageDto);
