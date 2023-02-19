@@ -1,6 +1,7 @@
 package net.sinzak.server.user.controller;
 
 
+import com.google.api.client.json.Json;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -72,6 +73,12 @@ public class UserCommandController {
         return userCommandService.updateUserImage(user,multipartFile);
     }
 
+    @ApiDocumentResponse
+    @ApiOperation(value ="/users/edit/category")
+    public JSONObject updateCategoryLike(@AuthenticationPrincipal User user,@RequestBody CategoryDto categoryDto){
+        return userCommandService.updateCategoryLike(user,categoryDto);
+    }
+
 
     @ApiDocumentResponse
     @ApiOperation(value = "팔로우하기")
@@ -105,6 +112,7 @@ public class UserCommandController {
     public JSONObject deleteHistory(@AuthenticationPrincipal User user) {
         return userCommandService.deleteSearchHistory(user);
     }
+
 
     @ExceptionHandler(NoSuchElementException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
