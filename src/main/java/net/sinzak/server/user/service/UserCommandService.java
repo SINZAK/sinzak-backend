@@ -3,6 +3,7 @@ package net.sinzak.server.user.service;
 
 import lombok.RequiredArgsConstructor;
 
+import net.sinzak.server.chatroom.service.ChatRoomCommandService;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.image.S3Service;
 import net.sinzak.server.user.domain.Report;
@@ -29,6 +30,7 @@ public class UserCommandService {
     private final UserRepository userRepository;
     private final ReportRepository reportRepository;
     private final SearchHistoryRepository historyRepository;
+    private final ChatRoomCommandService chatRoomCommandService;
     private final S3Service s3Service;
 
     public User saveTempUser(User user){
@@ -110,7 +112,7 @@ public class UserCommandService {
         if(checkAlreadyReport(opponentUserId, loginUser))
             return PropertyUtil.responseMessage("이미 신고한 회원입니다.");
         User opponentUser = userRepository.findById(opponentUserId).orElseThrow(UserNotFoundException::new);
-
+        chatRoomCommandService.makeChatRoomBlocked(loginUser,opponentUser);
         Report connect = Report.createConnect(loginUser, opponentUser);
         reportRepository.save(connect);
         return PropertyUtil.response(true);
