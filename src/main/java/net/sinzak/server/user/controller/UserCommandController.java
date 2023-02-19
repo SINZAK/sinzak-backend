@@ -68,13 +68,15 @@ public class UserCommandController {
         return userCommandService.updateUser(dto,user);
     }
     @ApiDocumentResponse
-    @ApiOperation(value ="/users/edit/image")
+    @ApiOperation(value ="프로필 이미지 변경")
+    @PostMapping(value ="/users/edit/image")
     public JSONObject updateUserImage(@AuthenticationPrincipal User user,@RequestPart MultipartFile multipartFile){
         return userCommandService.updateUserImage(user,multipartFile);
     }
 
     @ApiDocumentResponse
-    @ApiOperation(value ="/users/edit/category")
+    @ApiOperation(value ="관심장르 업데이트")
+    @PostMapping(value ="/users/edit/category")
     public JSONObject updateCategoryLike(@AuthenticationPrincipal User user,@RequestBody CategoryDto categoryDto){
         return userCommandService.updateCategoryLike(user,categoryDto);
     }
