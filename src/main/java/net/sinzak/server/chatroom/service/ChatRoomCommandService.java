@@ -11,7 +11,6 @@ import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.repository.UserChatRoomRepository;
 import net.sinzak.server.common.PostType;
 import net.sinzak.server.common.PropertyUtil;
-import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.product.domain.Product;
 import net.sinzak.server.product.repository.ProductRepository;
@@ -116,6 +115,14 @@ public class ChatRoomCommandService {
         return getCreatedChatRoomDto;
     }
 
+    public void makeChatRoomBlocked(User user,User opponentUser){
+        List<UserChatRoom> userChatRooms = userChatRoomRepository.findUserChatRoomByEmailFetchChatRoom(user.getEmail()); //보통은 차단한 상대가 없기에 취소
+        for(UserChatRoom userChatRoom : userChatRooms){
+            if(userChatRoom.getOpponentUserEmail().equals(opponentUser.getEmail())){
+                userChatRoom.getChatRoom().setBlocked(true);
+            }
+        }
+    }
     private ChatRoom checkIfUserIsAlreadyChatting(User user, List<ChatRoom> postChatRooms) {
         for(ChatRoom chatRoom: postChatRooms){
             for(UserChatRoom userChatRoom : chatRoom.getUserChatRooms()){

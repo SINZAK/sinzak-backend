@@ -22,6 +22,12 @@ public class ChatRoom extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private PostType postType;
 
+    private boolean blocked =false;
+
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
+    }
+
     public ChatRoom(){
         this.participantsNumber = 0;
         this.roomUuid = UUID.randomUUID().toString();
