@@ -42,7 +42,7 @@ public class UserCommandService {
             return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
         }
         User user = userRepository.findById(loginUser.getId()).orElseThrow(UserNotFoundException::new);
-        user.update(dto.getName(),dto.getPicture(),dto.getIntroduction());
+        user.update(dto.getName(),dto.getIntroduction());
         return PropertyUtil.response(true);
     }
 
@@ -56,7 +56,7 @@ public class UserCommandService {
             return PropertyUtil.responseMessage("이미지 저장 실패");
         }
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("image", findUser.getPicture());
+        jsonObject.put("picture", findUser.getPicture());
         return PropertyUtil.response(jsonObject);
     }
 

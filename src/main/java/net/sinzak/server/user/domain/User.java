@@ -158,9 +158,9 @@ public class User extends BaseTimeEntity implements UserDetails {
     }
 
 
-    public User update(String name, String picture, String introduction){
+    public User update(String name, String introduction){
         this.name =name;
-        this.picture = picture;
+
         this.introduction = introduction;
         return this;
     }
