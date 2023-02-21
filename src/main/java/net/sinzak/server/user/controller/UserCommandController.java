@@ -115,21 +115,21 @@ public class UserCommandController {
         return userCommandService.deleteSearchHistory(user);
     }
 
-
-    @ExceptionHandler(NoSuchElementException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    protected JSONObject handleException1() {
-        return PropertyUtil.responseMessage("유효하지 않은 토큰입니다.");
-    }
-
-    @ExceptionHandler(UserNotFoundException.class)
-    @ResponseStatus(HttpStatus.OK)
-    protected JSONObject handleUserNotFoundException() {
-        return PropertyUtil.responseMessage("존재하지 않는 유저입니다.");
-    }
-
-    @ExceptionHandler(InstanceNotFoundException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected JSONObject handleInstanceNotFoundException() {return PropertyUtil.responseMessage("존재하지 않는 객체입니다.");}
+//
+//    @ExceptionHandler(NoSuchElementException.class)
+//    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+//    protected JSONObject handleException1() {
+//        return PropertyUtil.responseMessage("유효하지 않은 토큰입니다.");
+//    }
+//
+//    @ExceptionHandler(UserNotFoundException.class)
+//    @ResponseStatus(HttpStatus.OK)
+//    protected JSONObject handleUserNotFoundException() {
+//        return PropertyUtil.responseMessage("존재하지 않는 유저입니다.");
+//    }
+//
+//    @ExceptionHandler(InstanceNotFoundException.class)
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    protected JSONObject handleInstanceNotFoundException() {return PropertyUtil.responseMessage("존재하지 않는 객체입니다.");}
 }
 

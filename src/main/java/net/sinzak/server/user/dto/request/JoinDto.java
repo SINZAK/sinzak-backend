@@ -16,6 +16,4 @@ public class JoinDto {
     private String univName;
     @ApiModelProperty(example = "insi2000@mail.hongik.ac.kr")
     private String univ_email;
-    @ApiModelProperty(example = "true")
-    boolean certified;
 }
