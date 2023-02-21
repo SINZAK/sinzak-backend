@@ -157,6 +157,7 @@ public class UserQueryService {
                 .univ(findUser.getUniv())
                 .ifFollow(checkIfFollowFindUser(user,findUser))
                 .cert_uni(findUser.isCert_uni())
+                .categoryLike(findUser.getCategoryLike())
                 .build();
         return userDto;
     }
