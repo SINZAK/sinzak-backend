@@ -47,7 +47,8 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     @Column
     @Setter
-    private String picture; //대표 사진
+    private String
+            picture; //대표 사진
 
     @Column
     private String introduction=""; //한 줄 소개
@@ -157,9 +158,9 @@ public class User extends BaseTimeEntity implements UserDetails {
     }
 
 
-    public User update(String name, String picture, String introduction){
+    public User update(String name, String introduction){
         this.name =name;
-        this.picture = picture;
+
         this.introduction = introduction;
         return this;
     }
