@@ -15,6 +15,7 @@ public class UserDto {
     private String followerNumber;
     private String imageUrl;
     private String univ;
+    private String categoryLike;
 
     private boolean cert_uni;
     private boolean ifFollow;
