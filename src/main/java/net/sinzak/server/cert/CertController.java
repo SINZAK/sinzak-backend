@@ -38,7 +38,6 @@ public class CertController {
         Map<String, Object> response = UnivCert.certify(API_KEY, mailDto.getUniv_email(), mailDto.getUnivName(), univ_check);
 
         boolean success = (boolean) response.get("success");
-
         return PropertyUtil.response(success);
     }
 
@@ -46,10 +45,11 @@ public class CertController {
     @ApiOperation(value = "대학 메일 인증 시작", notes = "인증코드 필수, 1000~9999의 인증번호 양식준수 \n" +
             "success : true 면 끝이고 아니면 학생증 인증이나 나중에 하기 버튼 클릭 유도")
     @PostMapping("/certify/mail/receive")
-    public JSONObject receiveUnivCertMail(@RequestBody MailDto mailDto) throws IOException {
+    public JSONObject receiveUnivCertMail(@AuthenticationPrincipal User user, @RequestBody MailDto mailDto) throws IOException {
         Map<String, Object> response = UnivCert.certifyCode(API_KEY, mailDto.getUniv_email(), mailDto.getUnivName(), mailDto.getCode());
         boolean success = (boolean) response.get("success");
-
+        if(success)
+            user.updateCertifiedUniv(mailDto.getUnivName(), mailDto.getUniv_email());
         return PropertyUtil.response(success);
     }
 
