@@ -55,8 +55,9 @@ public class UserCommandService {
         catch (Exception e){
             return PropertyUtil.responseMessage("이미지 저장 실패");
         }
-
-        return PropertyUtil.response(true);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("image", findUser.getPicture());
+        return PropertyUtil.response(jsonObject);
     }
 
     public JSONObject updateCategoryLike(User user, CategoryDto categoryDto){
