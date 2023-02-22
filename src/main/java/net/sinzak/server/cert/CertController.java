@@ -37,8 +37,7 @@ public class CertController {
             univ_check = true;
         Map<String, Object> response = UnivCert.certify(API_KEY, mailDto.getUniv_email(), mailDto.getUnivName(), univ_check);
 
-        boolean success = (boolean) response.get("success");
-        return PropertyUtil.response(success);
+        return new JSONObject(response);
     }
 
     @ApiDocumentResponse
@@ -47,10 +46,9 @@ public class CertController {
     @PostMapping("/certify/mail/receive")
     public JSONObject receiveUnivCertMail(@AuthenticationPrincipal User user, @RequestBody MailDto mailDto) throws IOException {
         Map<String, Object> response = UnivCert.certifyCode(API_KEY, mailDto.getUniv_email(), mailDto.getUnivName(), mailDto.getCode());
-        boolean success = (boolean) response.get("success");
-        if(success)
+        if((boolean) response.get("success"))
             user.updateCertifiedUniv(mailDto.getUnivName(), mailDto.getUniv_email());
-        return PropertyUtil.response(success);
+        return new JSONObject(response);
     }
 
 
