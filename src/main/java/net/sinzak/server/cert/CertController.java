@@ -27,7 +27,7 @@ public class CertController {
     private final static String API_KEY ="df6ea145-4134-40a3-a298-764cd7d5d7bb";
 
     @ApiDocumentResponse
-    @ApiOperation(value = "대학 메일 인증 시작", notes = "인증코드는 아예 생략하시고, address, univ만 주시면 됩니다  1000~9999의 인증번호 메일전송 예정 \n" +
+    @ApiOperation(value = "대학 메일 인증 시작", notes = "인증코드는 아예 생략하시고, univ_email, univName 주시면 됩니다  1000~9999의 인증번호 메일전송 예정 \n" +
             "success : true 로 올 경우 메일 발송된 것.")
     @PostMapping("/certify/mail/send")
     public JSONObject sendUnivCertMail(@RequestBody MailDto mailDto) throws IOException {
@@ -46,7 +46,8 @@ public class CertController {
     @PostMapping("/certify/mail/receive")
     public JSONObject receiveUnivCertMail(@AuthenticationPrincipal User user, @RequestBody MailDto mailDto) throws IOException {
         Map<String, Object> response = UnivCert.certifyCode(API_KEY, mailDto.getUniv_email(), mailDto.getUnivName(), mailDto.getCode());
-        if((boolean) response.get("success"))
+        boolean success = (boolean) response.get("success");
+        if(success)
             user.updateCertifiedUniv(mailDto.getUnivName(), mailDto.getUniv_email());
         return new JSONObject(response);
     }
