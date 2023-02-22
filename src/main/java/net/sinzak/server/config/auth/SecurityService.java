@@ -120,8 +120,11 @@ public class SecurityService {
     @Transactional(readOnly = true)
     public JSONObject checkEmail(EmailDto dto) {
         Optional<User> existUser = userRepository.findByEmail(dto.getEmail());
-        if (existUser.isPresent())
-            return PropertyUtil.responseMessage("이미 가입된 이메일입니다.");
+        if (existUser.isPresent()){
+            User user = existUser.get();
+            if(!user.getNickName().isBlank())
+                return PropertyUtil.responseMessage("이미 가입된 이메일입니다.");
+        }
         return PropertyUtil.response(true);
     }
 }
