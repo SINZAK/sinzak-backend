@@ -155,7 +155,7 @@ public class UserQueryService {
                 .myProfile(checkIfMyProfile(user,findUser))
                 .imageUrl(findUser.getPicture())
                 .univ(findUser.getUniv())
-                .ifFollow(checkIfFollowFindUser(user,findUser))
+                .isFollow(checkIfFollowFindUser(user,findUser))
                 .cert_uni(findUser.isCert_uni())
                 .categoryLike(findUser.getCategoryLike())
                 .build();
