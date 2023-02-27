@@ -1,5 +1,6 @@
 package net.sinzak.server.user.service;
 
+import com.google.api.client.json.Json;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.CustomJSONArray;
 import net.sinzak.server.common.PropertyUtil;
@@ -47,6 +48,18 @@ public class UserQueryService {
         List<ProfileShowForm> workEmployShowForms = makeWorkShowForm(findUser.getWorkPostList(),true);
         obj.put("workEmploys",workEmployShowForms);
         obj.put("profile",makeUserDto(user,findUser));
+        return PropertyUtil.response(obj);
+    }
+    public JSONObject getAllUser(){
+        List<User> users = userRepository.findAll();
+        List<JSONObject> obj = new ArrayList<>();
+        for(User user : users){
+            JSONObject jsonObject =new JSONObject();
+            jsonObject.put("id",user.getId());
+            jsonObject.put("email",user.getEmail());
+            obj.add(jsonObject);
+        }
+
         return PropertyUtil.response(obj);
     }
     public JSONObject getWishList(Long userId){
