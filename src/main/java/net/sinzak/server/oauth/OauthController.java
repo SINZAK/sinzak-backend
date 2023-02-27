@@ -40,7 +40,6 @@ public class OauthController {
     public JSONObject getOauthToken(@org.springframework.web.bind.annotation.RequestBody OauthDto tokenDto) throws Exception {
         JSONObject OauthInfo = getInfo(tokenDto);
         OAuthAttributes OauthUser = OAuthAttributes.of(tokenDto.getOrigin(), OauthInfo);
-
         TokenDto jwtToken;
         try{
             jwtToken = securityService.login(OauthUser.getEmail());
@@ -53,22 +52,22 @@ public class OauthController {
     }
 
     private JSONObject getInfo(OauthDto tokenDto) throws IOException, ParseException {
-        JSONObject OauthInfo = new JSONObject();
-        if(tokenDto.getOrigin().equals("google"))
-            OauthInfo = getGoogleInfo(tokenDto);
-        else if(tokenDto.getOrigin().equals("kakao"))
+        JSONObject OauthInfo;
+        if(tokenDto.getOrigin().equals("kakao"))
             OauthInfo = getKakaoInfo(tokenDto.getAccessToken());
         else if(tokenDto.getOrigin().equals("naver"))
             OauthInfo = null;
+        else
+            OauthInfo = getGoogleInfo(tokenDto);
 
         return OauthInfo;
     }
 
 
-    @ApiOperation(value = "스프링용 카카오로그인 실행",notes = "배포환경 : https://kauth.kakao.com/oauth/authorize?client_id=3201538a34f65dfa0fb2e96b0d268ca7&redirect_uri=" +
-            "https://sinzak.net/api/login/oauth2/code/kakao&response_type=code\n" +
-            "로컬환경 : https://kauth.kakao.com/oauth/authorize?client_id=3201538a34f65dfa0fb2e96b0d268ca7&redirect_uri=" +
-            "http://localhost:8080/api/login/oauth2/code/kakao&response_type=code")
+    @ApiOperation(value = "스프링용 카카오로그인 실행",notes = "로컬환경 : https://kauth.kakao.com/oauth/authorize?client_id=3201538a34f65dfa0fb2e96b0d268ca7&redirect_uri=" +
+            "http://localhost:8080/api/login/oauth2/code/kakao&response_type=code" +
+            "배포환경 : https://kauth.kakao.com/oauth/authorize?client_id=3201538a34f65dfa0fb2e96b0d268ca7&redirect_uri=\" +\n" +
+            "\"https://sinzak.net/api/login/oauth2/code/kakao&response_type=code\\n")
     @GetMapping("/test")
     public String kakaoLogin() throws IOException {
         String url = "https://kauth.kakao.com/oauth/authorize"
