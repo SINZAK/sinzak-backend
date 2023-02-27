@@ -1,6 +1,7 @@
 package net.sinzak.server.chatroom.service;
 
 
+import com.google.api.client.json.Json;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.chatroom.domain.ChatRoom;
@@ -12,6 +13,7 @@ import net.sinzak.server.chatroom.repository.UserChatRoomRepository;
 import net.sinzak.server.common.PostType;
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.error.UserNotFoundException;
+import net.sinzak.server.image.S3Service;
 import net.sinzak.server.product.domain.Product;
 import net.sinzak.server.product.repository.ProductRepository;
 import net.sinzak.server.user.domain.User;
@@ -23,7 +25,9 @@ import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +42,8 @@ public class ChatRoomCommandService {
     private final WorkRepository workRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final S3Service s3Service;
+
 
     public JSONObject createUserChatRoom(PostDto postDto, User user) { //상대방 아바타를 초대
         User postUser =null;
@@ -91,6 +97,20 @@ public class ChatRoomCommandService {
         if(postDto.getPostType().equals(PostType.PRODUCT.getName())){
             product.addChatRoom(chatRoom);
         }
+    }
+    public JSONObject uploadImage(String roomUuid, List<MultipartFile> multipartFiles){
+        Optional<ChatRoom> chatRoom = chatRoomRepository.findByRoomId(roomUuid);
+        List<JSONObject> obj = new ArrayList<>();
+        if(!chatRoom.isPresent()){
+            return PropertyUtil.responseMessage("존재하지 않는 채팅방 입니다.");
+        }
+        for(MultipartFile multipartFile : multipartFiles ){
+            JSONObject jsonObject = new JSONObject();
+            String url = s3Service.uploadImage(multipartFile);
+            jsonObject.put("url",url);
+            obj.add(jsonObject);
+        }
+        return PropertyUtil.response(obj);
     }
 //    public JSONObject leaveChatRoom(User user,String roomUuid){
 //        ChatRoom findChatRoom = chatRoomRepository.findByRoomId(roomUuid).orElseThrow(()->new InstanceNotFoundException("존재하지 않는 채팅방입니다."));

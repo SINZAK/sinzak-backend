@@ -16,7 +16,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Api(tags =" 채팅-명령")
 @RestController
@@ -31,6 +34,11 @@ public class ChatRoomCommandController {
     @ApiOperation(value ="채팅방 생성",notes = "로그인한 유저, 글 아이디(postId),글 타입(postType = work,product ) 사용")
     public JSONObject createChatRoom(@RequestBody PostDto postDto, @AuthenticationPrincipal User user){
         return chatRoomCommandService.createUserChatRoom(postDto,user);
+    }
+
+    @PostMapping(value ="/chat/rooms/{uuid}/image")
+    public JSONObject uploadImage(@PathVariable("uuid") String uuid, List<MultipartFile> files){
+        return chatRoomCommandService.uploadImage(uuid,files);
     }
 
 //    @PostMapping(value ="/chat/rooms/{uuid}/leave")
