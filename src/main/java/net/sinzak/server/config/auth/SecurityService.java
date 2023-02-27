@@ -37,6 +37,7 @@ public class SecurityService {
                 .orElseThrow(() -> new UserNotFoundException("가입되지 않은 ID 입니다."));
         TokenDto tokenDto = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
         //리프레시 토큰 저장
+        log.error(user.getNickName());
         if(user.getNickName().isEmpty())
             tokenDto.setIsJoined(false);
 
@@ -52,8 +53,8 @@ public class SecurityService {
     public TokenDto login(User user) {
         TokenDto tokenDto = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
         //리프레시 토큰 저장
-        if(user.getNickName().isEmpty())
-            tokenDto.setIsJoined(false);
+        tokenDto.setIsJoined(false);
+
         RefreshToken refreshToken = RefreshToken.builder()
                 .key(user.getId())
                 .token(tokenDto.getRefreshToken())

@@ -59,6 +59,7 @@ public class JwtTokenProvider {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .accessTokenExpireDate(tokenValidTime)
+                .joined(true)
                 .build();
     }
 
