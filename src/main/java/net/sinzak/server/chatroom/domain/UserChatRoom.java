@@ -24,7 +24,7 @@ public class UserChatRoom {
     private User user;
 
 
-    private String opponentUserEmail;
+    private Long opponentUserId;
     private String opponentUserUniv;
     private String roomName;
     private String image;
@@ -40,7 +40,7 @@ public class UserChatRoom {
         this.latestMessage = null;
         this.latestMessageTime = null;
         this.roomName = opponentUser.getName();
-        this.opponentUserEmail = opponentUser.getEmail();
+        this.opponentUserId = opponentUser.getId();
         this.opponentUserUniv = opponentUser.getUniv();
         this.image = opponentUser.getPicture();
         this.user = user;

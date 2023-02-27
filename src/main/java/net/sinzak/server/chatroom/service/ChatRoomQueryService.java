@@ -41,7 +41,7 @@ public class ChatRoomQueryService {
             return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
         }
         List<GetChatRoomsDto> chatRoomsDtos = userChatRoomRepository
-                .findUserChatRoomByEmailFetchChatRoom(user.getEmail()).stream()
+                .findUserChatRoomByIdFetchChatRoom(user.getId()).stream()
                 .map(
                         userChatRoom ->
                                 GetChatRoomsDto.builder()

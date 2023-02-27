@@ -66,7 +66,7 @@ public class ChatRoomCommandService {
         log.info("게시글 확인");
         JSONObject userStatus = checkUserStatus(user, postUser);
         if (userStatus != null) return userStatus; //만약 로그인 안 되어있거나 상대가 없다면
-        User findUser = userRepository.findByEmail(user.getEmail()).get();
+        User findUser = userRepository.findById(user.getId()).get();
 
         GetCreatedChatRoomDto getCreatedChatRoomDto =new GetCreatedChatRoomDto();
         ChatRoom chatRoom = checkIfUserIsAlreadyChatting(user, postChatRooms);
@@ -116,9 +116,9 @@ public class ChatRoomCommandService {
     }
 
     public void makeChatRoomBlocked(User user,User opponentUser){
-        List<UserChatRoom> userChatRooms = userChatRoomRepository.findUserChatRoomByEmailFetchChatRoom(user.getEmail()); //보통은 차단한 상대가 없기에 취소
+        List<UserChatRoom> userChatRooms = userChatRoomRepository.findUserChatRoomByIdFetchChatRoom(user.getId()); //보통은 차단한 상대가 없기에 취소
         for(UserChatRoom userChatRoom : userChatRooms){
-            if(userChatRoom.getOpponentUserEmail().equals(opponentUser.getEmail())){
+            if(userChatRoom.getOpponentUserId().equals(opponentUser.getId())){
                 userChatRoom.getChatRoom().setBlocked(true);
             }
         }
@@ -127,7 +127,7 @@ public class ChatRoomCommandService {
         for(ChatRoom chatRoom: postChatRooms){
             for(UserChatRoom userChatRoom : chatRoom.getUserChatRooms()){
                 //Post에 딸린 채팅방중 말 건 유저가 속한 채팅방이 있다면
-                if(userChatRoom.getOpponentUserEmail().equals(user.getEmail())){
+                if(userChatRoom.getOpponentUserId().equals(user.getId())){
                     return chatRoom;
                 }
             }
@@ -151,22 +151,22 @@ public class ChatRoomCommandService {
         chatRoomRepository.save(chatRoom);
     }
 
-    private ChatRoom checkIfChatRoomExist(User postUser, User findUser, ChatRoom chatRoom) {
-
-        List<UserChatRoom> userChatRooms =
-                userChatRoomRepository.findUserChatRoomByEmail(findUser.getEmail());
-        chatRoom = getChatRoom(postUser, userChatRooms, chatRoom);
-        return chatRoom;
-    }
-    private ChatRoom getChatRoom(User PostUser, List<UserChatRoom> userChatRooms, ChatRoom chatRoom) {
-        for (UserChatRoom userChatRoom : userChatRooms) {
-            if (userChatRoom.getOpponentUserEmail().equals(PostUser.getEmail())) { //만약에 이미 상대랑 같이 메시지하고 있는 방이 있다면
-                chatRoom = userChatRoom.getChatRoom();
-                break;
-            }
-        }
-        return chatRoom;
-    }
+//    private ChatRoom checkIfChatRoomExist(User postUser, User findUser, ChatRoom chatRoom) {
+//
+//        List<UserChatRoom> userChatRooms =
+//                userChatRoomRepository.findUserChatRoomByEmail(findUser.getEmail());
+//        chatRoom = getChatRoom(postUser, userChatRooms, chatRoom);
+//        return chatRoom;
+//    }
+//    private ChatRoom getChatRoom(User PostUser, List<UserChatRoom> userChatRooms, ChatRoom chatRoom) {
+//        for (UserChatRoom userChatRoom : userChatRooms) {
+//            if (userChatRoom.getOpponentUserId().equals(PostUser.getEmail())) { //만약에 이미 상대랑 같이 메시지하고 있는 방이 있다면
+//                chatRoom = userChatRoom.getChatRoom();
+//                break;
+//            }
+//        }
+//        return chatRoom;
+//    }
 
 }
 
