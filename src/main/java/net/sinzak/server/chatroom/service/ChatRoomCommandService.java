@@ -118,7 +118,7 @@ public class ChatRoomCommandService {
     public void makeChatRoomBlocked(User user,User opponentUser){
         List<UserChatRoom> userChatRooms = userChatRoomRepository.findUserChatRoomByIdFetchChatRoom(user.getId()); //보통은 차단한 상대가 없기에 취소
         for(UserChatRoom userChatRoom : userChatRooms){
-            if(userChatRoom.getOpponentUserId().equals(opponentUser.getEmail())){
+            if(userChatRoom.getOpponentUserId().equals(opponentUser.getId())){
                 userChatRoom.getChatRoom().setBlocked(true);
             }
         }
@@ -151,22 +151,22 @@ public class ChatRoomCommandService {
         chatRoomRepository.save(chatRoom);
     }
 
-    private ChatRoom checkIfChatRoomExist(User postUser, User findUser, ChatRoom chatRoom) {
-
-        List<UserChatRoom> userChatRooms =
-                userChatRoomRepository.findUserChatRoomByEmail(findUser.getEmail());
-        chatRoom = getChatRoom(postUser, userChatRooms, chatRoom);
-        return chatRoom;
-    }
-    private ChatRoom getChatRoom(User PostUser, List<UserChatRoom> userChatRooms, ChatRoom chatRoom) {
-        for (UserChatRoom userChatRoom : userChatRooms) {
-            if (userChatRoom.getOpponentUserId().equals(PostUser.getEmail())) { //만약에 이미 상대랑 같이 메시지하고 있는 방이 있다면
-                chatRoom = userChatRoom.getChatRoom();
-                break;
-            }
-        }
-        return chatRoom;
-    }
+//    private ChatRoom checkIfChatRoomExist(User postUser, User findUser, ChatRoom chatRoom) {
+//
+//        List<UserChatRoom> userChatRooms =
+//                userChatRoomRepository.findUserChatRoomByEmail(findUser.getEmail());
+//        chatRoom = getChatRoom(postUser, userChatRooms, chatRoom);
+//        return chatRoom;
+//    }
+//    private ChatRoom getChatRoom(User PostUser, List<UserChatRoom> userChatRooms, ChatRoom chatRoom) {
+//        for (UserChatRoom userChatRoom : userChatRooms) {
+//            if (userChatRoom.getOpponentUserId().equals(PostUser.getEmail())) { //만약에 이미 상대랑 같이 메시지하고 있는 방이 있다면
+//                chatRoom = userChatRoom.getChatRoom();
+//                break;
+//            }
+//        }
+//        return chatRoom;
+//    }
 
 }
 
