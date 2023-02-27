@@ -29,6 +29,12 @@ public class UserQueryController {
        return userQueryService.getUserProfile(userId, user);
 
     }
+
+    @ApiOperation(value ="모든 유저 목록 보기")
+    @GetMapping(value="/users")
+    public JSONObject getAllUser(){
+        return userQueryService.getAllUser();
+    }
     @ApiOperation(value ="팔로워리스트")
     @GetMapping(value ="/users/{userId}/followers")
     public JSONObject getFollowerList(@PathVariable Long userId) {
