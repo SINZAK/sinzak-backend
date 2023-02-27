@@ -40,6 +40,8 @@ public class OauthController {
     public JSONObject getOauthToken(@org.springframework.web.bind.annotation.RequestBody OauthDto tokenDto) throws Exception {
         JSONObject OauthInfo = getInfo(tokenDto);
         OAuthAttributes OauthUser = OAuthAttributes.of(tokenDto.getOrigin(), OauthInfo);
+        if(OauthUser.getEmail() == null || OauthUser.getEmail().isBlank())
+            return PropertyUtil.responseMessage("액세스 토큰으로 가져올 정보가 없습니다. (소셜로그인 실패)");
         TokenDto jwtToken;
         try{
             jwtToken = securityService.login(OauthUser.getEmail());
