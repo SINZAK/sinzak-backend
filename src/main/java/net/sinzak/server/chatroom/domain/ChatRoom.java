@@ -71,9 +71,9 @@ public class ChatRoom extends BaseTimeEntity {
         }
     }
 
-    public UserChatRoom leaveChatRoom(String userEmail){
+    public UserChatRoom leaveChatRoom(Long userId){
         for(UserChatRoom userChatRoom :this.userChatRooms){
-            if(userChatRoom.getUser().getEmail().equals(userEmail)){
+            if(userChatRoom.getUser().getId().equals(userId)){
                 this.participantsNumber--;
                 return userChatRoom;
             }
