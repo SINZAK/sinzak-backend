@@ -62,7 +62,7 @@ public class ChatMessageService {
                 .senderId(message.getSenderId())
                 .senderName(message.getSenderName())
                 .sendAt(newChatMessage.getCreatedDate())
-                .messageType(MessageType.TEXT.name())
+                .messageType(message.getMessageType().name())
                 .build();
         return getChatMessageDto;
     }
@@ -70,6 +70,7 @@ public class ChatMessageService {
     private ChatMessage addChatMessageToChatRoom(ChatMessageDto message, ChatRoom findChatRoom) {
         ChatMessage newChatMessage = ChatMessage.builder()
                 .message(message.getMessage())
+                .type(message.getMessageType())
                 .senderName(message.getSenderName())
                 .senderId(message.getSenderId())
                 .build();
