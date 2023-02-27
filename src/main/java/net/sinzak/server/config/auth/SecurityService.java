@@ -52,6 +52,8 @@ public class SecurityService {
     public TokenDto login(User user) {
         TokenDto tokenDto = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
         //리프레시 토큰 저장
+        if(user.getNickName().isEmpty())
+            tokenDto.setIsJoined(false);
         RefreshToken refreshToken = RefreshToken.builder()
                 .key(user.getId())
                 .token(tokenDto.getRefreshToken())
@@ -65,7 +67,7 @@ public class SecurityService {
     @Transactional(rollbackFor = Exception.class)
     public JSONObject join(User User, @RequestBody JoinDto dto) {
         if(!User.getNickName().isBlank())
-            return PropertyUtil.response("이미 회원가입된 유저입니다.");
+            return PropertyUtil.responseMessage("이미 회원가입된 유저입니다.");
         JSONObject obj = new JSONObject();
         User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
         user.saveJoinInfo(dto.getNickName(), dto.getCategory_like());
