@@ -86,6 +86,9 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE,orphanRemoval = true)
+    private List<UserChatRoom> userChatRooms = new ArrayList<>();
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<Product> productPostList = new ArrayList<>();
 
@@ -106,9 +109,6 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<WorkLikes> workLikesList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
-    private List<UserChatRoom> userChatRooms = new ArrayList<>();
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE)
     private List<Report> reportList = new ArrayList<>();
