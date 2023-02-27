@@ -38,10 +38,10 @@ public class ChatRoom extends BaseTimeEntity {
         this.roomUuid = UUID.randomUUID().toString();
     }
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.REMOVE,orphanRemoval = true)
     private List<ChatMessage> chatMessages = new ArrayList<>();
 
-    @OneToMany(mappedBy = "chatRoom",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "chatRoom",cascade = CascadeType.REMOVE,orphanRemoval = true)
     private Set<UserChatRoom> userChatRooms = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -71,9 +71,9 @@ public class ChatRoom extends BaseTimeEntity {
         }
     }
 
-    public UserChatRoom leaveChatRoom(String userEmail){
+    public UserChatRoom leaveChatRoom(Long userId){
         for(UserChatRoom userChatRoom :this.userChatRooms){
-            if(userChatRoom.getUser().getEmail().equals(userEmail)){
+            if(userChatRoom.getUser().getId().equals(userId)){
                 this.participantsNumber--;
                 return userChatRoom;
             }

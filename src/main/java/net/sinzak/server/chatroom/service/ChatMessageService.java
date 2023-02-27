@@ -81,7 +81,7 @@ public class ChatMessageService {
     public void leaveChatRoom(User user, ChatRoomUuidDto chatRoomUuidDto){
         ChatRoom findChatroom = chatRoomRepository.findByRoomUuidFetchUserChatRoom(chatRoomUuidDto.getRoomId())
                 .orElseThrow(()->new InstanceNotFoundException("존재하지 않는 채팅방입니다."));
-        UserChatRoom userChatRoom = findChatroom.leaveChatRoom(user.getEmail());
+        UserChatRoom userChatRoom = findChatroom.leaveChatRoom(user.getId());
         if(userChatRoom ==null){
             throw new InstanceNotFoundException("존재하지 않는 채팅방입니다.");
         }
