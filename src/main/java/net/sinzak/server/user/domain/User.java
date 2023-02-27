@@ -148,6 +148,8 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.picture = picture;
         this.origin = origin;
         this.categoryLike = "";
+        this.roles = Collections.singletonList("ROLE_USER");
+        this.role = Role.GUEST;
     }
 
 
