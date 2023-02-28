@@ -183,9 +183,9 @@ public class OauthController {
 
     @ApiOperation(value = "스프링용 네이버로그인 실행",notes =
             "로컬환경 : https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=DwXMEfKZq0tmkrsn6kLk&state=STATE_STRING" +
-            "&redirect_uri="+developURL+"/login/oauth2/code/naver"+'\n'+
+            "&redirect_uri="+developURL+"/api/login/oauth2/code/naver"+'\n'+
             "배포환경 : https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=DwXMEfKZq0tmkrsn6kLk&state=STATE_STRING" +
-            "&redirect_uri="+productURL+"/login/oauth2/code/naver&response_type=code&scope=profile%20email&include_granted_scopes=true")
+            "&redirect_uri="+productURL+"/api/login/oauth2/code/naver")
     @GetMapping("/test3")
     public void naverLogin() throws IOException {
     }
