@@ -45,21 +45,7 @@ public class ChatRoomCommandController {
         return chatRoomCommandService.uploadImage(uuid,files);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    @ResponseStatus(HttpStatus.OK)
-    protected JSONObject handleUserNotFoundException() {
-        return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_FOUND);
-    }
-    @ExceptionHandler(UserNotFoundException.class)
-    @ResponseStatus(HttpStatus.OK)
-    protected JSONObject handleUserNotFoundException(UserNotFoundException e) {
-        return PropertyUtil.responseMessage(e.getMessage());
-    }
-    @ExceptionHandler(ChatRoomNotFoundException.class)
-    @ResponseStatus(HttpStatus.OK)
-    public JSONObject handleChatRoomNotFoundException(){
-        return PropertyUtil.responseMessage("존재하지 않은 채팅방입니다");
-    }
+
 
 //    @PostMapping(value ="/chat/rooms/{uuid}/leave")
 //    @ApiOperation(value ="채팅방 나가기")
