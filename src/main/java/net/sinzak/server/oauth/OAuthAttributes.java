@@ -46,6 +46,7 @@ public class OAuthAttributes {
     }
 
     private static OAuthAttributes ofNaver(JSONObject attributes) {
+        System.out.println(attributes.toJSONString());
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
         return OAuthAttributes.builder()
                 .name((String) response.get("name"))

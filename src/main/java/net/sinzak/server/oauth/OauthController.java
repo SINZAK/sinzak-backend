@@ -58,7 +58,7 @@ public class OauthController {
         if(tokenDto.getOrigin().equals("kakao"))
             OauthInfo = getKakaoInfo(tokenDto.getAccessToken());
         else if(tokenDto.getOrigin().equals("naver"))
-            OauthInfo = null;
+            OauthInfo = getNaverInfo(tokenDto.getAccessToken());
         else
             OauthInfo = getGoogleInfo(tokenDto);
 
@@ -180,6 +180,54 @@ public class OauthController {
         return response;
     }
 
+
+    @ApiOperation(value = "스프링용 네이버로그인 실행",notes =
+            "로컬환경 : https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=DwXMEfKZq0tmkrsn6kLk&state=STATE_STRING" +
+            "&redirect_uri="+developURL+"/login/oauth2/code/naver"+'\n'+
+            "배포환경 : https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=DwXMEfKZq0tmkrsn6kLk&state=STATE_STRING" +
+            "&redirect_uri="+productURL+"/login/oauth2/code/naver&response_type=code&scope=profile%20email&include_granted_scopes=true")
+    @GetMapping("/test3")
+    public void naverLogin() throws IOException {
+    }
+
+    @ApiOperation(value = "스프링용 구글 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
+    @GetMapping(value = "/login/oauth2/code/naver")
+    public String oauthNaver(@RequestParam(value = "code", required = false) String code) throws Exception {
+        log.warn("인가코드 = {}",code);
+        JSONObject obj = getNaverAccessToken(code);
+        log.warn("액세스토큰 = {}",obj.get("access_token").toString());
+        return obj.toJSONString();
+    }
+
+    private JSONObject getNaverAccessToken(String code) throws IOException, ParseException {
+        String url = "https://nid.naver.com/oauth2.0/token?grant_type=authorization_code&client_id=DwXMEfKZq0tmkrsn6kLk&client_secret=2CAzvT18ok&code="+code+"&state=9kgsGTfH4j7IyAkg";
+        Request.Builder builder = new Request.Builder().header("Content-type", " application/x-www-form-urlencoded")
+                .url(url);
+        JSONObject postObj = new JSONObject();
+        RequestBody requestBody = RequestBody.create(postObj.toJSONString().getBytes());
+        builder.post(requestBody);
+        Request request = builder.build();
+
+        Response responseHTML = client.newCall(request).execute();
+        JSONParser parser = new JSONParser();
+        JSONObject response = (JSONObject) parser.parse(responseHTML.body().string());
+        log.warn(response.toJSONString());
+        return response;
+    }
+
+    private JSONObject getNaverInfo(String accessToken) throws IOException, ParseException {
+        String url = "https://openapi.naver.com/v1/nid/me";
+        Request.Builder builder = new Request.Builder()
+                .header("Authorization","Bearer "+accessToken)
+                .header("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
+                .url(url);
+        Request request = builder.build();
+
+        Response responseHTML = client.newCall(request).execute();
+        JSONParser parser = new JSONParser();
+        JSONObject response = (JSONObject) parser.parse(responseHTML.body().string());
+        return response;
+    }
 
 
 }
