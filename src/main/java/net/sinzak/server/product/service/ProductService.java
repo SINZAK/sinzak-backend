@@ -3,6 +3,7 @@ package net.sinzak.server.product.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.common.PostService;
+import net.sinzak.server.common.error.PostNotFoundException;
 import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.common.dto.SuggestDto;
 import net.sinzak.server.common.error.InstanceNotFoundException;
@@ -149,7 +150,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     @Transactional
     public JSONObject showDetail(Long id, User User){   // 글 상세 확인
         User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
-        Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(InstanceNotFoundException::new);
+        Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(PostNotFoundException::new);
         DetailProductForm detailForm = DetailProductForm.builder()
                 .id(product.getId())
                 .userId(product.getUser().getId())

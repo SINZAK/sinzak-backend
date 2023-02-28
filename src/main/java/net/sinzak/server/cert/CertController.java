@@ -69,15 +69,4 @@ public class CertController {
         return certService.uploadUnivCard(certId, multipartFile);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    @ResponseStatus(HttpStatus.OK)
-    protected JSONObject handleUserNotFoundException() {
-        return PropertyUtil.responseMessage("존재하지 않는 유저입니다.");
-    }
-
-    @ExceptionHandler(InstanceNotFoundException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected JSONObject handleInstanceNotFoundException() {
-        return PropertyUtil.responseMessage("존재하지 않는 객체입니다.");
-    }
 }
