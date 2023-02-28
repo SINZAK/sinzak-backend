@@ -3,14 +3,10 @@ package net.sinzak.server.cert;
 import com.univcert.api.UnivCert;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
-import net.sinzak.server.common.PropertyUtil;
-import net.sinzak.server.common.error.InstanceNotFoundException;
-import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.dto.request.UnivDto;
 import org.json.simple.JSONObject;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -69,15 +65,4 @@ public class CertController {
         return certService.uploadUnivCard(certId, multipartFile);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    @ResponseStatus(HttpStatus.OK)
-    protected JSONObject handleUserNotFoundException() {
-        return PropertyUtil.responseMessage("존재하지 않는 유저입니다.");
-    }
-
-    @ExceptionHandler(InstanceNotFoundException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected JSONObject handleInstanceNotFoundException() {
-        return PropertyUtil.responseMessage("존재하지 않는 객체입니다.");
-    }
 }

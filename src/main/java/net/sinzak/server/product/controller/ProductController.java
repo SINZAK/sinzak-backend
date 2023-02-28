@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.common.dto.SuggestDto;
+import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.config.auth.AuthUser;
 import net.sinzak.server.product.dto.*;
@@ -175,16 +176,5 @@ public class ProductController {
             return productService.productListForGuest(search, categories, align, sale, pageable);
         }
     }
-
-
-//    @ExceptionHandler(UserNotFoundException.class)
-//    @ResponseStatus(HttpStatus.OK)
-//    protected JSONObject handleUserNotFoundException() {
-//    return PropertyUtil.responseMessage("존재하지 않는 유저입니다.");
-//}
-//
-//    @ExceptionHandler(InstanceNotFoundException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    protected JSONObject handleInstanceNotFoundException() {return PropertyUtil.responseMessage("존재하지 않는 객체입니다.");}
 
 }

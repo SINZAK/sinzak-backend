@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.common.PostService;
 import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.common.dto.SuggestDto;
-import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
+import net.sinzak.server.common.error.PostNotFoundException;
 import net.sinzak.server.image.S3Service;
 import net.sinzak.server.product.domain.*;
 import net.sinzak.server.common.PropertyUtil;
@@ -68,7 +68,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     @Transactional(rollbackFor = {Exception.class})
     public JSONObject deleteImage(User User, Long productId, String url){   // 글 생성
-        Product product = productRepository.findById(productId).orElseThrow(InstanceNotFoundException::new);
+        Product product = productRepository.findById(productId).orElseThrow(PostNotFoundException::new);
         if(!User.getId().equals(product.getUser().getId()))
             return PropertyUtil.responseMessage("해당 작품의 작가가 아닙니다.");
         if(product.getImages().size()==1)
@@ -88,7 +88,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     public JSONObject saveImageInS3AndProduct(User user, List<MultipartFile> multipartFiles, Long id) {
-        Product product = productRepository.findById(id).orElseThrow(InstanceNotFoundException::new);
+        Product product = productRepository.findById(id).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(product.getUser().getId()))
             return PropertyUtil.responseMessage("잘못된 접근입니다.");
         for (MultipartFile img : multipartFiles) {
@@ -120,7 +120,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     @Transactional(rollbackFor = {Exception.class})
     public JSONObject editPost(User User, Long productId, ProductEditDto editDto){   // 글 생성
         User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
-        Product product = productRepository.findById(productId).orElseThrow(InstanceNotFoundException::new);
+        Product product = productRepository.findById(productId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(product.getUser().getId()))
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
 
@@ -132,7 +132,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     @Transactional(rollbackFor = {Exception.class})
     public JSONObject deletePost(User User, Long productId){   // 글 생성
         User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
-        Product product = productRepository.findById(productId).orElseThrow(InstanceNotFoundException::new);
+        Product product = productRepository.findById(productId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(product.getUser().getId()))
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
         deleteImagesInPost(product);
@@ -149,7 +149,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     @Transactional
     public JSONObject showDetail(Long id, User User){   // 글 상세 확인
         User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
-        Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(InstanceNotFoundException::new);
+        Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(PostNotFoundException::new);
         DetailProductForm detailForm = DetailProductForm.builder()
                 .id(product.getId())
                 .userId(product.getUser().getId())
@@ -219,7 +219,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     @Transactional
     public JSONObject showDetail(Long id){   // 비회원 글 보기
-        Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(InstanceNotFoundException::new);
+        Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(PostNotFoundException::new);
         List<String> imagesUrl = getImages(product);
         DetailProductForm detailForm = DetailProductForm.builder()
                 .id(product.getId())
@@ -306,7 +306,6 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     @Transactional(readOnly = true)
     public JSONObject showRecommendDetail(User User){
-
         User user = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
         List<String> userCategories = Arrays.asList(user.getCategoryLike().split(","));
 
@@ -346,7 +345,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         User user = userRepository.findByEmailFetchProductWishList(User.getEmail()).orElseThrow(UserNotFoundException::new); // 작품 찜까지 페치 조인
         List<ProductWish> wishList = user.getProductWishList(); //wishList == 유저의 찜 리스트
         boolean isWish=false;
-        Product product = productRepository.findById(form.getId()).orElseThrow(InstanceNotFoundException::new);
+        Product product = productRepository.findById(form.getId()).orElseThrow(PostNotFoundException::new);
 
         if(wishList.size()!=0){ /** 유저가 찜이 누른 적이 있다면 이미 누른 작품인지 비교 **/
             for (ProductWish wish : wishList) { //유저의 찜목록과 현재 누른 작품의 찜과 비교
@@ -388,49 +387,46 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         User user = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
         List<ProductLikes> userLikesList = user.getProductLikesList();
         boolean isLike=false;
-        Optional<Product> Product = productRepository.findById(form.getId());
-        if(Product.isPresent()){
-            Product product = Product.get();
-            if(userLikesList.size()!=0){
-                for (ProductLikes like : userLikesList) {
-                    if(product.equals(like.getProduct())) {
-                        isLike = true;
-                        break;
-                    }
-                }
-            }
+        Product product = productRepository.findById(form.getId()).orElseThrow(PostNotFoundException::new);
 
-            if (form.isMode() && !isLike){
-                product.plusLikesCnt();
-                ProductLikes connect = ProductLikes.createConnect(product, user);
-                likesRepository.save(connect);
-                isLike=true;
-                obj.put("success",true);
-            }
-            else if(!form.isMode() && isLike){
-                product.minusLikesCnt();
-                for (ProductLikes like : userLikesList) {
-                    if(product.equals(like.getProduct())) {
-                        likesRepository.delete(like);
-                        isLike = false;
-                        break;
-                    }
+        if(userLikesList.size()!=0){
+            for (ProductLikes like : userLikesList) {
+                if(product.equals(like.getProduct())) {
+                    isLike = true;
+                    break;
                 }
-                obj.put("success",true);
             }
-            else
-                obj.put("success",false);
-            obj.put("isLike",isLike);
-            return obj;
         }
-        return PropertyUtil.responseMessage("존재하지 않는 작품에 요청된 좋아요");
+
+        if (form.isMode() && !isLike){
+            product.plusLikesCnt();
+            ProductLikes connect = ProductLikes.createConnect(product, user);
+            likesRepository.save(connect);
+            isLike=true;
+            obj.put("success",true);
+        }
+        else if(!form.isMode() && isLike){
+            product.minusLikesCnt();
+            for (ProductLikes like : userLikesList) {
+                if(product.equals(like.getProduct())) {
+                    likesRepository.delete(like);
+                    isLike = false;
+                    break;
+                }
+            }
+            obj.put("success",true);
+        }
+        else
+            obj.put("success",false);
+        obj.put("isLike",isLike);
+        return obj;
     }
 
     @Transactional
     public JSONObject trading(@RequestBody ActionForm form){
         JSONObject obj = new JSONObject();
         boolean isTrading;
-        Product product = productRepository.findById(form.getId()).orElseThrow(InstanceNotFoundException::new);
+        Product product = productRepository.findById(form.getId()).orElseThrow(PostNotFoundException::new);
         isTrading = product.isTrading();
         if (form.isMode() && !isTrading){
             product.setTrading(true);
@@ -450,7 +446,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     @Transactional
     public JSONObject sell(User User, @RequestBody SellDto dto){
         User user = userRepository.findByEmailFetchProductSellList(User.getEmail()).orElseThrow(UserNotFoundException::new);
-        Product product = productRepository.findById(dto.getProductId()).orElseThrow(InstanceNotFoundException::new);
+        Product product = productRepository.findById(dto.getProductId()).orElseThrow(PostNotFoundException::new);
         ProductSell connect = ProductSell.createConnect(product, user);
         productSellRepository.save(connect);
         return PropertyUtil.response(true);
