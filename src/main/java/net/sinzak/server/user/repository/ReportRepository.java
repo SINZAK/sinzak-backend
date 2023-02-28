@@ -10,6 +10,6 @@ import java.util.Optional;
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
 
-    @Query("select r from Report  r where r.opponentUser.id = :opponentUserId and r.user.id =: userId")
+    @Query("select r from Report  r where r.opponentUser.id = :opponentUserId and r.user.id = :userId")
     Optional<Report> findByUserIdAndOpponentUserId(@Param("userId") Long userId,@Param("opponentUserId") Long opponentUserId);
 }
