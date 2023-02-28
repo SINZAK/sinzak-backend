@@ -3,6 +3,7 @@ package net.sinzak.server.config;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import net.sinzak.server.config.auth.AuthUser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -57,6 +58,7 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .useDefaultResponseMessages(false)
                 .ignoredParameterTypes(AuthenticationPrincipal.class)
+                .ignoredParameterTypes(AuthUser.class)
                 .groupName(groupName)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("net.sinzak.server"))

@@ -24,7 +24,7 @@ public class JwtTokenProvider {
     private String secretKey = "sinzak";
 
 
-    private final long tokenValidTime = 30 * 60 * 10000L; // 액세스토큰 유효시간 30분
+    private final long tokenValidTime = 30 * 60 * 10000L; // 액세스토큰 유효시간 300분
     private final long refreshValidTime = 14 * 24 * 60 * 60 * 1000L; //리프레시 = 14일
 
     private final CustomUserDetailsService userDetailsService;

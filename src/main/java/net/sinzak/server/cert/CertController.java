@@ -65,7 +65,7 @@ public class CertController {
     @PostMapping(value = "/certify/{id}/univ", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     @ApiImplicitParam(name = "multipartFile", dataType = "multipartFile",
             value = "파일 보내주시면 파일 s3서버에 저장 및, 해당 파일이 저장되어 있는 URL을 디비에 저장합니다")
-    public JSONObject uploadUnivCard(@AuthenticationPrincipal User user, @PathVariable("id") Long certId, @RequestPart MultipartFile multipartFile) {
+    public JSONObject uploadUnivCard(@PathVariable("id") Long certId, @RequestPart MultipartFile multipartFile) {
         return certService.uploadUnivCard(certId, multipartFile);
     }
 
