@@ -1,18 +1,12 @@
 package net.sinzak.server.common;
 
 import lombok.RequiredArgsConstructor;
-import net.sinzak.server.product.dto.DetailProductForm;
-import net.sinzak.server.product.dto.ShowForm;
-import net.sinzak.server.work.dto.DetailWorkForm;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpStatus;
 
-import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor

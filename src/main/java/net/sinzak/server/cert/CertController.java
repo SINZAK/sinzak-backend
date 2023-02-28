@@ -3,14 +3,10 @@ package net.sinzak.server.cert;
 import com.univcert.api.UnivCert;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
-import net.sinzak.server.common.PropertyUtil;
-import net.sinzak.server.common.error.InstanceNotFoundException;
-import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.dto.request.UnivDto;
 import org.json.simple.JSONObject;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -65,19 +61,8 @@ public class CertController {
     @PostMapping(value = "/certify/{id}/univ", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     @ApiImplicitParam(name = "multipartFile", dataType = "multipartFile",
             value = "파일 보내주시면 파일 s3서버에 저장 및, 해당 파일이 저장되어 있는 URL을 디비에 저장합니다")
-    public JSONObject uploadUnivCard(@AuthenticationPrincipal User user, @PathVariable("id") Long certId, @RequestPart MultipartFile multipartFile) {
+    public JSONObject uploadUnivCard(@PathVariable("id") Long certId, @RequestPart MultipartFile multipartFile) {
         return certService.uploadUnivCard(certId, multipartFile);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    @ResponseStatus(HttpStatus.OK)
-    protected JSONObject handleUserNotFoundException() {
-        return PropertyUtil.responseMessage("존재하지 않는 유저입니다.");
-    }
-
-    @ExceptionHandler(InstanceNotFoundException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected JSONObject handleInstanceNotFoundException() {
-        return PropertyUtil.responseMessage("존재하지 않는 객체입니다.");
-    }
 }

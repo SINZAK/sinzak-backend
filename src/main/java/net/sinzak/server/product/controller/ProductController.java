@@ -5,11 +5,10 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.dto.SuggestDto;
-import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
+import net.sinzak.server.config.auth.AuthUser;
 import net.sinzak.server.product.dto.*;
 import net.sinzak.server.product.service.ProductService;
 import net.sinzak.server.common.dto.ActionForm;
@@ -17,7 +16,6 @@ import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -107,14 +105,14 @@ public class ProductController {
     @ApiDocumentResponse
     @PostMapping("/products/sell")
     @ApiOperation(value = "작품 판매", notes = "회원의 구매목록에 추가, 해당 작품 판매완료 설정")
-    public JSONObject sell(@AuthenticationPrincipal User user, @RequestBody SellDto dto) {
+    public JSONObject sell(@AuthUser User user, @RequestBody SellDto dto) {
         return productService.sell(user, dto);
     }
 
     @ApiDocumentResponse
     @PostMapping("/products/suggest")
     @ApiOperation(value = "작품 가격제안")
-    public JSONObject suggest(@AuthenticationPrincipal User user, @RequestBody SuggestDto dto) {
+    public JSONObject suggest(@AuthUser User user, @RequestBody SuggestDto dto) {
         return productService.suggest(user, dto);
     }
 
@@ -178,16 +176,5 @@ public class ProductController {
             return productService.productListForGuest(search, categories, align, sale, pageable);
         }
     }
-
-
-//    @ExceptionHandler(UserNotFoundException.class)
-//    @ResponseStatus(HttpStatus.OK)
-//    protected JSONObject handleUserNotFoundException() {
-//    return PropertyUtil.responseMessage("존재하지 않는 유저입니다.");
-//}
-//
-//    @ExceptionHandler(InstanceNotFoundException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    protected JSONObject handleInstanceNotFoundException() {return PropertyUtil.responseMessage("존재하지 않는 객체입니다.");}
 
 }

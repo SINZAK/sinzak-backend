@@ -35,7 +35,7 @@ public class SecurityService {
     public TokenDto login(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("가입되지 않은 ID 입니다."));
-        TokenDto tokenDto = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
+        TokenDto tokenDto = jwtProvider.createToken(user.getId().toString(), user.getId(), user.getRoles());
         //리프레시 토큰 저장
         log.error(user.getNickName());
         if(user.getNickName().isEmpty())
@@ -51,7 +51,7 @@ public class SecurityService {
 
     @Transactional
     public TokenDto login(User user) {
-        TokenDto tokenDto = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
+        TokenDto tokenDto = jwtProvider.createToken(user.getId().toString(), user.getId(), user.getRoles());
         //리프레시 토큰 저장
         tokenDto.setIsJoined(false);
 
@@ -92,7 +92,7 @@ public class SecurityService {
         return obj;
     }
 
-    @Transactional
+    @Transactional //TODO
     public TokenDto reissue(User User,TokenRequestDto tokenRequestDto) {
         // 만료된 refresh token 에러
         if (!jwtProvider.validateToken(tokenRequestDto.getRefreshToken())) {
@@ -114,7 +114,7 @@ public class SecurityService {
             throw new NoSuchElementException();
 
         // AccessToken, RefreshToken 토큰 재발급, 리프레쉬 토큰 저장
-        TokenDto newCreatedToken = jwtProvider.createToken(User.getEmail(), User.getId(), User.getRoles());
+        TokenDto newCreatedToken = jwtProvider.createToken(User.getId().toString(), User.getId(), User.getRoles());
         RefreshToken updateRefreshToken = refreshToken.updateToken(newCreatedToken.getRefreshToken());
         refreshTokenRepository.save(updateRefreshToken);
 

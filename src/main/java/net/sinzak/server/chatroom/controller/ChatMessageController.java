@@ -7,11 +7,17 @@ import net.sinzak.server.chatroom.domain.ChatMessage;
 import net.sinzak.server.chatroom.dto.request.ChatMessageDto;
 import net.sinzak.server.chatroom.dto.request.ChatRoomUuidDto;
 import net.sinzak.server.chatroom.service.ChatMessageService;
+import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.error.ChatRoomNotFoundException;
 import net.sinzak.server.user.domain.User;
+import org.json.simple.JSONObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Controller
 @RequiredArgsConstructor
@@ -44,7 +50,11 @@ public class ChatMessageController {
     public void leave(@AuthenticationPrincipal User user, ChatRoomUuidDto chatRoomUuidDto){
         chatMessageService.leaveChatRoom(user,chatRoomUuidDto);
     }
-
+    @ExceptionHandler(ChatRoomNotFoundException.class)
+    @ResponseStatus(HttpStatus.OK)
+    public JSONObject handleChatRoomNotFoundException(){
+        return PropertyUtil.responseMessage("존재하지 않은 채팅방입니다");
+    }
 
 //    @GetMapping("/getChatMessage")
 //    public ChatMessage getChatMessage(@RequestParam String id) throws Exception{

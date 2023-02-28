@@ -1,7 +1,6 @@
 package net.sinzak.server.chatroom.service;
 
 
-import com.google.api.client.json.Json;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.chatroom.domain.ChatRoom;
@@ -12,12 +11,15 @@ import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.repository.UserChatRoomRepository;
 import net.sinzak.server.common.PostType;
 import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.error.ChatRoomNotFoundException;
+import net.sinzak.server.common.error.PostNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.image.S3Service;
 import net.sinzak.server.product.domain.Product;
 import net.sinzak.server.product.repository.ProductRepository;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.repository.UserRepository;
+import net.sinzak.server.user.service.UserQueryService;
 import net.sinzak.server.work.domain.Work;
 import net.sinzak.server.work.repository.WorkRepository;
 import org.jetbrains.annotations.NotNull;
@@ -43,26 +45,29 @@ public class ChatRoomCommandService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final S3Service s3Service;
-
+    private final UserQueryService userQueryService;
 
     public JSONObject createUserChatRoom(PostDto postDto, User user) { //상대방 아바타를 초대
         User postUser =null;
+        if(user == null){
+            throw new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN);
+        }
         List<ChatRoom> postChatRooms = null;
         Product product = null;
         Work work = null;
         if(postDto.getPostType().equals(PostType.PRODUCT.getName())){
             Optional<Product> findProduct = productRepository.findByIdFetchUserAndChatRooms(postDto.getPostId());
             if(!findProduct.isPresent()){
-                return PropertyUtil.responseMessage("없는 게시글입니다.");
+                throw new PostNotFoundException();
             }
             postUser = findProduct.get().getUser();
             postChatRooms = findProduct.get().getChatRooms(); //여기서 채팅방을 나중에 가져오는 것도 고려
             product = findProduct.get();
         }
         if(postDto.getPostType().equals(PostType.WORK.getName())){
-            Optional<Work> findWork = workRepository.findByIdFetchUserAAndChatRooms(postDto.getPostId());
+            Optional<Work> findWork = workRepository.findByIdFetchUserAndChatRooms(postDto.getPostId());
             if(!findWork.isPresent()){
-                return PropertyUtil.responseMessage("없는 게시글입니다.");
+                throw new PostNotFoundException();
             }
             postUser = findWork.get().getUser();
             postChatRooms = findWork.get().getChatRooms();
@@ -70,9 +75,12 @@ public class ChatRoomCommandService {
         }
 
         log.info("게시글 확인");
-        JSONObject userStatus = checkUserStatus(user, postUser);
-        if (userStatus != null) return userStatus; //만약 로그인 안 되어있거나 상대가 없다면
-        User findUser = userRepository.findById(user.getId()).get();
+        checkUserStatus(user,postUser);
+        User findUser = userRepository.findById(user.getId()).orElseThrow(UserNotFoundException::new);
+
+        if(userQueryService.checkReported(postUser,user)){
+            return PropertyUtil.responseMessage("차단된 상대입니다.");
+        }
 
         GetCreatedChatRoomDto getCreatedChatRoomDto =new GetCreatedChatRoomDto();
         ChatRoom chatRoom = checkIfUserIsAlreadyChatting(user, postChatRooms);
@@ -102,7 +110,7 @@ public class ChatRoomCommandService {
         Optional<ChatRoom> chatRoom = chatRoomRepository.findByRoomId(roomUuid);
         List<JSONObject> obj = new ArrayList<>();
         if(!chatRoom.isPresent()){
-            return PropertyUtil.responseMessage("존재하지 않는 채팅방 입니다.");
+            throw new ChatRoomNotFoundException();
         }
         for(MultipartFile multipartFile : multipartFiles ){
             JSONObject jsonObject = new JSONObject();
@@ -136,7 +144,9 @@ public class ChatRoomCommandService {
     }
 
     public void makeChatRoomBlocked(User user,User opponentUser){
-        List<UserChatRoom> userChatRooms = userChatRoomRepository.findUserChatRoomByIdFetchChatRoom(user.getId()); //보통은 차단한 상대가 없기에 취소
+        List<UserChatRoom> userChatRooms = Optional
+                .ofNullable(userChatRoomRepository.findUserChatRoomByIdFetchChatRoom(user.getId()))
+                .orElseThrow(UserNotFoundException::new); //보통은 차단한 상대가 없기에 취소
         for(UserChatRoom userChatRoom : userChatRooms){
             if(userChatRoom.getOpponentUserId().equals(opponentUser.getId())){
                 userChatRoom.getChatRoom().setBlocked(true);
@@ -155,14 +165,10 @@ public class ChatRoomCommandService {
         return null;
     }
     @Nullable
-    private JSONObject checkUserStatus(User user, User postUser) {
-        if (user == null) {
-            return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
+    private void checkUserStatus(User user, User postUser) {
+        if (user == null ||postUser ==null) {
+            throw new UserNotFoundException();
         }
-        if (postUser ==null) {
-            return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_FOUND);
-        }
-        return null;
     }
 
     ///밑은 타임리프 테스트
