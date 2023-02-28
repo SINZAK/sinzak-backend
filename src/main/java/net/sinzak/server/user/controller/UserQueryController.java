@@ -3,11 +3,14 @@ package net.sinzak.server.user.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.dto.IdDto;
+import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.dto.respond.UserDto;
 import net.sinzak.server.user.service.UserQueryService;
 import org.json.simple.JSONObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,12 +59,23 @@ public class UserQueryController {
     @ApiOperation(value ="스크랩 목록 ")
     @GetMapping(value ="/users/wish")
     public JSONObject showWish(@AuthenticationPrincipal User user){
-        return userQueryService.getWishList(user.getId());
+        return userQueryService.getWishList(user);
     }
     @ApiOperation(value ="의뢰해요 목록")
     @GetMapping(value ="/users/work-employ")
     public JSONObject showWorkEmploy(@AuthenticationPrincipal User user){
         return userQueryService.getWorkEmploys(user);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.OK)
+    protected JSONObject handleUserNotFoundException() {
+        return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_FOUND);
+    }
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.OK)
+    protected JSONObject handleUserNotFoundException(UserNotFoundException e) {
+        return PropertyUtil.responseMessage(e.getMessage());
     }
 
 

@@ -44,7 +44,7 @@ public class UserQueryService {
 
     public JSONObject getMyProfile(User user){
         JSONObject obj = new JSONObject();
-        User findUser = userRepository.findByEmailFetchProductPostList(user.getEmail()).orElseThrow(UserNotFoundException::new);
+        User findUser = userRepository.findByEmailFetchProductPostList(user.getEmail()).orElseThrow(()-> new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN));
         List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
         obj.put("products", productShowForms);
         List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList(),false);
@@ -66,9 +66,11 @@ public class UserQueryService {
 
         return PropertyUtil.response(obj);
     }
-    public JSONObject getWishList(Long userId){
-        List<WorkWish> workWishes= workWishRepository.findByUserIdFetchWork(userId);
-        List<ProductWish> productWishes = productWishRepository.findByUserIdFetchProduct(userId);
+    public JSONObject getWishList(User loginUser){
+        List<WorkWish> workWishes= Optional
+                .ofNullable(workWishRepository.findByUserIdFetchWork(loginUser.getId()))
+                .orElseThrow(()->new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN));
+        List<ProductWish> productWishes = productWishRepository.findByUserIdFetchProduct(loginUser.getId());
         JSONObject obj = new JSONObject();
         List<WishShowForm> workWishShowForms = makeWorkWishShowForms(workWishes);
         obj.put("workWishes",workWishShowForms);
@@ -79,8 +81,8 @@ public class UserQueryService {
 
     public JSONObject getWorkEmploys(User user){
         JSONObject obj = new JSONObject();
-        User findUser = userRepository.findByEmailFetchWorkPostList(user.getEmail()).orElseThrow(UserNotFoundException::new);
-        List<ProfileShowForm> workEmploys=  makeWorkShowForm(findUser.getWorkPostList(),true);
+        User loginUser = userRepository.findByEmailFetchWorkPostList(user.getEmail()).orElseThrow(()->new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN));
+        List<ProfileShowForm> workEmploys=  makeWorkShowForm(loginUser.getWorkPostList(),true);
         obj.put("workEmploys",workEmploys);
         return PropertyUtil.response(obj);
     }
@@ -161,7 +163,7 @@ public class UserQueryService {
 
     public JSONObject getUserProfile(Long userId, User user) {
         JSONObject obj = new JSONObject();
-        User findUser = userRepository.findByIdFetchProductPostList(userId).orElseThrow(UserNotFoundException::new);
+        User findUser = userRepository.findByIdFetchProductPostList(userId).orElseThrow(()->new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND));
         List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
         obj.put("products", productShowForms);
         List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList(),false);
@@ -214,6 +216,7 @@ public class UserQueryService {
         Set<Long> followingList = userRepository.findByIdFetchFollowingList(userId).orElseThrow(UserNotFoundException::new).getFollowingList();
         return getGetFollowDtoList(followingList);
     }
+
     private JSONObject getGetFollowDtoList(Set<Long> followList) {
         List<GetFollowDto> getFollowDtoList = new ArrayList<>();
         for(Long follow : followList){

@@ -47,7 +47,7 @@ public class UserCommandService {
     }
 
     public JSONObject updateUserImage(User loginUser, MultipartFile multipartFile){
-        User findUser = userRepository.findByEmail(loginUser.getEmail()).orElseThrow(UserNotFoundException::new);
+        User findUser = userRepository.findById(loginUser.getId()).orElseThrow(UserNotFoundException::new);
         try{
             String url = s3Service.uploadImage(multipartFile);
             findUser.setPicture(url);
@@ -61,7 +61,7 @@ public class UserCommandService {
     }
 
     public JSONObject updateCategoryLike(User user, CategoryDto categoryDto){
-        User findUser = userRepository.findByEmail(user.getEmail()).orElseThrow(UserNotFoundException::new);
+        User findUser = userRepository.findById(user.getId()).orElseThrow(UserNotFoundException::new);
         findUser.updateCategoryLike(categoryDto.getCategoryLike());
         return PropertyUtil.response(true);
     }
@@ -108,7 +108,7 @@ public class UserCommandService {
 
     public JSONObject report(ReportDto dto, User User){
         Long opponentUserId = dto.getUserId();
-        User loginUser = userRepository.findByEmailFetchReportList(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        User loginUser = userRepository.findByIdFetchReportList(User.getId()).orElseThrow(UserNotFoundException::new);
         if(loginUser.getId().equals(opponentUserId))
             return PropertyUtil.responseMessage("본인을 신고할 수 없습니다.");
         if(checkAlreadyReport(opponentUserId, loginUser))

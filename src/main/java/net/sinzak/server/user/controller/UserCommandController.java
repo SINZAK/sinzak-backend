@@ -125,7 +125,12 @@ public class UserCommandController {
     @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(HttpStatus.OK)
     protected JSONObject handleUserNotFoundException() {
-        return PropertyUtil.responseMessage("존재하지 않는 유저입니다.");
+        return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_FOUND);
+    }
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.OK)
+    protected JSONObject handleUserNotFoundException(UserNotFoundException e) {
+        return PropertyUtil.responseMessage(e.getMessage());
     }
 
     @ExceptionHandler(InstanceNotFoundException.class)

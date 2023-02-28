@@ -49,6 +49,9 @@ public class ChatRoomCommandService {
 
     public JSONObject createUserChatRoom(PostDto postDto, User user) { //상대방 아바타를 초대
         User postUser =null;
+        if(user == null){
+            throw new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN);
+        }
         List<ChatRoom> postChatRooms = null;
         Product product = null;
         Work work = null;
@@ -141,7 +144,9 @@ public class ChatRoomCommandService {
     }
 
     public void makeChatRoomBlocked(User user,User opponentUser){
-        List<UserChatRoom> userChatRooms = userChatRoomRepository.findUserChatRoomByIdFetchChatRoom(user.getId()); //보통은 차단한 상대가 없기에 취소
+        List<UserChatRoom> userChatRooms = Optional
+                .ofNullable(userChatRoomRepository.findUserChatRoomByIdFetchChatRoom(user.getId()))
+                .orElseThrow(UserNotFoundException::new); //보통은 차단한 상대가 없기에 취소
         for(UserChatRoom userChatRoom : userChatRooms){
             if(userChatRoom.getOpponentUserId().equals(opponentUser.getId())){
                 userChatRoom.getChatRoom().setBlocked(true);
