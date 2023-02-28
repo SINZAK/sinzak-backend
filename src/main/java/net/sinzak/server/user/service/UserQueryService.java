@@ -9,12 +9,14 @@ import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.product.domain.Product;
 import net.sinzak.server.product.domain.ProductWish;
 import net.sinzak.server.product.repository.ProductWishRepository;
+import net.sinzak.server.user.domain.Report;
 import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.user.dto.respond.GetFollowDto;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.dto.respond.ProfileShowForm;
 import net.sinzak.server.user.dto.respond.UserDto;
 import net.sinzak.server.user.dto.respond.WishShowForm;
+import net.sinzak.server.user.repository.ReportRepository;
 import net.sinzak.server.user.repository.SearchHistoryRepository;
 import net.sinzak.server.user.repository.UserRepository;
 import net.sinzak.server.work.domain.Work;
@@ -23,6 +25,7 @@ import net.sinzak.server.work.repository.WorkWishRepository;
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +40,7 @@ public class UserQueryService {
     private final SearchHistoryRepository historyRepository;
     private final WorkWishRepository workWishRepository;
     private final ProductWishRepository productWishRepository;
+    private final ReportRepository reportRepository;
 
     public JSONObject getMyProfile(User user){
         JSONObject obj = new JSONObject();
@@ -79,6 +83,14 @@ public class UserQueryService {
         List<ProfileShowForm> workEmploys=  makeWorkShowForm(findUser.getWorkPostList(),true);
         obj.put("workEmploys",workEmploys);
         return PropertyUtil.response(obj);
+    }
+
+    public boolean checkReported(User postUser,User loginUser){
+        Optional<Report> report = reportRepository.findByUserIdAndOpponentUserId(postUser.getId(), loginUser.getId());
+        if(report.isPresent()){
+            return true;
+        }
+        return false;
     }
 
     @NotNull

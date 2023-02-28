@@ -1,7 +1,6 @@
 package net.sinzak.server.chatroom.service;
 
 
-import com.google.api.client.json.Json;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.chatroom.domain.ChatRoom;
@@ -19,6 +18,7 @@ import net.sinzak.server.product.domain.Product;
 import net.sinzak.server.product.repository.ProductRepository;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.repository.UserRepository;
+import net.sinzak.server.user.service.UserQueryService;
 import net.sinzak.server.work.domain.Work;
 import net.sinzak.server.work.repository.WorkRepository;
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +44,7 @@ public class ChatRoomCommandService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final S3Service s3Service;
-
+    private final UserQueryService userQueryService;
 
     public JSONObject createUserChatRoom(PostDto postDto, User user) { //상대방 아바타를 초대
         User postUser =null;
@@ -61,7 +61,7 @@ public class ChatRoomCommandService {
             product = findProduct.get();
         }
         if(postDto.getPostType().equals(PostType.WORK.getName())){
-            Optional<Work> findWork = workRepository.findByIdFetchUserAAndChatRooms(postDto.getPostId());
+            Optional<Work> findWork = workRepository.findByIdFetchUserAndChatRooms(postDto.getPostId());
             if(!findWork.isPresent()){
                 return PropertyUtil.responseMessage("없는 게시글입니다.");
             }
@@ -73,6 +73,11 @@ public class ChatRoomCommandService {
         log.info("게시글 확인");
         checkUserStatus(user,postUser);
         User findUser = userRepository.findById(user.getId()).orElseThrow(UserNotFoundException::new);
+
+        if(userQueryService.checkReported(postUser,user)){
+            return PropertyUtil.responseMessage("차단된 상대입니다.");
+        }
+
         GetCreatedChatRoomDto getCreatedChatRoomDto =new GetCreatedChatRoomDto();
         ChatRoom chatRoom = checkIfUserIsAlreadyChatting(user, postChatRooms);
         if (chatRoom == null) { //상대랑 해당 포스트에 대해서 대화하고 있는 채팅방이 없다면 (만들어 줘야함)

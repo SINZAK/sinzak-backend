@@ -16,7 +16,7 @@ public class Report extends BaseTimeEntity {
     @Column(name = "report_id")
     private Long id;  //작품 번호
 
-    @ManyToOne(fetch = LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
     private User user;
 

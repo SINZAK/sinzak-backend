@@ -105,6 +105,7 @@ public class UserCommandService {
         return PropertyUtil.response(true);
     }
 
+
     public JSONObject report(ReportDto dto, User User){
         Long opponentUserId = dto.getUserId();
         User loginUser = userRepository.findByEmailFetchReportList(User.getEmail()).orElseThrow(UserNotFoundException::new);
