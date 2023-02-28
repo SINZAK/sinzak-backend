@@ -65,16 +65,6 @@ public class UserQueryController {
         return userQueryService.getWorkEmploys(user);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    @ResponseStatus(HttpStatus.OK)
-    protected JSONObject handleUserNotFoundException() {
-        return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_FOUND);
-    }
-    @ExceptionHandler(UserNotFoundException.class)
-    @ResponseStatus(HttpStatus.OK)
-    protected JSONObject handleUserNotFoundException(UserNotFoundException e) {
-        return PropertyUtil.responseMessage(e.getMessage());
-    }
 
 
 }

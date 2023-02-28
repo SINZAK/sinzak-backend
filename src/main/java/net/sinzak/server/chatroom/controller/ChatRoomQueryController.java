@@ -59,16 +59,6 @@ public class ChatRoomQueryController {
         PageRequest pageRequest = PageRequest.of(page,MESSAGE_PAGE_SIZE,Sort.by("messageId").descending());
         return chatRoomQueryService.getChatRoomMessage(roomUuid,pageRequest);
     }
-    @ExceptionHandler(ChatRoomNotFoundException.class)
-    @ResponseStatus(HttpStatus.OK)
-    public JSONObject handleChatRoomNotFoundException(){
-        return PropertyUtil.responseMessage("존재하지 않은 채팅방입니다");
-    }
-    @ExceptionHandler(PostNotFoundException.class)
-    @ResponseStatus(HttpStatus.OK)
-    public JSONObject handlePostRoomNotFoundException(){
-        return PropertyUtil.responseMessage("게시물을 찾을 수 없습니다.");
-    }
 
 //    @ApiOperation(value ="채팅방 메시지 조회")
 //    @GetMapping(value ="/rooms/{uuid}/message")
