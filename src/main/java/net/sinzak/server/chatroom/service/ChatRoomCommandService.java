@@ -12,6 +12,7 @@ import net.sinzak.server.chatroom.repository.UserChatRoomRepository;
 import net.sinzak.server.common.PostType;
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.error.ChatRoomNotFoundException;
+import net.sinzak.server.common.error.PostNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.image.S3Service;
 import net.sinzak.server.product.domain.Product;
@@ -54,7 +55,7 @@ public class ChatRoomCommandService {
         if(postDto.getPostType().equals(PostType.PRODUCT.getName())){
             Optional<Product> findProduct = productRepository.findByIdFetchUserAndChatRooms(postDto.getPostId());
             if(!findProduct.isPresent()){
-                return PropertyUtil.responseMessage("없는 게시글입니다.");
+                throw new PostNotFoundException();
             }
             postUser = findProduct.get().getUser();
             postChatRooms = findProduct.get().getChatRooms(); //여기서 채팅방을 나중에 가져오는 것도 고려
@@ -63,7 +64,7 @@ public class ChatRoomCommandService {
         if(postDto.getPostType().equals(PostType.WORK.getName())){
             Optional<Work> findWork = workRepository.findByIdFetchUserAndChatRooms(postDto.getPostId());
             if(!findWork.isPresent()){
-                return PropertyUtil.responseMessage("없는 게시글입니다.");
+                throw new PostNotFoundException();
             }
             postUser = findWork.get().getUser();
             postChatRooms = findWork.get().getChatRooms();

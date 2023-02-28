@@ -98,7 +98,7 @@ public class ChatRoomQueryService {
                 }
             }
         }
-        return PropertyUtil.responseMessage("찾는 채팅방이 없습니다.");
+        throw new ChatRoomNotFoundException();
     }
 
     private GetChatRoomDto makeWorkChatRoomDto(UserChatRoom userChatRoom, ChatRoom chatRoom) {

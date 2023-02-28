@@ -12,6 +12,7 @@ import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.service.ChatRoomQueryService;
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.error.ChatRoomNotFoundException;
+import net.sinzak.server.common.error.PostNotFoundException;
 import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
 import org.springframework.data.domain.Page;
@@ -62,6 +63,11 @@ public class ChatRoomQueryController {
     @ResponseStatus(HttpStatus.OK)
     public JSONObject handleChatRoomNotFoundException(){
         return PropertyUtil.responseMessage("존재하지 않은 채팅방입니다");
+    }
+    @ExceptionHandler(PostNotFoundException.class)
+    @ResponseStatus(HttpStatus.OK)
+    public JSONObject handlePostRoomNotFoundException(){
+        return PropertyUtil.responseMessage("게시물을 찾을 수 없습니다.");
     }
 
 //    @ApiOperation(value ="채팅방 메시지 조회")
