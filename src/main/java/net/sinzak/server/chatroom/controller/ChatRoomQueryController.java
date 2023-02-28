@@ -10,6 +10,9 @@ import net.sinzak.server.chatroom.domain.ChatRoom;
 import net.sinzak.server.chatroom.dto.respond.GetChatMessageDto;
 import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.service.ChatRoomQueryService;
+import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.error.ChatRoomNotFoundException;
+import net.sinzak.server.common.error.PostNotFoundException;
 import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
 import org.springframework.data.domain.Page;
@@ -17,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -54,6 +58,16 @@ public class ChatRoomQueryController {
             @PathVariable("uuid") String roomUuid, @RequestParam(value = "page",required = false,defaultValue = "0") int page){
         PageRequest pageRequest = PageRequest.of(page,MESSAGE_PAGE_SIZE,Sort.by("messageId").descending());
         return chatRoomQueryService.getChatRoomMessage(roomUuid,pageRequest);
+    }
+    @ExceptionHandler(ChatRoomNotFoundException.class)
+    @ResponseStatus(HttpStatus.OK)
+    public JSONObject handleChatRoomNotFoundException(){
+        return PropertyUtil.responseMessage("존재하지 않은 채팅방입니다");
+    }
+    @ExceptionHandler(PostNotFoundException.class)
+    @ResponseStatus(HttpStatus.OK)
+    public JSONObject handlePostRoomNotFoundException(){
+        return PropertyUtil.responseMessage("게시물을 찾을 수 없습니다.");
     }
 
 //    @ApiOperation(value ="채팅방 메시지 조회")

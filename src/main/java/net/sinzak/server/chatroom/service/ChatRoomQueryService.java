@@ -14,6 +14,7 @@ import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.repository.UserChatRoomRepository;
 import net.sinzak.server.common.PostType;
 import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.error.ChatRoomNotFoundException;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.user.domain.User;
@@ -58,7 +59,7 @@ public class ChatRoomQueryService {
     }
     public Page<GetChatMessageDto> getChatRoomMessage(String roomUuid, Pageable pageable){
         ChatRoom findChatRoom = chatRoomRepository.findByRoomUuidFetchChatMessage(roomUuid)
-                .orElseThrow(()->new InstanceNotFoundException("존재하지 않는 채팅방입니다."));
+                .orElseThrow(()->new ChatRoomNotFoundException());
         List<GetChatMessageDto> getChatMessageDtos = findChatRoom.getChatMessages()
                 .stream()
                 .sorted(Comparator.comparing(ChatMessage::getId).reversed())
@@ -83,7 +84,7 @@ public class ChatRoomQueryService {
             return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
         }
         List<UserChatRoom> userChatRooms = userChatRoomRepository
-                .findUserChatRoomByEmail(user.getEmail());
+                .findUserChatRoomByIdFetchChatRoom(user.getId());
         for(UserChatRoom userChatRoom : userChatRooms){
             if(userChatRoom.getChatRoom().getRoomUuid().equals(roomUuid)){
                 ChatRoom chatRoom = userChatRoom.getChatRoom();
@@ -97,7 +98,7 @@ public class ChatRoomQueryService {
                 }
             }
         }
-        return PropertyUtil.responseMessage("찾는 채팅방이 없습니다.");
+        throw new ChatRoomNotFoundException();
     }
 
     private GetChatRoomDto makeWorkChatRoomDto(UserChatRoom userChatRoom, ChatRoom chatRoom) {

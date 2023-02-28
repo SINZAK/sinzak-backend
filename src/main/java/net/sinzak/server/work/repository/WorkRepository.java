@@ -24,6 +24,6 @@ public interface WorkRepository extends JpaRepository<Work, Long> {
     Page<Work> findAll(@Param("keyword") String keyword, boolean employment, Pageable pageable);
 
     @Query("select w from Work w left join Fetch w.user left join fetch w.chatRooms where w.id = :id")
-    Optional<Work> findByIdFetchUserAAndChatRooms(@Param("id") Long id);
+    Optional<Work> findByIdFetchUserAndChatRooms(@Param("id") Long id);
 
 }

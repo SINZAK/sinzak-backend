@@ -9,9 +9,13 @@ import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.chatroom.dto.request.PostDto;
 import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.service.ChatRoomCommandService;
+import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.error.ChatRoomNotFoundException;
+import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,6 +43,22 @@ public class ChatRoomCommandController {
     @PostMapping(value ="/chat/rooms/{uuid}/image")
     public JSONObject uploadImage(@PathVariable("uuid") String uuid, List<MultipartFile> files){
         return chatRoomCommandService.uploadImage(uuid,files);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.OK)
+    protected JSONObject handleUserNotFoundException() {
+        return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_FOUND);
+    }
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.OK)
+    protected JSONObject handleUserNotFoundException(UserNotFoundException e) {
+        return PropertyUtil.responseMessage(e.getMessage());
+    }
+    @ExceptionHandler(ChatRoomNotFoundException.class)
+    @ResponseStatus(HttpStatus.OK)
+    public JSONObject handleChatRoomNotFoundException(){
+        return PropertyUtil.responseMessage("존재하지 않은 채팅방입니다");
     }
 
 //    @PostMapping(value ="/chat/rooms/{uuid}/leave")
