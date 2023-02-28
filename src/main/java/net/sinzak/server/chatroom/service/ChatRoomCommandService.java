@@ -12,6 +12,7 @@ import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.repository.UserChatRoomRepository;
 import net.sinzak.server.common.PostType;
 import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.error.ChatRoomNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.image.S3Service;
 import net.sinzak.server.product.domain.Product;
@@ -70,10 +71,8 @@ public class ChatRoomCommandService {
         }
 
         log.info("게시글 확인");
-        JSONObject userStatus = checkUserStatus(user, postUser);
-        if (userStatus != null) return userStatus; //만약 로그인 안 되어있거나 상대가 없다면
-        User findUser = userRepository.findById(user.getId()).get();
-
+        checkUserStatus(user,postUser);
+        User findUser = userRepository.findById(user.getId()).orElseThrow(UserNotFoundException::new);
         GetCreatedChatRoomDto getCreatedChatRoomDto =new GetCreatedChatRoomDto();
         ChatRoom chatRoom = checkIfUserIsAlreadyChatting(user, postChatRooms);
         if (chatRoom == null) { //상대랑 해당 포스트에 대해서 대화하고 있는 채팅방이 없다면 (만들어 줘야함)
@@ -102,7 +101,7 @@ public class ChatRoomCommandService {
         Optional<ChatRoom> chatRoom = chatRoomRepository.findByRoomId(roomUuid);
         List<JSONObject> obj = new ArrayList<>();
         if(!chatRoom.isPresent()){
-            return PropertyUtil.responseMessage("존재하지 않는 채팅방 입니다.");
+            throw new ChatRoomNotFoundException();
         }
         for(MultipartFile multipartFile : multipartFiles ){
             JSONObject jsonObject = new JSONObject();
@@ -155,14 +154,10 @@ public class ChatRoomCommandService {
         return null;
     }
     @Nullable
-    private JSONObject checkUserStatus(User user, User postUser) {
-        if (user == null) {
-            return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
+    private void checkUserStatus(User user, User postUser) {
+        if (user == null ||postUser ==null) {
+            throw new UserNotFoundException();
         }
-        if (postUser ==null) {
-            return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_FOUND);
-        }
-        return null;
     }
 
     ///밑은 타임리프 테스트
