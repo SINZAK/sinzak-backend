@@ -92,7 +92,7 @@ public class SecurityService {
         return obj;
     }
 
-    @Transactional
+    @Transactional //TODO
     public TokenDto reissue(User User,TokenRequestDto tokenRequestDto) {
         // 만료된 refresh token 에러
         if (!jwtProvider.validateToken(tokenRequestDto.getRefreshToken())) {
