@@ -19,7 +19,6 @@ import net.sinzak.server.chatroom.repository.ChatMessageRepository;
 import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.repository.UserChatRoomRepository;
 import net.sinzak.server.common.error.ChatRoomNotFoundException;
-import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.user.domain.User;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -58,7 +57,6 @@ public class ChatMessageService {
         GetChatMessageDto getChatMessageDto = makeMessageDto(message, newChatMessage);
         template.convertAndSend("/sub/chat/rooms/"+message.getRoomId(),getChatMessageDto);
     }
-
     private GetChatMessageDto makeMessageDto(ChatMessageDto message, ChatMessage newChatMessage) {
         GetChatMessageDto getChatMessageDto = GetChatMessageDto.builder()
                 .message(message.getMessage())
@@ -84,8 +82,9 @@ public class ChatMessageService {
     }
 
     @Transactional
-    public void leaveChatRoom(User user, ChatRoomUuidDto chatRoomUuidDto){
-        ChatRoom findChatroom = chatRoomRepository.findByRoomUuidFetchUserChatRoom(chatRoomUuidDto.getRoomId())
+    public void leaveChatRoom(User user, String roomUuid){
+        log.info(roomUuid);
+        ChatRoom findChatroom = chatRoomRepository.findByRoomUuidFetchUserChatRoom(roomUuid)
                 .orElseThrow(()->new ChatRoomNotFoundException());
         UserChatRoom userChatRoom = findChatroom.leaveChatRoom(user.getId());
         if(userChatRoom == null){
@@ -94,7 +93,7 @@ public class ChatMessageService {
         deleteChatRoom(findChatroom, userChatRoom);
         addLeaveChatMessageToChatRoom(user, findChatroom);
         GetChatMessageDto getChatMessageDto = makeLeaveChatMessageDto(user);
-        template.convertAndSend("/sub/chat/rooms/"+chatRoomUuidDto,getChatMessageDto);
+//        template.convertAndSend("/sub/chat/rooms/"+roomUuid,getChatMessageDto);
         return;
     }
 
@@ -102,7 +101,7 @@ public class ChatMessageService {
     private GetChatMessageDto makeLeaveChatMessageDto(User user) {
         GetChatMessageDto getChatMessageDto = GetChatMessageDto.builder()
                 .message("님이 채팅방을 나가셨습니다")
-                .senderName(user.getNickName())
+                .senderName(user.getName())
                 .sendAt(LocalDateTime.now())
                 .messageType(MessageType.LEAVE.name())
                 .build();
@@ -111,7 +110,6 @@ public class ChatMessageService {
 
     private void deleteChatRoom(ChatRoom findChatroom, UserChatRoom userChatRoom) {
         log.info("userChatRoom이름"+userChatRoom.getRoomName());
-        userChatRoomRepository.delete(userChatRoom);
         if(findChatroom.getParticipantsNumber()==0){
             chatRoomRepository.delete(findChatroom);
         }
@@ -120,8 +118,8 @@ public class ChatMessageService {
 
     private void addLeaveChatMessageToChatRoom(User user, ChatRoom findChatroom) {
         ChatMessage leaveChatMessage = ChatMessage.builder()
-                .message(user.getNickName()+"님이 채팅방을 나가셨습니다")
-                .senderName(user.getNickName())
+                .message(user.getName()+"님이 채팅방을 나가셨습니다")
+                .senderName(user.getName())
                 .senderId(user.getId())
                 .type(MessageType.LEAVE)
                 .build();

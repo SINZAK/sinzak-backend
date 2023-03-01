@@ -16,7 +16,7 @@ public class UserChatRoom {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="CHATROOM_ID")
+    @JoinColumn(name="CHAT_ROOM_ID")
     private ChatRoom chatRoom;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -24,6 +24,11 @@ public class UserChatRoom {
     private User user;
 
 
+    public void setDisable(boolean disable) {
+        isDisable = disable;
+    }
+
+    private boolean isDisable = false;
     private Long opponentUserId;
     private String opponentUserUniv;
     private String roomName;
@@ -39,7 +44,7 @@ public class UserChatRoom {
     public UserChatRoom(User user,User opponentUser){
         this.latestMessage = null;
         this.latestMessageTime = null;
-        this.roomName = opponentUser.getNickName();
+        this.roomName = opponentUser.getName();
         this.opponentUserId = opponentUser.getId();
         this.opponentUserUniv = opponentUser.getUniv();
         this.image = opponentUser.getPicture();

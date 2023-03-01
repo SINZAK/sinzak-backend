@@ -22,9 +22,12 @@ public class ChatMessage extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private MessageType type;
     private String senderName;
-    private String receiver;
-    private String roomId;
     private Long senderId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name ="chat_room_id")
+    private ChatRoom chatRoom;
+
+
 
     @Setter
     @Lob private String message; //모든 언어에 다 있는 byte[]
@@ -40,5 +43,8 @@ public class ChatMessage extends BaseTimeEntity {
 
     public void closeConnect(){
         this.type = MessageType.LEAVE;
+    }
+    public void setChatRoom(ChatRoom chatRoom){
+        this.chatRoom = chatRoom;
     }
 }

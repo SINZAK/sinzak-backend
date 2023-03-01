@@ -160,6 +160,10 @@ public class ChatRoomCommandService {
             for(UserChatRoom userChatRoom : chatRoom.getUserChatRooms()){
                 //Post에 딸린 채팅방중 말 건 유저가 속한 채팅방이 있다면
                 if(userChatRoom.getOpponentUserId().equals(user.getId())){
+                    if(userChatRoom.isDisable()){
+                        chatRoom.reEnterChatRoom(); //참여자 수 올려줌
+                        userChatRoom.setDisable(false);
+                    }
                     return chatRoom;
                 }
             }

@@ -27,6 +27,9 @@ public class ChatRoom extends BaseTimeEntity {
     public void setBlocked(boolean blocked) {
         this.blocked = blocked;
     }
+    public void reEnterChatRoom(){
+        this.participantsNumber++;
+    }
 
     public ChatRoom(){
         this.participantsNumber = 0;
@@ -38,11 +41,11 @@ public class ChatRoom extends BaseTimeEntity {
         this.roomUuid = UUID.randomUUID().toString();
     }
 
-    @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "chatRoom",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<ChatMessage> chatMessages = new ArrayList<>();
 
 
-    @OneToMany(mappedBy = "chatRoom")
+    @OneToMany(mappedBy = "chatRoom",cascade = CascadeType.ALL,orphanRemoval = true)
     private Set<UserChatRoom> userChatRooms = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -67,8 +70,9 @@ public class ChatRoom extends BaseTimeEntity {
     }
     public void addChatMessage(ChatMessage chatMessage){
         this.chatMessages.add(chatMessage);
+        chatMessage.setChatRoom(this);
         for(UserChatRoom userChatRoom :this.userChatRooms){
-            if(chatMessage.getType()==MessageType.TEXT){
+            if(chatMessage.getType()==MessageType.TEXT || chatMessage.getType()==MessageType.LEAVE){
                 userChatRoom.updateLatestMessage(chatMessage.getMessage());
             }
             if(chatMessage.getType()==MessageType.IMAGE){
@@ -78,14 +82,13 @@ public class ChatRoom extends BaseTimeEntity {
     }
 
     public UserChatRoom leaveChatRoom(Long userId){
-        System.out.println(this.userChatRooms.size()+":사이즈,"+userId+":userId");
+        System.out.println(this.userChatRooms.size()+":사이즈,"+userId+":userId") ;
         for(UserChatRoom userChatRoom :this.userChatRooms){
             System.out.println(userChatRoom.getUser().getId());
             if(userChatRoom.getUser().getId().equals(userId)){
                 this.participantsNumber--;
                 return userChatRoom;
             }
-
         }
         return null;
     }

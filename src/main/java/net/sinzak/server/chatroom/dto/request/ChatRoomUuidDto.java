@@ -9,5 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatRoomUuidDto {
-    private String roomId;
+    private String roomUuid;
 }
+
+
