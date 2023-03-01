@@ -41,7 +41,7 @@ public class OauthController {
         JSONObject OauthInfo = getInfo(tokenDto);
         OAuthAttributes OauthUser = OAuthAttributes.of(tokenDto.getOrigin(), OauthInfo);
         if(OauthUser.getEmail() == null || OauthUser.getEmail().isBlank())
-            return PropertyUtil.responseMessage("액세스 토큰으로 가져올 정보가 없습니다. (소셜로그인 실패)");
+            return PropertyUtil.responseMessage("회원가입 불가능(소셜로그인 실패)");
         TokenDto jwtToken;
         try{
             jwtToken = securityService.login(OauthUser.getEmail());
@@ -74,7 +74,7 @@ public class OauthController {
     public String kakaoLogin() throws IOException {
         String url = "https://kauth.kakao.com/oauth/authorize"
                 + "?client_id=3201538a34f65dfa0fb2e96b0d268ca7"
-                + "&redirect_uri="+productURL+"/api/login/oauth2/code/kakao"
+                + "&redirect_uri="+developURL+"/api/login/oauth2/code/kakao"
                 + "&response_type=code";
         return url;
     }
@@ -94,7 +94,7 @@ public class OauthController {
     private String getKakaoAccessToken(String code) throws IOException, ParseException {
         String url = "https://kauth.kakao.com/oauth/token"
                 + "?client_id=3201538a34f65dfa0fb2e96b0d268ca7"
-                + "&redirect_uri="+productURL+"/api/login/oauth2/code/kakao"
+                + "&redirect_uri="+developURL+"/api/login/oauth2/code/kakao"
                 + "&grant_type=authorization_code"
                 + "&code=" + code;
         Request.Builder builder = new Request.Builder().header("Content-type", " application/x-www-form-urlencoded")
@@ -116,9 +116,9 @@ public class OauthController {
             "배포환경 : https://accounts.google.com/o/oauth2/v2/auth?client_id=782966145872-6shnmrvqi0q4sihr8etu9nrvh9jv43dh.apps.googleusercontent.com" +
             "&redirect_uri=https://sinzak.net/api/login/oauth2/code/google&response_type=code&scope=profile%20email&include_granted_scopes=true")
     @GetMapping("/test2")
-    public String googleLogin() throws IOException {
+    public String googleLogin(){
         String url = "https://accounts.google.com/o/oauth2/v2/auth?client_id=782966145872-6shnmrvqi0q4sihr8etu9nrvh9jv43dh.apps.googleusercontent.com" +
-                "&redirect_uri="+ productURL +"/api/login/oauth2/code/google";
+                "&redirect_uri="+ developURL +"/api/login/oauth2/code/google";
         return url;
     }
 
@@ -135,7 +135,7 @@ public class OauthController {
         String url = "https://oauth2.googleapis.com/token"
                 + "?client_id=782966145872-6shnmrvqi0q4sihr8etu9nrvh9jv43dh.apps.googleusercontent.com"
                 + "&client_secret=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"
-                + "&redirect_uri="+productURL+"/api/login/oauth2/code/google"
+                + "&redirect_uri="+developURL+"/api/login/oauth2/code/google"
                 + "&grant_type=authorization_code"
                 + "&code=" + code;
         Request.Builder builder = new Request.Builder().header("Content-type", " application/x-www-form-urlencoded")
@@ -183,12 +183,11 @@ public class OauthController {
 
     @ApiOperation(value = "스프링용 네이버로그인 실행",notes =
             "로컬환경 : https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=DwXMEfKZq0tmkrsn6kLk&state=STATE_STRING" +
-            "&redirect_uri="+developURL+"/api/login/oauth2/code/naver"+'\n'+
+            "&redirect_uri=http://localhost:8080/api/login/oauth2/code/naver"+'\n'+
             "배포환경 : https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=DwXMEfKZq0tmkrsn6kLk&state=STATE_STRING" +
-            "&redirect_uri="+productURL+"/api/login/oauth2/code/naver")
+            "&redirect_uri=https://sinzak.net/api/login/oauth2/code/naver")
     @GetMapping("/test3")
-    public void naverLogin() throws IOException {
-    }
+    public void naverLogin(){}
 
     @ApiOperation(value = "스프링용 구글 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
     @GetMapping(value = "/login/oauth2/code/naver")

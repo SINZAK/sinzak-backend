@@ -1,6 +1,8 @@
 package net.sinzak.server.common;
 
 import lombok.RequiredArgsConstructor;
+import net.sinzak.server.common.error.UserNotFoundException;
+import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Configuration;
@@ -58,6 +60,11 @@ public class PropertyUtil implements EnvironmentAware {
         obj.put(SUCCESS_WORD, false);
         obj.put("message", message);
         return obj;
+    }
+
+    public static void checkHeader(User user) {
+        if(user ==null)
+            throw new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN);
     }
 
 }

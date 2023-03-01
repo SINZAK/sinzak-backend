@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.dto.IdDto;
-import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.config.auth.SecurityService;
@@ -16,12 +15,9 @@ import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.dto.request.*;
 import net.sinzak.server.user.service.UserCommandService;
 import org.json.simple.JSONObject;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.NoSuchElementException;
 
 @Api(tags = "유저-명령")
 @RestController
@@ -34,6 +30,7 @@ public class UserCommandController {
     @ApiOperation(value = "회원가입", notes = "카테고리는 {\"category_like\" : \"orient,painting\"} 처럼 콤마로만 구분해서 보내주세요\n 메일 인증 단계 이후에 한꺼번에 보내주세요 디스코드에 기재해놓겠습니다.")
     @PostMapping("/join")
     public JSONObject join(@AuthenticationPrincipal User user, @RequestBody JoinDto dto) {
+        PropertyUtil.checkHeader(user);
         return securityService.join(user, dto);
     }
 
@@ -56,6 +53,7 @@ public class UserCommandController {
     @ApiOperation(value = "토큰 만료시 재발급, access,refresh 둘 다 보내주세요")
     @PostMapping("/reissue")
     public TokenDto reissue(@AuthenticationPrincipal User user, @RequestBody TokenRequestDto tokenRequestDto) {
+        PropertyUtil.checkHeader(user);
         return securityService.reissue(user, tokenRequestDto);
     }
 
@@ -63,12 +61,14 @@ public class UserCommandController {
     @ApiOperation(value = "유저 정보변경", notes = "이름,한줄 소개, 학교(보류) ")
     @PostMapping(value = "/users/edit")
     public JSONObject updateUser( @RequestBody UpdateUserDto dto , @AuthenticationPrincipal User user) {
+        PropertyUtil.checkHeader(user);
         return userCommandService.updateUser(dto,user);
     }
     @ApiDocumentResponse
     @ApiOperation(value ="프로필 이미지 변경")
     @PostMapping(value ="/users/edit/image")
     public JSONObject updateUserImage(@AuthenticationPrincipal User user,@RequestPart MultipartFile multipartFile){
+        PropertyUtil.checkHeader(user);
         return userCommandService.updateUserImage(user,multipartFile);
     }
 
@@ -76,6 +76,7 @@ public class UserCommandController {
     @ApiOperation(value ="관심장르 업데이트")
     @PostMapping(value ="/users/edit/category")
     public JSONObject updateCategoryLike(@AuthenticationPrincipal User user,@RequestBody CategoryDto categoryDto){
+        PropertyUtil.checkHeader(user);
         return userCommandService.updateCategoryLike(user,categoryDto);
     }
 
@@ -84,6 +85,7 @@ public class UserCommandController {
     @ApiOperation(value = "팔로우하기")
     @PostMapping(value = "/users/follow")
     public JSONObject followUser(@RequestBody UserIdDto userIdDto, @AuthenticationPrincipal User user){
+        PropertyUtil.checkHeader(user);
         return userCommandService.follow(userIdDto.getUserId(),user);
     }
 
@@ -91,6 +93,7 @@ public class UserCommandController {
     @ApiOperation(value = "언팔로우하기")
     @PostMapping(value = "/users/unfollow")
     public JSONObject unFollowUser(@RequestBody UserIdDto userIdDto, @AuthenticationPrincipal User user){
+        PropertyUtil.checkHeader(user);
         return userCommandService.unFollow(userIdDto.getUserId(),user);
     }
 
@@ -98,18 +101,21 @@ public class UserCommandController {
     @ApiOperation(value = "신고하기")
     @PostMapping(value = "/users/report")
     public JSONObject report(@RequestBody ReportDto reportDto, @AuthenticationPrincipal User user){
+        PropertyUtil.checkHeader(user);
         return userCommandService.report(reportDto, user);
     }
 
     @ApiOperation(value = "검색기록 삭제", notes = "Post인 것에 유의하고 같은 url을 사용하려고 합니다. 해당 기록의 id를 주시면 삭제합니다.")
     @PostMapping(value = "/users/history")
     public JSONObject deleteHistory(@RequestBody IdDto idDto, @AuthenticationPrincipal User user) {
+        PropertyUtil.checkHeader(user);
         return userCommandService.deleteSearchHistory(idDto.getId(), user);
     }
 
     @ApiOperation(value = "검색기록 전체! 삭제", notes = "전체 삭제입니다")
     @PostMapping(value = "/users/deletehistories")
     public JSONObject deleteHistory(@AuthenticationPrincipal User user) {
+        PropertyUtil.checkHeader(user);
         return userCommandService.deleteSearchHistory(user);
     }
 

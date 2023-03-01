@@ -21,12 +21,14 @@ public class UserQueryController {
     @ApiOperation(value ="내 프로필 보기")
     @GetMapping(value ="/users/my-profile")
     public JSONObject getMyProfile(@AuthenticationPrincipal User user){
+        PropertyUtil.checkHeader(user);
         return userQueryService.getMyProfile(user);
     }
 
     @ApiOperation(value ="유저 프로필 보기")
     @GetMapping(value ="/users/{userId}/profile")
     public JSONObject getUserProfile(@PathVariable Long userId, @AuthenticationPrincipal User user){
+        PropertyUtil.checkHeader(user);
        return userQueryService.getUserProfile(userId, user);
 
     }
@@ -51,17 +53,20 @@ public class UserQueryController {
     @ApiOperation(value = "검색기록 출력", notes = "GetMapping에 유의 삭제는 Post로")
     @GetMapping(value = "/users/history")
     public JSONObject showHistory(@AuthenticationPrincipal User user) {
+        PropertyUtil.checkHeader(user);
         return userQueryService.showSearchHistory(user);
     }
 
     @ApiOperation(value ="스크랩 목록 ")
     @GetMapping(value ="/users/wish")
     public JSONObject showWish(@AuthenticationPrincipal User user){
+        PropertyUtil.checkHeader(user);
         return userQueryService.getWishList(user);
     }
     @ApiOperation(value ="의뢰해요 목록")
     @GetMapping(value ="/users/work-employ")
     public JSONObject showWorkEmploy(@AuthenticationPrincipal User user){
+        PropertyUtil.checkHeader(user);
         return userQueryService.getWorkEmploys(user);
     }
 
