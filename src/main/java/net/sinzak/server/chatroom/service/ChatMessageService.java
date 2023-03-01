@@ -50,7 +50,8 @@ public class ChatMessageService {
                 chatRoomRepository
                         .findByRoomUuidFetchChatMessage(message.getRoomId())
                         .orElseThrow(()->new ChatRoomNotFoundException());
-        if(findChatRoom.isBlocked()){
+        if(findChatRoom.isBlocked() || findChatRoom.getParticipantsNumber()<2){
+            //차단 되어있거나 한 명이 나간 상태라면 보내지 않음
             return;
         }
         ChatMessage newChatMessage = addChatMessageToChatRoom(message, findChatRoom);
