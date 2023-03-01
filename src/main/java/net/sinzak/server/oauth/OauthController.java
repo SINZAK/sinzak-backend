@@ -74,7 +74,7 @@ public class OauthController {
     public String kakaoLogin() throws IOException {
         String url = "https://kauth.kakao.com/oauth/authorize"
                 + "?client_id=3201538a34f65dfa0fb2e96b0d268ca7"
-                + "&redirect_uri="+developURL+"/api/login/oauth2/code/kakao"
+                + "&redirect_uri="+productURL+"/api/login/oauth2/code/kakao"
                 + "&response_type=code";
         return url;
     }
@@ -94,7 +94,7 @@ public class OauthController {
     private String getKakaoAccessToken(String code) throws IOException, ParseException {
         String url = "https://kauth.kakao.com/oauth/token"
                 + "?client_id=3201538a34f65dfa0fb2e96b0d268ca7"
-                + "&redirect_uri="+developURL+"/api/login/oauth2/code/kakao"
+                + "&redirect_uri="+productURL+"/api/login/oauth2/code/kakao"
                 + "&grant_type=authorization_code"
                 + "&code=" + code;
         Request.Builder builder = new Request.Builder().header("Content-type", " application/x-www-form-urlencoded")
@@ -135,7 +135,7 @@ public class OauthController {
         String url = "https://oauth2.googleapis.com/token"
                 + "?client_id=782966145872-6shnmrvqi0q4sihr8etu9nrvh9jv43dh.apps.googleusercontent.com"
                 + "&client_secret=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"
-                + "&redirect_uri="+developURL+"/api/login/oauth2/code/google"
+                + "&redirect_uri="+productURL+"/api/login/oauth2/code/google"
                 + "&grant_type=authorization_code"
                 + "&code=" + code;
         Request.Builder builder = new Request.Builder().header("Content-type", " application/x-www-form-urlencoded")
