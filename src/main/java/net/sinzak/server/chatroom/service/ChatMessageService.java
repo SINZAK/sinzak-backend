@@ -102,7 +102,7 @@ public class ChatMessageService {
     private GetChatMessageDto makeLeaveChatMessageDto(User user) {
         GetChatMessageDto getChatMessageDto = GetChatMessageDto.builder()
                 .message("님이 채팅방을 나가셨습니다")
-                .senderName(user.getName())
+                .senderName(user.getNickName())
                 .sendAt(LocalDateTime.now())
                 .messageType(MessageType.LEAVE.name())
                 .build();
@@ -120,8 +120,8 @@ public class ChatMessageService {
 
     private void addLeaveChatMessageToChatRoom(User user, ChatRoom findChatroom) {
         ChatMessage leaveChatMessage = ChatMessage.builder()
-                .message(user.getName()+"님이 채팅방을 나가셨습니다")
-                .senderName(user.getName())
+                .message(user.getNickName()+"님이 채팅방을 나가셨습니다")
+                .senderName(user.getNickName())
                 .senderId(user.getId())
                 .type(MessageType.LEAVE)
                 .build();
