@@ -7,6 +7,7 @@ package net.sinzak.server.chatroom.service;
 //import com.google.cloud.firestore.WriteResult;
 //import com.google.firebase.cloud.FirestoreClient;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.chatroom.domain.ChatMessage;
 import net.sinzak.server.chatroom.domain.ChatRoom;
 import net.sinzak.server.chatroom.domain.MessageType;
@@ -24,7 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatMessageService {
@@ -84,7 +85,7 @@ public class ChatMessageService {
         ChatRoom findChatroom = chatRoomRepository.findByRoomUuidFetchUserChatRoom(chatRoomUuidDto.getRoomId())
                 .orElseThrow(()->new ChatRoomNotFoundException());
         UserChatRoom userChatRoom = findChatroom.leaveChatRoom(user.getId());
-        if(userChatRoom ==null){
+        if(userChatRoom == null){
             throw new ChatRoomNotFoundException();
         }
         deleteChatRoom(findChatroom, userChatRoom);
@@ -92,8 +93,8 @@ public class ChatMessageService {
         GetChatMessageDto getChatMessageDto = makeLeaveChatMessageDto(user);
         template.convertAndSend("/sub/chat/rooms/"+chatRoomUuidDto,getChatMessageDto);
         return;
-
     }
+
 
     private GetChatMessageDto makeLeaveChatMessageDto(User user) {
         GetChatMessageDto getChatMessageDto = GetChatMessageDto.builder()
@@ -106,17 +107,20 @@ public class ChatMessageService {
     }
 
     private void deleteChatRoom(ChatRoom findChatroom, UserChatRoom userChatRoom) {
+        log.info("userChatRoom이름"+userChatRoom.getRoomName());
         userChatRoomRepository.delete(userChatRoom);
         if(findChatroom.getParticipantsNumber()==0){
             chatRoomRepository.delete(findChatroom);
         }
     }
 
+
     private void addLeaveChatMessageToChatRoom(User user, ChatRoom findChatroom) {
         ChatMessage leaveChatMessage = ChatMessage.builder()
                 .message(user.getName()+"님이 채팅방을 나가셨습니다")
                 .senderName(user.getName())
                 .senderId(user.getId())
+                .type(MessageType.LEAVE)
                 .build();
         findChatroom.addChatMessage(leaveChatMessage);
     }

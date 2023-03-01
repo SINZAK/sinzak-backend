@@ -51,6 +51,4 @@ public class UserChatRoom {
     public void setChatRoom(ChatRoom chatRoom){
         this.chatRoom = chatRoom;
     }
-
-
 }

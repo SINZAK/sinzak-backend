@@ -17,12 +17,13 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 @Controller
 @RequiredArgsConstructor
 @Slf4j
-
 public class ChatMessageController {
     private final SimpMessagingTemplate template;
     private final ChatMessageService chatMessageService;
@@ -49,11 +50,6 @@ public class ChatMessageController {
     @MessageMapping(value = "/chat/leave")
     public void leave(@AuthenticationPrincipal User user, ChatRoomUuidDto chatRoomUuidDto){
         chatMessageService.leaveChatRoom(user,chatRoomUuidDto);
-    }
-    @ExceptionHandler(ChatRoomNotFoundException.class)
-    @ResponseStatus(HttpStatus.OK)
-    public JSONObject handleChatRoomNotFoundException(){
-        return PropertyUtil.responseMessage("존재하지 않은 채팅방입니다");
     }
 
 //    @GetMapping("/getChatMessage")
