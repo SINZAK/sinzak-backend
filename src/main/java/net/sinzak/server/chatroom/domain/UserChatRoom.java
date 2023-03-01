@@ -39,7 +39,7 @@ public class UserChatRoom {
     public UserChatRoom(User user,User opponentUser){
         this.latestMessage = null;
         this.latestMessageTime = null;
-        this.roomName = opponentUser.getName();
+        this.roomName = opponentUser.getNickName();
         this.opponentUserId = opponentUser.getId();
         this.opponentUserUniv = opponentUser.getUniv();
         this.image = opponentUser.getPicture();
