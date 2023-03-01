@@ -54,9 +54,9 @@ public class ChatRoomQueryController {
         return chatRoomQueryService.getChatRoom(roomUuid,user);
     }
 
-    @GetMapping(value ="/rooms/post")
+    @PostMapping(value ="/rooms/post")
     @ApiOperation(value = "상품에 딸려있는 채팅방 불러오기")
-    public JSONObject getChatRoomByProduct(@AuthenticationPrincipal User user, PostDto postDto){
+    public JSONObject getChatRoomByProduct(@AuthenticationPrincipal User user, @RequestBody PostDto postDto){
         return chatRoomQueryService.getChatRoomsByPost(user,postDto);
     }
 

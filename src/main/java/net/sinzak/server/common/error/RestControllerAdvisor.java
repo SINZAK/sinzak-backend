@@ -28,11 +28,11 @@ public class RestControllerAdvisor {
         return PropertyUtil.responseMessage("존재하지 않는 객체입니다.");
     }
 
-//    @ExceptionHandler(ChatRoomNotFoundException.class)
-//    @ResponseStatus(HttpStatus.OK)
-//    protected JSONObject handleChatRoomNotFoundException() {
-//        return PropertyUtil.responseMessage("존재하지 않는 채팅방입니다.");
-//    }
+    @ExceptionHandler(ChatRoomNotFoundException.class)
+    @ResponseStatus(HttpStatus.OK)
+    protected JSONObject handleChatRoomNotFoundException() {
+        return PropertyUtil.responseMessage("존재하지 않는 채팅방입니다.");
+    }
 
     @ExceptionHandler(UserNotLoginException.class)
     @ResponseStatus(HttpStatus.OK)

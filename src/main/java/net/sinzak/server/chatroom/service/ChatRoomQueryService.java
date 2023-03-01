@@ -55,7 +55,7 @@ public class ChatRoomQueryService {
         List<UserChatRoom> userChatRooms = userChatRoomRepository.findUserChatRoomByIdFetchChatRoom(loginUser.getId());
         for(UserChatRoom userChatRoom :userChatRooms){
             ChatRoom chatRoom = userChatRoom.getChatRoom();
-            if(chatRoom.getPostType().name().equals(postDto.getPostType())){
+            if(chatRoom.getPostType().getName().equals(postDto.getPostType())){
                 GetChatRoomsDto getChatRoomsDto =
                         GetChatRoomsDto.builder()
                                 .roomUuid(chatRoom.getRoomUuid())
