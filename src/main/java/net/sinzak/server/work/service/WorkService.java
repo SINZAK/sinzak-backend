@@ -2,6 +2,7 @@ package net.sinzak.server.work.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.sinzak.server.chatroom.domain.ChatRoom;
 import net.sinzak.server.common.PostService;
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.dto.ActionForm;
@@ -9,6 +10,7 @@ import net.sinzak.server.common.error.PostNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.image.S3Service;
 import net.sinzak.server.common.dto.SuggestDto;
+import net.sinzak.server.product.domain.Product;
 import net.sinzak.server.product.dto.ShowForm;
 import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.user.domain.User;
@@ -50,6 +52,11 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     private final SearchHistoryRepository historyRepository;
     private final S3Service s3Service;
 
+    @Transactional
+    public List<ChatRoom> getChatRoom(Long productId){
+        Work work = workRepository.findByIdFetchChatRooms(productId).orElseThrow(PostNotFoundException::new);
+        return work.getChatRooms();
+    }
     @Transactional(rollbackFor = {Exception.class})
     public JSONObject makePost(User User, WorkPostDto postDto){
         User user = userRepository.findByEmailFetchWorkPostList(User.getEmail()).orElseThrow(UserNotFoundException::new);

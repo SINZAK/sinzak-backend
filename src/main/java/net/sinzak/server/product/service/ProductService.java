@@ -2,6 +2,7 @@ package net.sinzak.server.product.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.sinzak.server.chatroom.domain.ChatRoom;
 import net.sinzak.server.common.PostService;
 import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.common.dto.SuggestDto;
@@ -338,6 +339,11 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         }
         return followingProductList;
     }
+    @Transactional
+    public List<ChatRoom> getChatRoom(Long productId){
+        Product product = productRepository.findByIdFetchChatRooms(productId).orElseThrow(PostNotFoundException::new);
+        return product.getChatRooms();
+    }
 
     @Transactional
     public JSONObject wish(User User, @RequestBody ActionForm form){   // 찜
@@ -380,6 +386,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return obj;
 
     }
+
+
 
     @Transactional
     public JSONObject likes(User User, @RequestBody ActionForm form){
