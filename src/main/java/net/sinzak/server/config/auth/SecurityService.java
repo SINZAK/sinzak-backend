@@ -94,12 +94,9 @@ public class SecurityService {
     }
 
     @Transactional //TODO
-    public TokenDto reissue(User User,TokenRequestDto tokenRequestDto) {
+    public TokenDto reissue(User User, TokenRequestDto tokenRequestDto) {
         List<RefreshToken> refreshTokens = refreshTokenRepository.findByKey(User.getId());
         RefreshToken refreshToken = refreshTokens.get(refreshTokens.size()-1); //마지막꺼가 가장 최신반영된 토큰
-        // 리프레시 토큰 불일치 에러
-        if (!refreshToken.getToken().equals(tokenRequestDto.getRefreshToken()))
-            throw new NoSuchElementException();
 
         // AccessToken, RefreshToken 토큰 재발급, 리프레쉬 토큰 저장
         TokenDto newCreatedToken = jwtProvider.createToken(User.getId().toString(), User.getId(), User.getRoles());
