@@ -67,6 +67,8 @@ public class SecurityService {
 
     @Transactional(rollbackFor = Exception.class)
     public JSONObject join(User User, @RequestBody JoinDto dto) {
+        if(User==null)
+            throw new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN);
         if(!User.getNickName().isBlank())
             return PropertyUtil.responseMessage("이미 회원가입된 유저입니다.");
         JSONObject obj = new JSONObject();
