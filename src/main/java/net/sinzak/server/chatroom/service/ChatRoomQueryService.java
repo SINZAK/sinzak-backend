@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.chatroom.domain.ChatMessage;
 import net.sinzak.server.chatroom.domain.ChatRoom;
 import net.sinzak.server.chatroom.domain.UserChatRoom;
+import net.sinzak.server.chatroom.dto.request.PostDto;
 import net.sinzak.server.chatroom.dto.respond.GetChatMessageDto;
 import net.sinzak.server.chatroom.dto.respond.GetChatRoomDto;
 import net.sinzak.server.chatroom.dto.respond.GetChatRoomsDto;
@@ -37,6 +38,12 @@ public class ChatRoomQueryService {
     private final ChatRoomRepository chatRoomRepository;
     private final UserChatRoomRepository userChatRoomRepository;
 
+    public JSONObject getChatRoomsByProduct(User user, PostDto postDto){
+        if(user ==null){
+            throw new
+        }
+
+    }
     public JSONObject getChatRooms(User user){
         if(user ==null){
             return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
