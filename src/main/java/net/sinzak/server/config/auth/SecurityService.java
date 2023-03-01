@@ -34,13 +34,13 @@ public class SecurityService {
     @Transactional
     public TokenDto login(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("가입되지 않은 ID 입니다."));
+                .orElseThrow(() -> new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND));
         TokenDto tokenDto = jwtProvider.createToken(user.getId().toString(), user.getId(), user.getRoles());
         //리프레시 토큰 저장
         log.error(user.getNickName());
         if(user.getNickName().isEmpty())
             tokenDto.setIsJoined(false);
-
+        tokenDto.setOrigin(user.getOrigin());
         RefreshToken refreshToken = RefreshToken.builder()
                 .key(user.getId())
                 .token(tokenDto.getRefreshToken())
@@ -51,10 +51,11 @@ public class SecurityService {
 
     @Transactional
     public TokenDto login(User user) {
+        PropertyUtil.checkHeader(user);
         TokenDto tokenDto = jwtProvider.createToken(user.getId().toString(), user.getId(), user.getRoles());
         //리프레시 토큰 저장
         tokenDto.setIsJoined(false);
-
+        tokenDto.setOrigin(user.getOrigin());
         RefreshToken refreshToken = RefreshToken.builder()
                 .key(user.getId())
                 .token(tokenDto.getRefreshToken())
