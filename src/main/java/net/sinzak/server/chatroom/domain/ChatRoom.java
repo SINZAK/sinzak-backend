@@ -38,10 +38,10 @@ public class ChatRoom extends BaseTimeEntity {
         this.roomUuid = UUID.randomUUID().toString();
     }
 
-    @OneToMany(cascade = CascadeType.REMOVE,orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
     private List<ChatMessage> chatMessages = new ArrayList<>();
 
-    @OneToMany(mappedBy = "chatRoom",cascade = CascadeType.REMOVE,orphanRemoval = true)
+    @OneToMany(mappedBy = "chatRoom",cascade = CascadeType.ALL,orphanRemoval = true)
     private Set<UserChatRoom> userChatRooms = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
