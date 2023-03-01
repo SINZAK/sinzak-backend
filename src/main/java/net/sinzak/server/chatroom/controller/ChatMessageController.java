@@ -42,7 +42,7 @@ public class ChatMessageController {
         chatMessageService.sendChatMessage(chatMessageDto);
     }
 
-    @PostMapping(value = "/chat/room/{uuid}/leave")
+    @MessageMapping(value = "/chat/room/{uuid}/leave")
     public void leave(@AuthenticationPrincipal User user, @PathVariable("uuid") String roomUuid){
         chatMessageService.leaveChatRoom(user,roomUuid);
     }
