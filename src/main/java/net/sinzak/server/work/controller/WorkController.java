@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.dto.SuggestDto;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.common.dto.ActionForm;
@@ -37,6 +38,7 @@ public class WorkController {
             "category = portrait, illustration, logo, poster, design, editorial, label, other 주의점은 콤마로 구분하되 공백은 삽입X")
     @PostMapping(value = "/works/build", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public JSONObject makeWorkPost(@AuthenticationPrincipal User user, @RequestBody WorkPostDto postDto) {
+        PropertyUtil.checkHeader(user);
         return workService.makePost(user, postDto);
     }
 
@@ -46,6 +48,7 @@ public class WorkController {
     @ApiImplicitParam(name = "multipartFile", dataType = "multipartFile",
             value = "파일 보내주시면 파일 s3서버에 저장 및, 해당 파일이 저장되어 있는 URL을 디비에 저장합니다")
     public JSONObject makeProductPost(@AuthenticationPrincipal User user, @PathVariable("id") Long workId, @RequestPart List<MultipartFile> multipartFile) {
+        PropertyUtil.checkHeader(user);
         return workService.saveImageInS3AndWork(user, multipartFile, workId);
     }
 
@@ -53,6 +56,7 @@ public class WorkController {
     @ApiOperation(value = "의뢰 이미지 삭제", notes = "하나씩만 처리할게요, 썸네일(첫번째 사진)은 불가능하게 가시죠")
     @PostMapping(value = "/works/{id}/deleteimage")
     public JSONObject deleteProductImage(@AuthenticationPrincipal User user, @PathVariable("id") Long workId, @RequestBody ImageUrlDto dto) {
+        PropertyUtil.checkHeader(user);
         return workService.deleteImage(user, workId, dto.getUrl());
     }
 
@@ -60,6 +64,7 @@ public class WorkController {
     @ApiOperation(value = "의뢰 수정")
     @PostMapping(value = "/works/{id}/edit")
     public JSONObject editPost(@AuthenticationPrincipal User user, @PathVariable("id") Long workId, @RequestBody WorkEditDto editDto) {
+        PropertyUtil.checkHeader(user);
         return workService.editPost(user, workId, editDto);
     }
 
@@ -67,6 +72,7 @@ public class WorkController {
     @ApiOperation(value = "의뢰 삭제")
     @PostMapping(value = "/works/{id}/delete")
     public JSONObject deletePost(@AuthenticationPrincipal User user, @PathVariable("id") Long workId) {
+        PropertyUtil.checkHeader(user);
         return workService.deletePost(user, workId);
     }
 
@@ -85,6 +91,7 @@ public class WorkController {
     @PostMapping("/works/wish")
     @ApiOperation(value = "의뢰 찜")
     public JSONObject wish(@AuthenticationPrincipal User user, @RequestBody ActionForm form) {
+        PropertyUtil.checkHeader(user);
         return workService.wish(user, form);
     }
 
@@ -92,6 +99,7 @@ public class WorkController {
     @PostMapping("/works/likes")
     @ApiOperation(value = "의뢰 좋아요", notes = "{\"success\":true, \"isfav\" : true} 이런식으로 보냅니다. 요청 이후 좋아요 버튼이 어떻게 되어있어야 하는지 알려주기위해서")
     public JSONObject likes(@AuthenticationPrincipal User user, @RequestBody ActionForm form) {
+        PropertyUtil.checkHeader(user);
         return workService.likes(user, form);
     }
 
@@ -99,6 +107,7 @@ public class WorkController {
     @PostMapping("/works/suggest")
     @ApiOperation(value = "의뢰 가격제안")
     public JSONObject suggest(@AuthenticationPrincipal User user, @RequestBody SuggestDto dto) {
+        PropertyUtil.checkHeader(user);
         return workService.suggest(user, dto);
     }
 

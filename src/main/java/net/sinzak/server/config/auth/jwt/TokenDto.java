@@ -12,8 +12,12 @@ public class TokenDto {
     private String refreshToken;
     private Long accessTokenExpireDate;
     private boolean joined = true;
-
+    private String origin = "";
     public void setIsJoined(boolean joined) {
         this.joined = joined;
+    }
+
+    public void setOrigin(String origin) {
+        this.origin = origin;
     }
 }
