@@ -26,4 +26,7 @@ public interface WorkRepository extends JpaRepository<Work, Long> {
     @Query("select w from Work w left join Fetch w.user left join fetch w.chatRooms where w.id = :id")
     Optional<Work> findByIdFetchUserAndChatRooms(@Param("id") Long id);
 
+    @Query("select w from Work w left join fetch w.chatRooms where w.id = :id")
+    Optional<Work> findByIdFetchChatRooms(@Param("id") Long id);
+
 }
