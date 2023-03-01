@@ -33,4 +33,9 @@ public class RestControllerAdvisor {
     protected JSONObject handleChatRoomNotFoundException() {
         return PropertyUtil.responseMessage("존재하지 않는 채팅방입니다.");
     }
+
+    @ExceptionHandler(UserNotLoginException.class)
+    @ResponseStatus(HttpStatus.OK)
+    protected JSONObject handleUserNotLoginException(){return PropertyUtil.responseMessage("로그인이 필요한 작업입니다.");}
+
 }
