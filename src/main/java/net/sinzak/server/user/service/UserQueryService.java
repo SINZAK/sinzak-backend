@@ -175,7 +175,7 @@ public class UserQueryService {
     private UserDto makeUserDto(User user, User findUser) {
         UserDto userDto = UserDto.builder()
                 .userId(findUser.getId())
-                .name(findUser.getName())
+                .name(findUser.getNickName())
                 .introduction(findUser.getIntroduction())
                 .followingNumber(findUser.getFollowingNum())
                 .followerNumber(findUser.getFollowerNum())
@@ -224,7 +224,7 @@ public class UserQueryService {
             if(findUser.isPresent()){
                 GetFollowDto getFollowDto = GetFollowDto.builder().
                         userId(findUser.get().getId()).
-                        name(findUser.get().getName()).
+                        name(findUser.get().getNickName()).
                         picture(findUser.get().getPicture()).
                         build();
                 getFollowDtoList.add(getFollowDto);
