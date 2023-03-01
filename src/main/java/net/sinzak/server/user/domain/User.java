@@ -47,8 +47,7 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     @Column
     @Setter
-    private String
-            picture; //대표 사진
+    private String picture=""; //대표 사진
 
     @Column
     private String introduction=""; //한 줄 소개
@@ -86,34 +85,34 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE,orphanRemoval = true)
+    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<UserChatRoom> userChatRooms = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Product> productPostList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ProductSell> productSellList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ProductWish> productWishList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ProductLikes> productLikesList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<Work> workPostList = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<WorkWish> workWishList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<WorkLikes> workLikesList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Report> reportList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<SearchHistory> historyList = new HashSet<>();
 
 
