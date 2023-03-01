@@ -82,7 +82,7 @@ public class SecurityService {
             throw new InstanceNotFoundException("서버 오류로 저장되지 않았습니다.");
         TokenDto tokenDto = jwtProvider.createToken(user.getUsername(), user.getId(), user.getRoles());
         tokenDto.setIsJoined(true);
-
+        tokenDto.setOrigin(user.getOrigin());
         RefreshToken refreshToken = RefreshToken.builder()
                 .key(user.getId())
                 .token(tokenDto.getRefreshToken())
