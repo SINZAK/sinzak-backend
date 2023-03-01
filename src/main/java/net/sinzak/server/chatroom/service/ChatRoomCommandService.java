@@ -133,6 +133,8 @@ public class ChatRoomCommandService {
         UserChatRoom OpponentUserChatRoom = new UserChatRoom(invitedUser, findUser);
         chatRoom.addUserChatRoom(myUserChatRoom);
         chatRoom.addUserChatRoom(OpponentUserChatRoom);
+        userChatRoomRepository.save(myUserChatRoom);
+        userChatRoomRepository.save(OpponentUserChatRoom);
         chatRoomRepository.save(chatRoom);
         return chatRoom;
     }
