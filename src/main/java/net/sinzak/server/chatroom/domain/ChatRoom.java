@@ -68,7 +68,12 @@ public class ChatRoom extends BaseTimeEntity {
     addChatMessage(ChatMessage chatMessage){
         this.chatMessages.add(chatMessage);
         for(UserChatRoom userChatRoom :this.userChatRooms){
-            userChatRoom.updateLatestMessage(chatMessage.getMessage());
+            if(chatMessage.getType()==MessageType.TEXT){
+                userChatRoom.updateLatestMessage(chatMessage.getMessage());
+            }
+            if(chatMessage.getType()==MessageType.IMAGE){
+                userChatRoom.updateLatestMessage("사진");
+            }
         }
     }
 
