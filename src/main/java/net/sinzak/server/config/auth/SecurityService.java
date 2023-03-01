@@ -95,19 +95,6 @@ public class SecurityService {
 
     @Transactional //TODO
     public TokenDto reissue(User User,TokenRequestDto tokenRequestDto) {
-        // 만료된 refresh token 에러
-        if (!jwtProvider.validateToken(tokenRequestDto.getRefreshToken())) {
-            throw new NoSuchElementException();
-        }
-
-        // AccessToken 에서 Username (pk) 가져오기
-        String accessToken = tokenRequestDto.getAccessToken();
-        Authentication authentication = jwtProvider.getAuthentication(accessToken);
-
-        // user pk로 유저 검색 / repo 에 저장된 Refresh Token 이 없음
-
-        if(!authentication.getName().equals(User.getEmail()))
-            throw new NoSuchElementException();
         List<RefreshToken> refreshTokens = refreshTokenRepository.findByKey(User.getId());
         RefreshToken refreshToken = refreshTokens.get(refreshTokens.size()-1); //마지막꺼가 가장 최신반영된 토큰
         // 리프레시 토큰 불일치 에러

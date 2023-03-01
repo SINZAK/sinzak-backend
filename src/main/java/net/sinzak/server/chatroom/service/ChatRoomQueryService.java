@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.chatroom.domain.ChatMessage;
 import net.sinzak.server.chatroom.domain.ChatRoom;
 import net.sinzak.server.chatroom.domain.UserChatRoom;
+import net.sinzak.server.chatroom.dto.request.PostDto;
 import net.sinzak.server.chatroom.dto.respond.GetChatMessageDto;
 import net.sinzak.server.chatroom.dto.respond.GetChatRoomDto;
 import net.sinzak.server.chatroom.dto.respond.GetChatRoomsDto;
@@ -17,7 +18,10 @@ import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.error.ChatRoomNotFoundException;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
+import net.sinzak.server.common.error.UserNotLoginException;
+import net.sinzak.server.product.service.ProductService;
 import net.sinzak.server.user.domain.User;
+import net.sinzak.server.work.service.WorkService;
 import org.json.simple.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -25,8 +29,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,10 +42,33 @@ import java.util.stream.Collectors;
 public class ChatRoomQueryService {
     private final ChatRoomRepository chatRoomRepository;
     private final UserChatRoomRepository userChatRoomRepository;
+    private final ProductService productService;
+    private final WorkService workService;
 
+//    public JSONObject getChatRoomsByProduct(User user, PostDto postDto){
+//        if(user ==null){
+//            throw new UserNotLoginException();
+//        }
+//        List<GetChatRoomsDto> getChatRoomsDtos = new ArrayList<>();
+//        List<ChatRoom> chatRooms =null;
+//        if(postDto.getPostType().equals(PostType.WORK.name())){
+//            chatRooms = workService.getChatRoom(postDto.getPostId());
+//        }
+//        if(postDto.getPostType().equals(PostType.PRODUCT.name())) {
+//            chatRooms = productService.getChatRoom(postDto.getPostId());
+//        }
+//        for(ChatRoom chatRoom: chatRooms){
+//            Set<UserChatRoom> userChatRooms = chatRoom.getUserChatRooms();
+//            for(UserChatRoom userChatRoom : userChatRooms){
+//                if(userChatRoom.getUser().getId().equals()){
+//
+//                }
+//            }
+//        }
+//    }
     public JSONObject getChatRooms(User user){
         if(user ==null){
-            return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
+            throw new UserNotLoginException();
         }
         List<GetChatRoomsDto> chatRoomsDtos = userChatRoomRepository
                 .findUserChatRoomByIdFetchChatRoom(user.getId()).stream()

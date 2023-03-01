@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.chatroom.domain.ChatMessage;
 import net.sinzak.server.chatroom.domain.ChatRoom;
+import net.sinzak.server.chatroom.dto.request.PostDto;
 import net.sinzak.server.chatroom.dto.respond.GetChatMessageDto;
 import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.service.ChatRoomQueryService;
@@ -52,6 +53,11 @@ public class ChatRoomQueryController {
     public JSONObject getChatRoom(@PathVariable("uuid") String roomUuid, @AuthenticationPrincipal User user){
         return chatRoomQueryService.getChatRoom(roomUuid,user);
     }
+//    @GetMapping(value ="/rooms/post")
+//    @ApiOperation(value = "상품에 딸려있는 채팅방 불러오기")
+//    public JSONObject getChatRoomByProduct(@AuthenticationPrincipal User user, PostDto postDto){
+//        return chatRoomQueryService.getChatRoomsByProduct(user,postDto);
+//    }
 
     @GetMapping(value = "/rooms/{uuid}/message")
     public Page<GetChatMessageDto> getChatRoomMessage(
