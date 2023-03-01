@@ -76,7 +76,7 @@ public class ChatRoomCommandService {
 
         log.info("게시글 확인");
         checkUserStatus(user,postUser);
-        User findUser = userRepository.findById(user.getId()).orElseThrow(UserNotFoundException::new);
+        User loginUser = userRepository.findById(user.getId()).orElseThrow(UserNotFoundException::new);
 
         if(userQueryService.checkReported(postUser,user)){
             return PropertyUtil.responseMessage("차단된 상대입니다.");
@@ -86,7 +86,7 @@ public class ChatRoomCommandService {
         ChatRoom chatRoom = checkIfUserIsAlreadyChatting(user, postChatRooms);
         if (chatRoom == null) { //상대랑 해당 포스트에 대해서 대화하고 있는 채팅방이 없다면 (만들어 줘야함)
             log.info("채팅방 새로 생성");
-            chatRoom = makeChatRoomAndUserChatRoom(postUser, findUser);
+            chatRoom = makeChatRoomAndUserChatRoom(postUser, loginUser);
             addChatRoomToPost(postDto, product, work, chatRoom);
             chatRoomRepository.save(chatRoom);
             getCreatedChatRoomDto.setNewChatRoom(true);
@@ -127,10 +127,11 @@ public class ChatRoomCommandService {
 //    }
 
     @NotNull
-    private ChatRoom makeChatRoomAndUserChatRoom(User invitedUser, User findUser) {
+    private ChatRoom makeChatRoomAndUserChatRoom(User postUser, User loginUser) {
         ChatRoom chatRoom = new ChatRoom();
-        UserChatRoom myUserChatRoom = new UserChatRoom(findUser, invitedUser);
-        UserChatRoom OpponentUserChatRoom = new UserChatRoom(invitedUser, findUser);
+        chatRoom.setPostUserId(postUser.getId());
+        UserChatRoom myUserChatRoom = new UserChatRoom(loginUser, postUser);
+        UserChatRoom OpponentUserChatRoom = new UserChatRoom(postUser, loginUser);
         chatRoom.addUserChatRoom(myUserChatRoom);
         chatRoom.addUserChatRoom(OpponentUserChatRoom);
         userChatRoomRepository.save(myUserChatRoom);

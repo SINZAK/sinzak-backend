@@ -71,7 +71,7 @@ public class ChatRoomQueryService {
             throw new UserNotLoginException();
         }
         List<GetChatRoomsDto> chatRoomsDtos = userChatRoomRepository
-                .findUserChatRoomByIdFetchChatRoom(user.getId()).stream()
+                .findUserChatRoomByIdFetchChatRoomWhereNotDisabled(user.getId()).stream()
                 .map(
                         userChatRoom ->
                                 GetChatRoomsDto.builder()
@@ -132,7 +132,7 @@ public class ChatRoomQueryService {
 
     private GetChatRoomDto makeWorkChatRoomDto(UserChatRoom userChatRoom, ChatRoom chatRoom) {
         GetChatRoomDto getChatRoomDto = GetChatRoomDto.builder()
-                .userId(userChatRoom.getOpponentUserId())
+                .userId(chatRoom.getPostUserId())
                 .roomName(userChatRoom.getRoomName())
                 .productId(chatRoom.getWork().getId())
                 .productName(chatRoom.getWork().getTitle())

@@ -19,6 +19,12 @@ public class ChatRoom extends BaseTimeEntity {
     private Integer participantsNumber;
     private String roomUuid;
     private String roomName;
+
+    public void setPostUserId(Long postUserId) {
+        PostUserId = postUserId;
+    }
+
+    private Long PostUserId;
     @Enumerated(EnumType.STRING)
     private PostType postType;
 

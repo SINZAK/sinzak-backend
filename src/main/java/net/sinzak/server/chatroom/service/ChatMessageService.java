@@ -94,7 +94,7 @@ public class ChatMessageService {
         deleteChatRoom(findChatroom, userChatRoom);
         addLeaveChatMessageToChatRoom(user, findChatroom);
         GetChatMessageDto getChatMessageDto = makeLeaveChatMessageDto(user);
-//        template.convertAndSend("/sub/chat/rooms/"+roomUuid,getChatMessageDto);
+        template.convertAndSend("/sub/chat/rooms/"+roomUuid,getChatMessageDto);
         return;
     }
 
