@@ -15,6 +15,7 @@ import net.sinzak.server.chatroom.domain.UserChatRoom;
 import net.sinzak.server.chatroom.dto.request.ChatMessageDto;
 import net.sinzak.server.chatroom.dto.request.ChatRoomUuidDto;
 import net.sinzak.server.chatroom.dto.respond.GetChatMessageDto;
+import net.sinzak.server.chatroom.repository.ChatMessageRepository;
 import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.repository.UserChatRoomRepository;
 import net.sinzak.server.common.error.ChatRoomNotFoundException;
@@ -32,6 +33,7 @@ public class ChatMessageService {
     private final ChatRoomRepository chatRoomRepository;
     private final UserChatRoomRepository userChatRoomRepository;
     private final SimpMessagingTemplate template;
+    private final ChatMessageRepository chatMessageRepository;
 
     public static final String COLLECTION_NAME="chatMessage";
 
@@ -77,6 +79,7 @@ public class ChatMessageService {
                 .senderId(message.getSenderId())
                 .build();
         findChatRoom.addChatMessage(newChatMessage);
+        chatMessageRepository.save(newChatMessage);
         return newChatMessage;
     }
 
@@ -122,6 +125,7 @@ public class ChatMessageService {
                 .senderId(user.getId())
                 .type(MessageType.LEAVE)
                 .build();
+        chatMessageRepository.save(leaveChatMessage);
         findChatroom.addChatMessage(leaveChatMessage);
     }
 
