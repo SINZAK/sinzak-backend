@@ -146,9 +146,7 @@ public class ChatRoomCommandService {
     }
 
     public void makeChatRoomBlocked(User user,User opponentUser){
-        List<UserChatRoom> userChatRooms = Optional
-                .ofNullable(userChatRoomRepository.findUserChatRoomByIdFetchChatRoom(user.getId()))
-                .orElseThrow(UserNotFoundException::new); //보통은 차단한 상대가 없기에 취소
+        List<UserChatRoom> userChatRooms = userChatRoomRepository.findUserChatRoomByIdFetchChatRoom(user.getId());
         for(UserChatRoom userChatRoom : userChatRooms){
             if(userChatRoom.getOpponentUserId().equals(opponentUser.getId())){
                 userChatRoom.getChatRoom().setBlocked(true);
@@ -159,7 +157,7 @@ public class ChatRoomCommandService {
         for(ChatRoom chatRoom: postChatRooms){
             for(UserChatRoom userChatRoom : chatRoom.getUserChatRooms()){
                 //Post에 딸린 채팅방중 말 건 유저가 속한 채팅방이 있다면
-                if(userChatRoom.getOpponentUserId().equals(user.getId())){
+                if(userChatRoom.getUser().getId().equals(user.getId())){
                     if(userChatRoom.isDisable()){
                         chatRoom.reEnterChatRoom(); //참여자 수 올려줌
                         userChatRoom.setDisable(false);

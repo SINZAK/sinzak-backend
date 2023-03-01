@@ -39,7 +39,6 @@ public class ChatRoomCommandController {
     public JSONObject createChatRoom(@RequestBody PostDto postDto, @AuthenticationPrincipal User user){
         return chatRoomCommandService.createUserChatRoom(postDto,user);
     }
-
     @PostMapping(value ="/chat/rooms/{uuid}/image")
     public JSONObject uploadImage(@PathVariable("uuid") String uuid, List<MultipartFile> files){
         return chatRoomCommandService.uploadImage(uuid,files);
