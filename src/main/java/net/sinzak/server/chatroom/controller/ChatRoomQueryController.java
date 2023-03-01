@@ -53,11 +53,12 @@ public class ChatRoomQueryController {
     public JSONObject getChatRoom(@PathVariable("uuid") String roomUuid, @AuthenticationPrincipal User user){
         return chatRoomQueryService.getChatRoom(roomUuid,user);
     }
-//    @GetMapping(value ="/rooms/post")
-//    @ApiOperation(value = "상품에 딸려있는 채팅방 불러오기")
-//    public JSONObject getChatRoomByProduct(@AuthenticationPrincipal User user, PostDto postDto){
-//        return chatRoomQueryService.getChatRoomsByProduct(user,postDto);
-//    }
+
+    @PostMapping(value ="/rooms/post")
+    @ApiOperation(value = "상품에 딸려있는 채팅방 불러오기")
+    public JSONObject getChatRoomByProduct(@AuthenticationPrincipal User user, @RequestBody PostDto postDto){
+        return chatRoomQueryService.getChatRoomsByPost(user,postDto);
+    }
 
     @GetMapping(value = "/rooms/{uuid}/message")
     public Page<GetChatMessageDto> getChatRoomMessage(

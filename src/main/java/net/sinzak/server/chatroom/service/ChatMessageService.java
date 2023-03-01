@@ -7,6 +7,7 @@ package net.sinzak.server.chatroom.service;
 //import com.google.cloud.firestore.WriteResult;
 //import com.google.firebase.cloud.FirestoreClient;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.chatroom.domain.ChatMessage;
 import net.sinzak.server.chatroom.domain.ChatRoom;
 import net.sinzak.server.chatroom.domain.MessageType;
@@ -14,23 +15,24 @@ import net.sinzak.server.chatroom.domain.UserChatRoom;
 import net.sinzak.server.chatroom.dto.request.ChatMessageDto;
 import net.sinzak.server.chatroom.dto.request.ChatRoomUuidDto;
 import net.sinzak.server.chatroom.dto.respond.GetChatMessageDto;
+import net.sinzak.server.chatroom.repository.ChatMessageRepository;
 import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.repository.UserChatRoomRepository;
 import net.sinzak.server.common.error.ChatRoomNotFoundException;
-import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.user.domain.User;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatMessageService {
     private final ChatRoomRepository chatRoomRepository;
     private final UserChatRoomRepository userChatRoomRepository;
     private final SimpMessagingTemplate template;
+    private final ChatMessageRepository chatMessageRepository;
 
     public static final String COLLECTION_NAME="chatMessage";
 
@@ -48,14 +50,14 @@ public class ChatMessageService {
                 chatRoomRepository
                         .findByRoomUuidFetchChatMessage(message.getRoomId())
                         .orElseThrow(()->new ChatRoomNotFoundException());
-        if(findChatRoom.isBlocked()){
+        if(findChatRoom.isBlocked() || findChatRoom.getParticipantsNumber()<2){
+            //차단 되어있거나 한 명이 나간 상태라면 보내지 않음
             return;
         }
         ChatMessage newChatMessage = addChatMessageToChatRoom(message, findChatRoom);
         GetChatMessageDto getChatMessageDto = makeMessageDto(message, newChatMessage);
         template.convertAndSend("/sub/chat/rooms/"+message.getRoomId(),getChatMessageDto);
     }
-
     private GetChatMessageDto makeMessageDto(ChatMessageDto message, ChatMessage newChatMessage) {
         GetChatMessageDto getChatMessageDto = GetChatMessageDto.builder()
                 .message(message.getMessage())
@@ -76,24 +78,26 @@ public class ChatMessageService {
                 .senderId(message.getSenderId())
                 .build();
         findChatRoom.addChatMessage(newChatMessage);
+        chatMessageRepository.save(newChatMessage);
         return newChatMessage;
     }
 
     @Transactional
-    public void leaveChatRoom(User user, ChatRoomUuidDto chatRoomUuidDto){
-        ChatRoom findChatroom = chatRoomRepository.findByRoomUuidFetchUserChatRoom(chatRoomUuidDto.getRoomId())
+    public void leaveChatRoom(User user, String roomUuid){
+        log.info(roomUuid);
+        ChatRoom findChatroom = chatRoomRepository.findByRoomUuidFetchUserChatRoom(roomUuid)
                 .orElseThrow(()->new ChatRoomNotFoundException());
         UserChatRoom userChatRoom = findChatroom.leaveChatRoom(user.getId());
-        if(userChatRoom ==null){
+        if(userChatRoom == null){
             throw new ChatRoomNotFoundException();
         }
         deleteChatRoom(findChatroom, userChatRoom);
         addLeaveChatMessageToChatRoom(user, findChatroom);
         GetChatMessageDto getChatMessageDto = makeLeaveChatMessageDto(user);
-        template.convertAndSend("/sub/chat/rooms/"+chatRoomUuidDto,getChatMessageDto);
+        template.convertAndSend("/sub/chat/rooms/"+roomUuid,getChatMessageDto);
         return;
-
     }
+
 
     private GetChatMessageDto makeLeaveChatMessageDto(User user) {
         GetChatMessageDto getChatMessageDto = GetChatMessageDto.builder()
@@ -106,18 +110,21 @@ public class ChatMessageService {
     }
 
     private void deleteChatRoom(ChatRoom findChatroom, UserChatRoom userChatRoom) {
-        userChatRoomRepository.delete(userChatRoom);
+        log.info("userChatRoom이름"+userChatRoom.getRoomName());
         if(findChatroom.getParticipantsNumber()==0){
             chatRoomRepository.delete(findChatroom);
         }
     }
+
 
     private void addLeaveChatMessageToChatRoom(User user, ChatRoom findChatroom) {
         ChatMessage leaveChatMessage = ChatMessage.builder()
                 .message(user.getName()+"님이 채팅방을 나가셨습니다")
                 .senderName(user.getName())
                 .senderId(user.getId())
+                .type(MessageType.LEAVE)
                 .build();
+        chatMessageRepository.save(leaveChatMessage);
         findChatroom.addChatMessage(leaveChatMessage);
     }
 
