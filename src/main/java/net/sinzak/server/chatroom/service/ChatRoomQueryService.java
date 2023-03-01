@@ -132,6 +132,7 @@ public class ChatRoomQueryService {
 
     private GetChatRoomDto makeWorkChatRoomDto(UserChatRoom userChatRoom, ChatRoom chatRoom) {
         GetChatRoomDto getChatRoomDto = GetChatRoomDto.builder()
+                .userId(userChatRoom.getOpponentUserId())
                 .roomName(userChatRoom.getRoomName())
                 .productId(chatRoom.getWork().getId())
                 .productName(chatRoom.getWork().getTitle())

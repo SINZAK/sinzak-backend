@@ -13,4 +13,5 @@ public class GetChatRoomDto {
     private String thumbnail;
     private boolean complete;
     private boolean suggest;
+    private Long userId;
 }

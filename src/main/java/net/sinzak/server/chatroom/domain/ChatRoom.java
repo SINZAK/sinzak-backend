@@ -41,7 +41,8 @@ public class ChatRoom extends BaseTimeEntity {
     @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
     private List<ChatMessage> chatMessages = new ArrayList<>();
 
-    @OneToMany(mappedBy = "chatRoom",cascade = CascadeType.ALL,orphanRemoval = true)
+
+    @OneToMany(mappedBy = "chatRoom")
     private Set<UserChatRoom> userChatRooms = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -68,16 +69,24 @@ public class ChatRoom extends BaseTimeEntity {
     addChatMessage(ChatMessage chatMessage){
         this.chatMessages.add(chatMessage);
         for(UserChatRoom userChatRoom :this.userChatRooms){
-            userChatRoom.updateLatestMessage(chatMessage.getMessage());
+            if(chatMessage.getType()==MessageType.TEXT){
+                userChatRoom.updateLatestMessage(chatMessage.getMessage());
+            }
+            if(chatMessage.getType()==MessageType.IMAGE){
+                userChatRoom.updateLatestMessage("사진");
+            }
         }
     }
 
     public UserChatRoom leaveChatRoom(Long userId){
+        System.out.println(this.userChatRooms.size()+":사이즈,"+userId+":userId");
         for(UserChatRoom userChatRoom :this.userChatRooms){
+            System.out.println(userChatRoom.getUser().getId());
             if(userChatRoom.getUser().getId().equals(userId)){
                 this.participantsNumber--;
                 return userChatRoom;
             }
+
         }
         return null;
     }
