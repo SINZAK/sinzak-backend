@@ -229,4 +229,25 @@ public class OauthController {
     }
 
 
+
+    public static final String TEAM_ID = "F7B353LPM3";
+    public static final String REDIRECT_URL = "http://localhost:8080/api/login/oauth2/code/apple";
+    public static final String CLIENT_ID = "com.kimdee.Sinzak";
+    public static final String KEY_ID = "37QTX3F226";
+
+    public static final String AUTH_URL = "https://appleid.apple.com";
+    public static final String KEY_PATH = "static/apple/AuthKey_TUK366564L.p8";
+
+    @ApiOperation(value = "스프링용 구글로그인 실행",notes = "" +
+            "로컬환경 : "+AUTH_URL+"/auth/authorize?client_id=" + CLIENT_ID + "&redirect_uri=" + "http://localhost:8080/api/login/oauth2/code/apple"
+            + "&response_type=code id_token&response_mode=form_post"+'\n'+
+            "배포환경 : "+AUTH_URL+"/auth/authorize?client_id=" + CLIENT_ID + "&redirect_uri=" + "https://sinzak.net/api/login/oauth2/code/apple"
+            + "&response_type=code id_token&response_mode=form_post")
+    @GetMapping("/test4")
+    public String appleLogin(){
+        String url = AUTH_URL+"/auth/authorize?client_id=" + CLIENT_ID + "&redirect_uri=" + "https://sinzak.net/api/login/oauth2/code/apple"
+                + "&response_type=code id_token&response_mode=form_post";
+        return url;
+    }
+
 }

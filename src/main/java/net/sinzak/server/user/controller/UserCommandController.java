@@ -119,5 +119,13 @@ public class UserCommandController {
         return userCommandService.deleteSearchHistory(user);
     }
 
+    @ApiDocumentResponse
+    @ApiOperation(value = "유저 탈퇴하기")
+    @PostMapping(value = "/users/resign")
+    public JSONObject report(@AuthenticationPrincipal User user){
+        PropertyUtil.checkHeader(user);
+        return userCommandService.resign(user);
+    }
+
 }
 
