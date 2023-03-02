@@ -83,7 +83,7 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
     private List<ProductWish> productWishList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "product",cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "product")
     private List<ChatRoom> chatRooms = new ArrayList<>();
 
     @Builder
