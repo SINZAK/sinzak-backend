@@ -91,7 +91,7 @@ public class ChatMessageService {
         if(userChatRoom == null){
             throw new ChatRoomNotFoundException();
         }
-        deleteChatRoom(findChatroom, userChatRoom);
+        deleteChatRoom(findChatroom);
         addLeaveChatMessageToChatRoom(user, findChatroom);
         GetChatMessageDto getChatMessageDto = makeLeaveChatMessageDto(user);
         template.convertAndSend("/sub/chat/rooms/"+roomUuid,getChatMessageDto);
@@ -109,9 +109,11 @@ public class ChatMessageService {
         return getChatMessageDto;
     }
 
-    private void deleteChatRoom(ChatRoom findChatroom, UserChatRoom userChatRoom) {
-        log.info("userChatRoom이름"+userChatRoom.getRoomName());
+    private void deleteChatRoom(ChatRoom findChatroom) {
         if(findChatroom.getParticipantsNumber()==0){
+            for(UserChatRoom userChatRoom : findChatroom.getUserChatRooms()){
+                userChatRoomRepository.delete(userChatRoom);
+            }
             chatRoomRepository.delete(findChatroom);
         }
     }
@@ -124,7 +126,7 @@ public class ChatMessageService {
                 .senderId(user.getId())
                 .type(MessageType.LEAVE)
                 .build();
-        chatMessageRepository.save(leaveChatMessage);
+//        chatMessageRepository.save(leaveChatMessage);
         findChatroom.addChatMessage(leaveChatMessage);
     }
 
