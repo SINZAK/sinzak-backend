@@ -94,9 +94,6 @@ public class ChatRoomQueryService {
 //        }
     }
     public JSONObject getChatRooms(User user){
-        if(user ==null){
-            throw new UserNotLoginException();
-        }
         List<GetChatRoomsDto> chatRoomsDtos = userChatRoomRepository
                 .findUserChatRoomByIdFetchChatRoomWhereNotDisabled(user.getId()).stream()
                 .map(

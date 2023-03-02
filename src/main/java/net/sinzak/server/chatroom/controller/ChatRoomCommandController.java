@@ -37,6 +37,7 @@ public class ChatRoomCommandController {
     @PostMapping (value ="/chat/rooms/create")
     @ApiOperation(value ="채팅방 생성",notes = "로그인한 유저, 글 아이디(postId),글 타입(postType = work,product ) 사용")
     public JSONObject createChatRoom(@RequestBody PostDto postDto, @AuthenticationPrincipal User user){
+        PropertyUtil.checkHeader(user);
         return chatRoomCommandService.createUserChatRoom(postDto,user);
     }
     @PostMapping(value ="/chat/rooms/{uuid}/image")
