@@ -49,9 +49,6 @@ public class ChatRoomCommandService {
 
     public JSONObject createUserChatRoom(PostDto postDto, User user) { //상대방 아바타를 초대
         User postUser =null;
-        if(user == null){
-            throw new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN);
-        }
         List<ChatRoom> postChatRooms = null;
         Product product = null;
         Work work = null;

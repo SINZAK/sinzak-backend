@@ -28,7 +28,6 @@ public class UserQueryController {
     @ApiOperation(value ="유저 프로필 보기")
     @GetMapping(value ="/users/{userId}/profile")
     public JSONObject getUserProfile(@PathVariable Long userId, @AuthenticationPrincipal User user){
-        PropertyUtil.checkHeader(user);
        return userQueryService.getUserProfile(userId, user);
 
     }
