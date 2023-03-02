@@ -78,7 +78,7 @@ public class ChatMessageService {
                 .senderId(message.getSenderId())
                 .build();
         findChatRoom.addChatMessage(newChatMessage);
-        chatMessageRepository.save(newChatMessage);
+//        chatMessageRepository.save(newChatMessage);
         return newChatMessage;
     }
 
