@@ -82,7 +82,7 @@ public class Work extends BaseTimeEntity { /** 외주 **/
     @OneToMany(mappedBy = "work", cascade = CascadeType.REMOVE)
     private List<WorkWish> workWishList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "work",cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "work")
     private List<ChatRoom> chatRooms = new ArrayList<>();
 
     @Builder

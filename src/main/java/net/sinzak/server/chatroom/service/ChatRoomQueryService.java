@@ -52,7 +52,7 @@ public class ChatRoomQueryService {
             throw new UserNotLoginException();
         }
         List<GetChatRoomsDto> getChatRoomsDtos = new ArrayList<>();
-        List<UserChatRoom> userChatRooms = userChatRoomRepository.findUserChatRoomByIdFetchChatRoom(loginUser.getId());
+        List<UserChatRoom> userChatRooms = userChatRoomRepository.findUserChatRoomByIdFetchChatRoomWhereNotDisabled(loginUser.getId());
         for(UserChatRoom userChatRoom :userChatRooms){
             ChatRoom chatRoom = userChatRoom.getChatRoom();
             if(chatRoom.getPostType().getName().equals(postDto.getPostType())){
