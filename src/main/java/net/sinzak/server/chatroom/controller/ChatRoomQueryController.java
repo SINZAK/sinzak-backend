@@ -45,6 +45,7 @@ public class ChatRoomQueryController {
     @PostMapping("/rooms")
     @ApiOperation(value ="채팅방 목록 조회")
     public JSONObject getChatRooms(@AuthenticationPrincipal User user){
+        PropertyUtil.checkHeader(user);
         return chatRoomQueryService.getChatRooms(user);
     }
 
