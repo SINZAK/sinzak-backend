@@ -29,6 +29,7 @@ public class OAuthAttributes {
         // 여기서 네이버와 카카오 등 구분 (ofNaver, ofKakao)
         if ("naver".equals(registrationId)) return ofNaver(attributes);
         else if ("kakao".equals(registrationId)) return ofKakao(attributes);
+        else if ("apple".equals(registrationId)) return ofApple(attributes);
         return ofGoogle(attributes);
     }
 
@@ -61,8 +62,16 @@ public class OAuthAttributes {
         return OAuthAttributes.builder()
                 .name((String) attributes.get("name"))
                 .email((String) attributes.get("email"))
-//                .picture((String) attributes.get("picture"))
                 .origin("Google")
+                .build();
+    }
+
+    private static OAuthAttributes ofApple(JSONObject attributes) {
+        log.warn(attributes.toJSONString());
+        return OAuthAttributes.builder()
+                .name("애플로그인")
+                .email((String) attributes.get("sub"))
+                .origin("Apple")
                 .build();
     }
 }
