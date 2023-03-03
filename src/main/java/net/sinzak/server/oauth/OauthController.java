@@ -251,7 +251,7 @@ public class OauthController {
     }
 
     @ApiOperation(value = "스프링용 애플 코드 반환 로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
-    @GetMapping(value = "/login/oauth2/code/apple")
+    @RequestMapping(value = "/login/oauth2/code/apple")
     public String oauthApple(@RequestParam(value = "code", required = false) String code) throws Exception {
         log.warn("인가코드 = {}",code);
         return code;
