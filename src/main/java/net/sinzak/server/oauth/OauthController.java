@@ -232,7 +232,7 @@ public class OauthController {
 
     public static final String TEAM_ID = "F7B353LPM3";
     public static final String REDIRECT_URL = "http://localhost:8080/api/login/oauth2/code/apple";
-    public static final String CLIENT_ID = "com.kimdee.Sinzak";
+    public static final String CLIENT_ID = "net.sinzak.sinzak";
     public static final String KEY_ID = "37QTX3F226";
 
     public static final String AUTH_URL = "https://appleid.apple.com";
@@ -249,5 +249,14 @@ public class OauthController {
                 + "&response_type=code id_token&response_mode=form_post";
         return url;
     }
+
+    @ApiOperation(value = "스프링용 애플 코드 반환 로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
+    @GetMapping(value = "/login/oauth2/code/naver")
+    public String oauthApple(@RequestParam(value = "code", required = false) String code) throws Exception {
+        log.warn("인가코드 = {}",code);
+        return code;
+    }
+
+
 
 }
