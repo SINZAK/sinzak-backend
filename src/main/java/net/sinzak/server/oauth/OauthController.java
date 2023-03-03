@@ -279,7 +279,7 @@ public class OauthController {
         return url;
     }
 
-    @ApiOperation(value = "도이님 idToken 받아보기",notes = "idToken 값에 담아주세요 액세스 토큰, 인가코드 가  아닌 애플측으로부터 id_token 으로 받았었던 값입니다")
+    @ApiOperation(value = "도이님 전용 애플 idToken 테스트",notes = "idToken 값에 담아주세요 액세스 토큰, 인가코드 가  아닌 애플측으로부터 id_token 으로 받았었던 값입니다")
     @PostMapping("/oauth/apple")
     public String getIdToken(@org.springframework.web.bind.annotation.RequestBody OauthDto tokenDto){
         String response = "받은 id토큰 = "+tokenDto.getIdToken();
