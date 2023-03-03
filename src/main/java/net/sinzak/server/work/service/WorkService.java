@@ -183,6 +183,8 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
                 .employment(work.isEmployment())
                 .complete(work.isComplete()).build();
 
+        if(user.getId().equals(work.getUser().getId()))
+            detailForm.setMyPost();
         boolean isLike = checkIsLikes(user.getWorkLikesList(), work);
         boolean isWish = checkIsWish(user, work.getWorkWishList());
         boolean isFollowing  = checkIsFollowing(user.getFollowingList(), work);

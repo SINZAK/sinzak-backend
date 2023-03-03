@@ -57,6 +57,8 @@ public class DetailForm {
     private int wishCnt;
     @ApiModelProperty(example = "2")
     private int chatCnt;
+    @ApiModelProperty(example = "false",notes = "true -> 내가 올린 글")
+    private boolean myPost;
     @ApiModelProperty(example = "false",notes = "true -> 판매완료")
     private boolean complete;
 
@@ -88,5 +90,9 @@ public class DetailForm {
         this.wishCnt = wishCnt;
         this.chatCnt = chatCnt;
         this.complete = complete;
+    }
+
+    public void setMyPost() {
+        this.myPost = true;
     }
 }
