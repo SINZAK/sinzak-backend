@@ -28,6 +28,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
+      - name: make application-db.properties
+        run: |
+          cd ./src/main/resources/static/apple
+          touch ./AuthKey_37QTX3F226.p8
+          echo "${{ secrets.APPLE_KEY }}" > ./AuthKey_37QTX3F226.p8
+        shell: bash
+
       - name: 🔧 Build Spring server
         run: |
           chmod +x ./gradlew
