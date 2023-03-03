@@ -19,6 +19,12 @@ public class ChatRoom extends BaseTimeEntity {
     private Integer participantsNumber;
     private String roomUuid;
     private String roomName;
+
+    public void setPostUserId(Long postUserId) {
+        PostUserId = postUserId;
+    }
+
+    private Long PostUserId;
     @Enumerated(EnumType.STRING)
     private PostType postType;
 
@@ -26,6 +32,9 @@ public class ChatRoom extends BaseTimeEntity {
 
     public void setBlocked(boolean blocked) {
         this.blocked = blocked;
+    }
+    public void reEnterChatRoom(){
+        this.participantsNumber++;
     }
 
     public ChatRoom(){
@@ -38,10 +47,11 @@ public class ChatRoom extends BaseTimeEntity {
         this.roomUuid = UUID.randomUUID().toString();
     }
 
-    @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "chatRoom",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<ChatMessage> chatMessages = new ArrayList<>();
 
-    @OneToMany(mappedBy = "chatRoom",cascade = CascadeType.ALL,orphanRemoval = true)
+
+    @OneToMany(mappedBy = "chatRoom")
     private Set<UserChatRoom> userChatRooms = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -64,17 +74,25 @@ public class ChatRoom extends BaseTimeEntity {
         this.userChatRooms.add(userChatRoom);
         this.participantsNumber++;
     }
-    public void
-    addChatMessage(ChatMessage chatMessage){
+    public void addChatMessage(ChatMessage chatMessage){
         this.chatMessages.add(chatMessage);
+        chatMessage.setChatRoom(this);
         for(UserChatRoom userChatRoom :this.userChatRooms){
-            userChatRoom.updateLatestMessage(chatMessage.getMessage());
+            if(chatMessage.getType()==MessageType.TEXT || chatMessage.getType()==MessageType.LEAVE){
+                userChatRoom.updateLatestMessage(chatMessage.getMessage());
+            }
+            if(chatMessage.getType()==MessageType.IMAGE){
+                userChatRoom.updateLatestMessage("사진");
+            }
         }
     }
 
     public UserChatRoom leaveChatRoom(Long userId){
+        System.out.println(this.userChatRooms.size()+":사이즈,"+userId+":userId") ;
         for(UserChatRoom userChatRoom :this.userChatRooms){
+            System.out.println(userChatRoom.getUser().getId());
             if(userChatRoom.getUser().getId().equals(userId)){
+                userChatRoom.setDisable(true);
                 this.participantsNumber--;
                 return userChatRoom;
             }

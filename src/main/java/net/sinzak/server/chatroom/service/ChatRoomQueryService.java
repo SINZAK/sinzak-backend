@@ -19,8 +19,10 @@ import net.sinzak.server.common.error.ChatRoomNotFoundException;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.error.UserNotLoginException;
+import net.sinzak.server.product.domain.Product;
 import net.sinzak.server.product.service.ProductService;
 import net.sinzak.server.user.domain.User;
+import net.sinzak.server.work.domain.Work;
 import net.sinzak.server.work.service.WorkService;
 import org.json.simple.JSONObject;
 import org.springframework.data.domain.Page;
@@ -45,11 +47,29 @@ public class ChatRoomQueryService {
     private final ProductService productService;
     private final WorkService workService;
 
-//    public JSONObject getChatRoomsByProduct(User user, PostDto postDto){
-//        if(user ==null){
-//            throw new UserNotLoginException();
-//        }
-//        List<GetChatRoomsDto> getChatRoomsDtos = new ArrayList<>();
+    public JSONObject getChatRoomsByPost(User loginUser, PostDto postDto){
+        if(loginUser ==null){
+            throw new UserNotLoginException();
+        }
+        List<GetChatRoomsDto> getChatRoomsDtos = new ArrayList<>();
+        List<UserChatRoom> userChatRooms = userChatRoomRepository.findUserChatRoomByIdFetchChatRoomWhereNotDisabled(loginUser.getId());
+        for(UserChatRoom userChatRoom :userChatRooms){
+            ChatRoom chatRoom = userChatRoom.getChatRoom();
+            if(chatRoom.getPostType().getName().equals(postDto.getPostType())){
+                GetChatRoomsDto getChatRoomsDto =
+                        GetChatRoomsDto.builder()
+                                .roomUuid(chatRoom.getRoomUuid())
+                                .roomName(userChatRoom.getRoomName())
+                                .image(userChatRoom.getImage())
+                                .univ(userChatRoom.getOpponentUserUniv())
+                                .latestMessage(userChatRoom.getLatestMessage())
+                                .latestMessageTime(userChatRoom.getLatestMessageTime())
+                                .build();
+                getChatRoomsDtos.add(getChatRoomsDto);
+            }
+        }
+        return PropertyUtil.response(getChatRoomsDtos);
+          // 포스트기반 찾기
 //        List<ChatRoom> chatRooms =null;
 //        if(postDto.getPostType().equals(PostType.WORK.name())){
 //            chatRooms = workService.getChatRoom(postDto.getPostId());
@@ -60,18 +80,22 @@ public class ChatRoomQueryService {
 //        for(ChatRoom chatRoom: chatRooms){
 //            Set<UserChatRoom> userChatRooms = chatRoom.getUserChatRooms();
 //            for(UserChatRoom userChatRoom : userChatRooms){
-//                if(userChatRoom.getUser().getId().equals()){
+//                if(!userChatRoom.getOpponentUserId().equals(loginUser.getId())){
+//                    //유저 채팅방의 상대방 id가 내 Id와 다르다면
+//                    GetChatRoomDto getChatRoomDto =null;
+//                    if(postDto.getPostType().equals(PostType.WORK.name())){
 //
+//                    }
+//                    if(postDto.getPostType().equals(PostType.PRODUCT.name())) {
+//
+//                    }
 //                }
 //            }
 //        }
-//    }
+    }
     public JSONObject getChatRooms(User user){
-        if(user ==null){
-            throw new UserNotLoginException();
-        }
         List<GetChatRoomsDto> chatRoomsDtos = userChatRoomRepository
-                .findUserChatRoomByIdFetchChatRoom(user.getId()).stream()
+                .findUserChatRoomByIdFetchChatRoomWhereNotDisabled(user.getId()).stream()
                 .map(
                         userChatRoom ->
                                 GetChatRoomsDto.builder()
@@ -132,6 +156,7 @@ public class ChatRoomQueryService {
 
     private GetChatRoomDto makeWorkChatRoomDto(UserChatRoom userChatRoom, ChatRoom chatRoom) {
         GetChatRoomDto getChatRoomDto = GetChatRoomDto.builder()
+                .userId(chatRoom.getPostUserId())
                 .roomName(userChatRoom.getRoomName())
                 .productId(chatRoom.getWork().getId())
                 .productName(chatRoom.getWork().getTitle())
@@ -145,6 +170,7 @@ public class ChatRoomQueryService {
 
     private GetChatRoomDto makeProductChatRoomDto(UserChatRoom userChatRoom, ChatRoom chatRoom) {
         GetChatRoomDto getChatRoomDto = GetChatRoomDto.builder()
+                .userId(chatRoom.getPostUserId())
                 .roomName(userChatRoom.getRoomName())
                 .productId(chatRoom.getProduct().getId())
                 .productName(chatRoom.getProduct().getTitle())
