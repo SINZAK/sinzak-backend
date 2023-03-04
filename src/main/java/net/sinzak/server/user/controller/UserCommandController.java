@@ -35,11 +35,18 @@ public class UserCommandController {
     }
 
     @ApiDocumentResponse
+    @ApiOperation(value = "회원가입", notes = "이미 존재하는 닉네임일때 -> success : false, message : 이미 존재하는 닉네임입니다.")
+    @PostMapping("/check/nickname")
+    public JSONObject checkNickName(@RequestBody NickNameDto nickNameDto) {
+        return userCommandService.checkNickName(nickNameDto.getNickName());
+    }
+
+    @ApiDocumentResponse
     @ApiOperation(value = "이메일 중복체크", notes = "이메일 중복 시 에는 하단과 같이 반환됩니다 false면 가입 불가능한 이메일인거로 생각하시면 됩니다 \n{\n" +
             "  \"success\": false,\n" +
             "  \"message\": \"이미 가입된 이메일입니다.\"\n" +
             "}")
-    @PostMapping("/checkemail")
+    @PostMapping("/check/email")
     public JSONObject checkEmail(@RequestBody EmailDto dto) {
         return securityService.checkEmail(dto);
     }

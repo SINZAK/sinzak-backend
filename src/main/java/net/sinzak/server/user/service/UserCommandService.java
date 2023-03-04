@@ -105,6 +105,12 @@ public class UserCommandService {
         return PropertyUtil.response(true);
     }
 
+    public JSONObject checkNickName(String nickName){
+        if(userRepository.findByNickName(nickName).isPresent())
+            return PropertyUtil.responseMessage("이미 존재하는 닉네임입니다.");
+        return PropertyUtil.response(true);
+    }
+
 
     public JSONObject report(ReportDto dto, User User){
         Long opponentUserId = dto.getUserId();
