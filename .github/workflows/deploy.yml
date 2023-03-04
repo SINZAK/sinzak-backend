@@ -28,6 +28,34 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
+      - name: make apple Login KEY
+        run: |
+          cd ./src/main/resources/static/apple
+          touch ./AuthKey_37QTX3F226.p8
+          echo "${{ secrets.APPLE_KEY }}" > ./AuthKey_37QTX3F226.p8
+        shell: bash
+
+      - name: make application-db.properties
+        run: |
+          cd ./src/main/resources
+          touch ./application-db.properties
+          echo "${{ secrets.DB_PROPERTIES }}" > ./application-db.properties
+        shell: bash
+
+      - name: make application-real.properties
+        run: |
+          cd ./src/main/resources
+          touch ./application-real.properties
+          echo "${{ secrets.REAL_PROPERTIES }}" > ./application-real.properties
+        shell: bash
+
+      - name: make application-oauth.properties
+        run: |
+          cd ./src/main/resources
+          touch ./application-oauth.properties
+          echo "${{ secrets.OAUTH_PROPERTIES }}" > ./application-oauth.properties
+        shell: bash
+
       - name: 🔧 Build Spring server
         run: |
           chmod +x ./gradlew
@@ -44,6 +72,18 @@ jobs:
           target: "/home/ec2-user/deploy"
           strip_components: 2
 
+#      - name: Execute Server Init Script
+#        uses: appleboy/ssh-action@master
+#        id: deploy-prod
+#        with:
+#          host: ${{ secrets.HOST_DEV }}
+#          username: ec2-user
+#          key: ${{ secrets.SSH_PEM_KEY }}
+#          passphrase: ${{ secrets.PASSPHRASE }}
+#          port: 22
+#          envs: GITHUB_SHA
+#          script: chmod +x /home/ec2-user/deploy/deploy.sh && sh /home/ec2-user/deploy/deploy.sh
+
       - name: Execute Server Init Script
         uses: appleboy/ssh-action@master
         id: deploy-prod
@@ -54,41 +94,12 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           port: 22
           envs: GITHUB_SHA
-          script: chmod +x /home/ec2-user/deploy/deploy.sh && sh /home/ec2-user/deploy/deploy.sh
-
-#      - name: Docker build & push to prod
-#        run: |
-#          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-#          docker build -t sis000512/docker-spring:1.0 .
-#          docker push sis000512/docker-spring:1.0
-    ## deploy to production
-#      - name: Deploy to prod
-#        uses: appleboy/ssh-action@master
-#        id: deploy-prod
-#        with:
-#            host: ${{ secrets.HOST_DEV }}
-#            username: ec2-user
-#            password: ${{ secrets.PRIVATE_KEY }}
-#            port: 22
-#            envs: GITHUB_SHA
-#            script: |
-#                whoami
-#                ls -al
-#                sudo docker rm -f $(docker ps -qa)
-#                sudo docker pull sis000512/docker-spring:1.0
-#                docker-compose up -d
-#                docker image prune -f
-
-  current-time:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get Current Time
-        uses: 1466587594/get-current-time@v2
-        id: current-time
-        with:
-          format: YYYY-MM-DDTHH:mm:ss
-          utcOffset: "+09:00"
-
-      - name: Print Current Time
-        run: echo "Current Time=${{steps.current-time.outputs.formattedTime}}"
-        shell: bash
+          script: |
+            cd deploy
+            docker container stop sinzak
+            docker container stop sinzak-web
+            docker build -t sinzak .
+            docker run -d --rm -p 8080:8080 --name sinzak sinzak
+#            cd front
+#            docker build -t sinzak-web .
+#            docker run -d --rm -it -p 3000:3000  --name sinzak-web sinzak-web

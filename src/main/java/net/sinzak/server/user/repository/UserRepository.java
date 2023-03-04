@@ -11,6 +11,9 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(@Param("email")String email);
 
+    @Query("select u from User u where u.nickName = :nickName")
+    Optional<User> findByNickName(@Param("nickName")String nickName);
+
     @Query("select u from User u left join fetch u.productWishList where u.id = :id")
     Optional<User> findByIdFetchProductWishList(@Param("id") Long id);
 

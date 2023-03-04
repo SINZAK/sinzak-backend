@@ -176,7 +176,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                 .height(product.getSize().height)
                 .trading(product.isTrading())
                 .complete(product.isComplete()).build();
-
+        if(user.getId().equals(product.getUser().getId()))
+            detailForm.setMyPost();
         boolean isLike = checkIsLikes(user.getProductLikesList(), product);
         boolean isWish = checkIsWish(user, product.getProductWishList());
         boolean isFollowing  = checkIsFollowing(user.getFollowingList(), product);
