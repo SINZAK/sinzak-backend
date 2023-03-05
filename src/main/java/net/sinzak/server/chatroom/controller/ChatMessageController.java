@@ -9,6 +9,7 @@ import net.sinzak.server.chatroom.dto.request.ChatMessageDto;
 import net.sinzak.server.chatroom.dto.request.ChatRoomUuidDto;
 import net.sinzak.server.chatroom.service.ChatMessageService;
 import net.sinzak.server.user.domain.User;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -44,9 +45,9 @@ public class ChatMessageController {
         chatMessageService.sendChatMessage(chatMessageDto);
     }
 
-    @MessageMapping(value = "/chat/room/{uuid}/leave")
-    public void leave(@AuthenticationPrincipal User user, @PathVariable("uuid") String roomUuid){
-        chatMessageService.leaveChatRoom(user,roomUuid);
+    @MessageMapping(value = "/chat/leave")
+    public void leave(ChatMessageDto chatMessageDto){
+        chatMessageService.leaveChatRoom(chatMessageDto);
     }
 
 //    @GetMapping("/getChatMessage")

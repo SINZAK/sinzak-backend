@@ -30,13 +30,16 @@ public class FireBaseService {
                 .putData("route",route)
                 .build();
         try{
-            String response = FirebaseMessaging.getInstance().send(message);
+            FirebaseMessaging.getInstance().sendAsync(message);
         }
         catch (Exception e){
-            log.warn(e.getMessage());
+            e.printStackTrace();
 
             log.warn("알림 전송에 실패하였습니다.");
         }
+    }
+    public String getToken(){
+        FirebaseMessaging.getInstance().t
     }
     public void sendToAllNotification(List<String> tokenList,String title, String body, String route){
         List<Message> messages = tokenList.stream().map(token->Message.builder()

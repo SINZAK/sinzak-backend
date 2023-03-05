@@ -84,26 +84,26 @@ public class ChatMessageService {
     }
 
     @Transactional
-    public void leaveChatRoom(User user, String roomUuid){
-        log.info(roomUuid+":uuid");
-        ChatRoom findChatroom = chatRoomRepository.findByRoomUuidFetchUserChatRoom(roomUuid)
+    public void leaveChatRoom(ChatMessageDto chatMessageDto){
+        log.info(chatMessageDto.getRoomId()+":uuid");
+        ChatRoom findChatroom = chatRoomRepository.findByRoomUuidFetchUserChatRoom(chatMessageDto.getRoomId())
                 .orElseThrow(()->new ChatRoomNotFoundException());
-        UserChatRoom userChatRoom = findChatroom.leaveChatRoom(user.getId());
+        UserChatRoom userChatRoom = findChatroom.leaveChatRoom(chatMessageDto.getSenderId());
         if(userChatRoom == null){
             throw new ChatRoomNotFoundException();
         }
         deleteChatRoom(findChatroom);
-        addLeaveChatMessageToChatRoom(user, findChatroom);
-        GetChatMessageDto getChatMessageDto = makeLeaveChatMessageDto(user);
-        template.convertAndSend("/sub/chat/rooms/"+roomUuid,getChatMessageDto);
+        addLeaveChatMessageToChatRoom(chatMessageDto, findChatroom);
+        GetChatMessageDto getChatMessageDto = makeLeaveChatMessageDto(chatMessageDto);
+        template.convertAndSend("/sub/chat/rooms/"+chatMessageDto.getRoomId(),getChatMessageDto);
         return;
     }
 
 
-    private GetChatMessageDto makeLeaveChatMessageDto(User user) {
+    private GetChatMessageDto makeLeaveChatMessageDto(ChatMessageDto chatMessageDto) {
         GetChatMessageDto getChatMessageDto = GetChatMessageDto.builder()
                 .message("님이 채팅방을 나가셨습니다")
-                .senderName(user.getName())
+                .senderName(chatMessageDto.getSenderName())
                 .sendAt(LocalDateTime.now())
                 .messageType(MessageType.LEAVE.name())
                 .build();
@@ -120,11 +120,11 @@ public class ChatMessageService {
     }
 
 
-    private void addLeaveChatMessageToChatRoom(User user, ChatRoom findChatroom) {
+    private void addLeaveChatMessageToChatRoom(ChatMessageDto chatMessageDto, ChatRoom findChatroom) {
         ChatMessage leaveChatMessage = ChatMessage.builder()
-                .message(user.getName()+"님이 채팅방을 나가셨습니다")
-                .senderName(user.getName())
-                .senderId(user.getId())
+                .message(chatMessageDto.getSenderName()+"님이 채팅방을 나가셨습니다")
+                .senderName(chatMessageDto.getSenderName())
+                .senderId(chatMessageDto.getSenderId())
                 .type(MessageType.LEAVE)
                 .build();
 //        chatMessageRepository.save(leaveChatMessage);
