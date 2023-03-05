@@ -119,7 +119,9 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.fcmToken = fcmToken;
     }
 
-    private String fcmToken;
+    @Column
+    private String fcmToken ="";
+    @Column
     private boolean alarmReceive;
 
     @ElementCollection
