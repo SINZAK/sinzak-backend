@@ -47,6 +47,7 @@ public class ChatMessageController {
 
     @MessageMapping(value = "/chat/leave")
     public void leave(ChatMessageDto chatMessageDto){
+        log.info("채팅방 나가기"+chatMessageDto.getRoomId());
         chatMessageService.leaveChatRoom(chatMessageDto);
     }
 
