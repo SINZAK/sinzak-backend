@@ -112,6 +112,22 @@ public class UserCommandController {
         return userCommandService.report(reportDto, user);
     }
 
+    @ApiDocumentResponse
+    @ApiOperation(value = "신고 취소하기", notes = "userId만 제대로 주시면 응답합니다. (reason은 생략)")
+    @PostMapping(value = "/users/report/cancel")
+    public JSONObject reportCancel(@RequestBody ReportDto reportDto, @AuthenticationPrincipal User user){
+        PropertyUtil.checkHeader(user);
+        return userCommandService.reportCancel(reportDto, user);
+    }
+
+    @ApiDocumentResponse
+    @ApiOperation(value = "신고 목록 출력")
+    @PostMapping(value = "/users/reportlist")
+    public JSONObject reportList(@AuthenticationPrincipal User user){
+        PropertyUtil.checkHeader(user);
+        return userCommandService.showReportList(user);
+    }
+
     @ApiOperation(value = "검색기록 삭제", notes = "Post인 것에 유의하고 같은 url을 사용하려고 합니다. 해당 기록의 id를 주시면 삭제합니다.")
     @PostMapping(value = "/users/history")
     public JSONObject deleteHistory(@RequestBody IdDto idDto, @AuthenticationPrincipal User user) {
