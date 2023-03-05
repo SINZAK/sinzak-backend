@@ -119,7 +119,6 @@ public class ChatRoomQueryService {
                 .map(
                 chatMessage -> GetChatMessageDto.builder()
                         .senderName(chatMessage.getSenderName())
-                        .messageId(chatMessage.getId())
                         .sendAt(chatMessage.getCreatedDate())
                         .message(chatMessage.getMessage())
                         .senderId(chatMessage.getSenderId())

@@ -28,7 +28,6 @@ public class FireBaseService {
                 .build();
         try{
             String response = FirebaseMessaging.getInstance().send(message);
-
         }
         catch (Exception e){
             log.warn("알림 전송에 실패하였습니다.");

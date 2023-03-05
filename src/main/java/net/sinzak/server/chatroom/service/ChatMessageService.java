@@ -19,6 +19,7 @@ import net.sinzak.server.chatroom.repository.ChatMessageRepository;
 import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.repository.UserChatRoomRepository;
 import net.sinzak.server.common.error.ChatRoomNotFoundException;
+import net.sinzak.server.firebase.FireBaseService;
 import net.sinzak.server.user.domain.User;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ public class ChatMessageService {
     private final UserChatRoomRepository userChatRoomRepository;
     private final SimpMessagingTemplate template;
     private final ChatMessageRepository chatMessageRepository;
-
+    private final FireBaseService fireBaseService;
     public static final String COLLECTION_NAME="chatMessage";
 
 //    public JSONObject createChatMessage(ChatMessageDto chatMessageDto) throws Exception{
@@ -45,7 +46,7 @@ public class ChatMessageService {
 //    }
 
     @Transactional
-    public void sendChatMessage(ChatMessageDto message){
+    public void sendChatMessage(ChatMessageDto message,User user){
         ChatRoom findChatRoom =
                 chatRoomRepository
                         .findByRoomUuidFetchChatMessage(message.getRoomId())
@@ -55,16 +56,15 @@ public class ChatMessageService {
             return;
         }
         ChatMessage newChatMessage = addChatMessageToChatRoom(message, findChatRoom);
-        GetChatMessageDto getChatMessageDto = makeMessageDto(message, newChatMessage);
+        GetChatMessageDto getChatMessageDto = makeMessageDto(message);
         template.convertAndSend("/sub/chat/rooms/"+message.getRoomId(),getChatMessageDto);
     }
-    private GetChatMessageDto makeMessageDto(ChatMessageDto message, ChatMessage newChatMessage) {
+    private GetChatMessageDto makeMessageDto(ChatMessageDto message) {
         GetChatMessageDto getChatMessageDto = GetChatMessageDto.builder()
                 .message(message.getMessage())
-                .messageId(newChatMessage.getId())
                 .senderId(message.getSenderId())
                 .senderName(message.getSenderName())
-                .sendAt(newChatMessage.getCreatedDate())
+                .sendAt(LocalDateTime.now())
                 .messageType(message.getMessageType().name())
                 .build();
         return getChatMessageDto;

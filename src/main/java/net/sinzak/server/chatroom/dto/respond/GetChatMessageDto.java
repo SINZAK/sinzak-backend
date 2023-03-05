@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class GetChatMessageDto {
     private Long senderId;
-    private Long messageId;
     private String message;
     private String senderName;
     private LocalDateTime sendAt;

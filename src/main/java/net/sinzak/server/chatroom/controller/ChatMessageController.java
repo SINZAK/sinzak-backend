@@ -37,9 +37,9 @@ public class ChatMessageController {
 //        template.convertAndSend("/sub/chat/rooms/"+chatMessage.getRoomUuid(),chatMessageDto);
 //    }
     @MessageMapping(value ="/chat/message")
-    public void message(ChatMessageDto chatMessageDto){
+    public void message(@AuthenticationPrincipal User user,ChatMessageDto chatMessageDto){
         log.info("메시지 구독"+chatMessageDto.getRoomId());
-        chatMessageService.sendChatMessage(chatMessageDto);
+        chatMessageService.sendChatMessage(chatMessageDto,user);
     }
 
     @MessageMapping(value = "/chat/room/{uuid}/leave")
