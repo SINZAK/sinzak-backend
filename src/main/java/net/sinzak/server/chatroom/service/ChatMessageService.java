@@ -46,7 +46,7 @@ public class ChatMessageService {
 //    }
 
     @Transactional
-    public void sendChatMessage(ChatMessageDto message,User user){
+    public void sendChatMessage(ChatMessageDto message){
         ChatRoom findChatRoom =
                 chatRoomRepository
                         .findByRoomUuidFetchChatMessage(message.getRoomId())
@@ -55,7 +55,8 @@ public class ChatMessageService {
             //차단 되어있거나 한 명이 나간 상태라면 보내지 않음
             return;
         }
-        ChatMessage newChatMessage = addChatMessageToChatRoom(message, findChatRoom);
+        User opponentUser = addChatMessageToChatRoom(message, findChatRoom);
+        fireBaseService.sendIndividualNotification(opponentUser,"채팅 알림",message.getSenderName()+": "+message.getMessage(),message.getRoomId()); // 메시지 이동 루트를 보내줌
         GetChatMessageDto getChatMessageDto = makeMessageDto(message);
         template.convertAndSend("/sub/chat/rooms/"+message.getRoomId(),getChatMessageDto);
     }
@@ -70,16 +71,16 @@ public class ChatMessageService {
         return getChatMessageDto;
     }
 
-    private ChatMessage addChatMessageToChatRoom(ChatMessageDto message, ChatRoom findChatRoom) {
+    private User addChatMessageToChatRoom(ChatMessageDto message, ChatRoom findChatRoom) {
         ChatMessage newChatMessage = ChatMessage.builder()
                 .message(message.getMessage())
                 .type(message.getMessageType())
                 .senderName(message.getSenderName())
                 .senderId(message.getSenderId())
                 .build();
-        findChatRoom.addChatMessage(newChatMessage);
 //        chatMessageRepository.save(newChatMessage);
-        return newChatMessage;
+        User opponentUser = findChatRoom.addChatMessage(newChatMessage);
+        return opponentUser;
     }
 
     @Transactional
