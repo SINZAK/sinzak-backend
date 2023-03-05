@@ -80,7 +80,13 @@ public class User extends BaseTimeEntity implements UserDetails {
     private int popularity=0;  //'지금 뜨는 아티스트' 때문에 만듦
 
     @Column
-    private String origin; //무슨 로그인인지
+    private String origin;
+
+    @Column
+    private boolean alarm_receive;
+
+    @Column
+    private String fcm_token=""; //무슨 로그인인지
 
     @Enumerated(EnumType.STRING)
     private Role role;
