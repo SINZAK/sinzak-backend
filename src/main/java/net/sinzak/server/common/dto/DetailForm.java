@@ -1,11 +1,7 @@
 package net.sinzak.server.common.dto;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Builder;
 import lombok.Getter;
-import net.sinzak.server.user.domain.embed.Size;
-
-import javax.persistence.*;
 import java.util.List;
 
 @Getter
