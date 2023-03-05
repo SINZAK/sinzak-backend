@@ -85,7 +85,7 @@ public class ChatMessageService {
 
     @Transactional
     public void leaveChatRoom(User user, String roomUuid){
-        log.info(roomUuid);
+        log.info(roomUuid+":uuid");
         ChatRoom findChatroom = chatRoomRepository.findByRoomUuidFetchUserChatRoom(roomUuid)
                 .orElseThrow(()->new ChatRoomNotFoundException());
         UserChatRoom userChatRoom = findChatroom.leaveChatRoom(user.getId());

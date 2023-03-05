@@ -1,6 +1,7 @@
 package net.sinzak.server.chatroom.controller;
 
 
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.chatroom.domain.ChatMessage;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Api(tags = "채팅-메시지")
 @Controller
 @RequiredArgsConstructor
 @Slf4j
@@ -37,7 +39,7 @@ public class ChatMessageController {
 //        template.convertAndSend("/sub/chat/rooms/"+chatMessage.getRoomUuid(),chatMessageDto);
 //    }
     @MessageMapping(value ="/chat/message")
-    public void message(@AuthenticationPrincipal User user,ChatMessageDto chatMessageDto){
+    public void message(ChatMessageDto chatMessageDto){
         log.info("메시지 구독"+chatMessageDto.getRoomId());
         chatMessageService.sendChatMessage(chatMessageDto);
     }
