@@ -23,6 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -117,7 +119,7 @@ public class UserCommandService {
         User loginUser = userRepository.findByIdFetchReportList(User.getId()).orElseThrow(UserNotFoundException::new);
         if(loginUser.getId().equals(opponentUserId))
             return PropertyUtil.responseMessage("본인을 신고할 수 없습니다.");
-        if(checkAlreadyReport(opponentUserId, loginUser))
+        if(checkReportHistory(opponentUserId, loginUser).isPresent())
             return PropertyUtil.responseMessage("이미 신고한 회원입니다.");
         User opponentUser = userRepository.findById(opponentUserId).orElseThrow(UserNotFoundException::new);
         chatRoomCommandService.makeChatRoomBlocked(loginUser,opponentUser);
@@ -126,12 +128,29 @@ public class UserCommandService {
         return PropertyUtil.response(true);
     }
 
-    private boolean checkAlreadyReport(Long id, User loginUser) {
+    public JSONObject reportCancel(ReportDto dto, User User){
+        Long opponentUserId = dto.getUserId();
+        User loginUser = userRepository.findByIdFetchReportList(User.getId()).orElseThrow(UserNotFoundException::new);
+        if(loginUser.getId().equals(opponentUserId))
+            return PropertyUtil.responseMessage("본인을 신고 취소 할 수 없습니다.");
+        Report report = checkReportHistory(opponentUserId, loginUser).orElseThrow(InstanceNotFoundException::new);
+        User opponentUser = userRepository.findById(opponentUserId).orElseThrow(UserNotFoundException::new);
+        chatRoomCommandService.makeChatRoomBlocked(loginUser,opponentUser);
+        reportRepository.delete(report);
+        return PropertyUtil.response(true);
+    }
+
+    private Optional<Report> checkReportHistory(Long id, User loginUser) {
         for (Report report : loginUser.getReportList()) {
             if(report.getOpponentUser().getId().equals(id))
-                return true;
+                return Optional.of(report);
         }
-        return false;
+        return Optional.empty();
+    }
+
+    public JSONObject showReportList(User User){
+        User loginUser = userRepository.findByIdFetchReportList(User.getId()).orElseThrow(UserNotFoundException::new);
+        return PropertyUtil.response(loginUser.getReportList());
     }
 
     @Transactional

@@ -25,7 +25,7 @@ public class RestControllerAdvisor {
     @ExceptionHandler(InstanceNotFoundException.class)
     @ResponseStatus(HttpStatus.OK)
     protected JSONObject handleInstanceNotFoundException() {
-        return PropertyUtil.responseMessage("존재하지 않는 객체입니다.");
+        return PropertyUtil.responseMessage("이미 완료된 요청이거나, 존재하지 않는 객체입니다.");
     }
 
     @ExceptionHandler(ChatRoomNotFoundException.class)
