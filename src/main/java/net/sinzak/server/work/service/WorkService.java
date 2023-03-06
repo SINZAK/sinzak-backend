@@ -144,7 +144,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         Work work = workRepository.findByIdFetchChatRooms(workId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(work.getUser().getId()))
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
-        deleteImagesInPost(work);
+//        deleteImagesInPost(work);
         work.divideChatRoom();
         workRepository.delete(work);
         return PropertyUtil.response(true);

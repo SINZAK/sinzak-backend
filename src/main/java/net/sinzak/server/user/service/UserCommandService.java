@@ -46,7 +46,7 @@ public class UserCommandService {
     }
 
     public JSONObject updateUser(UpdateUserDto dto, User loginUser){
-        Optional<User> duplicateNameUser = userRepository.findByNickName(dto.getName());
+        Optional<User> duplicateNameUser = userRepository.findByNickNameExceptOriginalNickName(dto.getName(),loginUser.getNickName());
         if(duplicateNameUser.isPresent()){
             return PropertyUtil.responseMessage("이미 가입된 닉네임입니다");
         }
