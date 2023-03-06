@@ -42,7 +42,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     private String name;
 
     @Column
-    private String nickName=""; //얘는 안 쓸 수도있음
+    private String nickName="";
 
     @Column
     @Setter
@@ -160,6 +160,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     public User(String email, String name, String picture, String origin) {
         this.email = email;
         this.name = name;
+        this.nickName = name;
         this.picture = picture;
         this.origin = origin;
         this.categoryLike = "";
@@ -180,7 +181,7 @@ public class User extends BaseTimeEntity implements UserDetails {
 
 
     public User update(String name, String introduction){
-        this.name =name;
+        this.nickName =name;
 
         this.introduction = introduction;
         return this;

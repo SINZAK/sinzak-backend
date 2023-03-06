@@ -141,10 +141,11 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     @Transactional(rollbackFor = {Exception.class})
     public JSONObject deletePost(User User, Long workId){   // 글 생성
         User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
-        Work work = workRepository.findById(workId).orElseThrow(PostNotFoundException::new);
+        Work work = workRepository.findByIdFetchChatRooms(workId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(work.getUser().getId()))
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
         deleteImagesInPost(work);
+        work.divideChatRoom();
         workRepository.delete(work);
         return PropertyUtil.response(true);
     }
