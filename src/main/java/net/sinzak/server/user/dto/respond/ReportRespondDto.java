@@ -3,6 +3,7 @@ package net.sinzak.server.user.dto.respond;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @NoArgsConstructor
 public class ReportRespondDto {
     private Long userId;
