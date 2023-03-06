@@ -85,7 +85,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     private boolean alarm_receive;
 
     @Column
-    private String fcm_token=""; //무슨 로그인인지
+    private String fcm_token="";
 
     @Enumerated(EnumType.STRING)
     private Role role;
