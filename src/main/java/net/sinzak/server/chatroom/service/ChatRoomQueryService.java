@@ -141,10 +141,16 @@ public class ChatRoomQueryService {
             if(userChatRoom.getChatRoom().getRoomUuid().equals(roomUuid)){
                 ChatRoom chatRoom = userChatRoom.getChatRoom();
                 if(chatRoom.getPostType().equals(PostType.PRODUCT)){
+                    if(chatRoom.getProduct()==null){
+                        return PropertyUtil.response("삭제된 게시글입니다");
+                    }
                     GetChatRoomDto getChatRoomDto = makeProductChatRoomDto(userChatRoom, chatRoom);
                     return PropertyUtil.response(getChatRoomDto);
                 }
                 if(chatRoom.getPostType().equals(PostType.WORK)){
+                    if(chatRoom.getWork()==null){
+                        return PropertyUtil.response("삭제된 게시글입니다");
+                    }
                     GetChatRoomDto getChatRoomDto = makeWorkChatRoomDto(userChatRoom, chatRoom);
                     return PropertyUtil.response(getChatRoomDto);
                 }
@@ -154,6 +160,9 @@ public class ChatRoomQueryService {
     }
 
     private GetChatRoomDto makeWorkChatRoomDto(UserChatRoom userChatRoom, ChatRoom chatRoom) {
+        if(chatRoom.getWork()==null){
+
+        }
         GetChatRoomDto getChatRoomDto = GetChatRoomDto.builder()
                 .userId(chatRoom.getPostUserId())
                 .roomName(userChatRoom.getRoomName())

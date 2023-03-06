@@ -121,6 +121,11 @@ public class Work extends BaseTimeEntity { /** 외주 **/
         this.chatRooms.add(chatRoom);
         this.chatCnt++;
     }
+    public void divideChatRoom(){
+        for(ChatRoom chatRoom :this.getChatRooms()){
+            chatRoom.setWork(null);
+        }
+    }
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
     }

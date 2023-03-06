@@ -122,6 +122,11 @@ public class Product extends BaseTimeEntity { /** 작품 **/
         this.chatRooms.add(chatRoom);
         this.chatCnt++;
     }
+    public void divideChatRoom(){
+        for(ChatRoom chatRoom :this.getChatRooms()){
+            chatRoom.setProduct(null);
+        }
+    }
     public void addImage(ProductImage image) {
         this.getImages().add(image);
     }
