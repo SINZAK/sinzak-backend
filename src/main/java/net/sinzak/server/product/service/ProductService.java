@@ -23,6 +23,7 @@ import org.json.simple.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -214,11 +215,16 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     public boolean checkIsFollowing(Set<Long> userFollowingList, Product product) {
         boolean isFollowing = false;
-        for (Long followingId : userFollowingList) {
-            if(product.getUser().getId().equals(followingId)){
-                isFollowing = true;
-                break;
+        try{
+            for (Long followingId : userFollowingList) {
+                if(product.getUser().getId().equals(followingId)){
+                    isFollowing = true;
+                    break;
+                }
             }
+        }
+        catch (EntityNotFoundException e){
+            return false;
         }
         return isFollowing;
     }
