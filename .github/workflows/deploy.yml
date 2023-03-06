@@ -55,6 +55,13 @@ jobs:
           touch ./application-oauth.properties
           echo "${{ secrets.OAUTH_PROPERTIES }}" > ./application-oauth.properties
         shell: bash
+        
+      - name: make firebaseAccountKey.json
+        run: |
+          cd ./src/main/resources
+          touch ./fireBaseAccountKey.json
+          echo "${{ secrets.FIREBASEKEY }}" > ./application-real.properties
+        shell: bash
 
       - name: 🔧 Build Spring server
         run: |
