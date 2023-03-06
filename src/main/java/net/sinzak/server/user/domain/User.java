@@ -1,6 +1,5 @@
 package net.sinzak.server.user.domain;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -115,14 +114,14 @@ public class User extends BaseTimeEntity implements UserDetails {
     @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<SearchHistory> historyList = new HashSet<>();
 
-    public void setFcmToken(String fcmToken) {
-        this.fcmToken = fcmToken;
+    public void setFcm(String fcmToken) {
+        this.fcm = fcmToken;
     }
 
     @Column
-    private String fcmToken ="";
-    @Column
-    private boolean alarmReceive;
+    private String fcm ="";
+//    @Column
+//    private boolean alarm_receive;
 
     @ElementCollection
     @CollectionTable(name = "FOLLOWING_LIST", joinColumns = @JoinColumn(name = "user_id"))
@@ -160,12 +159,12 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.categoryLike = "";
         this.roles = Collections.singletonList("ROLE_USER");
         this.role = Role.GUEST;
-        this.alarmReceive = false;
+//        this.alarm_receive = false;
     }
 
-    public void setAlarmReceive(boolean receive){
-        this.alarmReceive = receive;
-    }
+//    public void setAlarm_receive(boolean receive){
+//        this.alarm_receive = receive;
+//    }
 
 
     public void saveJoinInfo(String nickName, String categoryLike) {
