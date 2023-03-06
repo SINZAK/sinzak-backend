@@ -60,7 +60,7 @@ jobs:
         run: |
           cd ./src/main/resources
           touch ./fireBaseAccountKey.json
-          echo "${{ secrets.FIREBASEKEY }}" > ./application-real.properties
+          echo "${{ secrets.FIREBASEKEY }}" > ./fireBaseAccountKey.json
         shell: bash
 
       - name: 🔧 Build Spring server
