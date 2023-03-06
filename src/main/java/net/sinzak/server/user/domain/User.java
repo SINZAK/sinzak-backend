@@ -120,12 +120,12 @@ public class User extends BaseTimeEntity implements UserDetails {
     @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<SearchHistory> historyList = new HashSet<>();
 
-    public void setFcmToken(String fcmToken) {
-        this.fcmToken = fcmToken;
+    public void setFcm(String fcmToken) {
+        this.fcm = fcmToken;
     }
 
     @Column
-    private String fcmToken ="";
+    private String fcm ="";
 //    @Column
 //    private boolean alarm_receive;
 

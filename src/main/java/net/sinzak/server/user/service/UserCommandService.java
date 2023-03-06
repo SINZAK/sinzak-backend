@@ -70,7 +70,7 @@ public class UserCommandService {
     }
     public JSONObject setToken(FcmDto fcmDto){
         User loginUser = userRepository.findById(fcmDto.getUserId()).orElseThrow(UserNotFoundException::new);
-        loginUser.setFcmToken(fcmDto.getFcmToken());
+        loginUser.setFcm(fcmDto.getFcmToken());
         return PropertyUtil.response(true);
     }
 

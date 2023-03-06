@@ -20,13 +20,13 @@ import java.util.stream.Collectors;
 public class FireBaseService {
 
     public void sendIndividualNotification(User user, String title, String body, String route){
-        if(user.getFcmToken().equals("")){ //로그아웃 한 상태라면
+        if(user.getFcm().equals("")){ //로그아웃 한 상태라면
             return;
         }
         Notification notification = new Notification(title,body);
         Message message = Message.builder()
                 .setNotification(notification)
-                .setToken(user.getFcmToken())
+                .setToken(user.getFcm())
                 .putData("route",route)
                 .build();
         try{
