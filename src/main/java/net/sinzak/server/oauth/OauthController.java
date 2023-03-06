@@ -158,17 +158,18 @@ public class OauthController {
 
     @ApiOperation(value = "리액트용 구글 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
     @GetMapping(value = "/web/google")
-    public JSONObject oauthWebGoogle(@RequestParam(value = "url") String url) throws Exception {
-        JSONObject obj = getWebGoogleURL(url);
+    public JSONObject oauthWebGoogle(@RequestParam(value = "code") String code, @RequestParam(value = "redirect_uri") String redirect_uri) throws Exception {
+        JSONObject obj = getWebGoogleURL(redirect_uri,code);
         log.warn("액세스토큰 = {}",obj.get("access_token").toString());
         return obj;
     }
 
-    private JSONObject getWebGoogleURL(String URL) throws IOException, ParseException {
+    private JSONObject getWebGoogleURL(String redirect_uri, String code) throws IOException, ParseException {
         String url = "https://oauth2.googleapis.com/token"
                 + "?client_id=782966145872-6shnmrvqi0q4sihr8etu9nrvh9jv43dh.apps.googleusercontent.com"
-                + "&client_secret=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" + "&grant_type=authorization_code&"
-                + URL;
+                + "&client_secret=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" + "&grant_type=authorization_code"
+                + "&redirect_uri="+redirect_uri
+                + "&code="+code;
         Request.Builder builder = new Request.Builder().header("Content-type", " application/x-www-form-urlencoded")
                 .url(url);
         JSONObject postObj = new JSONObject();
