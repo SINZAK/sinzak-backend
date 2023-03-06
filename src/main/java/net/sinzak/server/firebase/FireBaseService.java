@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 public class FireBaseService {
 
     public void sendIndividualNotification(User user, String title, String body, String route){
+
         if( user.getFcm() ==null || user.getFcm().equals("")){ //로그아웃 한 상태라면
             return;
         }
