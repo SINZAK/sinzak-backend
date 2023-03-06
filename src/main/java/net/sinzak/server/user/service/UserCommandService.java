@@ -131,7 +131,7 @@ public class UserCommandService {
         if(checkReportHistory(opponentUserId, loginUser).isPresent())
             return PropertyUtil.responseMessage("이미 신고한 회원입니다.");
         User opponentUser = userRepository.findById(opponentUserId).orElseThrow(UserNotFoundException::new);
-        chatRoomCommandService.makeChatRoomBlocked(loginUser,opponentUser);
+        chatRoomCommandService.makeChatRoomBlocked(loginUser,opponentUser,true);
         Report connect = Report.createConnect(loginUser, opponentUser);
         reportRepository.save(connect);
         return PropertyUtil.response(true);
@@ -144,7 +144,7 @@ public class UserCommandService {
             return PropertyUtil.responseMessage("본인을 신고 취소 할 수 없습니다.");
         Report report = checkReportHistory(opponentUserId, loginUser).orElseThrow(InstanceNotFoundException::new);
         User opponentUser = userRepository.findById(opponentUserId).orElseThrow(UserNotFoundException::new);
-        chatRoomCommandService.makeChatRoomBlocked(loginUser,opponentUser);
+        chatRoomCommandService.makeChatRoomBlocked(loginUser,opponentUser,false);
         reportRepository.delete(report);
         return PropertyUtil.response(true);
     }
