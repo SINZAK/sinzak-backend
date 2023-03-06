@@ -11,10 +11,11 @@ import net.sinzak.server.user.domain.Report;
 import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.user.dto.request.CategoryDto;
 import net.sinzak.server.user.dto.request.FcmDto;
-import net.sinzak.server.user.dto.request.ReportDto;
+import net.sinzak.server.user.dto.request.ReportRequestDto;
 import net.sinzak.server.user.dto.request.UpdateUserDto;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.common.error.UserNotFoundException;
+import net.sinzak.server.user.dto.respond.ReportRespondDto;
 import net.sinzak.server.user.repository.ReportRepository;
 
 import net.sinzak.server.user.repository.SearchHistoryRepository;
@@ -25,6 +26,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -37,6 +40,7 @@ public class UserCommandService {
     private final ChatRoomCommandService chatRoomCommandService;
     private final S3Service s3Service;
     private final FireBaseService fireBaseService;
+
     public User saveTempUser(User user){
         return userRepository.save(user);
     }
@@ -105,6 +109,7 @@ public class UserCommandService {
         findUser.updateFollowNumber();
         return PropertyUtil.response(true);
     }
+
     public JSONObject addFollow(User findUser, User loginUser){
         User user = userRepository.findByIdFetchFollowingList(loginUser.getId()).orElseThrow(UserNotFoundException::new);
         user.getFollowingList().add(findUser.getId());
@@ -116,6 +121,7 @@ public class UserCommandService {
         return PropertyUtil.response(true);
     }
 
+    @Transactional(readOnly = true)
     public JSONObject checkNickName(String nickName){
         if(userRepository.findByNickName(nickName).isPresent())
             return PropertyUtil.responseMessage("이미 존재하는 닉네임입니다.");
@@ -123,7 +129,7 @@ public class UserCommandService {
     }
 
 
-    public JSONObject report(ReportDto dto, User User){
+    public JSONObject report(ReportRequestDto dto, User User){
         Long opponentUserId = dto.getUserId();
         User loginUser = userRepository.findByIdFetchReportList(User.getId()).orElseThrow(UserNotFoundException::new);
         if(loginUser.getId().equals(opponentUserId))
@@ -137,7 +143,7 @@ public class UserCommandService {
         return PropertyUtil.response(true);
     }
 
-    public JSONObject reportCancel(ReportDto dto, User User){
+    public JSONObject reportCancel(ReportRequestDto dto, User User){
         Long opponentUserId = dto.getUserId();
         User loginUser = userRepository.findByIdFetchReportList(User.getId()).orElseThrow(UserNotFoundException::new);
         if(loginUser.getId().equals(opponentUserId))
@@ -157,12 +163,17 @@ public class UserCommandService {
         return Optional.empty();
     }
 
+    @Transactional(readOnly = true)
     public JSONObject showReportList(User User){
         User loginUser = userRepository.findByIdFetchReportList(User.getId()).orElseThrow(UserNotFoundException::new);
-        return PropertyUtil.response(loginUser.getReportList());
+        List<Report> reportList = loginUser.getReportList();
+        List<ReportRespondDto> reportRespondDtos = new ArrayList<>();
+        for (Report report : reportList)
+            reportRespondDtos.add(new ReportRespondDto(report.getOpponentUser().getId(), report.getOpponentUser().getNickName(), report.getOpponentUser().getPicture()));
+
+        return PropertyUtil.response(reportRespondDtos);
     }
 
-    @Transactional
     public JSONObject deleteSearchHistory(Long id, User User){
         User user = historyRepository.findByEmailFetchHistoryList(User.getEmail()).orElseThrow(InstanceNotFoundException::new);
         for (SearchHistory history : user.getHistoryList()) {
@@ -172,7 +183,6 @@ public class UserCommandService {
         return PropertyUtil.response(true);
     }
 
-    @Transactional
     public JSONObject deleteSearchHistory(User User){
         User user = historyRepository.findByEmailFetchHistoryList(User.getEmail()).orElseThrow(InstanceNotFoundException::new);
         historyRepository.deleteAll(user.getHistoryList());
