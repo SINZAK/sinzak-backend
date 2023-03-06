@@ -46,9 +46,11 @@ public class UserCommandService {
     }
 
     public JSONObject updateUser(UpdateUserDto dto, User loginUser){
-        if(loginUser ==null){
-            return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
+        Optional<User> duplicateNameUser = userRepository.findByNickName(dto.getName());
+        if(duplicateNameUser.isPresent()){
+            return PropertyUtil.responseMessage("이미 가입된 닉네임입니다");
         }
+        PropertyUtil.checkHeader(loginUser);
         User user = userRepository.findById(loginUser.getId()).orElseThrow(UserNotFoundException::new);
         user.update(dto.getName(),dto.getIntroduction());
         return PropertyUtil.response(true);

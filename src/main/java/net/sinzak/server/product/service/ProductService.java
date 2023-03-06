@@ -138,7 +138,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         Product product = productRepository.findByIdFetchChatRooms(productId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(product.getUser().getId()))
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
-        deleteImagesInPost(product);
+//        deleteImagesInPost(product);
         product.divideChatRoom();
         productRepository.delete(product);
         return PropertyUtil.response(true);
