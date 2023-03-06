@@ -176,7 +176,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
             detailForm.setUserInfo(product.getUser().getId(), product.getUser().getPicture(), product.getUser().getUniv(), product.getUser().isCert_uni(), product.getUser().isCert_celeb(), product.getUser().getFollowerNum());
         }
         catch(EntityNotFoundException e) {
-            detailForm.setUserInfo(product.getUser().getId(), null, "??", false, false, "0");
+            detailForm.setUserInfo(null, null, "??", false, false, "0");
         }
         if(user.getId().equals(product.getUser().getId()))
             detailForm.setMyPost();
