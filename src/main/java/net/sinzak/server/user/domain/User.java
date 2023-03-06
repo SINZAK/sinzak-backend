@@ -121,6 +121,14 @@ public class User extends BaseTimeEntity implements UserDetails {
     @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<SearchHistory> historyList = new HashSet<>();
 
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
+
+    @Column
+    private String fcmToken ="";
+    @Column
+    private boolean alarmReceive;
 
     @ElementCollection
     @CollectionTable(name = "FOLLOWING_LIST", joinColumns = @JoinColumn(name = "user_id"))
@@ -147,6 +155,8 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.role = Role.GUEST;
     }
 
+
+
     @Builder
     public User(String email, String name, String picture, String origin) {
         this.email = email;
@@ -156,6 +166,11 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.categoryLike = "";
         this.roles = Collections.singletonList("ROLE_USER");
         this.role = Role.GUEST;
+        this.alarmReceive = false;
+    }
+
+    public void setAlarmReceive(boolean receive){
+        this.alarmReceive = receive;
     }
 
 

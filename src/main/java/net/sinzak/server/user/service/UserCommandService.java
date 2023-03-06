@@ -9,6 +9,7 @@ import net.sinzak.server.image.S3Service;
 import net.sinzak.server.user.domain.Report;
 import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.user.dto.request.CategoryDto;
+import net.sinzak.server.user.dto.request.FcmDto;
 import net.sinzak.server.user.dto.request.ReportDto;
 import net.sinzak.server.user.dto.request.UpdateUserDto;
 import net.sinzak.server.user.domain.User;
@@ -65,6 +66,11 @@ public class UserCommandService {
     public JSONObject updateCategoryLike(User user, CategoryDto categoryDto){
         User findUser = userRepository.findById(user.getId()).orElseThrow(UserNotFoundException::new);
         findUser.updateCategoryLike(categoryDto.getCategoryLike());
+        return PropertyUtil.response(true);
+    }
+    public JSONObject setToken(FcmDto fcmDto){
+        User loginUser = userRepository.findById(fcmDto.getUserId()).orElseThrow(UserNotFoundException::new);
+        loginUser.setFcmToken(fcmDto.getFcmToken());
         return PropertyUtil.response(true);
     }
 

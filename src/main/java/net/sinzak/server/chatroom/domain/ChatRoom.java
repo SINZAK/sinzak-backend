@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.sinzak.server.BaseTimeEntity;
 import net.sinzak.server.common.PostType;
 import net.sinzak.server.product.domain.Product;
+import net.sinzak.server.user.domain.User;
 import net.sinzak.server.work.domain.Work;
 
 import javax.persistence.*;
@@ -74,10 +75,15 @@ public class ChatRoom extends BaseTimeEntity {
         this.userChatRooms.add(userChatRoom);
         this.participantsNumber++;
     }
-    public void addChatMessage(ChatMessage chatMessage){
+    public User addChatMessage(ChatMessage chatMessage){
         this.chatMessages.add(chatMessage);
+        User opponentUser =null;
         chatMessage.setChatRoom(this);
         for(UserChatRoom userChatRoom :this.userChatRooms){
+            User findUser = userChatRoom.getUser();
+            if(!findUser.getId().equals(chatMessage.getSenderId())){ //보낸 사람이 아닌 유저에게
+                opponentUser = findUser;
+            }
             if(chatMessage.getType()==MessageType.TEXT || chatMessage.getType()==MessageType.LEAVE){
                 userChatRoom.updateLatestMessage(chatMessage.getMessage());
             }
@@ -85,6 +91,7 @@ public class ChatRoom extends BaseTimeEntity {
                 userChatRoom.updateLatestMessage("사진");
             }
         }
+        return opponentUser;
     }
 
     public UserChatRoom leaveChatRoom(Long userId){
