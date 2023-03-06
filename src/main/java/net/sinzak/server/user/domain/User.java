@@ -126,8 +126,8 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     @Column
     private String fcmToken ="";
-    @Column
-    private boolean alarm_receive;
+//    @Column
+//    private boolean alarm_receive;
 
     @ElementCollection
     @CollectionTable(name = "FOLLOWING_LIST", joinColumns = @JoinColumn(name = "user_id"))
@@ -165,12 +165,12 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.categoryLike = "";
         this.roles = Collections.singletonList("ROLE_USER");
         this.role = Role.GUEST;
-        this.alarm_receive = false;
+//        this.alarm_receive = false;
     }
 
-    public void setAlarm_receive(boolean receive){
-        this.alarm_receive = receive;
-    }
+//    public void setAlarm_receive(boolean receive){
+//        this.alarm_receive = receive;
+//    }
 
 
     public void saveJoinInfo(String nickName, String categoryLike) {
