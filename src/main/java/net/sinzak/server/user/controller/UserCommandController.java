@@ -128,7 +128,7 @@ public class UserCommandController {
         return userCommandService.showReportList(user);
     }
     @ApiDocumentResponse
-    @ApiOperation(value ="fcm 토큰 저장")
+    @ApiOperation(value ="fcm 토큰 저장", notes = "로그아웃할 땐 fcm토큰 빈칸")
     @PostMapping(value = "/users/fcm")
     public JSONObject setToken(FcmDto fcmDto){
         return userCommandService.setToken(fcmDto);
