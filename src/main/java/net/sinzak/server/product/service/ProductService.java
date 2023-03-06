@@ -133,10 +133,11 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     @Transactional(rollbackFor = {Exception.class})
     public JSONObject deletePost(User User, Long productId){   // 글 생성
         User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
-        Product product = productRepository.findById(productId).orElseThrow(PostNotFoundException::new);
+        Product product = productRepository.findByIdFetchChatRooms(productId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(product.getUser().getId()))
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
         deleteImagesInPost(product);
+        product.divideChatRoom();
         productRepository.delete(product);
         return PropertyUtil.response(true);
     }

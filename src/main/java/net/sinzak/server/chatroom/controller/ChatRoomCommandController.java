@@ -16,6 +16,7 @@ import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -40,9 +41,9 @@ public class ChatRoomCommandController {
         PropertyUtil.checkHeader(user);
         return chatRoomCommandService.createUserChatRoom(postDto,user);
     }
-    @PostMapping(value ="/chat/rooms/{uuid}/image")
-    public JSONObject uploadImage(@PathVariable("uuid") String uuid, List<MultipartFile> files){
-        return chatRoomCommandService.uploadImage(uuid,files);
+    @PostMapping(value ="/chat/rooms/{uuid}/image",consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public JSONObject uploadImage(@PathVariable("uuid") String uuid, @RequestPart List<MultipartFile> multipartFile){
+        return chatRoomCommandService.uploadImage(uuid,multipartFile);
     }
 
 
