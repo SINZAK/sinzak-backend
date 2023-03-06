@@ -156,6 +156,33 @@ public class OauthController {
                 "&redirect_uri="+ developURL +"/api/login/oauth2/code/google";
     }
 
+    @ApiOperation(value = "리액트용 구글 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
+    @GetMapping(value = "/web/google")
+    public JSONObject oauthWebGoogle(@RequestParam(value = "url") String url) throws Exception {
+        JSONObject obj = getWebGoogleURL(url);
+        log.warn("액세스토큰 = {}",obj.get("access_token").toString());
+        return obj;
+    }
+
+    private JSONObject getWebGoogleURL(String URL) throws IOException, ParseException {
+        String url = "https://oauth2.googleapis.com/token"
+                + "?client_id=782966145872-6shnmrvqi0q4sihr8etu9nrvh9jv43dh.apps.googleusercontent.com"
+                + "&client_secret=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" + "&grant_type=authorization_code&"
+                + URL;
+        Request.Builder builder = new Request.Builder().header("Content-type", " application/x-www-form-urlencoded")
+                .url(url);
+        JSONObject postObj = new JSONObject();
+        RequestBody requestBody = RequestBody.create(postObj.toJSONString().getBytes());
+        builder.post(requestBody);
+        Request request = builder.build();
+
+        Response responseHTML = client.newCall(request).execute();
+        JSONParser parser = new JSONParser();
+        JSONObject response = (JSONObject) parser.parse(responseHTML.body().string());
+        log.warn(response.toJSONString());
+        return response;
+    }
+
     @ApiOperation(value = "스프링용 구글 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
     @GetMapping(value = "/login/oauth2/code/google")
     public String oauthGoogle(@RequestParam(value = "code", required = false) String code) throws Exception {
@@ -164,6 +191,7 @@ public class OauthController {
         log.warn("액세스토큰 = {}",obj.get("access_token").toString());
         return obj.toJSONString();
     }
+
 
     private JSONObject getGoogleAccessToken(String code) throws IOException, ParseException {
         String url = "https://oauth2.googleapis.com/token"
