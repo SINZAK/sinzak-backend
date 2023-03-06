@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.*;
 
 @Service
@@ -151,31 +152,32 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     public JSONObject showDetail(Long id, User User){   // 글 상세 확인
         User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
         Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(PostNotFoundException::new);
-        DetailProductForm detailForm = DetailProductForm.builder()
-                .id(product.getId())
-                .userId(product.getUser().getId())
-                .author(product.getAuthor())
-                .author_picture(product.getUser().getPicture())
-                .univ(product.getUser().getUniv())
-                .cert_uni(product.getUser().isCert_uni())
-                .cert_celeb(product.getUser().isCert_celeb())
-                .followerNum(product.getUser().getFollowerNum())
-                .images(getImages(product))
-                .title(product.getTitle())
-                .price(product.getPrice())
-                .category(product.getCategory())
-                .date(product.getCreatedDate().toString())
-                .content(product.getContent())
-                .suggest(product.isSuggest())
-                .likesCnt(product.getLikesCnt())
-                .views(product.getViews())
-                .wishCnt(product.getWishCnt())
-                .chatCnt(product.getChatCnt())
-                .width(product.getSize().width)
-                .vertical(product.getSize().vertical)
-                .height(product.getSize().height)
-                .trading(product.isTrading())
-                .complete(product.isComplete()).build();
+        DetailProductForm detailForm = null;
+        try{
+            detailForm = DetailProductForm.builder()
+                    .id(product.getId())
+                    .author(product.getAuthor())
+                    .images(getImages(product))
+                    .title(product.getTitle())
+                    .price(product.getPrice())
+                    .category(product.getCategory())
+                    .date(product.getCreatedDate().toString())
+                    .content(product.getContent())
+                    .suggest(product.isSuggest())
+                    .likesCnt(product.getLikesCnt())
+                    .views(product.getViews())
+                    .wishCnt(product.getWishCnt())
+                    .chatCnt(product.getChatCnt())
+                    .width(product.getSize().width)
+                    .vertical(product.getSize().vertical)
+                    .height(product.getSize().height)
+                    .trading(product.isTrading())
+                    .complete(product.isComplete()).build();
+            detailForm.setUserInfo(product.getUser().getId(), product.getUser().getPicture(), product.getUser().getUniv(), product.getUser().isCert_uni(), product.getUser().isCert_celeb(), product.getUser().getFollowerNum());
+        }
+        catch(EntityNotFoundException e) {
+            detailForm.setUserInfo(product.getUser().getId(), null, "??", false, false, "0");
+        }
         if(user.getId().equals(product.getUser().getId()))
             detailForm.setMyPost();
         boolean isLike = checkIsLikes(user.getProductLikesList(), product);
