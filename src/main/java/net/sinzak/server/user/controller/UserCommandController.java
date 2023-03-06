@@ -127,6 +127,12 @@ public class UserCommandController {
         PropertyUtil.checkHeader(user);
         return userCommandService.showReportList(user);
     }
+    @ApiDocumentResponse
+    @ApiOperation(value ="fcm 토큰 저장")
+    @PostMapping(value = "/users/fcm")
+    public JSONObject setToken(FcmDto fcmDto){
+        return userCommandService.setToken(fcmDto);
+    }
 
     @ApiOperation(value = "검색기록 삭제", notes = "Post인 것에 유의하고 같은 url을 사용하려고 합니다. 해당 기록의 id를 주시면 삭제합니다.")
     @PostMapping(value = "/users/history")
