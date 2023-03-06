@@ -109,7 +109,7 @@ public class UserCommandService {
         User user = userRepository.findByIdFetchFollowingList(loginUser.getId()).orElseThrow(UserNotFoundException::new);
         user.getFollowingList().add(findUser.getId());
         findUser.getFollowerList().add(loginUser.getId());
-        fireBaseService.sendIndividualNotification(findUser,"팔로우 알림",findUser.getName(),findUser.getId().toString());
+        fireBaseService.sendIndividualNotification(findUser,"팔로우 알림",findUser.getNickName(),findUser.getId().toString());
 
         user.updateFollowNumber();
         findUser.updateFollowNumber();
