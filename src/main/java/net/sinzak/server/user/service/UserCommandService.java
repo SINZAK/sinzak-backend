@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 import net.sinzak.server.chatroom.service.ChatRoomCommandService;
 import net.sinzak.server.common.error.InstanceNotFoundException;
+import net.sinzak.server.firebase.FireBaseService;
 import net.sinzak.server.image.S3Service;
 import net.sinzak.server.user.domain.Report;
 import net.sinzak.server.user.domain.SearchHistory;
@@ -35,7 +36,7 @@ public class UserCommandService {
     private final SearchHistoryRepository historyRepository;
     private final ChatRoomCommandService chatRoomCommandService;
     private final S3Service s3Service;
-
+    private final FireBaseService fireBaseService;
     public User saveTempUser(User user){
         return userRepository.save(user);
     }
@@ -108,6 +109,8 @@ public class UserCommandService {
         User user = userRepository.findByIdFetchFollowingList(loginUser.getId()).orElseThrow(UserNotFoundException::new);
         user.getFollowingList().add(findUser.getId());
         findUser.getFollowerList().add(loginUser.getId());
+        fireBaseService.sendIndividualNotification(findUser,"팔로우 알림",findUser.getName(),findUser.getId().toString());
+
         user.updateFollowNumber();
         findUser.updateFollowNumber();
         return PropertyUtil.response(true);
