@@ -138,9 +138,13 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         if(!user.getId().equals(product.getUser().getId()))
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
 //        deleteImagesInPost(product);
-        product.divideChatRoom();
+        beforeDeleteProduct(product);
         productRepository.delete(product);
         return PropertyUtil.response(true);
+    }
+
+    private void beforeDeleteProduct(Product product) {
+        product.makeChatRoomNull();
     }
 
     private void deleteImagesInPost(Product product) {
@@ -153,48 +157,64 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     public JSONObject showDetail(Long id, User User){   // 글 상세 확인
         User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
         Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(PostNotFoundException::new);
-        DetailProductForm detailForm = null;
-        try{
-            detailForm = DetailProductForm.builder()
-                    .id(product.getId())
-                    .userId(product.getUser().getId())
-                    .author(product.getAuthor())
-                    .author_picture(product.getUser().getPicture())
-                    .univ(product.getUser().getUniv())
-                    .cert_uni(product.getUser().isCert_uni())
-                    .cert_celeb(product.getUser().isCert_celeb())
-                    .followerNum(product.getUser().getFollowerNum())
-                    .images(getImages(product))
-                    .title(product.getTitle())
-                    .price(product.getPrice())
-                    .category(product.getCategory())
-                    .date(product.getCreatedDate().toString())
-                    .content(product.getContent())
-                    .suggest(product.isSuggest())
-                    .likesCnt(product.getLikesCnt())
-                    .views(product.getViews())
-                    .wishCnt(product.getWishCnt())
-                    .chatCnt(product.getChatCnt())
-                    .width(product.getSize().width)
-                    .vertical(product.getSize().vertical)
-                    .height(product.getSize().height)
-                    .trading(product.isTrading())
-                    .complete(product.isComplete()).build();
-            if(user.getId().equals(product.getUser().getId()))
-                detailForm.setMyPost();
-            boolean isLike = checkIsLikes(user.getProductLikesList(), product);
-            boolean isWish = checkIsWish(user, product.getProductWishList());
-            boolean isFollowing  = checkIsFollowing(user.getFollowingList(), product);
-            detailForm.setUserAction(isLike, isWish, isFollowing);
+        DetailProductForm detailForm = makeProductDetailForm(product);
+        if(product.getUser()!=null){
+            User postUser = product.getUser();
+            detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_celeb(), postUser.getFollowerNum());
         }
-        catch (EntityNotFoundException e){
+        else {
             detailForm.setUserInfo(null, "탈퇴한 회원", null, "??", false, false, "0");
         }
-
+        if(user.getId().equals(product.getUser().getId())){
+            detailForm.setMyPost();
+        }
+        boolean isLike = checkIsLikes(user.getProductLikesList(), product);
+        boolean isWish = checkIsWish(user, product.getProductWishList());
+        boolean isFollowing = false;
+        if(product.getUser()!=null){
+            isFollowing = checkIsFollowing(user.getFollowingList(), product);
+        }
+        detailForm.setUserAction(isLike, isWish, isFollowing);
         product.addViews();
         return PropertyUtil.response(detailForm);
     }
-
+    @Transactional
+    public JSONObject showDetail(Long id){   // 비회원 글 보기
+        Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(PostNotFoundException::new);
+        DetailProductForm detailForm = makeProductDetailForm(product);
+        if(product.getUser()!=null){
+            User postUser =product.getUser();
+            detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_celeb(), postUser.getFollowerNum());
+        }
+        else{
+            detailForm.setUserInfo(null, "탈퇴한 회원", null, "??", false, false, "0");
+        }
+        detailForm.setUserAction(false,false,false);
+        product.addViews();
+        return PropertyUtil.response(detailForm);
+    }
+    private DetailProductForm makeProductDetailForm(Product product) {
+        DetailProductForm  detailForm = DetailProductForm.builder()
+                .id(product.getId())
+                .author(product.getAuthor())
+                .images(getImages(product))
+                .title(product.getTitle())
+                .price(product.getPrice())
+                .category(product.getCategory())
+                .date(product.getCreatedDate().toString())
+                .content(product.getContent())
+                .suggest(product.isSuggest())
+                .likesCnt(product.getLikesCnt())
+                .views(product.getViews())
+                .wishCnt(product.getWishCnt())
+                .chatCnt(product.getChatCnt())
+                .width(product.getSize().width)
+                .vertical(product.getSize().vertical)
+                .height(product.getSize().height)
+                .trading(product.isTrading())
+                .complete(product.isComplete()).build();
+        return detailForm;
+    }
     public boolean checkIsLikes(List<ProductLikes> userLikesList, Product product) {
         boolean isLike = false;
         for (ProductLikes likes : userLikesList) {
@@ -228,47 +248,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return isFollowing;
     }
 
-    @Transactional
-    public JSONObject showDetail(Long id){   // 비회원 글 보기
-        Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(PostNotFoundException::new);
-        List<String> imagesUrl = getImages(product);
-        DetailProductForm detailForm = null;
-        try{
-            detailForm = DetailProductForm.builder()
-                    .id(product.getId())
-                    .author(product.getAuthor())
-                    .userId(product.getUser().getId())
-                    .author_picture(product.getUser().getPicture())
-                    .univ(product.getUser().getUniv())
-                    .cert_uni(product.getUser().isCert_uni())
-                    .cert_celeb(product.getUser().isCert_celeb())
-                    .followerNum(product.getUser().getFollowerNum())
-                    .images(imagesUrl)
-                    .title(product.getTitle())
-                    .price(product.getPrice())
-                    .category(product.getCategory())
-                    .date(product.getCreatedDate().toString())
-                    .content(product.getContent())
-                    .suggest(product.isSuggest())
-                    .likesCnt(product.getLikesCnt())
-                    .views(product.getViews())
-                    .wishCnt(product.getWishCnt())
-                    .chatCnt(product.getChatCnt())
-                    .width(product.getSize().width)
-                    .vertical(product.getSize().vertical)
-                    .height(product.getSize().height)
-                    .trading(product.isTrading())
-                    .complete(product.isComplete())
-                    .build();
 
-        }
-        catch(EntityNotFoundException e){
-            detailForm.setUserInfo(null, "탈퇴한 회원", null, "??", false, false, "0");
-        }
-        detailForm.setUserAction(false,false,false);
-        product.addViews();
-        return PropertyUtil.response(detailForm);
-    }
 
 
     @Transactional(readOnly = true)

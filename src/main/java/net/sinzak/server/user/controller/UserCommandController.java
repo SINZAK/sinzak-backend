@@ -149,7 +149,7 @@ public class UserCommandController {
     @ApiDocumentResponse
     @ApiOperation(value = "유저 탈퇴하기")
     @PostMapping(value = "/users/resign")
-    public JSONObject report(@AuthenticationPrincipal User user){
+    public JSONObject resign(@AuthenticationPrincipal User user){
         PropertyUtil.checkHeader(user);
         return userCommandService.resign(user);
     }
