@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -160,37 +161,44 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     public JSONObject showDetail(Long id, User User){   // 글 상세 확인
         User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
         Work work = workRepository.findByIdFetchWorkWishAndUser(id).orElseThrow(PostNotFoundException::new);
+        DetailWorkForm detailForm = null;
+        try{
+            detailForm = DetailWorkForm.builder()
+                    .id(work.getId())
+                    .userId(work.getUser().getId())
+                    .author(work.getAuthor())
+                    .author_picture(work.getUser().getPicture())
+                    .univ(work.getUser().getUniv())
+                    .cert_uni(work.getUser().isCert_uni())
+                    .cert_celeb(work.getUser().isCert_celeb())
+                    .followerNum(work.getUser().getFollowerNum())
+                    .images(getImages(work))
+                    .title(work.getTitle())
+                    .price(work.getPrice())
+                    .category(work.getCategory())
+                    .date(work.getCreatedDate().toString())
+                    .content(work.getContent())
+                    .suggest(work.isSuggest())
+                    .likesCnt(work.getLikesCnt())
+                    .views(work.getViews())
+                    .wishCnt(work.getWishCnt())
+                    .chatCnt(work.getChatCnt())
+                    .employment(work.isEmployment())
+                    .complete(work.isComplete()).build();
 
-        DetailWorkForm detailForm = DetailWorkForm.builder()
-                .id(work.getId())
-                .userId(work.getUser().getId())
-                .author(work.getAuthor())
-                .author_picture(work.getUser().getPicture())
-                .univ(work.getUser().getUniv())
-                .cert_uni(work.getUser().isCert_uni())
-                .cert_celeb(work.getUser().isCert_celeb())
-                .followerNum(work.getUser().getFollowerNum())
-                .images(getImages(work))
-                .title(work.getTitle())
-                .price(work.getPrice())
-                .category(work.getCategory())
-                .date(work.getCreatedDate().toString())
-                .content(work.getContent())
-                .suggest(work.isSuggest())
-                .likesCnt(work.getLikesCnt())
-                .views(work.getViews())
-                .wishCnt(work.getWishCnt())
-                .chatCnt(work.getChatCnt())
-                .employment(work.isEmployment())
-                .complete(work.isComplete()).build();
+            if(user.getId().equals(work.getUser().getId()))
+                detailForm.setMyPost();
+            boolean isLike = checkIsLikes(user.getWorkLikesList(), work);
+            boolean isWish = checkIsWish(user, work.getWorkWishList());
+            boolean isFollowing  = checkIsFollowing(user.getFollowingList(), work);
 
-        if(user.getId().equals(work.getUser().getId()))
-            detailForm.setMyPost();
-        boolean isLike = checkIsLikes(user.getWorkLikesList(), work);
-        boolean isWish = checkIsWish(user, work.getWorkWishList());
-        boolean isFollowing  = checkIsFollowing(user.getFollowingList(), work);
+            detailForm.setUserAction(isLike, isWish, isFollowing);
+        }
+        catch (EntityNotFoundException e){
+            detailForm.setUserInfo(null, detailForm.getAuthor(), null, "??", false, false, "0");
+        }
 
-        detailForm.setUserAction(isLike, isWish, isFollowing);
+
         work.addViews();
         return PropertyUtil.response(detailForm);
     }
@@ -231,29 +239,34 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     @Transactional
     public JSONObject showDetail(Long id){   // 글 상세 확인
         Work work = workRepository.findByIdFetchWorkWishAndUser(id).orElseThrow(PostNotFoundException::new);
-        DetailWorkForm detailForm = DetailWorkForm.builder()
-                .id(work.getId())
-                .userId(work.getUser().getId())
-                .author(work.getAuthor())
-                .author_picture(work.getUser().getPicture())
-                .univ(work.getUser().getUniv())
-                .cert_uni(work.getUser().isCert_uni())
-                .cert_celeb(work.getUser().isCert_celeb())
-                .followerNum(work.getUser().getFollowerNum())
-                .images(getImages(work))
-                .title(work.getTitle())
-                .price(work.getPrice())
-                .category(work.getCategory())
-                .date(work.getCreatedDate().toString())
-                .content(work.getContent())
-                .suggest(work.isSuggest())
-                .likesCnt(work.getLikesCnt())
-                .views(work.getViews())
-                .wishCnt(work.getWishCnt())
-                .chatCnt(work.getChatCnt())
-                .employment(work.isEmployment())
-                .complete(work.isComplete()).build();
-
+        DetailWorkForm detailForm =null;
+        try{
+            detailForm = DetailWorkForm.builder()
+                    .id(work.getId())
+                    .userId(work.getUser().getId())
+                    .author(work.getAuthor())
+                    .author_picture(work.getUser().getPicture())
+                    .univ(work.getUser().getUniv())
+                    .cert_uni(work.getUser().isCert_uni())
+                    .cert_celeb(work.getUser().isCert_celeb())
+                    .followerNum(work.getUser().getFollowerNum())
+                    .images(getImages(work))
+                    .title(work.getTitle())
+                    .price(work.getPrice())
+                    .category(work.getCategory())
+                    .date(work.getCreatedDate().toString())
+                    .content(work.getContent())
+                    .suggest(work.isSuggest())
+                    .likesCnt(work.getLikesCnt())
+                    .views(work.getViews())
+                    .wishCnt(work.getWishCnt())
+                    .chatCnt(work.getChatCnt())
+                    .employment(work.isEmployment())
+                    .complete(work.isComplete()).build();
+        }
+        catch(EntityNotFoundException e){
+            detailForm.setUserInfo(null, detailForm.getAuthor(), null, "??", false, false, "0");
+        }
         detailForm.setUserAction(false,false,false);
         work.addViews();
         return PropertyUtil.response(detailForm);

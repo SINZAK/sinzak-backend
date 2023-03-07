@@ -137,7 +137,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         Product product = productRepository.findByIdFetchChatRooms(productId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(product.getUser().getId()))
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
-        deleteImagesInPost(product);
+//        deleteImagesInPost(product);
         product.divideChatRoom();
         productRepository.delete(product);
         return PropertyUtil.response(true);
@@ -157,7 +157,13 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         try{
             detailForm = DetailProductForm.builder()
                     .id(product.getId())
+                    .userId(product.getUser().getId())
                     .author(product.getAuthor())
+                    .author_picture(product.getUser().getPicture())
+                    .univ(product.getUser().getUniv())
+                    .cert_uni(product.getUser().isCert_uni())
+                    .cert_celeb(product.getUser().isCert_celeb())
+                    .followerNum(product.getUser().getFollowerNum())
                     .images(getImages(product))
                     .title(product.getTitle())
                     .price(product.getPrice())
@@ -174,18 +180,17 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                     .height(product.getSize().height)
                     .trading(product.isTrading())
                     .complete(product.isComplete()).build();
-            detailForm.setUserInfo(product.getUser().getId(), product.getUser().getNickName(), product.getUser().getPicture(), product.getUser().getUniv(), product.getUser().isCert_uni(), product.getUser().isCert_celeb(), product.getUser().getFollowerNum());
-
             if(user.getId().equals(product.getUser().getId()))
                 detailForm.setMyPost();
+            boolean isLike = checkIsLikes(user.getProductLikesList(), product);
+            boolean isWish = checkIsWish(user, product.getProductWishList());
+            boolean isFollowing  = checkIsFollowing(user.getFollowingList(), product);
+            detailForm.setUserAction(isLike, isWish, isFollowing);
         }
-        catch(EntityNotFoundException e) {
+        catch (EntityNotFoundException e){
             detailForm.setUserInfo(null, detailForm.getAuthor(), null, "??", false, false, "0");
         }
-        boolean isLike = checkIsLikes(user.getProductLikesList(), product);
-        boolean isWish = checkIsWish(user, product.getProductWishList());
-        boolean isFollowing  = checkIsFollowing(user.getFollowingList(), product);
-        detailForm.setUserAction(isLike, isWish, isFollowing);
+
         product.addViews();
         return PropertyUtil.response(detailForm);
     }
@@ -214,16 +219,11 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     public boolean checkIsFollowing(Set<Long> userFollowingList, Product product) {
         boolean isFollowing = false;
-        try{
-            for (Long followingId : userFollowingList) {
-                if(product.getUser().getId().equals(followingId)){
-                    isFollowing = true;
-                    break;
-                }
+        for (Long followingId : userFollowingList) {
+            if(product.getUser().getId().equals(followingId)){
+                isFollowing = true;
+                break;
             }
-        }
-        catch (EntityNotFoundException e){
-            return false;
         }
         return isFollowing;
     }
@@ -236,7 +236,13 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         try{
             detailForm = DetailProductForm.builder()
                     .id(product.getId())
+                    .userId(product.getUser().getId())
                     .author(product.getAuthor())
+                    .author_picture(product.getUser().getPicture())
+                    .univ(product.getUser().getUniv())
+                    .cert_uni(product.getUser().isCert_uni())
+                    .cert_celeb(product.getUser().isCert_celeb())
+                    .followerNum(product.getUser().getFollowerNum())
                     .images(imagesUrl)
                     .title(product.getTitle())
                     .price(product.getPrice())
@@ -254,9 +260,10 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                     .trading(product.isTrading())
                     .complete(product.isComplete())
                     .build();
-            detailForm.setUserInfo(product.getUser().getId(), product.getUser().getNickName(), product.getUser().getPicture(), product.getUser().getUniv(), product.getUser().isCert_uni(), product.getUser().isCert_celeb(), product.getUser().getFollowerNum());
-        }catch (EntityNotFoundException e){
-            detailForm.setUserInfo(null, detailForm.getAuthor(),null, "??", false, false, "0");
+
+        }
+        catch(EntityNotFoundException e){
+            detailForm.setUserInfo(null, detailForm.getAuthor(), null, "??", false, false, "0");
         }
         detailForm.setUserAction(false,false,false);
         product.addViews();
