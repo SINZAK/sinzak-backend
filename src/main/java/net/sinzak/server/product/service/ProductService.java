@@ -175,13 +175,13 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                     .height(product.getSize().height)
                     .trading(product.isTrading())
                     .complete(product.isComplete()).build();
-            detailForm.setUserInfo(product.getUser().getId(), product.getUser().getPicture(), product.getUser().getUniv(), product.getUser().isCert_uni(), product.getUser().isCert_celeb(), product.getUser().getFollowerNum());
+            detailForm.setUserInfo(product.getUser().getId(), product.getUser().getNickName(), product.getUser().getPicture(), product.getUser().getUniv(), product.getUser().isCert_uni(), product.getUser().isCert_celeb(), product.getUser().getFollowerNum());
 
             if(user.getId().equals(product.getUser().getId()))
                 detailForm.setMyPost();
         }
         catch(EntityNotFoundException e) {
-            detailForm.setUserInfo(null, null, "??", false, false, "0");
+            detailForm.setUserInfo(null, detailForm.getAuthor(), null, "??", false, false, "0");
         }
         boolean isLike = checkIsLikes(user.getProductLikesList(), product);
         boolean isWish = checkIsWish(user, product.getProductWishList());
