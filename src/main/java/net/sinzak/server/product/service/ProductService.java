@@ -158,11 +158,11 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
         Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(PostNotFoundException::new);
         DetailProductForm detailForm = makeProductDetailForm(product);
-        try {
+        if(product.getUser()!=null){
             User postUser = product.getUser();
             detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_celeb(), postUser.getFollowerNum());
         }
-        catch(EntityNotFoundException e) {
+        else {
             detailForm.setUserInfo(null, "탈퇴한 회원", null, "??", false, false, "0");
         }
         if(user.getId().equals(product.getUser().getId())){
@@ -170,7 +170,10 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         }
         boolean isLike = checkIsLikes(user.getProductLikesList(), product);
         boolean isWish = checkIsWish(user, product.getProductWishList());
-        boolean isFollowing  = checkIsFollowing(user.getFollowingList(), product);
+        boolean isFollowing = false;
+        if(product.getUser()!=null){
+            isFollowing = checkIsFollowing(user.getFollowingList(), product);
+        }
         detailForm.setUserAction(isLike, isWish, isFollowing);
         product.addViews();
         return PropertyUtil.response(detailForm);
@@ -179,11 +182,11 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     public JSONObject showDetail(Long id){   // 비회원 글 보기
         Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(PostNotFoundException::new);
         DetailProductForm detailForm = makeProductDetailForm(product);
-        try{
+        if(product.getUser()!=null){
             User postUser =product.getUser();
             detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_celeb(), postUser.getFollowerNum());
         }
-        catch(EntityNotFoundException e){
+        else{
             detailForm.setUserInfo(null, "탈퇴한 회원", null, "??", false, false, "0");
         }
         detailForm.setUserAction(false,false,false);

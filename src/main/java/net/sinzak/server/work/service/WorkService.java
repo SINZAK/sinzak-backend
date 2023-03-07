@@ -164,11 +164,11 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
         Work work = workRepository.findByIdFetchWorkWishAndUser(id).orElseThrow(PostNotFoundException::new);
         DetailWorkForm detailForm = makeWorkDetailForm(work);
-        try{
+        if(work.getUser()!=null){
             User postUser = work.getUser();
             detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_celeb(), postUser.getFollowerNum());
         }
-        catch (EntityNotFoundException e){
+        else{
             detailForm.setUserInfo(null, "탈퇴한 회원", null, "??", false, false, "0");
             return PropertyUtil.response(detailForm);
         }
@@ -177,7 +177,10 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         }
         boolean isLike = checkIsLikes(user.getWorkLikesList(), work);
         boolean isWish = checkIsWish(user, work.getWorkWishList());
-        boolean isFollowing  = checkIsFollowing(user.getFollowingList(), work);
+        boolean isFollowing  = false;
+        if(work.getUser()!=null){
+            isFollowing =checkIsFollowing(user.getFollowingList(), work);
+        }
         detailForm.setUserAction(isLike, isWish, isFollowing);
         work.addViews();
         return PropertyUtil.response(detailForm);
@@ -208,11 +211,11 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     public JSONObject showDetail(Long id){   // 글 상세 확인
         Work work = workRepository.findByIdFetchWorkWishAndUser(id).orElseThrow(PostNotFoundException::new);
         DetailWorkForm detailForm =makeWorkDetailForm(work);
-        try{
+        if(work.getUser()!=null){
             User postUser = work.getUser();
             detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_celeb(), postUser.getFollowerNum());
         }
-        catch(EntityNotFoundException e){
+        else{
             detailForm.setUserInfo(null, "탈퇴한 회원", null, "??", false, false, "0");
             return PropertyUtil.response(detailForm);
         }
