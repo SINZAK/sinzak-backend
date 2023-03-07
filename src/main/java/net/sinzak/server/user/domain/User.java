@@ -12,6 +12,7 @@ import net.sinzak.server.product.domain.ProductWish;
 import net.sinzak.server.work.domain.Work;
 import net.sinzak.server.work.domain.WorkLikes;
 import net.sinzak.server.work.domain.WorkWish;
+import org.hibernate.Hibernate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -93,8 +94,11 @@ public class User extends BaseTimeEntity implements UserDetails {
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<UserChatRoom> userChatRooms = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "user",cascade = CascadeType.MERGE)
     private List<Product> productPostList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user" ,cascade = CascadeType.MERGE)
+    private Set<Work> workPostList = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ProductSell> productSellList = new ArrayList<>();
@@ -105,8 +109,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ProductLikes> productLikesList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private Set<Work> workPostList = new HashSet<>();
+
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<WorkWish> workWishList = new ArrayList<>();
@@ -141,6 +144,16 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles = new ArrayList<>();
+
+
+    public void makePostNull(){
+        for(Work work : this.workPostList){
+            work.deleteUser();
+        }
+        for(Product product : this.productPostList){
+            product.deleteUser();
+        }
+    }
 
 
     @Builder
