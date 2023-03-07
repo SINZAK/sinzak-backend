@@ -97,6 +97,9 @@ public class Product extends BaseTimeEntity { /** 작품 **/
         this.size = size;
     }
 
+    public void deleteUser(){
+        this.user =null;
+    }
     public void setUser(User user) {
         user.getProductPostList().add(this);
         this.user = user;

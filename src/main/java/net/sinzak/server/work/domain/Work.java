@@ -101,6 +101,10 @@ public class Work extends BaseTimeEntity { /** 외주 **/
         user.getWorkPostList().add(this);
         this.user = user;
     }
+
+    public void deleteUser(){
+        this.user =null;
+    }
     public void editPost(WorkEditDto dto){
         this.title = dto.getTitle();
         this.content = dto.getContent();
