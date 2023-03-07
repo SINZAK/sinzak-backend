@@ -179,6 +179,11 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.categoryLike = categoryLike;
     }
 
+    public void setRandomProfileImage() {
+        Random ran = new Random();
+        int randomNumber = ran.nextInt(10)+1;
+        this.picture = "https://sinzakimage.s3.ap-northeast-2.amazonaws.com/static/profile"+randomNumber+".png";
+    }
 
     public User update(String name, String introduction){
         this.nickName =name;
