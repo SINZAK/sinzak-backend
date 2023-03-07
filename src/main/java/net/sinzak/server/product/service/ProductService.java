@@ -23,7 +23,6 @@ import org.json.simple.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -255,9 +254,9 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                     .trading(product.isTrading())
                     .complete(product.isComplete())
                     .build();
-            detailForm.setUserInfo(product.getUser().getId(), product.getUser().getPicture(), product.getUser().getUniv(), product.getUser().isCert_uni(), product.getUser().isCert_celeb(), product.getUser().getFollowerNum());
+            detailForm.setUserInfo(product.getUser().getId(), product.getUser().getNickName(), product.getUser().getPicture(), product.getUser().getUniv(), product.getUser().isCert_uni(), product.getUser().isCert_celeb(), product.getUser().getFollowerNum());
         }catch (EntityNotFoundException e){
-            detailForm.setUserInfo(null, null, "??", false, false, "0");
+            detailForm.setUserInfo(null, detailForm.getAuthor(),null, "??", false, false, "0");
         }
         detailForm.setUserAction(false,false,false);
         product.addViews();
