@@ -73,8 +73,7 @@ public class SecurityService {
         JSONObject obj = new JSONObject();
         User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
         user.saveJoinInfo(dto.getNickName(), dto.getCategory_like());
-//        if(user.getOrigin().equals("apple"))
-//            user.updateEmailForAppleUser();  /** 애플로그인은 이메일을 토큰 ID로써야함  --> 왜냐면 이후에 애플 로그인시 프론트에서 이메일 못받아옴 **/
+        user.setRandomProfileImage();
         JoinTerms terms = new JoinTerms(dto.isTerm());
         terms.setUser(user);
         JoinTerms saveTerms = joinTermsRepository.save(terms);

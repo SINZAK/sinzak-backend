@@ -3,7 +3,7 @@ package net.sinzak.server.user.dto.request;
 import lombok.Getter;
 
 @Getter
-public class ReportDto {
+public class ReportRequestDto {
     private Long userId;
     private String reason;
 }

@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.*;
 
 @Service
@@ -136,7 +137,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         Product product = productRepository.findByIdFetchChatRooms(productId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(product.getUser().getId()))
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
-//        deleteImagesInPost(product);
+        deleteImagesInPost(product);
         product.divideChatRoom();
         productRepository.delete(product);
         return PropertyUtil.response(true);
@@ -152,33 +153,35 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     public JSONObject showDetail(Long id, User User){   // 글 상세 확인
         User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
         Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(PostNotFoundException::new);
-        DetailProductForm detailForm = DetailProductForm.builder()
-                .id(product.getId())
-                .userId(product.getUser().getId())
-                .author(product.getAuthor())
-                .author_picture(product.getUser().getPicture())
-                .univ(product.getUser().getUniv())
-                .cert_uni(product.getUser().isCert_uni())
-                .cert_celeb(product.getUser().isCert_celeb())
-                .followerNum(product.getUser().getFollowerNum())
-                .images(getImages(product))
-                .title(product.getTitle())
-                .price(product.getPrice())
-                .category(product.getCategory())
-                .date(product.getCreatedDate().toString())
-                .content(product.getContent())
-                .suggest(product.isSuggest())
-                .likesCnt(product.getLikesCnt())
-                .views(product.getViews())
-                .wishCnt(product.getWishCnt())
-                .chatCnt(product.getChatCnt())
-                .width(product.getSize().width)
-                .vertical(product.getSize().vertical)
-                .height(product.getSize().height)
-                .trading(product.isTrading())
-                .complete(product.isComplete()).build();
-        if(user.getId().equals(product.getUser().getId()))
-            detailForm.setMyPost();
+        DetailProductForm detailForm = null;
+        try{
+            detailForm = DetailProductForm.builder()
+                    .id(product.getId())
+                    .author(product.getAuthor())
+                    .images(getImages(product))
+                    .title(product.getTitle())
+                    .price(product.getPrice())
+                    .category(product.getCategory())
+                    .date(product.getCreatedDate().toString())
+                    .content(product.getContent())
+                    .suggest(product.isSuggest())
+                    .likesCnt(product.getLikesCnt())
+                    .views(product.getViews())
+                    .wishCnt(product.getWishCnt())
+                    .chatCnt(product.getChatCnt())
+                    .width(product.getSize().width)
+                    .vertical(product.getSize().vertical)
+                    .height(product.getSize().height)
+                    .trading(product.isTrading())
+                    .complete(product.isComplete()).build();
+            detailForm.setUserInfo(product.getUser().getId(), product.getUser().getNickName(), product.getUser().getPicture(), product.getUser().getUniv(), product.getUser().isCert_uni(), product.getUser().isCert_celeb(), product.getUser().getFollowerNum());
+
+            if(user.getId().equals(product.getUser().getId()))
+                detailForm.setMyPost();
+        }
+        catch(EntityNotFoundException e) {
+            detailForm.setUserInfo(null, detailForm.getAuthor(), null, "??", false, false, "0");
+        }
         boolean isLike = checkIsLikes(user.getProductLikesList(), product);
         boolean isWish = checkIsWish(user, product.getProductWishList());
         boolean isFollowing  = checkIsFollowing(user.getFollowingList(), product);
@@ -211,11 +214,16 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     public boolean checkIsFollowing(Set<Long> userFollowingList, Product product) {
         boolean isFollowing = false;
-        for (Long followingId : userFollowingList) {
-            if(product.getUser().getId().equals(followingId)){
-                isFollowing = true;
-                break;
+        try{
+            for (Long followingId : userFollowingList) {
+                if(product.getUser().getId().equals(followingId)){
+                    isFollowing = true;
+                    break;
+                }
             }
+        }
+        catch (EntityNotFoundException e){
+            return false;
         }
         return isFollowing;
     }
@@ -224,32 +232,32 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     public JSONObject showDetail(Long id){   // 비회원 글 보기
         Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(PostNotFoundException::new);
         List<String> imagesUrl = getImages(product);
-        DetailProductForm detailForm = DetailProductForm.builder()
-                .id(product.getId())
-                .userId(product.getUser().getId())
-                .author(product.getAuthor())
-                .author_picture(product.getUser().getPicture())
-                .univ(product.getUser().getUniv())
-                .cert_uni(product.getUser().isCert_uni())
-                .cert_celeb(product.getUser().isCert_celeb())
-                .followerNum(product.getUser().getFollowerNum())
-                .images(imagesUrl)
-                .title(product.getTitle())
-                .price(product.getPrice())
-                .category(product.getCategory())
-                .date(product.getCreatedDate().toString())
-                .content(product.getContent())
-                .suggest(product.isSuggest())
-                .likesCnt(product.getLikesCnt())
-                .views(product.getViews())
-                .wishCnt(product.getWishCnt())
-                .chatCnt(product.getChatCnt())
-                .width(product.getSize().width)
-                .vertical(product.getSize().vertical)
-                .height(product.getSize().height)
-                .trading(product.isTrading())
-                .complete(product.isComplete())
-                .build();
+        DetailProductForm detailForm = null;
+        try{
+            detailForm = DetailProductForm.builder()
+                    .id(product.getId())
+                    .author(product.getAuthor())
+                    .images(imagesUrl)
+                    .title(product.getTitle())
+                    .price(product.getPrice())
+                    .category(product.getCategory())
+                    .date(product.getCreatedDate().toString())
+                    .content(product.getContent())
+                    .suggest(product.isSuggest())
+                    .likesCnt(product.getLikesCnt())
+                    .views(product.getViews())
+                    .wishCnt(product.getWishCnt())
+                    .chatCnt(product.getChatCnt())
+                    .width(product.getSize().width)
+                    .vertical(product.getSize().vertical)
+                    .height(product.getSize().height)
+                    .trading(product.isTrading())
+                    .complete(product.isComplete())
+                    .build();
+            detailForm.setUserInfo(product.getUser().getId(), product.getUser().getNickName(), product.getUser().getPicture(), product.getUser().getUniv(), product.getUser().isCert_uni(), product.getUser().isCert_celeb(), product.getUser().getFollowerNum());
+        }catch (EntityNotFoundException e){
+            detailForm.setUserInfo(null, detailForm.getAuthor(),null, "??", false, false, "0");
+        }
         detailForm.setUserAction(false,false,false);
         product.addViews();
         return PropertyUtil.response(detailForm);

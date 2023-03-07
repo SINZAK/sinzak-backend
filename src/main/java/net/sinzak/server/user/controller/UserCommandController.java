@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.dto.IdDto;
-import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.config.auth.SecurityService;
 import net.sinzak.server.config.auth.jwt.TokenDto;
@@ -106,17 +105,17 @@ public class UserCommandController {
     @ApiDocumentResponse
     @ApiOperation(value = "신고하기")
     @PostMapping(value = "/users/report")
-    public JSONObject report(@RequestBody ReportDto reportDto, @AuthenticationPrincipal User user){
+    public JSONObject report(@RequestBody ReportRequestDto reportRequestDto, @AuthenticationPrincipal User user){
         PropertyUtil.checkHeader(user);
-        return userCommandService.report(reportDto, user);
+        return userCommandService.report(reportRequestDto, user);
     }
 
     @ApiDocumentResponse
     @ApiOperation(value = "신고 취소하기", notes = "userId만 제대로 주시면 응답합니다. (reason은 생략)")
     @PostMapping(value = "/users/report/cancel")
-    public JSONObject reportCancel(@RequestBody ReportDto reportDto, @AuthenticationPrincipal User user){
+    public JSONObject reportCancel(@RequestBody ReportRequestDto reportRequestDto, @AuthenticationPrincipal User user){
         PropertyUtil.checkHeader(user);
-        return userCommandService.reportCancel(reportDto, user);
+        return userCommandService.reportCancel(reportRequestDto, user);
     }
 
     @ApiDocumentResponse

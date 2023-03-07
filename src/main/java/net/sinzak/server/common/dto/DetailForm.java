@@ -88,7 +88,19 @@ public class DetailForm {
         this.complete = complete;
     }
 
+    public void setUserInfo(Long userId, String author, String author_picture, String univ, boolean cert_uni, boolean cert_celeb, String followerNum) {
+        this.userId = userId;
+        this.author = "(탈퇴한 회원) " + author;
+        this.author_picture = author_picture;
+        this.univ = univ;
+        this.cert_uni = cert_uni;
+        this.cert_celeb = cert_celeb;
+        this.followerNum = followerNum;
+    }
+
     public void setMyPost() {
         this.myPost = true;
     }
+
+
 }

@@ -41,7 +41,7 @@ public class OAuthAttributes {
         return OAuthAttributes.builder()
                 .name((String) profile.get("nickname"))
                 .email((String) kakao_account.get("email"))
-                .picture((String) profile.get("profile_image_url"))
+//                .picture((String) profile.get("profile_image_url"))
                 .origin("Kakao")
                 .build();
     }
@@ -52,7 +52,7 @@ public class OAuthAttributes {
         return OAuthAttributes.builder()
                 .name((String) response.get("name"))
                 .email((String) response.get("email"))
-                .picture((String) response.get("profile_image"))
+//                .picture((String) response.get("profile_image"))
                 .origin("Naver")
                 .build();
 
