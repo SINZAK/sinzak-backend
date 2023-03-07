@@ -90,7 +90,7 @@ public class DetailForm {
 
     public void setUserInfo(Long userId, String author, String author_picture, String univ, boolean cert_uni, boolean cert_celeb, String followerNum) {
         this.userId = userId;
-        this.author = "(탈퇴한 회원) " + author;
+        this.author = author;
         this.author_picture = author_picture;
         this.univ = univ;
         this.cert_uni = cert_uni;
