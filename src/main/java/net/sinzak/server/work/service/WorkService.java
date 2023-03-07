@@ -165,8 +165,8 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         try{
             detailForm = DetailWorkForm.builder()
                     .id(work.getId())
-                    .userId(work.getUser().getId())
                     .author(work.getAuthor())
+                    .userId(work.getUser().getId())
                     .author_picture(work.getUser().getPicture())
                     .univ(work.getUser().getUniv())
                     .cert_uni(work.getUser().isCert_uni())
@@ -195,7 +195,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
             detailForm.setUserAction(isLike, isWish, isFollowing);
         }
         catch (EntityNotFoundException e){
-            detailForm.setUserInfo(null, detailForm.getAuthor(), null, "??", false, false, "0");
+            detailForm.setUserInfo(null, work.getAuthor(), null, "??", false, false, "0");
         }
 
 
@@ -243,8 +243,8 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         try{
             detailForm = DetailWorkForm.builder()
                     .id(work.getId())
-                    .userId(work.getUser().getId())
                     .author(work.getAuthor())
+                    .userId(work.getUser().getId())
                     .author_picture(work.getUser().getPicture())
                     .univ(work.getUser().getUniv())
                     .cert_uni(work.getUser().isCert_uni())
@@ -265,7 +265,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
                     .complete(work.isComplete()).build();
         }
         catch(EntityNotFoundException e){
-            detailForm.setUserInfo(null, detailForm.getAuthor(), null, "??", false, false, "0");
+            detailForm.setUserInfo(null, work.getAuthor(), null, "??", false, false, "0");
         }
         detailForm.setUserAction(false,false,false);
         work.addViews();
@@ -374,8 +374,6 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         suggestRepository.save(connect);
         return PropertyUtil.response(true);
     }
-
-
 
     @Transactional
     public PageImpl<ShowForm> workListForUser(User User, String keyword, List<String> categories, String align, boolean employment, Pageable pageable){
