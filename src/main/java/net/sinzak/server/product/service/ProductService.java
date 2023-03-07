@@ -188,7 +188,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
             detailForm.setUserAction(isLike, isWish, isFollowing);
         }
         catch (EntityNotFoundException e){
-            detailForm.setUserInfo(null, product.getAuthor(), null, "??", false, false, "0");
+            detailForm.setUserInfo(null, "탈퇴한 회원", null, "??", false, false, "0");
         }
 
         product.addViews();
@@ -263,7 +263,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
         }
         catch(EntityNotFoundException e){
-            detailForm.setUserInfo(null, product.getAuthor(), null, "??", false, false, "0");
+            detailForm.setUserInfo(null, "탈퇴한 회원", null, "??", false, false, "0");
         }
         detailForm.setUserAction(false,false,false);
         product.addViews();

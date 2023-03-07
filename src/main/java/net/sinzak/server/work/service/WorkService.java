@@ -195,7 +195,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
             detailForm.setUserAction(isLike, isWish, isFollowing);
         }
         catch (EntityNotFoundException e){
-            detailForm.setUserInfo(null, work.getAuthor(), null, "??", false, false, "0");
+            detailForm.setUserInfo(null, "탈퇴한 회원", null, "??", false, false, "0");
         }
 
 
@@ -265,7 +265,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
                     .complete(work.isComplete()).build();
         }
         catch(EntityNotFoundException e){
-            detailForm.setUserInfo(null, work.getAuthor(), null, "??", false, false, "0");
+            detailForm.setUserInfo(null, "탈퇴한 회원", null, "??", false, false, "0");
         }
         detailForm.setUserAction(false,false,false);
         work.addViews();
