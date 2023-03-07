@@ -194,11 +194,15 @@ public class UserCommandService {
     @Transactional(rollbackFor = Exception.class)
     public JSONObject resign(User user){
         try{
+            beforeDeleteUser(user);
             userRepository.delete(user);
         }
         catch (Exception e){
             return PropertyUtil.responseMessage("오류로 인해 탈퇴되지 않았습니다.");
         }
         return PropertyUtil.response(true);
+    }
+    private void beforeDeleteUser(User user){
+        user.makePostNull();
     }
 }
