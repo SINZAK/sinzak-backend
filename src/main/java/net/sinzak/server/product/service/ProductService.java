@@ -77,8 +77,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
             return PropertyUtil.responseMessage("최소 1개 이상의 이미지를 보유해야 합니다.");
 
         for (ProductImage image : product.getImages()) {
-//            if(image.getImageUrl().equals(product.getThumbnail()))
-//                return PropertyUtil.responseMessage("썸네일은 삭제 불가능합니다."); //TODO 프론트가 어쩔지 보자.
+            if(image.getImageUrl().equals(product.getThumbnail()))
+                return PropertyUtil.responseMessage("썸네일은 삭제 불가능합니다.");
             if(image.getImageUrl().equals(url)){
                 imageRepository.delete(image);
                 product.getImages().remove(image);

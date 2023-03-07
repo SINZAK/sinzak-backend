@@ -14,7 +14,7 @@ import java.util.Map;
 public class OAuthAttributes {
     private String name;
     private String email;
-    private String picture;
+    private String picture="";
     private String origin;
 
     @Builder
@@ -41,6 +41,7 @@ public class OAuthAttributes {
         return OAuthAttributes.builder()
                 .name((String) profile.get("nickname"))
                 .email((String) kakao_account.get("email"))
+                .picture("")
 //                .picture((String) profile.get("profile_image_url"))
                 .origin("Kakao")
                 .build();
@@ -52,6 +53,7 @@ public class OAuthAttributes {
         return OAuthAttributes.builder()
                 .name((String) response.get("name"))
                 .email((String) response.get("email"))
+                .picture("")
 //                .picture((String) response.get("profile_image"))
                 .origin("Naver")
                 .build();
@@ -62,6 +64,7 @@ public class OAuthAttributes {
         return OAuthAttributes.builder()
                 .name((String) attributes.get("name"))
                 .email((String) attributes.get("email"))
+                .picture("")
                 .origin("Google")
                 .build();
     }
