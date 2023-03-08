@@ -458,6 +458,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     public JSONObject sell(User User, @RequestBody SellDto dto){
         User user = userRepository.findByEmailFetchProductSellList(User.getEmail()).orElseThrow(UserNotFoundException::new);
         Product product = productRepository.findById(dto.getProductId()).orElseThrow(PostNotFoundException::new);
+        if(product.isComplete())
+            return PropertyUtil.responseMessage("이미 판매완료된 작품입니다.");
         ProductSell connect = ProductSell.createConnect(product, user);
         productSellRepository.save(connect);
         return PropertyUtil.response(true);
