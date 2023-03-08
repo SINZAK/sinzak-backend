@@ -110,7 +110,6 @@ public class User extends BaseTimeEntity implements UserDetails {
     private List<ProductLikes> productLikesList = new ArrayList<>();
 
 
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<WorkWish> workWishList = new ArrayList<>();
 
@@ -144,6 +143,15 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles = new ArrayList<>();
+
+
+
+
+    @Column
+    private boolean isDelete= false;
+    public void setDelete(boolean delete) {
+        isDelete = delete;
+    }
 
 
     public void makePostNull(){

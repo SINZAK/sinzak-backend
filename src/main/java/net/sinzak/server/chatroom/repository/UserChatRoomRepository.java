@@ -14,7 +14,6 @@ public interface UserChatRoomRepository extends JpaRepository<UserChatRoom,Long>
     @Query("select uc from UserChatRoom as uc where uc.user.email = :email")
     List<UserChatRoom> findUserChatRoomByEmail(@Param ("email") String email);
 
-
     @Query("select uc from UserChatRoom uc left join fetch uc.chatRoom where uc.user.email = :email")
     List<UserChatRoom> findUserChatRoomByEmailFetchChatRoom(@Param("email") String email);
 

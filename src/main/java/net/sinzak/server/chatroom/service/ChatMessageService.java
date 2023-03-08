@@ -118,8 +118,6 @@ public class ChatMessageService {
             chatRoomRepository.delete(findChatroom);
         }
     }
-
-
     private void addLeaveChatMessageToChatRoom(ChatMessageDto chatMessageDto, ChatRoom findChatroom) {
         ChatMessage leaveChatMessage = ChatMessage.builder()
                 .message(chatMessageDto.getSenderName()+"님이 채팅방을 나가셨습니다")

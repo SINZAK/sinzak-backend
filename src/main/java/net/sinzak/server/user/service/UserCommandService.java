@@ -51,13 +51,13 @@ public class UserCommandService {
             return PropertyUtil.responseMessage("이미 가입된 닉네임입니다");
         }
         PropertyUtil.checkHeader(loginUser);
-        User user = userRepository.findById(loginUser.getId()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdNotDeleted(loginUser.getId()).orElseThrow(UserNotFoundException::new);
         user.update(dto.getName(),dto.getIntroduction());
         return PropertyUtil.response(true);
     }
 
     public JSONObject updateUserImage(User loginUser, MultipartFile multipartFile){
-        User findUser = userRepository.findById(loginUser.getId()).orElseThrow(UserNotFoundException::new);
+        User findUser = userRepository.findByIdNotDeleted(loginUser.getId()).orElseThrow(UserNotFoundException::new);
         try{
             String url = s3Service.uploadImage(multipartFile);
             findUser.setPicture(url);
@@ -71,19 +71,19 @@ public class UserCommandService {
     }
 
     public JSONObject updateCategoryLike(User user, CategoryDto categoryDto){
-        User findUser = userRepository.findById(user.getId()).orElseThrow(UserNotFoundException::new);
+        User findUser = userRepository.findByIdNotDeleted(user.getId()).orElseThrow(UserNotFoundException::new);
         findUser.updateCategoryLike(categoryDto.getCategoryLike());
         return PropertyUtil.response(true);
     }
     public JSONObject setToken(FcmDto fcmDto){
-        User loginUser = userRepository.findById(fcmDto.getUserId()).orElseThrow(UserNotFoundException::new);
+        User loginUser = userRepository.findByIdNotDeleted(fcmDto.getUserId()).orElseThrow(UserNotFoundException::new);
         loginUser.setFcm(fcmDto.getFcmToken());
         return PropertyUtil.response(true);
     }
 
 
     public JSONObject follow(Long userId, User loginUser){
-        User findUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        User findUser = userRepository.findByIdNotDeleted(userId).orElseThrow(UserNotFoundException::new);
         if(loginUser ==null){
             return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
         }
@@ -93,7 +93,7 @@ public class UserCommandService {
         return addFollow(findUser,loginUser);
     }
     public JSONObject unFollow(Long userId,User loginUser){
-        User findUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        User findUser = userRepository.findByIdNotDeleted(userId).orElseThrow(UserNotFoundException::new);
         if(loginUser ==null){
             return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
         }
@@ -138,7 +138,7 @@ public class UserCommandService {
             return PropertyUtil.responseMessage("본인을 신고할 수 없습니다.");
         if(checkReportHistory(opponentUserId, loginUser).isPresent())
             return PropertyUtil.responseMessage("이미 신고한 회원입니다.");
-        User opponentUser = userRepository.findById(opponentUserId).orElseThrow(UserNotFoundException::new);
+        User opponentUser = userRepository.findByIdNotDeleted(opponentUserId).orElseThrow(UserNotFoundException::new);
         chatRoomCommandService.makeChatRoomBlocked(loginUser,opponentUser,true);
         Report connect = Report.createConnect(loginUser, opponentUser);
         reportRepository.save(connect);
@@ -151,7 +151,7 @@ public class UserCommandService {
         if(loginUser.getId().equals(opponentUserId))
             return PropertyUtil.responseMessage("본인을 신고 취소 할 수 없습니다.");
         Report report = checkReportHistory(opponentUserId, loginUser).orElseThrow(InstanceNotFoundException::new);
-        User opponentUser = userRepository.findById(opponentUserId).orElseThrow(UserNotFoundException::new);
+        User opponentUser = userRepository.findByIdNotDeleted(opponentUserId).orElseThrow(UserNotFoundException::new);
         chatRoomCommandService.makeChatRoomBlocked(loginUser,opponentUser,false);
         reportRepository.delete(report);
         return PropertyUtil.response(true);
@@ -177,7 +177,7 @@ public class UserCommandService {
     }
 
     public JSONObject deleteSearchHistory(Long id, User User){
-        User user = historyRepository.findByEmailFetchHistoryList(User.getEmail()).orElseThrow(InstanceNotFoundException::new);
+        User user = historyRepository.findByIdFetchHistoryList(User.getId()).orElseThrow(InstanceNotFoundException::new);
         for (SearchHistory history : user.getHistoryList()) {
             if(history.getId().equals(id))
                 historyRepository.delete(history);
@@ -186,7 +186,7 @@ public class UserCommandService {
     }
 
     public JSONObject deleteSearchHistory(User User){
-        User user = historyRepository.findByEmailFetchHistoryList(User.getEmail()).orElseThrow(InstanceNotFoundException::new);
+        User user = historyRepository.findByIdFetchHistoryList(User.getId()).orElseThrow(InstanceNotFoundException::new);
         historyRepository.deleteAll(user.getHistoryList());
         return PropertyUtil.response(true);
     }
@@ -194,9 +194,7 @@ public class UserCommandService {
     @Transactional(rollbackFor = Exception.class)
     public JSONObject resign(User user){
         try{
-            User loginUser = userRepository.findByIdFetchWorkListAndProductList(user.getId()).orElseThrow(UserNotFoundException::new);
-            beforeDeleteUser(loginUser);
-            userRepository.delete(loginUser);
+            user.setDelete(true);
             return PropertyUtil.response(true);
         }
         catch (Exception e){

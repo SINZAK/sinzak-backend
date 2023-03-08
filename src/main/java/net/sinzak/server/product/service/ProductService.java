@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.*;
 
 @Service
@@ -52,7 +51,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     @Transactional(rollbackFor = {Exception.class})
     public JSONObject makePost(User User, ProductPostDto buildDto){   // 글 생성
-        User user = userRepository.findByEmailFetchProductPostList(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdFetchProductPostList(User.getId()).orElseThrow(UserNotFoundException::new);
         Product product = Product.builder()
                     .title(buildDto.getTitle())
                     .content(buildDto.getContent())
@@ -121,7 +120,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     @Transactional(rollbackFor = {Exception.class})
     public JSONObject editPost(User User, Long productId, ProductEditDto editDto){   // 글 생성
-        User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdNotDeleted(User.getId()).orElseThrow(UserNotFoundException::new);
         Product product = productRepository.findById(productId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(product.getUser().getId()))
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
@@ -133,7 +132,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     @Transactional(rollbackFor = {Exception.class})
     public JSONObject deletePost(User User, Long productId){   // 글 생성
-        User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdNotDeleted(User.getId()).orElseThrow(UserNotFoundException::new);
         Product product = productRepository.findByIdFetchChatRooms(productId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(product.getUser().getId()))
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
@@ -155,10 +154,10 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     @Transactional
     public JSONObject showDetail(Long id, User User){   // 글 상세 확인
-        User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdFetchFollowingAndLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
         Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(PostNotFoundException::new);
         DetailProductForm detailForm = makeProductDetailForm(product);
-        if(product.getUser()!=null){
+        if(!product.getUser().isDelete()){
             User postUser = product.getUser();
             detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_celeb(), postUser.getFollowerNum());
         }
@@ -182,7 +181,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     public JSONObject showDetail(Long id){   // 비회원 글 보기
         Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(PostNotFoundException::new);
         DetailProductForm detailForm = makeProductDetailForm(product);
-        if(product.getUser()!=null){
+        if(!product.getUser().isDelete()){
             User postUser =product.getUser();
             detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_celeb(), postUser.getFollowerNum());
         }
@@ -254,7 +253,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     @Transactional(readOnly = true)
     public JSONObject showHome(User User){
         JSONObject obj = new JSONObject();
-        User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdFetchFollowingAndLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
         List<String> userCategories = Arrays.asList(user.getCategoryLike().split(","));
 
         List<Product> productList = productRepository.findAll();
@@ -304,7 +303,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     @Transactional(readOnly = true)
     public JSONObject showRecommendDetail(User User){
-        User user = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdFetchLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
         List<String> userCategories = Arrays.asList(user.getCategoryLike().split(","));
 
         List<Product> recommendList = QDSLRepository.findCountByCategoriesDesc(userCategories, HOME_DETAIL_OBJECTS);
@@ -315,7 +314,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     @Transactional(readOnly = true)
     public JSONObject showFollowingDetail(User User){
-        User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdFetchFollowingAndLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
         List<Product> productList = productRepository.findAll();
 
         List<Product> followingList = getFollowingList(user, productList, HOME_DETAIL_OBJECTS);
@@ -345,7 +344,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     @Transactional
     public JSONObject wish(User User, @RequestBody ActionForm form){   // 찜
         JSONObject obj = new JSONObject();
-        User user = userRepository.findByEmailFetchProductWishList(User.getEmail()).orElseThrow(UserNotFoundException::new); // 작품 찜까지 페치 조인
+        User user = userRepository.findByIdFetchProductWishList(User.getId()).orElseThrow(UserNotFoundException::new); // 작품 찜까지 페치 조인
         List<ProductWish> wishList = user.getProductWishList(); //wishList == 유저의 찜 리스트
         boolean isWish=false;
         Product product = productRepository.findById(form.getId()).orElseThrow(PostNotFoundException::new);
@@ -389,7 +388,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     @Transactional
     public JSONObject likes(User User, @RequestBody ActionForm form){
         JSONObject obj = new JSONObject();
-        User user = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdFetchLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
         List<ProductLikes> userLikesList = user.getProductLikesList();
         boolean isLike=false;
         Product product = productRepository.findById(form.getId()).orElseThrow(PostNotFoundException::new);
@@ -450,7 +449,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     @Transactional
     public JSONObject sell(User User, @RequestBody SellDto dto){
-        User user = userRepository.findByEmailFetchProductSellList(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdFetchProductSellList(User.getId()).orElseThrow(UserNotFoundException::new);
         Product product = productRepository.findById(dto.getProductId()).orElseThrow(PostNotFoundException::new);
         ProductSell connect = ProductSell.createConnect(product, user);
         productSellRepository.save(connect);
@@ -459,7 +458,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     @Transactional
     public JSONObject suggest(User User, @RequestBody SuggestDto dto){
-        User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdNotDeleted(User.getId()).orElseThrow(UserNotFoundException::new);
         if(suggestRepository.findByUserIdAndProductId(user.getId(),dto.getId()).isPresent())
             return PropertyUtil.responseMessage("이미 제안을 하신 작품입니다.");
         Product product = productRepository.findById(dto.getId()).orElseThrow();
@@ -471,7 +470,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     @Transactional
     public PageImpl<ShowForm> productListForUser(User User, String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
-        User user  = userRepository.findByEmailFetchHistoryAndLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        User user  = userRepository.findByIdFetchHistoryAndLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
         if(!keyword.isEmpty())
             saveSearchHistory(keyword, user);
         Page<Product> productList = QDSLRepository.findAllByCompleteAndCategoriesAligned(complete, keyword, categories, align, pageable);

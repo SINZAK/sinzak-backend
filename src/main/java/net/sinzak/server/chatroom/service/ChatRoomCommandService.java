@@ -73,7 +73,7 @@ public class ChatRoomCommandService {
 
         log.info("게시글 확인");
         checkUserStatus(user,postUser);
-        User loginUser = userRepository.findById(user.getId()).orElseThrow(UserNotFoundException::new);
+        User loginUser = userRepository.findByIdNotDeleted(user.getId()).orElseThrow(UserNotFoundException::new);
 
         if(userQueryService.checkReported(postUser,user)){
             return PropertyUtil.responseMessage("차단된 상대입니다.");

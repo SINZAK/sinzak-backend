@@ -31,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -58,7 +57,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     }
     @Transactional(rollbackFor = {Exception.class})
     public JSONObject makePost(User User, WorkPostDto postDto){
-        User user = userRepository.findByEmailFetchWorkPostList(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdFetchWorkPostList(User.getId()).orElseThrow(UserNotFoundException::new);
         Work work = Work.builder()
                 .title(postDto.getTitle())
                 .content(postDto.getContent())
@@ -127,7 +126,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
 
     @Transactional(rollbackFor = {Exception.class})
     public JSONObject editPost(User User, Long workId, WorkEditDto editDto){
-        User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdNotDeleted(User.getId()).orElseThrow(UserNotFoundException::new);
         Work work = workRepository.findById(workId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(work.getUser().getId()))
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
@@ -139,7 +138,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
 
     @Transactional(rollbackFor = {Exception.class})
     public JSONObject deletePost(User User, Long workId){   // 글 생성
-        User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdNotDeleted(User.getId()).orElseThrow(UserNotFoundException::new);
         Work work = workRepository.findByIdFetchChatRooms(workId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(work.getUser().getId()))
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
@@ -161,7 +160,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
 
     @Transactional
     public JSONObject showDetail(Long id, User User){   // 글 상세 확인
-        User user = userRepository.findByEmailFetchFollowingAndLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdFetchFollowingAndLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
         Work work = workRepository.findByIdFetchWorkWishAndUser(id).orElseThrow(PostNotFoundException::new);
         DetailWorkForm detailForm = makeWorkDetailForm(work);
         if(work.getUser()!=null){
@@ -270,7 +269,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     @Transactional
     public JSONObject wish(User User, @RequestBody ActionForm form){
         JSONObject obj = new JSONObject();
-        User user = userRepository.findByEmailFetchWorkWishList(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdFetchWorkWishList(User.getId()).orElseThrow(UserNotFoundException::new);
         List<WorkWish> wishList = user.getWorkWishList();
         boolean isWish=false;
         Work work = workRepository.findById(form.getId()).orElseThrow(PostNotFoundException::new);
@@ -312,7 +311,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     @Transactional
     public JSONObject likes(User User, @RequestBody ActionForm form){
         JSONObject obj = new JSONObject();
-        User user = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdFetchLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
         List<WorkLikes> userLikesList = user.getWorkLikesList();
         boolean isLike=false;
         Work work = workRepository.findById(form.getId()).orElseThrow(PostNotFoundException::new);
@@ -352,7 +351,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
 
     @Transactional
     public JSONObject suggest(User User, @RequestBody SuggestDto dto){
-        User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdNotDeleted(User.getId()).orElseThrow(UserNotFoundException::new);
         if(suggestRepository.findByUserIdAndWorkId(user.getId(),dto.getId()).isPresent())
             return PropertyUtil.responseMessage("이미 제안을 하신 작품입니다.");
         Work work = workRepository.findById(dto.getId()).orElseThrow();
@@ -364,7 +363,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
 
     @Transactional
     public PageImpl<ShowForm> workListForUser(User User, String keyword, List<String> categories, String align, boolean employment, Pageable pageable){
-        User user  = userRepository.findByEmailFetchLikesList(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        User user  = userRepository.findByIdFetchLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
         if(!keyword.isEmpty())
             saveSearchHistory(keyword, user);
         Page<Work> workList = QDSLRepository.findSearchingByEmploymentAndCategoriesAligned(employment, keyword, categories, align, pageable);

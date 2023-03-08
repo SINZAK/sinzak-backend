@@ -24,7 +24,7 @@ public class CertService {
 
     @Transactional
     public JSONObject certifyUniv(User User, UnivDto dto){
-        User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdNotDeleted(User.getId()).orElseThrow(UserNotFoundException::new);
         Optional<Cert> savedCert = certRepository.findCertByUnivEmail(dto.getUniv_email());
         Long certId;
         if(savedCert.isEmpty())

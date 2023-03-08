@@ -111,7 +111,7 @@ public class ProductController {
     @ApiDocumentResponse
     @PostMapping("/products/sell")
     @ApiOperation(value = "작품 판매", notes = "회원의 구매목록에 추가, 해당 작품 판매완료 설정")
-    public JSONObject sell(User user, @RequestBody SellDto dto) {
+    public JSONObject sell(@AuthenticationPrincipal User user, @RequestBody SellDto dto) {
         PropertyUtil.checkHeader(user);
         return productService.sell(user, dto);
     }
@@ -119,7 +119,7 @@ public class ProductController {
     @ApiDocumentResponse
     @PostMapping("/products/suggest")
     @ApiOperation(value = "작품 가격제안")
-    public JSONObject suggest(User user, @RequestBody SuggestDto dto) {
+    public JSONObject suggest(@AuthenticationPrincipal User user, @RequestBody SuggestDto dto) {
         PropertyUtil.checkHeader(user);
         return productService.suggest(user, dto);
     }

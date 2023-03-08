@@ -33,7 +33,7 @@ public class SecurityService {
 
     @Transactional
     public TokenDto login(String email) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmailNotDeleted(email)
                 .orElseThrow(() -> new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND));
         TokenDto tokenDto = jwtProvider.createToken(user.getId().toString(), user.getId(), user.getRoles());
         //리프레시 토큰 저장
@@ -71,7 +71,7 @@ public class SecurityService {
         if(!User.getNickName().isBlank())
             return PropertyUtil.responseMessage("이미 회원가입된 유저입니다.");
         JSONObject obj = new JSONObject();
-        User user = userRepository.findByEmail(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByEmailNotDeleted(User.getEmail()).orElseThrow(UserNotFoundException::new);
         user.saveJoinInfo(dto.getNickName(), dto.getCategory_like());
         user.setRandomProfileImage();
         JoinTerms terms = new JoinTerms(dto.isTerm());
@@ -108,7 +108,7 @@ public class SecurityService {
 
     @Transactional(readOnly = true)
     public JSONObject checkEmail(EmailDto dto) {
-        Optional<User> existUser = userRepository.findByEmail(dto.getEmail());
+        Optional<User> existUser = userRepository.findByEmailNotDeleted(dto.getEmail());
         if (existUser.isPresent()){
             User user = existUser.get();
             if(!user.getNickName().isBlank())
