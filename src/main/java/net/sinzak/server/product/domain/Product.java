@@ -141,4 +141,6 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     public void setTrading(boolean trading) {
         this.trading = trading;
     }
+
+    public void setComplete(boolean complete) {this.complete = complete;}
 }

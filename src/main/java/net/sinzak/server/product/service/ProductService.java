@@ -462,6 +462,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
             return PropertyUtil.responseMessage("이미 판매완료된 작품입니다.");
         ProductSell connect = ProductSell.createConnect(product, user);
         productSellRepository.save(connect);
+        product.setComplete(true);
+        product.setTrading(false);
         return PropertyUtil.response(true);
     }
 
