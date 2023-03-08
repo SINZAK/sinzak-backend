@@ -163,7 +163,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         User user = userRepository.findByIdFetchFollowingAndLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
         Work work = workRepository.findByIdFetchWorkWishAndUser(id).orElseThrow(PostNotFoundException::new);
         DetailWorkForm detailForm = makeWorkDetailForm(work);
-        if(work.getUser()!=null){
+        if(!work.getUser().isDelete()){
             User postUser = work.getUser();
             detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_celeb(), postUser.getFollowerNum());
         }
@@ -210,7 +210,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     public JSONObject showDetail(Long id){   // 글 상세 확인
         Work work = workRepository.findByIdFetchWorkWishAndUser(id).orElseThrow(PostNotFoundException::new);
         DetailWorkForm detailForm =makeWorkDetailForm(work);
-        if(work.getUser()!=null){
+        if(!work.getUser().isDelete()){
             User postUser = work.getUser();
             detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_celeb(), postUser.getFollowerNum());
         }

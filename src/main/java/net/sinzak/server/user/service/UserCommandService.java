@@ -165,16 +165,7 @@ public class UserCommandService {
         return Optional.empty();
     }
 
-    @Transactional(readOnly = true)
-    public JSONObject showReportList(User User){
-        User loginUser = userRepository.findByIdFetchReportList(User.getId()).orElseThrow(UserNotFoundException::new);
-        List<Report> reportList = loginUser.getReportList();
-        List<ReportRespondDto> reportRespondDtos = new ArrayList<>();
-        for (Report report : reportList)
-            reportRespondDtos.add(new ReportRespondDto(report.getOpponentUser().getId(), report.getOpponentUser().getNickName(), report.getOpponentUser().getPicture()));
 
-        return PropertyUtil.response(reportRespondDtos);
-    }
 
     public JSONObject deleteSearchHistory(Long id, User User){
         User user = historyRepository.findByIdFetchHistoryList(User.getId()).orElseThrow(InstanceNotFoundException::new);

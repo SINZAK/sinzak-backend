@@ -10,11 +10,8 @@ import net.sinzak.server.product.domain.ProductWish;
 import net.sinzak.server.product.repository.ProductWishRepository;
 import net.sinzak.server.user.domain.Report;
 import net.sinzak.server.user.domain.SearchHistory;
-import net.sinzak.server.user.dto.respond.GetFollowDto;
+import net.sinzak.server.user.dto.respond.*;
 import net.sinzak.server.user.domain.User;
-import net.sinzak.server.user.dto.respond.ProfileShowForm;
-import net.sinzak.server.user.dto.respond.UserDto;
-import net.sinzak.server.user.dto.respond.WishShowForm;
 import net.sinzak.server.user.repository.ReportRepository;
 import net.sinzak.server.user.repository.SearchHistoryRepository;
 import net.sinzak.server.user.repository.UserRepository;
@@ -229,6 +226,17 @@ public class UserQueryService {
             }
         }
         return PropertyUtil.response(getFollowDtoList);
+    }
+    @Transactional(readOnly = true)
+    public JSONObject showReportList(User User){
+        User loginUser = userRepository.findByIdFetchReportList(User.getId()).orElseThrow(UserNotFoundException::new);
+        List<Report> reportList = loginUser.getReportList();
+        List<ReportRespondDto> reportRespondDtos = new ArrayList<>();
+        for (Report report : reportList)
+            if(!report.getOpponentUser().isDelete()){
+                reportRespondDtos.add(new ReportRespondDto(report.getOpponentUser().getId(), report.getOpponentUser().getNickName(), report.getOpponentUser().getPicture()));
+            }
+        return PropertyUtil.response(reportRespondDtos);
     }
 
     @Transactional
