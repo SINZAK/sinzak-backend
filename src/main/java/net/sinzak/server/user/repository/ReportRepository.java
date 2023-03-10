@@ -11,5 +11,8 @@ import java.util.Optional;
 public interface ReportRepository extends JpaRepository<Report, Long> {
 
     @Query("select r from Report  r where (r.opponentUser.id = :opponentUserId and r.user.id = :userId) or(r.opponentUser.id = :userId and r.user.id = :opponentUserId)")
-    Optional<Report> findByUserIdAndOpponentUserId(@Param("userId") Long userId,@Param("opponentUserId") Long opponentUserId);
+    List<Report> findByUserIdAndOpponentUserIdBoth(@Param("userId") Long userId, @Param("opponentUserId") Long opponentUserId);
+
+    @Query("select r from Report r left join fetch r.opponentUser where r.user.id = :userId")
+    List<Report> findByUserId(@Param("userId") Long userId);
 }

@@ -83,8 +83,8 @@ public class UserQueryService {
     }
 
     public boolean checkReported(User postUser,User loginUser){
-        Optional<Report> report = reportRepository.findByUserIdAndOpponentUserId(postUser.getId(), loginUser.getId());
-        if(report.isPresent()){
+        List<Report> report = reportRepository.findByUserIdAndOpponentUserIdBoth(postUser.getId(), loginUser.getId());
+        if(!report.isEmpty()){
             return true;
         }
         return false;
@@ -230,7 +230,7 @@ public class UserQueryService {
     @Transactional(readOnly = true)
     public JSONObject showReportList(User User){
         User loginUser = userRepository.findByIdFetchReportList(User.getId()).orElseThrow(UserNotFoundException::new);
-        List<Report> reportList = loginUser.getReportList();
+        List<Report> reportList = reportRepository.findByUserId(loginUser.getId());
         List<ReportRespondDto> reportRespondDtos = new ArrayList<>();
         for (Report report : reportList)
             if(!report.getOpponentUser().isDelete()){
