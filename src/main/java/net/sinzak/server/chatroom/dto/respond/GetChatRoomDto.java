@@ -14,4 +14,5 @@ public class GetChatRoomDto {
     private boolean complete;
     private boolean suggest;
     private Long userId;
+    private String postType;
 }
