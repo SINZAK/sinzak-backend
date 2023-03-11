@@ -10,6 +10,7 @@ import net.sinzak.server.common.dto.SuggestDto;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.common.dto.ActionForm;
 import net.sinzak.server.product.dto.ImageUrlDto;
+import net.sinzak.server.product.dto.SellDto;
 import net.sinzak.server.product.dto.ShowForm;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.work.dto.WorkEditDto;
@@ -102,6 +103,15 @@ public class WorkController {
         PropertyUtil.checkHeader(user);
         return workService.likes(user, form);
     }
+
+    @ApiDocumentResponse
+    @PostMapping("/works/sell")
+    @ApiOperation(value = "모집 완료", notes = "해당 의뢰 모집 완료 설정!")
+    public JSONObject sell(@AuthenticationPrincipal User user, @RequestBody SellDto dto) {
+        PropertyUtil.checkHeader(user);
+        return workService.sell(user, dto);
+    }
+
 
     @ApiDocumentResponse
     @PostMapping("/works/suggest")

@@ -10,6 +10,7 @@ import net.sinzak.server.common.error.PostNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.image.S3Service;
 import net.sinzak.server.common.dto.SuggestDto;
+import net.sinzak.server.product.dto.SellDto;
 import net.sinzak.server.product.dto.ShowForm;
 import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.user.domain.User;
@@ -45,6 +46,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     private final WorkWishRepository workWishRepository;
     private final WorkImageRepository imageRepository;
     private final WorkLikesRepository likesRepository;
+    private final WorkSellRepository workSellRepository;
     private final WorkSuggestRepository suggestRepository;
     private final WorkQDSLRepositoryImpl QDSLRepository;
     private final SearchHistoryRepository historyRepository;
@@ -347,6 +349,18 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
             obj.put("success",false);
         obj.put("isLike",isLike);
         return obj;
+    }
+
+    @Transactional
+    public JSONObject sell(User User, @RequestBody SellDto dto){
+        User user = userRepository.findByEmailFetchProductSellList(User.getEmail()).orElseThrow(UserNotFoundException::new);
+        Work work = workRepository.findById(dto.getPostId()).orElseThrow(PostNotFoundException::new);
+        if(work.isComplete())
+            return PropertyUtil.responseMessage("이미 판매완료된 작품입니다.");
+        WorkSell connect = WorkSell.createConnect(work, user);
+        workSellRepository.save(connect);
+        work.setComplete(true);
+        return PropertyUtil.response(true);
     }
 
     @Transactional
