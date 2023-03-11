@@ -125,7 +125,7 @@ public class ProductController {
     }
 
     @ApiDocumentResponse
-    @ApiOperation(value = "작품 홈")
+    @ApiOperation(value = "작품 홈", notes = "신작 , 추천, 팔로잉으로 분류")
     @PostMapping("/home/products")
     public JSONObject showHomeProduct(@AuthenticationPrincipal User user) {
         try {

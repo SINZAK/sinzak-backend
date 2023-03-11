@@ -194,6 +194,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
                 .images(getImages(work))
                 .title(work.getTitle())
                 .price(work.getPrice())
+                .topPrice(work.getTopPrice())
                 .category(work.getCategory())
                 .date(work.getCreatedDate().toString())
                 .content(work.getContent())
