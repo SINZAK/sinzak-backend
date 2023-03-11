@@ -122,6 +122,7 @@ public class ChatRoomQueryService {
                         .sendAt(chatMessage.getCreatedDate())
                         .message(chatMessage.getMessage())
                         .senderId(chatMessage.getSenderId())
+                        .messageType(chatMessage.getType().toString())
                         .build()
         ).collect(Collectors.toList());
         int start = (int) pageable.getOffset();
