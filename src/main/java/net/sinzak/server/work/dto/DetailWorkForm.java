@@ -13,8 +13,8 @@ public class DetailWorkForm extends DetailForm {
     private boolean employment;
 
     @Builder
-    public DetailWorkForm(Long id, Long userId, String author, String author_picture, String univ, boolean cert_uni, boolean cert_celeb, String followerNum, List<String> images, String title, String category, String date, String content, int price, boolean suggest, int likesCnt, int views, int wishCnt, int chatCnt, boolean complete, boolean employment) {
-        super(id, userId, author, author_picture, univ, cert_uni, cert_celeb, followerNum, images, title, category, date, content, price, suggest, likesCnt, views, wishCnt, chatCnt, complete);
+    public DetailWorkForm(Long id, Long userId, String author, String author_picture, String univ, boolean cert_uni, boolean cert_celeb, String followerNum, List<String> images, String title, String category, String date, String content, int price, int topPrice, boolean suggest, int likesCnt, int views, int wishCnt, int chatCnt, boolean complete, boolean employment) {
+        super(id, userId, author, author_picture, univ, cert_uni, cert_celeb, followerNum, images, title, category, date, content, price, topPrice, suggest, likesCnt, views, wishCnt, chatCnt, complete);
         this.employment = employment;
     }
 }

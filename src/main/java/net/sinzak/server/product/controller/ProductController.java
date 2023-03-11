@@ -101,17 +101,11 @@ public class ProductController {
         return productService.likes(user, form);
     }
 
-    @ApiDocumentResponse
-    @PostMapping("/products/trading")
-    @ApiOperation(value = "작품 거래중")
-    public JSONObject trading(@RequestBody ActionForm form) {
-        return productService.trading(form);
-    }
 
     @ApiDocumentResponse
     @PostMapping("/products/sell")
     @ApiOperation(value = "작품 판매", notes = "회원의 구매목록에 추가, 해당 작품 판매완료 설정")
-    public JSONObject sell(User user, @RequestBody SellDto dto) {
+    public JSONObject sell(@AuthenticationPrincipal User user, @RequestBody SellDto dto) {
         PropertyUtil.checkHeader(user);
         return productService.sell(user, dto);
     }
@@ -119,13 +113,15 @@ public class ProductController {
     @ApiDocumentResponse
     @PostMapping("/products/suggest")
     @ApiOperation(value = "작품 가격제안")
-    public JSONObject suggest(User user, @RequestBody SuggestDto dto) {
+    public JSONObject suggest(@AuthenticationPrincipal User user, @RequestBody SuggestDto dto) {
         PropertyUtil.checkHeader(user);
         return productService.suggest(user, dto);
     }
 
     @ApiDocumentResponse
-    @ApiOperation(value = "작품 홈")
+    @ApiOperation(value = "작품 홈", notes = "회원 : new(최신순), recommend(추천순), following(팔로잉)" +
+            "비회원 : new(최신순), trading(채팅 수 1이상, 판매완료 안된 것), hot(좋아요 순)\n" +
+            "비회원은 더보기 버튼 클릭 시 로그인 창으로")
     @PostMapping("/home/products")
     public JSONObject showHomeProduct(@AuthenticationPrincipal User user) {
         try {

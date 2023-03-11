@@ -31,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -168,19 +167,18 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
             User postUser = work.getUser();
             detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_celeb(), postUser.getFollowerNum());
         }
-        else{
+        else
             detailForm.setUserInfo(null, "탈퇴한 회원", null, "??", false, false, "0");
-            return PropertyUtil.response(detailForm);
-        }
-        if(user.getId().equals(work.getUser().getId())){
+
+        if(user.getId().equals(work.getUser().getId()))
             detailForm.setMyPost();
-        }
+
         boolean isLike = checkIsLikes(user.getWorkLikesList(), work);
         boolean isWish = checkIsWish(user, work.getWorkWishList());
         boolean isFollowing  = false;
-        if(work.getUser()!=null){
+        if(work.getUser()!=null)
             isFollowing =checkIsFollowing(user.getFollowingList(), work);
-        }
+
         detailForm.setUserAction(isLike, isWish, isFollowing);
         work.addViews();
         return PropertyUtil.response(detailForm);
@@ -194,6 +192,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
                 .images(getImages(work))
                 .title(work.getTitle())
                 .price(work.getPrice())
+                .topPrice(work.getTopPrice())
                 .category(work.getCategory())
                 .date(work.getCreatedDate().toString())
                 .content(work.getContent())

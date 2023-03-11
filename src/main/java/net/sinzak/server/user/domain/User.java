@@ -173,7 +173,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     public User(String email, String name, String picture, String origin) {
         this.email = email;
         this.name = name;
-        this.nickName = name;
+        this.nickName = "";
         this.picture = picture;
         this.origin = origin;
         this.categoryLike = "";

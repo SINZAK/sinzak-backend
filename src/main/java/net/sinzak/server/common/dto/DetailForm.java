@@ -39,6 +39,8 @@ public class DetailForm {
     private String content;
     @ApiModelProperty(value = "작품(가격), 외주(페이)", example = "30000")
     private int price;
+    @ApiModelProperty(value = "현 최고 제안 가격", example = "50000")
+    private int topPrice;
     @ApiModelProperty(example = "false",notes = "true -> 체크 한 사람(가격 제안 받겠다는 사람)")
     private boolean suggest;
     @ApiModelProperty(example = "true",notes = "true -> 누른 사람")
@@ -59,13 +61,7 @@ public class DetailForm {
     private boolean complete;
 
 
-    public void setUserAction(boolean like, boolean wish, boolean isFollowing) {
-        this.isLike = like;
-        this.isWish = wish;
-        this.isFollowing = isFollowing;
-    }
-
-    public DetailForm(Long id, Long userId, String author, String author_picture, String univ, boolean cert_uni, boolean cert_celeb, String followerNum, List<String> images, String title, String category, String date, String content, int price, boolean suggest, int likesCnt, int views, int wishCnt, int chatCnt, boolean complete) {
+    public DetailForm(Long id, Long userId, String author, String author_picture, String univ, boolean cert_uni, boolean cert_celeb, String followerNum, List<String> images, String title, String category, String date, String content, int price, int topPrice, boolean suggest, int likesCnt, int views, int wishCnt, int chatCnt, boolean complete) {
         this.id = id;
         this.userId = userId;
         this.author = author;
@@ -80,6 +76,7 @@ public class DetailForm {
         this.date = date;
         this.content = content;
         this.price = price;
+        this.topPrice = topPrice;
         this.suggest = suggest;
         this.likesCnt = likesCnt;
         this.views = views;
@@ -96,6 +93,12 @@ public class DetailForm {
         this.cert_uni = cert_uni;
         this.cert_celeb = cert_celeb;
         this.followerNum = followerNum;
+    }
+
+    public void setUserAction(boolean like, boolean wish, boolean isFollowing) {
+        this.isLike = like;
+        this.isWish = wish;
+        this.isFollowing = isFollowing;
     }
 
     public void setMyPost() {
