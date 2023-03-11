@@ -200,6 +200,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                 .images(getImages(product))
                 .title(product.getTitle())
                 .price(product.getPrice())
+                .topPrice(product.getTopPrice())
                 .category(product.getCategory())
                 .date(product.getCreatedDate().toString())
                 .content(product.getContent())
