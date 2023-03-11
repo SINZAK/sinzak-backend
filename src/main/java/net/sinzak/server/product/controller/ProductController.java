@@ -101,12 +101,6 @@ public class ProductController {
         return productService.likes(user, form);
     }
 
-//    @ApiDocumentResponse
-//    @PostMapping("/products/trading")
-//    @ApiOperation(value = "작품 거래중")
-//    public JSONObject trading(@RequestBody ActionForm form) {
-//        return productService.trading(form);
-//    }
 
     @ApiDocumentResponse
     @PostMapping("/products/sell")

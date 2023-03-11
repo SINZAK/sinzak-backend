@@ -68,9 +68,6 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     private Size size;
 
     @Column
-    private boolean trading = false;
-
-    @Column
     private boolean complete = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -144,10 +141,6 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     }
 
     public void addViews() {this.views++;this.popularity++;}
-
-    public void setTrading(boolean trading) {
-        this.trading = trading;
-    }
 
     public void setComplete(boolean complete) {this.complete = complete;}
 }

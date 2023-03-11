@@ -211,7 +211,6 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                 .width(product.getSize().width)
                 .vertical(product.getSize().vertical)
                 .height(product.getSize().height)
-                .trading(product.isTrading())
                 .complete(product.isComplete()).build();
         return detailForm;
     }
@@ -427,26 +426,26 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return obj;
     }
 
-    @Transactional
-    public JSONObject trading(@RequestBody ActionForm form){
-        JSONObject obj = new JSONObject();
-        boolean isTrading;
-        Product product = productRepository.findById(form.getId()).orElseThrow(PostNotFoundException::new);
-        isTrading = product.isTrading();
-        if (form.isMode() && !isTrading){
-            product.setTrading(true);
-            isTrading=true;
-            obj.put("success",true);
-        }
-        else if(!form.isMode() && isTrading){
-            product.setTrading(false);
-            obj.put("success",true);
-        }
-        else
-            obj.put("success",false);
-        obj.put("isTrading",isTrading);
-        return obj;
-    }
+//    @Transactional
+//    public JSONObject trading(@RequestBody ActionForm form){
+//        JSONObject obj = new JSONObject();
+//        boolean isTrading;
+//        Product product = productRepository.findById(form.getId()).orElseThrow(PostNotFoundException::new);
+//        isTrading = product.isTrading();
+//        if (form.isMode() && !isTrading){
+//            product.setTrading(true);
+//            isTrading=true;
+//            obj.put("success",true);
+//        }
+//        else if(!form.isMode() && isTrading){
+//            product.setTrading(false);
+//            obj.put("success",true);
+//        }
+//        else
+//            obj.put("success",false);
+//        obj.put("isTrading",isTrading);
+//        return obj;
+//    }
 
     @Transactional
     public JSONObject sell(User User, @RequestBody SellDto dto){
