@@ -165,6 +165,7 @@ public class ChatRoomQueryService {
 
         }
         GetChatRoomDto getChatRoomDto = GetChatRoomDto.builder()
+                .postType(PostType.WORK)
                 .userId(chatRoom.getPostUserId())
                 .roomName(userChatRoom.getRoomName())
                 .productId(chatRoom.getWork().getId())
@@ -179,6 +180,7 @@ public class ChatRoomQueryService {
 
     private GetChatRoomDto makeProductChatRoomDto(UserChatRoom userChatRoom, ChatRoom chatRoom) {
         GetChatRoomDto getChatRoomDto = GetChatRoomDto.builder()
+                .postType(PostType.PRODUCT)
                 .userId(chatRoom.getPostUserId())
                 .roomName(userChatRoom.getRoomName())
                 .productId(chatRoom.getProduct().getId())
