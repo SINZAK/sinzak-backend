@@ -141,5 +141,7 @@ public class Work extends BaseTimeEntity { /** 외주 **/
     public void setTopPrice(int topPrice) {
         this.topPrice = topPrice;
     }
+
+    public void setComplete(boolean complete) {this.complete = complete;}
 }
 
