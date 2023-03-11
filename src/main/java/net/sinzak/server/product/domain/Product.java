@@ -83,9 +83,8 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
     private List<ProductWish> productWishList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "product")
-    private List<ChatRoom> chatRooms = new ArrayList<>();
-
+    @OneToMany(mappedBy = "product",cascade= CascadeType.MERGE)
+    private List<ChatRoom> chatRooms  = new ArrayList<>();
     @Builder
     public Product(String title, String content, String category, int price, boolean suggest, String author, String univ, Size size) {
         this.title = title;
@@ -98,6 +97,9 @@ public class Product extends BaseTimeEntity { /** 작품 **/
         this.size = size;
     }
 
+    public void deleteUser(){
+        this.user =null;
+    }
     public void setUser(User user) {
         user.getProductPostList().add(this);
         this.user = user;
@@ -121,6 +123,11 @@ public class Product extends BaseTimeEntity { /** 작품 **/
         chatRoom.setProduct(this);
         this.chatRooms.add(chatRoom);
         this.chatCnt++;
+    }
+    public void makeChatRoomNull(){
+        for(ChatRoom chatRoom :this.getChatRooms()){
+            chatRoom.setProduct(null);
+        }
     }
     public void addImage(ProductImage image) {
         this.getImages().add(image);

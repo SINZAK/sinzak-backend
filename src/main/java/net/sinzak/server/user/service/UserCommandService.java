@@ -46,9 +46,11 @@ public class UserCommandService {
     }
 
     public JSONObject updateUser(UpdateUserDto dto, User loginUser){
-        if(loginUser ==null){
-            return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
+        Optional<User> duplicateNameUser = userRepository.findByNickNameExceptOriginalNickName(dto.getName(),loginUser.getNickName());
+        if(duplicateNameUser.isPresent()){
+            return PropertyUtil.responseMessage("이미 가입된 닉네임입니다");
         }
+        PropertyUtil.checkHeader(loginUser);
         User user = userRepository.findById(loginUser.getId()).orElseThrow(UserNotFoundException::new);
         user.update(dto.getName(),dto.getIntroduction());
         return PropertyUtil.response(true);
@@ -114,7 +116,7 @@ public class UserCommandService {
         User user = userRepository.findByIdFetchFollowingList(loginUser.getId()).orElseThrow(UserNotFoundException::new);
         user.getFollowingList().add(findUser.getId());
         findUser.getFollowerList().add(loginUser.getId());
-        fireBaseService.sendIndividualNotification(findUser,"팔로우 알림",findUser.getName(),findUser.getId().toString());
+        fireBaseService.sendIndividualNotification(findUser,"팔로우 알림",findUser.getNickName(),findUser.getId().toString());
 
         user.updateFollowNumber();
         findUser.updateFollowNumber();
@@ -137,7 +139,7 @@ public class UserCommandService {
         if(checkReportHistory(opponentUserId, loginUser).isPresent())
             return PropertyUtil.responseMessage("이미 신고한 회원입니다.");
         User opponentUser = userRepository.findById(opponentUserId).orElseThrow(UserNotFoundException::new);
-        chatRoomCommandService.makeChatRoomBlocked(loginUser,opponentUser);
+        chatRoomCommandService.makeChatRoomBlocked(loginUser,opponentUser,true);
         Report connect = Report.createConnect(loginUser, opponentUser);
         reportRepository.save(connect);
         return PropertyUtil.response(true);
@@ -150,7 +152,7 @@ public class UserCommandService {
             return PropertyUtil.responseMessage("본인을 신고 취소 할 수 없습니다.");
         Report report = checkReportHistory(opponentUserId, loginUser).orElseThrow(InstanceNotFoundException::new);
         User opponentUser = userRepository.findById(opponentUserId).orElseThrow(UserNotFoundException::new);
-        chatRoomCommandService.makeChatRoomBlocked(loginUser,opponentUser);
+        chatRoomCommandService.makeChatRoomBlocked(loginUser,opponentUser,false);
         reportRepository.delete(report);
         return PropertyUtil.response(true);
     }
@@ -192,11 +194,17 @@ public class UserCommandService {
     @Transactional(rollbackFor = Exception.class)
     public JSONObject resign(User user){
         try{
-            userRepository.delete(user);
+            User loginUser = userRepository.findByIdFetchWorkListAndProductList(user.getId()).orElseThrow(UserNotFoundException::new);
+            beforeDeleteUser(loginUser);
+            userRepository.delete(loginUser);
+            return PropertyUtil.response(true);
         }
         catch (Exception e){
-            return PropertyUtil.responseMessage("오류로 인해 탈퇴되지 않았습니다.");
+            return PropertyUtil.response(false);
         }
-        return PropertyUtil.response(true);
+
+    }
+    private void beforeDeleteUser(User user){
+        user.makePostNull();
     }
 }

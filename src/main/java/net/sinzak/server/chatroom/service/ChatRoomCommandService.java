@@ -143,11 +143,11 @@ public class ChatRoomCommandService {
         return getCreatedChatRoomDto;
     }
 
-    public void makeChatRoomBlocked(User user,User opponentUser){
+    public void makeChatRoomBlocked(User user,User opponentUser,boolean isBlock){
         List<UserChatRoom> userChatRooms = userChatRoomRepository.findUserChatRoomByIdFetchChatRoom(user.getId());
         for(UserChatRoom userChatRoom : userChatRooms){
             if(userChatRoom.getOpponentUserId().equals(opponentUser.getId())){
-                userChatRoom.getChatRoom().setBlocked(true);
+                userChatRoom.getChatRoom().setBlocked(isBlock);
             }
         }
     }

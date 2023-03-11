@@ -101,6 +101,10 @@ public class Work extends BaseTimeEntity { /** 외주 **/
         user.getWorkPostList().add(this);
         this.user = user;
     }
+
+    public void deleteUser(){
+        this.user =null;
+    }
     public void editPost(WorkEditDto dto){
         this.title = dto.getTitle();
         this.content = dto.getContent();
@@ -120,6 +124,11 @@ public class Work extends BaseTimeEntity { /** 외주 **/
         chatRoom.setWork(this);
         this.chatRooms.add(chatRoom);
         this.chatCnt++;
+    }
+    public void makeChatRoomNull(){
+        for(ChatRoom chatRoom :this.getChatRooms()){
+            chatRoom.setWork(null);
+        }
     }
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;

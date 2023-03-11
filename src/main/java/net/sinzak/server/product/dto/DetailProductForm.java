@@ -3,6 +3,7 @@ package net.sinzak.server.product.dto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import net.sinzak.server.common.dto.DetailForm;
 
 import java.util.List;

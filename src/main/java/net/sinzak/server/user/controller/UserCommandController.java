@@ -67,7 +67,6 @@ public class UserCommandController {
     @ApiOperation(value = "유저 정보변경", notes = "이름,한줄 소개, 학교(보류) ")
     @PostMapping(value = "/users/edit")
     public JSONObject updateUser( @RequestBody UpdateUserDto dto , @AuthenticationPrincipal User user) {
-        PropertyUtil.checkHeader(user);
         return userCommandService.updateUser(dto,user);
     }
     @ApiDocumentResponse
@@ -150,7 +149,7 @@ public class UserCommandController {
     @ApiDocumentResponse
     @ApiOperation(value = "유저 탈퇴하기")
     @PostMapping(value = "/users/resign")
-    public JSONObject report(@AuthenticationPrincipal User user){
+    public JSONObject resign(@AuthenticationPrincipal User user){
         PropertyUtil.checkHeader(user);
         return userCommandService.resign(user);
     }

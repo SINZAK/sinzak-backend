@@ -12,6 +12,7 @@ import net.sinzak.server.product.domain.ProductWish;
 import net.sinzak.server.work.domain.Work;
 import net.sinzak.server.work.domain.WorkLikes;
 import net.sinzak.server.work.domain.WorkWish;
+import org.hibernate.Hibernate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -42,7 +43,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     private String name;
 
     @Column
-    private String nickName=""; //얘는 안 쓸 수도있음
+    private String nickName="";
 
     @Column
     @Setter
@@ -93,8 +94,11 @@ public class User extends BaseTimeEntity implements UserDetails {
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<UserChatRoom> userChatRooms = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "user",cascade = CascadeType.MERGE)
     private List<Product> productPostList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user" ,cascade = CascadeType.MERGE)
+    private Set<Work> workPostList = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ProductSell> productSellList = new ArrayList<>();
@@ -105,8 +109,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ProductLikes> productLikesList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private Set<Work> workPostList = new HashSet<>();
+
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<WorkWish> workWishList = new ArrayList<>();
@@ -143,6 +146,16 @@ public class User extends BaseTimeEntity implements UserDetails {
     private List<String> roles = new ArrayList<>();
 
 
+    public void makePostNull(){
+        for(Work work : this.workPostList){
+            work.deleteUser();
+        }
+        for(Product product : this.productPostList){
+            product.deleteUser();
+        }
+    }
+
+
     @Builder
     public User(String email, String name, String nickName, String categoryLike, String origin) {
         this.email = email;
@@ -160,6 +173,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     public User(String email, String name, String picture, String origin) {
         this.email = email;
         this.name = name;
+        this.nickName = "";
         this.picture = picture;
         this.origin = origin;
         this.categoryLike = "";
@@ -178,9 +192,14 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.categoryLike = categoryLike;
     }
 
+    public void setRandomProfileImage() {
+        Random ran = new Random();
+        int randomNumber = ran.nextInt(10)+1;
+        this.picture = "https://sinzakimage.s3.ap-northeast-2.amazonaws.com/static/profile"+randomNumber+".png";
+    }
 
     public User update(String name, String introduction){
-        this.name =name;
+        this.nickName =name;
 
         this.introduction = introduction;
         return this;
