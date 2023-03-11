@@ -538,13 +538,13 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     private List<ShowForm> makeHomeShowFormListForGuest(List<Product> productList) {
-        List<ShowForm> newList = new ArrayList<>();  /** 신작 3개 **/
+        List<ShowForm> showForms = new ArrayList<>();
         for (int i = 0; i < productList.size(); i++) {
             if (i >= HOME_OBJECTS)
                 break;
-            addProductInJSONFormat(newList, productList.get(i), false);
+            addProductInJSONFormat(showForms, productList.get(i), false);
         }
-        return newList;
+        return showForms;
     }
 
     private List<ShowForm> makeDetailHomeShowFormList(List<ProductLikes> userLikesList, List<Product> productList) {
