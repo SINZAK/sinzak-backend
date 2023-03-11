@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.*;
 
 @Service
@@ -137,7 +136,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         Product product = productRepository.findByIdFetchChatRooms(productId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(product.getUser().getId()))
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
-//        deleteImagesInPost(product);
+        deleteImagesInPost(product);
         beforeDeleteProduct(product);
         productRepository.delete(product);
         return PropertyUtil.response(true);
@@ -171,9 +170,9 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         boolean isLike = checkIsLikes(user.getProductLikesList(), product);
         boolean isWish = checkIsWish(user, product.getProductWishList());
         boolean isFollowing = false;
-        if(product.getUser()!=null){
+        if(product.getUser()!=null)
             isFollowing = checkIsFollowing(user.getFollowingList(), product);
-        }
+
         detailForm.setUserAction(isLike, isWish, isFollowing);
         product.addViews();
         return PropertyUtil.response(detailForm);
