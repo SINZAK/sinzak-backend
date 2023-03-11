@@ -162,12 +162,12 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
             User postUser = product.getUser();
             detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_celeb(), postUser.getFollowerNum());
         }
-        else {
+        else 
             detailForm.setUserInfo(null, "탈퇴한 회원", null, "??", false, false, "0");
-        }
-        if(user.getId().equals(product.getUser().getId())){
+        
+        if(user.getId().equals(product.getUser().getId()))
             detailForm.setMyPost();
-        }
+        
         boolean isLike = checkIsLikes(user.getProductLikesList(), product);
         boolean isWish = checkIsWish(user, product.getProductWishList());
         boolean isFollowing = false;
@@ -457,7 +457,6 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         ProductSell connect = ProductSell.createConnect(product, user);
         productSellRepository.save(connect);
         product.setComplete(true);
-        product.setTrading(false);
         return PropertyUtil.response(true);
     }
 
