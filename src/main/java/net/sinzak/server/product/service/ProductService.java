@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.*;
 
 @Service
@@ -137,7 +136,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         Product product = productRepository.findByIdFetchChatRooms(productId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(product.getUser().getId()))
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
-//        deleteImagesInPost(product);
+        deleteImagesInPost(product);
         beforeDeleteProduct(product);
         productRepository.delete(product);
         return PropertyUtil.response(true);
@@ -171,9 +170,9 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         boolean isLike = checkIsLikes(user.getProductLikesList(), product);
         boolean isWish = checkIsWish(user, product.getProductWishList());
         boolean isFollowing = false;
-        if(product.getUser()!=null){
+        if(product.getUser()!=null)
             isFollowing = checkIsFollowing(user.getFollowingList(), product);
-        }
+
         detailForm.setUserAction(isLike, isWish, isFollowing);
         product.addViews();
         return PropertyUtil.response(detailForm);
@@ -212,7 +211,6 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                 .width(product.getSize().width)
                 .vertical(product.getSize().vertical)
                 .height(product.getSize().height)
-                .trading(product.isTrading())
                 .complete(product.isComplete()).build();
         return detailForm;
     }
@@ -428,26 +426,26 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return obj;
     }
 
-    @Transactional
-    public JSONObject trading(@RequestBody ActionForm form){
-        JSONObject obj = new JSONObject();
-        boolean isTrading;
-        Product product = productRepository.findById(form.getId()).orElseThrow(PostNotFoundException::new);
-        isTrading = product.isTrading();
-        if (form.isMode() && !isTrading){
-            product.setTrading(true);
-            isTrading=true;
-            obj.put("success",true);
-        }
-        else if(!form.isMode() && isTrading){
-            product.setTrading(false);
-            obj.put("success",true);
-        }
-        else
-            obj.put("success",false);
-        obj.put("isTrading",isTrading);
-        return obj;
-    }
+//    @Transactional
+//    public JSONObject trading(@RequestBody ActionForm form){
+//        JSONObject obj = new JSONObject();
+//        boolean isTrading;
+//        Product product = productRepository.findById(form.getId()).orElseThrow(PostNotFoundException::new);
+//        isTrading = product.isTrading();
+//        if (form.isMode() && !isTrading){
+//            product.setTrading(true);
+//            isTrading=true;
+//            obj.put("success",true);
+//        }
+//        else if(!form.isMode() && isTrading){
+//            product.setTrading(false);
+//            obj.put("success",true);
+//        }
+//        else
+//            obj.put("success",false);
+//        obj.put("isTrading",isTrading);
+//        return obj;
+//    }
 
     @Transactional
     public JSONObject sell(User User, @RequestBody SellDto dto){
@@ -539,13 +537,13 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     private List<ShowForm> makeHomeShowFormListForGuest(List<Product> productList) {
-        List<ShowForm> newList = new ArrayList<>();  /** 신작 3개 **/
+        List<ShowForm> showForms = new ArrayList<>();
         for (int i = 0; i < productList.size(); i++) {
             if (i >= HOME_OBJECTS)
                 break;
-            addProductInJSONFormat(newList, productList.get(i), false);
+            addProductInJSONFormat(showForms, productList.get(i), false);
         }
-        return newList;
+        return showForms;
     }
 
     private List<ShowForm> makeDetailHomeShowFormList(List<ProductLikes> userLikesList, List<Product> productList) {

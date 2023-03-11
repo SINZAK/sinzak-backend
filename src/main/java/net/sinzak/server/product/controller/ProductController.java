@@ -101,12 +101,6 @@ public class ProductController {
         return productService.likes(user, form);
     }
 
-//    @ApiDocumentResponse
-//    @PostMapping("/products/trading")
-//    @ApiOperation(value = "작품 거래중")
-//    public JSONObject trading(@RequestBody ActionForm form) {
-//        return productService.trading(form);
-//    }
 
     @ApiDocumentResponse
     @PostMapping("/products/sell")
@@ -125,7 +119,9 @@ public class ProductController {
     }
 
     @ApiDocumentResponse
-    @ApiOperation(value = "작품 홈", notes = "신작 , 추천, 팔로잉으로 분류")
+    @ApiOperation(value = "작품 홈", notes = "회원 : new(최신순), recommend(추천순), following(팔로잉)" +
+            "비회원 : new(최신순), trading(채팅 수 1이상, 판매완료 안된 것), hot(좋아요 순)\n" +
+            "비회원은 더보기 버튼 클릭 시 로그인 창으로")
     @PostMapping("/home/products")
     public JSONObject showHomeProduct(@AuthenticationPrincipal User user) {
         try {

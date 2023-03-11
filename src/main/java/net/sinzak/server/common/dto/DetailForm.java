@@ -61,12 +61,6 @@ public class DetailForm {
     private boolean complete;
 
 
-    public void setUserAction(boolean like, boolean wish, boolean isFollowing) {
-        this.isLike = like;
-        this.isWish = wish;
-        this.isFollowing = isFollowing;
-    }
-
     public DetailForm(Long id, Long userId, String author, String author_picture, String univ, boolean cert_uni, boolean cert_celeb, String followerNum, List<String> images, String title, String category, String date, String content, int price, int topPrice, boolean suggest, int likesCnt, int views, int wishCnt, int chatCnt, boolean complete) {
         this.id = id;
         this.userId = userId;
@@ -99,6 +93,12 @@ public class DetailForm {
         this.cert_uni = cert_uni;
         this.cert_celeb = cert_celeb;
         this.followerNum = followerNum;
+    }
+
+    public void setUserAction(boolean like, boolean wish, boolean isFollowing) {
+        this.isLike = like;
+        this.isWish = wish;
+        this.isFollowing = isFollowing;
     }
 
     public void setMyPost() {
