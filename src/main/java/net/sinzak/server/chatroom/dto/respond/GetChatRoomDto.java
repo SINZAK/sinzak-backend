@@ -2,6 +2,7 @@ package net.sinzak.server.chatroom.dto.respond;
 
 import lombok.Builder;
 import lombok.Getter;
+import net.sinzak.server.common.PostType;
 
 @Getter
 @Builder
@@ -14,4 +15,5 @@ public class GetChatRoomDto {
     private boolean complete;
     private boolean suggest;
     private Long userId;
+    private PostType postType;
 }
