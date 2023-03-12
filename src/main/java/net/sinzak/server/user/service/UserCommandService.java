@@ -194,7 +194,4 @@ public class UserCommandService {
         }
 
     }
-    private void beforeDeleteUser(User user){
-        user.makePostNull();
-    }
 }

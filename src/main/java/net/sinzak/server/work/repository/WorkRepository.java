@@ -11,11 +11,14 @@ import java.util.Optional;
 
 public interface WorkRepository extends JpaRepository<Work, Long> {
 
-    @Query("select w from Work w left join fetch w.workWishList left join fetch w.user where w.id = :id")
-    Optional<Work> findByIdFetchWorkWishAndUser(@Param("id")Long id);   /** 해당 외주 찜을 누른 유저 목록까지 불러오기 **/
+    @Query("select w from Work w left join fetch w.workWishList left join fetch w.user where w.id = :id and w.isDeleted = false")
+    Optional<Work> findByIdFetchWorkNotDeletedWishAndUser(@Param("id")Long id);   /** 해당 외주 찜을 누른 유저 목록까지 불러오기 **/
 
     @Query("select w from Work w order by w.id desc")
     Page<Work> findAll(Pageable pageable);
+
+    @Query("select w from Work w where w.id = :id and w.isDeleted = false")
+    Optional<Work> findByIdNotDeleted(@Param("id") Long id);
 
     @Query("select w from Work w where w.employment = :employment order by w.id desc")
     Page<Work> findAll(boolean employment, Pageable pageable);
@@ -24,9 +27,9 @@ public interface WorkRepository extends JpaRepository<Work, Long> {
     Page<Work> findAll(@Param("keyword") String keyword, boolean employment, Pageable pageable);
 
     @Query("select w from Work w left join Fetch w.user left join fetch w.chatRooms where w.id = :id")
-    Optional<Work> findByIdFetchUserAndChatRooms(@Param("id") Long id);
+    Optional<Work> findByIdFetchUserAndChatRooms(@Param("id") Long id); //채팅방은 삭제된 게시글이어도 보여줘야 함
 
-    @Query("select w from Work w left join fetch w.chatRooms where w.id = :id")
+    @Query("select w from Work w left join fetch w.chatRooms where w.id = :id and w.isDeleted = false")
     Optional<Work> findByIdFetchChatRooms(@Param("id") Long id);
 
 }

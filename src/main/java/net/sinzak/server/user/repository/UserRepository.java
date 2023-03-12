@@ -49,8 +49,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByIdFetchWorkWishList(@Param("id")Long id);
 
     //Product and Work
-    @Query("SELECT u FROM User u LEFT JOIN FETCH u.productPostList LEFT JOIN FETCH u.workPostList WHERE u.id = :id and u.isDelete = false")
-    Optional<User> findByIdFetchWorkListAndProductList(@Param("id") Long id);
+    @Query("SELECT u FROM User u JOIN FETCH u.productPostList JOIN FETCH u.workPostList WHERE u.id = :id and u.isDelete = false")
+    Optional<User> findByIdFetchWorkListAndProductList(@Param("id") Long id); //두개 조인할 때는 left 쓰면 안 됨 left join 두 번을 쓰거나 Left join fetch
 
     //Follow
     @Query("select u from User u left join fetch u.followerList where u.id =:id and u.isDelete = false")

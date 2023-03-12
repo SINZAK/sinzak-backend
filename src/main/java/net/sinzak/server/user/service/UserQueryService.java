@@ -95,6 +95,9 @@ public class UserQueryService {
         List<WishShowForm> productWishShowForms = new ArrayList<>();
         for(ProductWish productWish : productWishes){
             Product product = productWish.getProduct();
+            if(product.isDeleted()){
+                continue;
+            }
             WishShowForm wishShowForm = WishShowForm.builder()
                     .id(product.getId())
                     .thumbnail(product.getThumbnail())
@@ -112,6 +115,9 @@ public class UserQueryService {
         List<WishShowForm> workWishShowForms = new ArrayList<>();
         for(WorkWish workWish : workWishes){
             Work work = workWish.getWork();
+            if(work.isDeleted()){
+                continue;
+            }
             WishShowForm wishShowForm = WishShowForm.builder()
                     .id(work.getId())
                     .complete(work.isComplete())
@@ -128,6 +134,9 @@ public class UserQueryService {
         List<ProfileShowForm> showFormList = new ArrayList<>();
         System.out.println(productList.size());
         for (Product product : productList) {
+            if(product.isDeleted()){
+                continue;
+            }
             ProfileShowForm form = ProfileShowForm.builder()
                     .id(product.getId())
                     .complete(product.isComplete())
@@ -142,6 +151,9 @@ public class UserQueryService {
     private List<ProfileShowForm> makeWorkShowForm(Set<Work> workList,boolean isEmploy) {
         List<ProfileShowForm> showFormList = new ArrayList<>();
         for (Work work : workList) {
+            if(work.isDeleted()){
+                continue;
+            }
             if(work.isEmployment()==isEmploy){
                 ProfileShowForm form = ProfileShowForm.builder()
                         .id(work.getId())

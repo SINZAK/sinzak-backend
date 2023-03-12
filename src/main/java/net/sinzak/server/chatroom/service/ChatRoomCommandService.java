@@ -62,7 +62,8 @@ public class ChatRoomCommandService {
             product = findProduct.get();
         }
         if(postDto.getPostType().equals(PostType.WORK.getName())){
-            Optional<Work> findWork = workRepository.findByIdFetchUserAndChatRooms(postDto.getPostId());
+            Optional<Work> findWork = workRepository.
+                    findByIdFetchUserAndChatRooms(postDto.getPostId());
             if(!findWork.isPresent()){
                 throw new PostNotFoundException();
             }
