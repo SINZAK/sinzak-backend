@@ -50,8 +50,9 @@ public class ChatRoomQueryController {
     }
 
     @PostMapping(value = "/rooms/{uuid}")
-    @ApiOperation(value ="채팅방 정보 조회 ")
+    @ApiOperation(value ="채팅방 정보 조회 " ,notes = "postUserId = 게시글 올린 유저아이디, opponentUserId = 채팅 하는 상대방 아이디 ,삭제된 게시글일시 productId : null ->삭제된 게시글")
     public JSONObject getChatRoom(@PathVariable("uuid") String roomUuid, @AuthenticationPrincipal User user){
+        PropertyUtil.checkHeader(user);
         return chatRoomQueryService.getChatRoom(roomUuid,user);
     }
 
