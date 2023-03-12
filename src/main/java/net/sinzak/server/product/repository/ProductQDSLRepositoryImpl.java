@@ -28,7 +28,7 @@ public class ProductQDSLRepositoryImpl implements QDSLRepository<Product> {
     public Page<Product> findAllByCompleteAndCategoriesAligned(boolean complete, String keyword, List<String> categories, String align, Pageable pageable) {
         List<Product> result = queryFactory
                 .selectFrom(product)
-                .where(eqComplete(complete), eqCategories(categories), eqSearch(keyword))
+                .where(eqComplete(complete), eqCategories(categories), eqSearch(keyword).and(product.isDeleted.eq(false)))
                 .orderBy(standardAlign(align))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -90,7 +90,8 @@ public class ProductQDSLRepositoryImpl implements QDSLRepository<Product> {
     public List<Product> findCountByCategoriesDesc(List<String> categories, int count) {
         List<Product> result = queryFactory
                 .selectFrom(product)
-                .where(eqCategories(categories))
+                .where(eqCategories(categories)
+                        .and(product.isDeleted.eq(false)))
                 .orderBy(product.id.desc())
                 .limit(count)
                 .fetch();

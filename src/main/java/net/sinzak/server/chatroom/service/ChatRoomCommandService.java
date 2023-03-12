@@ -53,7 +53,7 @@ public class ChatRoomCommandService {
         Product product = null;
         Work work = null;
         if(postDto.getPostType().equals(PostType.PRODUCT.getName())){
-            Optional<Product> findProduct = productRepository.findByIdFetchUserAndChatRooms(postDto.getPostId());
+            Optional<Product> findProduct = productRepository.findByIdFetchChatRooms(postDto.getPostId());
             if(!findProduct.isPresent()){
                 throw new PostNotFoundException();
             }
@@ -63,7 +63,7 @@ public class ChatRoomCommandService {
         }
         if(postDto.getPostType().equals(PostType.WORK.getName())){
             Optional<Work> findWork = workRepository.
-                    findByIdFetchUserAndChatRooms(postDto.getPostId());
+                    findByIdFetchChatRooms(postDto.getPostId());
             if(!findWork.isPresent()){
                 throw new PostNotFoundException();
             }

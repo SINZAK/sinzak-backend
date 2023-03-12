@@ -256,7 +256,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         User user = userRepository.findByIdFetchFollowingAndLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
         List<String> userCategories = Arrays.asList(user.getCategoryLike().split(","));
 
-        List<Product> productList = productRepository.findAll();
+        List<Product> productList = productRepository.findAllProductNotDeleted();
         obj.put("new", makeHomeShowFormList(user.getProductLikesList(), productList));   /** 신작 3개 **/
 
 
@@ -274,7 +274,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     @Transactional(readOnly = true)
     public JSONObject showHome(){
         JSONObject obj = new JSONObject();
-        List<Product> productList = productRepository.findAll();
+        List<Product> productList = productRepository.findAllProductNotDeleted();
 
         obj.put("new",makeHomeShowFormListForGuest(productList));
 
@@ -315,7 +315,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     @Transactional(readOnly = true)
     public JSONObject showFollowingDetail(User User){
         User user = userRepository.findByIdFetchFollowingAndLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
-        List<Product> productList = productRepository.findAll();
+        List<Product> productList = productRepository.findAllProductNotDeleted();
 
         List<Product> followingList = getFollowingList(user, productList, HOME_DETAIL_OBJECTS);
         List<ShowForm> data = makeDetailHomeShowFormList(user.getProductLikesList(), followingList);
