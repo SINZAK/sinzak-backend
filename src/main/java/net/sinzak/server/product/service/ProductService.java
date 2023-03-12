@@ -76,8 +76,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
             return PropertyUtil.responseMessage("최소 1개 이상의 이미지를 보유해야 합니다.");
 
         for (ProductImage image : product.getImages()) {
-//            if(image.getImageUrl().equals(product.getThumbnail()))
-//                return PropertyUtil.responseMessage("썸네일은 삭제 불가능합니다."); //TODO 프론트가 어쩔지 보자.
+            if(image.getImageUrl().equals(product.getThumbnail()))
+                return PropertyUtil.responseMessage("썸네일은 삭제 불가능합니다.");
             if(image.getImageUrl().equals(url)){
                 imageRepository.delete(image);
                 product.getImages().remove(image);
@@ -136,7 +136,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         Product product = productRepository.findByIdFetchChatRooms(productId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(product.getUser().getId()))
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
-//        deleteImagesInPost(product);
+        deleteImagesInPost(product);
         beforeDeleteProduct(product);
         productRepository.delete(product);
         return PropertyUtil.response(true);
@@ -161,18 +161,18 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
             User postUser = product.getUser();
             detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_celeb(), postUser.getFollowerNum());
         }
-        else {
+        else
             detailForm.setUserInfo(null, "탈퇴한 회원", null, "??", false, false, "0");
-        }
-        if(user.getId().equals(product.getUser().getId())){
+
+        if(user.getId().equals(product.getUser().getId()))
             detailForm.setMyPost();
-        }
+
         boolean isLike = checkIsLikes(user.getProductLikesList(), product);
         boolean isWish = checkIsWish(user, product.getProductWishList());
         boolean isFollowing = false;
-        if(product.getUser()!=null){
+        if(!product.getUser().isDelete())
             isFollowing = checkIsFollowing(user.getFollowingList(), product);
-        }
+
         detailForm.setUserAction(isLike, isWish, isFollowing);
         product.addViews();
         return PropertyUtil.response(detailForm);
@@ -199,6 +199,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                 .images(getImages(product))
                 .title(product.getTitle())
                 .price(product.getPrice())
+                .topPrice(product.getTopPrice())
                 .category(product.getCategory())
                 .date(product.getCreatedDate().toString())
                 .content(product.getContent())
@@ -210,7 +211,6 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                 .width(product.getSize().width)
                 .vertical(product.getSize().vertical)
                 .height(product.getSize().height)
-                .trading(product.isTrading())
                 .complete(product.isComplete()).build();
         return detailForm;
     }
@@ -426,33 +426,36 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return obj;
     }
 
-    @Transactional
-    public JSONObject trading(@RequestBody ActionForm form){
-        JSONObject obj = new JSONObject();
-        boolean isTrading;
-        Product product = productRepository.findById(form.getId()).orElseThrow(PostNotFoundException::new);
-        isTrading = product.isTrading();
-        if (form.isMode() && !isTrading){
-            product.setTrading(true);
-            isTrading=true;
-            obj.put("success",true);
-        }
-        else if(!form.isMode() && isTrading){
-            product.setTrading(false);
-            obj.put("success",true);
-        }
-        else
-            obj.put("success",false);
-        obj.put("isTrading",isTrading);
-        return obj;
-    }
+//    @Transactional
+//    public JSONObject trading(@RequestBody ActionForm form){
+//        JSONObject obj = new JSONObject();
+//        boolean isTrading;
+//        Product product = productRepository.findById(form.getId()).orElseThrow(PostNotFoundException::new);
+//        isTrading = product.isTrading();
+//        if (form.isMode() && !isTrading){
+//            product.setTrading(true);
+//            isTrading=true;
+//            obj.put("success",true);
+//        }
+//        else if(!form.isMode() && isTrading){
+//            product.setTrading(false);
+//            obj.put("success",true);
+//        }
+//        else
+//            obj.put("success",false);
+//        obj.put("isTrading",isTrading);
+//        return obj;
+//    }
 
     @Transactional
     public JSONObject sell(User User, @RequestBody SellDto dto){
         User user = userRepository.findByIdFetchProductSellList(User.getId()).orElseThrow(UserNotFoundException::new);
-        Product product = productRepository.findById(dto.getProductId()).orElseThrow(PostNotFoundException::new);
+        Product product = productRepository.findById(dto.getPostId()).orElseThrow(PostNotFoundException::new);
+        if(product.isComplete())
+            return PropertyUtil.responseMessage("이미 판매완료된 작품입니다.");
         ProductSell connect = ProductSell.createConnect(product, user);
         productSellRepository.save(connect);
+        product.setComplete(true);
         return PropertyUtil.response(true);
     }
 
@@ -534,13 +537,13 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     private List<ShowForm> makeHomeShowFormListForGuest(List<Product> productList) {
-        List<ShowForm> newList = new ArrayList<>();  /** 신작 3개 **/
+        List<ShowForm> showForms = new ArrayList<>();
         for (int i = 0; i < productList.size(); i++) {
             if (i >= HOME_OBJECTS)
                 break;
-            addProductInJSONFormat(newList, productList.get(i), false);
+            addProductInJSONFormat(showForms, productList.get(i), false);
         }
-        return newList;
+        return showForms;
     }
 
     private List<ShowForm> makeDetailHomeShowFormList(List<ProductLikes> userLikesList, List<Product> productList) {

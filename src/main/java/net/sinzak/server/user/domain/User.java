@@ -11,8 +11,8 @@ import net.sinzak.server.product.domain.ProductSell;
 import net.sinzak.server.product.domain.ProductWish;
 import net.sinzak.server.work.domain.Work;
 import net.sinzak.server.work.domain.WorkLikes;
+import net.sinzak.server.work.domain.WorkSell;
 import net.sinzak.server.work.domain.WorkWish;
-import org.hibernate.Hibernate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -85,8 +85,6 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Column
     private boolean alarm_receive;
 
-    @Column
-    private String fcm_token="";
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -109,6 +107,9 @@ public class User extends BaseTimeEntity implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ProductLikes> productLikesList = new ArrayList<>();
 
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<WorkSell> workSellList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<WorkWish> workWishList = new ArrayList<>();
@@ -181,7 +182,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     public User(String email, String name, String picture, String origin) {
         this.email = email;
         this.name = name;
-        this.nickName = name;
+        this.nickName = "";
         this.picture = picture;
         this.origin = origin;
         this.categoryLike = "";

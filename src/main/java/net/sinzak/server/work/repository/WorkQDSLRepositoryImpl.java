@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static net.sinzak.server.product.domain.QProduct.product;
 import static net.sinzak.server.work.domain.QWork.work;
 
 
@@ -52,11 +53,13 @@ public class WorkQDSLRepositoryImpl implements QDSLRepository<Work> {
         return builder;
     }
 
-    private BooleanExpression eqSearch(String keyword) { //complete 가 true면   where complete = false 로 가져온다.
+
+    private BooleanBuilder eqSearch(String keyword) { //complete 가 true면   where complete = false 로 가져온다.
+        BooleanBuilder builder = new BooleanBuilder();
         if (keyword.isEmpty()){
             return null;
         }
-        return work.content.contains(keyword);
+        return builder.or(work.title.contains(keyword)).or(work.content.contains(keyword));
     }
 
     private OrderSpecifier<? extends Number> standardAlign(String align) {
