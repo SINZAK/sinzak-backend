@@ -16,13 +16,9 @@ import net.sinzak.server.chatroom.repository.UserChatRoomRepository;
 import net.sinzak.server.common.PostType;
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.error.ChatRoomNotFoundException;
-import net.sinzak.server.common.error.InstanceNotFoundException;
-import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.error.UserNotLoginException;
-import net.sinzak.server.product.domain.Product;
 import net.sinzak.server.product.service.ProductService;
 import net.sinzak.server.user.domain.User;
-import net.sinzak.server.work.domain.Work;
 import net.sinzak.server.work.service.WorkService;
 import org.json.simple.JSONObject;
 import org.springframework.data.domain.Page;
@@ -34,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -132,64 +127,64 @@ public class ChatRoomQueryService {
     }
 
     public JSONObject getChatRoom(String roomUuid,User user){
-        if(user ==null){
-            return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
-        }
-        List<UserChatRoom> userChatRooms = userChatRoomRepository
-                .findUserChatRoomByIdFetchChatRoomWhereNotDisabled(user.getId());
-        for(UserChatRoom userChatRoom : userChatRooms){
-            if(userChatRoom.getChatRoom().getRoomUuid().equals(roomUuid)){
-                ChatRoom chatRoom = userChatRoom.getChatRoom();
-                if(chatRoom.getPostType().equals(PostType.PRODUCT)){
-                    if(chatRoom.getProduct().isDeleted()){
-                        return PropertyUtil.responseMessage("삭제된 게시글입니다");
-                    }
-                    GetChatRoomDto getChatRoomDto = makeProductChatRoomDto(userChatRoom, chatRoom);
-                    return PropertyUtil.response(getChatRoomDto);
-                }
-                if(chatRoom.getPostType().equals(PostType.WORK)){
-                    if(chatRoom.getWork().isDeleted()){
-                        return PropertyUtil.responseMessage("삭제된 게시글입니다");
-                    }
-                    GetChatRoomDto getChatRoomDto = makeWorkChatRoomDto(userChatRoom, chatRoom);
-                    return PropertyUtil.response(getChatRoomDto);
-                }
+        ChatRoom chatRoom = chatRoomRepository.findByRoomUuidFetchUserChatRoom(roomUuid).orElseThrow(ChatRoomNotFoundException::new);
+        UserChatRoom myUserChatRoom =null;
+        UserChatRoom opponentUserChatRoom = null;
+        for(UserChatRoom userChatRoom : chatRoom.getUserChatRooms()){
+            if(userChatRoom.getUser().getId().equals(user.getId())){
+                myUserChatRoom =  userChatRoom;
+            }
+            else{
+                opponentUserChatRoom = userChatRoom;
             }
         }
-        throw new ChatRoomNotFoundException();
+        if(chatRoom.getPostType().equals(PostType.PRODUCT)){
+            GetChatRoomDto getChatRoomDto = makeProductChatRoomDto(myUserChatRoom,chatRoom,opponentUserChatRoom);
+            if(chatRoom.getProduct().isDeleted()){
+                getChatRoomDto.setPostId(null);
+            }
+            return PropertyUtil.response(getChatRoomDto);
+        }
+        if(chatRoom.getPostType().equals(PostType.WORK)){
+            GetChatRoomDto getChatRoomDto = makeWorkChatRoomDto(myUserChatRoom,chatRoom,opponentUserChatRoom);
+            if(chatRoom.getWork().isDeleted()){
+                getChatRoomDto.setPostId(null);
+            }
+            return PropertyUtil.response(getChatRoomDto);
+        }
+        return PropertyUtil.responseMessage("잘못된 요청입니다");
     }
 
-    private GetChatRoomDto makeWorkChatRoomDto(UserChatRoom userChatRoom, ChatRoom chatRoom) {
-        if(chatRoom.getWork()==null){
-
-        }
+    private GetChatRoomDto makeWorkChatRoomDto(UserChatRoom userChatRoom, ChatRoom chatRoom,UserChatRoom opponentUserChatRoom) {
         GetChatRoomDto getChatRoomDto = GetChatRoomDto.builder()
                 .postType(PostType.WORK)
-                .userId(chatRoom.getPostUserId())
+                .postUserId(chatRoom.getPostUserId())
                 .roomName(userChatRoom.getRoomName())
-                .productId(chatRoom.getWork().getId())
+                .postId(chatRoom.getWork().getId())
                 .postType(chatRoom.getPostType())
-                .productName(chatRoom.getWork().getTitle())
+                .postName(chatRoom.getWork().getTitle())
                 .price(chatRoom.getWork().getPrice())
                 .thumbnail(chatRoom.getWork().getThumbnail())
                 .complete(chatRoom.getWork().isComplete())
                 .suggest(chatRoom.getWork().isSuggest())
+                .opponentUserId(opponentUserChatRoom.getUser().getId())
                 .build();
         return getChatRoomDto;
     }
 
-    private GetChatRoomDto makeProductChatRoomDto(UserChatRoom userChatRoom, ChatRoom chatRoom) {
+    private GetChatRoomDto makeProductChatRoomDto(UserChatRoom myUserChatRoom, ChatRoom chatRoom,UserChatRoom opponentUserChatRoom) {
         GetChatRoomDto getChatRoomDto = GetChatRoomDto.builder()
                 .postType(PostType.PRODUCT)
-                .userId(chatRoom.getPostUserId())
-                .roomName(userChatRoom.getRoomName())
-                .productId(chatRoom.getProduct().getId())
+                .postUserId(chatRoom.getPostUserId())
+                .roomName(myUserChatRoom.getRoomName())
+                .postId(chatRoom.getProduct().getId())
                 .postType(chatRoom.getPostType())
-                .productName(chatRoom.getProduct().getTitle())
+                .postName(chatRoom.getProduct().getTitle())
                 .price(chatRoom.getProduct().getPrice())
                 .thumbnail(chatRoom.getProduct().getThumbnail())
                 .complete(chatRoom.getProduct().isComplete())
                 .suggest(chatRoom.getProduct().isSuggest())
+                .opponentUserId(opponentUserChatRoom.getUser().getId())
                 .build();
         return getChatRoomDto;
     }
