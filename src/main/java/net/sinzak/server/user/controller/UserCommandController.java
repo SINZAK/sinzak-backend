@@ -119,13 +119,6 @@ public class UserCommandController {
     }
 
     @ApiDocumentResponse
-    @ApiOperation(value = "신고 목록 출력")
-    @PostMapping(value = "/users/reportlist")
-    public JSONObject reportList(@AuthenticationPrincipal User user){
-        PropertyUtil.checkHeader(user);
-        return userCommandService.showReportList(user);
-    }
-    @ApiDocumentResponse
     @ApiOperation(value ="fcm 토큰 저장", notes = "로그아웃할 땐 fcm토큰 빈칸")
     @PostMapping(value = "/users/fcm")
     public JSONObject setToken(FcmDto fcmDto){
