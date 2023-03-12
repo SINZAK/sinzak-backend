@@ -54,9 +54,11 @@ public class ChatRoomQueryService {
         List<GetChatRoomsDto> getChatRoomsDtos = new ArrayList<>();
         List<UserChatRoom> userChatRooms = userChatRoomRepository.findUserChatRoomByUserIdWhereNotDisabled(loginUser.getId());
         List<ChatRoom> postChatRoom = null;
-        if(postDto.getPostType().equals(PostType.PRODUCT.toString())){
+        if(postDto.getPostType().equals(PostType.PRODUCT.getName())){
             postChatRoom = chatRoomRepository.findChatRoomByProductId(postDto.getPostId());
+            log.info(postChatRoom.size() +":딸린 채팅방 개수");
             for(UserChatRoom userChatRoom :userChatRooms){
+                log.info(userChatRooms.size()+":내 모든 채팅방 개수");
                 for(ChatRoom chatRoom : postChatRoom){
                     if(userChatRoom.getChatRoom().getId().equals(chatRoom.getId())){
                         GetChatRoomsDto getChatRoomsDto = makeUserChatRoom(userChatRoom, chatRoom);
@@ -65,7 +67,7 @@ public class ChatRoomQueryService {
                 }
             }
         }
-        if(postDto.getPostType().equals(PostType.WORK.toString())){
+        if(postDto.getPostType().equals(PostType.WORK.getName())){
             postChatRoom = chatRoomRepository.findChatRoomByWorkId(postDto.getPostId());
             for(UserChatRoom userChatRoom :userChatRooms){
                 for(ChatRoom chatRoom : postChatRoom){
