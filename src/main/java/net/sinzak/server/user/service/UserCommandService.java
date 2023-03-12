@@ -185,7 +185,8 @@ public class UserCommandService {
     @Transactional(rollbackFor = Exception.class)
     public JSONObject resign(User user){
         try{
-            user.setDelete(true);
+            User loginUser = userRepository.findById(user.getId()).orElseThrow(UserNotFoundException::new);
+            loginUser.setDelete(true);
             return PropertyUtil.response(true);
         }
         catch (Exception e){
