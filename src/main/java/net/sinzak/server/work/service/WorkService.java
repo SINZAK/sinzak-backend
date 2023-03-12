@@ -75,7 +75,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     }
 
     public JSONObject saveImageInS3AndWork(User user, List<MultipartFile> multipartFiles, Long id) {
-        Work work = workRepository.findById(id).orElseThrow(PostNotFoundException::new);
+        Work work = workRepository.findByIdNotDeleted(id).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(work.getUser().getId()))
             return PropertyUtil.responseMessage("작성자가 아닙니다.");
         for (MultipartFile img : multipartFiles) {
@@ -109,7 +109,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
 
     @Transactional(rollbackFor = {Exception.class})
     public JSONObject deleteImage(User User, Long workId, String url){   // 글 생성
-        Work work = workRepository.findById(workId).orElseThrow(PostNotFoundException::new);
+        Work work = workRepository.findByIdNotDeleted(workId).orElseThrow(PostNotFoundException::new);
         if(!User.getId().equals(work.getUser().getId()))
             return PropertyUtil.responseMessage("해당 작품의 작가가 아닙니다.");
         if(work.getImages().size()==1)
@@ -129,7 +129,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     @Transactional(rollbackFor = {Exception.class})
     public JSONObject editPost(User User, Long workId, WorkEditDto editDto){
         User user = userRepository.findByIdNotDeleted(User.getId()).orElseThrow(UserNotFoundException::new);
-        Work work = workRepository.findById(workId).orElseThrow(PostNotFoundException::new);
+        Work work = workRepository.findByIdNotDeleted(workId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(work.getUser().getId()))
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
 
@@ -145,14 +145,11 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         if(!user.getId().equals(work.getUser().getId()))
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
 //        deleteImagesInPost(work);
-        beforeDeleteWork(work);
-        workRepository.delete(work);
+        work.setDeleted(true);
         return PropertyUtil.response(true);
     }
 
-    private void beforeDeleteWork(Work work) {
-        work.makeChatRoomNull();
-    }
+
 
     private void deleteImagesInPost(Work work) {
         for (WorkImage image : work.getImages()) {
@@ -163,7 +160,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     @Transactional
     public JSONObject showDetail(Long id, User User){   // 글 상세 확인
         User user = userRepository.findByIdFetchFollowingAndLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
-        Work work = workRepository.findByIdFetchWorkWishAndUser(id).orElseThrow(PostNotFoundException::new);
+        Work work = workRepository.findByIdFetchWorkNotDeletedWishAndUser(id).orElseThrow(PostNotFoundException::new);
         DetailWorkForm detailForm = makeWorkDetailForm(work);
         if(!work.getUser().isDelete()){
             User postUser = work.getUser();
@@ -210,7 +207,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
 
     @Transactional
     public JSONObject showDetail(Long id){   // 글 상세 확인
-        Work work = workRepository.findByIdFetchWorkWishAndUser(id).orElseThrow(PostNotFoundException::new);
+        Work work = workRepository.findByIdFetchWorkNotDeletedWishAndUser(id).orElseThrow(PostNotFoundException::new);
         DetailWorkForm detailForm =makeWorkDetailForm(work);
         if(!work.getUser().isDelete()){
             User postUser = work.getUser();
@@ -274,7 +271,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         User user = userRepository.findByIdFetchWorkWishList(User.getId()).orElseThrow(UserNotFoundException::new);
         List<WorkWish> wishList = user.getWorkWishList();
         boolean isWish=false;
-        Work work = workRepository.findById(form.getId()).orElseThrow(PostNotFoundException::new);
+        Work work = workRepository.findByIdNotDeleted(form.getId()).orElseThrow(PostNotFoundException::new);
 
         if(wishList.size()!=0){
             for (WorkWish wish : wishList) {
@@ -316,7 +313,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         User user = userRepository.findByIdFetchLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
         List<WorkLikes> userLikesList = user.getWorkLikesList();
         boolean isLike=false;
-        Work work = workRepository.findById(form.getId()).orElseThrow(PostNotFoundException::new);
+        Work work = workRepository.findByIdNotDeleted(form.getId()).orElseThrow(PostNotFoundException::new);
 
         if(userLikesList.size()!=0){
             for (WorkLikes like : userLikesList) {
@@ -354,7 +351,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     @Transactional
     public JSONObject sell(User User, @RequestBody SellDto dto){
         User user = userRepository.findByIdFetchProductSellList(User.getId()).orElseThrow(UserNotFoundException::new);
-        Work work = workRepository.findById(dto.getPostId()).orElseThrow(PostNotFoundException::new);
+        Work work = workRepository.findByIdNotDeleted(dto.getPostId()).orElseThrow(PostNotFoundException::new);
         if(work.isComplete())
             return PropertyUtil.responseMessage("이미 판매완료된 작품입니다.");
         WorkSell connect = WorkSell.createConnect(work, user);
@@ -368,7 +365,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         User user = userRepository.findByIdNotDeleted(User.getId()).orElseThrow(UserNotFoundException::new);
         if(suggestRepository.findByUserIdAndWorkId(user.getId(),dto.getId()).isPresent())
             return PropertyUtil.responseMessage("이미 제안을 하신 작품입니다.");
-        Work work = workRepository.findById(dto.getId()).orElseThrow();
+        Work work = workRepository.findByIdNotDeleted(dto.getId()).orElseThrow();
         WorkSuggest connect = WorkSuggest.createConnect(work, user);
         work.setTopPrice(dto.getPrice());
         suggestRepository.save(connect);

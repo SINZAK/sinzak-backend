@@ -28,7 +28,7 @@ public class WorkQDSLRepositoryImpl implements QDSLRepository<Work> {
     public Page<Work> findSearchingByEmploymentAndCategoriesAligned(boolean employment, String keyword, List<String> categories, String align, Pageable pageable) {
         List<Work> result = queryFactory
                 .selectFrom(work)
-                .where(work.employment.eq(employment), eqCategories(categories), eqSearch(keyword))
+                .where(work.employment.eq(employment), eqCategories(categories), eqSearch(keyword),work.isDeleted.eq(false))
                 .orderBy(standardAlign(align))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

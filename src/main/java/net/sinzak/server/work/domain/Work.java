@@ -72,6 +72,9 @@ public class Work extends BaseTimeEntity { /** 외주 **/
     @Column
     private boolean complete = false;
 
+    @Column
+    private boolean isDeleted = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;  //수취인
@@ -100,6 +103,10 @@ public class Work extends BaseTimeEntity { /** 외주 **/
     public void setUser(User user) {
         user.getWorkPostList().add(this);
         this.user = user;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 
     public void deleteUser(){

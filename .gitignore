@@ -28,6 +28,7 @@ out/
 
 **/fireBaseAccountKey.json
 **/application-local.properties
+**/application-db.properties
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
