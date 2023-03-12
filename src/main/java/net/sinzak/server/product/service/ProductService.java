@@ -137,8 +137,9 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         if(!user.getId().equals(product.getUser().getId()))
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
         deleteImagesInPost(product);
-        beforeDeleteProduct(product);
-        productRepository.delete(product);
+        product.setDeleted(true);
+//        beforeDeleteProduct(product);
+//        productRepository.delete(product);
         return PropertyUtil.response(true);
     }
 
