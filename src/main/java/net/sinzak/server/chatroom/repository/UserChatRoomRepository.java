@@ -23,4 +23,7 @@ public interface UserChatRoomRepository extends JpaRepository<UserChatRoom,Long>
     @Query("select uc from UserChatRoom uc left join fetch uc.chatRoom where uc.user.id = :id and uc.isDisable = false")
     List<UserChatRoom> findUserChatRoomByIdFetchChatRoomWhereNotDisabled(@Param("id") Long id);
 
+    @Query("select uc from UserChatRoom uc where uc.user.id = :id and uc.isDisable = false")
+    List<UserChatRoom> findUserChatRoomByUserIdWhereNotDisabled(@Param("id") Long id);
+
 }

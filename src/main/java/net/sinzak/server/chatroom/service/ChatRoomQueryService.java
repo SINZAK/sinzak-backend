@@ -52,47 +52,46 @@ public class ChatRoomQueryService {
             throw new UserNotLoginException();
         }
         List<GetChatRoomsDto> getChatRoomsDtos = new ArrayList<>();
-        List<UserChatRoom> userChatRooms = userChatRoomRepository.findUserChatRoomByIdFetchChatRoomWhereNotDisabled(loginUser.getId());
-        for(UserChatRoom userChatRoom :userChatRooms){
-            ChatRoom chatRoom = userChatRoom.getChatRoom();
-            if(chatRoom.getPostType().getName().equals(postDto.getPostType())){
-                GetChatRoomsDto getChatRoomsDto =
-                        GetChatRoomsDto.builder()
-                                .roomUuid(chatRoom.getRoomUuid())
-                                .roomName(userChatRoom.getRoomName())
-                                .image(userChatRoom.getImage())
-                                .univ(userChatRoom.getOpponentUserUniv())
-                                .latestMessage(userChatRoom.getLatestMessage())
-                                .latestMessageTime(userChatRoom.getLatestMessageTime())
-                                .build();
-                getChatRoomsDtos.add(getChatRoomsDto);
+        List<UserChatRoom> userChatRooms = userChatRoomRepository.findUserChatRoomByUserIdWhereNotDisabled(loginUser.getId());
+        List<ChatRoom> postChatRoom = null;
+        if(postDto.getPostType().equals(PostType.PRODUCT.getName())){
+            postChatRoom = chatRoomRepository.findChatRoomByProductId(postDto.getPostId());
+            log.info(postChatRoom.size() +":딸린 채팅방 개수");
+            for(UserChatRoom userChatRoom :userChatRooms){
+                log.info(userChatRooms.size()+":내 모든 채팅방 개수");
+                for(ChatRoom chatRoom : postChatRoom){
+                    if(userChatRoom.getChatRoom().getId().equals(chatRoom.getId())){
+                        GetChatRoomsDto getChatRoomsDto = makeUserChatRoom(userChatRoom, chatRoom);
+                        getChatRoomsDtos.add(getChatRoomsDto);
+                    }
+                }
+            }
+        }
+        if(postDto.getPostType().equals(PostType.WORK.getName())){
+            postChatRoom = chatRoomRepository.findChatRoomByWorkId(postDto.getPostId());
+            for(UserChatRoom userChatRoom :userChatRooms){
+                for(ChatRoom chatRoom : postChatRoom){
+                    if(userChatRoom.getChatRoom().getId().equals(chatRoom.getId())){
+                        GetChatRoomsDto getChatRoomsDto = makeUserChatRoom(userChatRoom, chatRoom);
+                        getChatRoomsDtos.add(getChatRoomsDto);
+                    }
+                }
             }
         }
         return PropertyUtil.response(getChatRoomsDtos);
-          // 포스트기반 찾기
-//        List<ChatRoom> chatRooms =null;
-//        if(postDto.getPostType().equals(PostType.WORK.name())){
-//            chatRooms = workService.getChatRoom(postDto.getPostId());
-//        }
-//        if(postDto.getPostType().equals(PostType.PRODUCT.name())) {
-//            chatRooms = productService.getChatRoom(postDto.getPostId());
-//        }
-//        for(ChatRoom chatRoom: chatRooms){
-//            Set<UserChatRoom> userChatRooms = chatRoom.getUserChatRooms();
-//            for(UserChatRoom userChatRoom : userChatRooms){
-//                if(!userChatRoom.getOpponentUserId().equals(loginUser.getId())){
-//                    //유저 채팅방의 상대방 id가 내 Id와 다르다면
-//                    GetChatRoomDto getChatRoomDto =null;
-//                    if(postDto.getPostType().equals(PostType.WORK.name())){
-//
-//                    }
-//                    if(postDto.getPostType().equals(PostType.PRODUCT.name())) {
-//
-//                    }
-//                }
-//            }
-//        }
     }
+
+    private GetChatRoomsDto makeUserChatRoom(UserChatRoom userChatRoom, ChatRoom chatRoom) {
+        return GetChatRoomsDto.builder()
+                .roomUuid(chatRoom.getRoomUuid())
+                .roomName(userChatRoom.getRoomName())
+                .image(userChatRoom.getImage())
+                .univ(userChatRoom.getOpponentUserUniv())
+                .latestMessage(userChatRoom.getLatestMessage())
+                .latestMessageTime(userChatRoom.getLatestMessageTime())
+                .build();
+    }
+
     public JSONObject getChatRooms(User user){
         List<GetChatRoomsDto> chatRoomsDtos = userChatRoomRepository
                 .findUserChatRoomByIdFetchChatRoomWhereNotDisabled(user.getId()).stream()
@@ -137,7 +136,7 @@ public class ChatRoomQueryService {
             return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
         }
         List<UserChatRoom> userChatRooms = userChatRoomRepository
-                .findUserChatRoomByIdFetchChatRoom(user.getId());
+                .findUserChatRoomByIdFetchChatRoomWhereNotDisabled(user.getId());
         for(UserChatRoom userChatRoom : userChatRooms){
             if(userChatRoom.getChatRoom().getRoomUuid().equals(roomUuid)){
                 ChatRoom chatRoom = userChatRoom.getChatRoom();
