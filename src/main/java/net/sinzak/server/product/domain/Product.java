@@ -37,6 +37,10 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     @Column
     private boolean suggest = false;
 
+
+    @Column
+    private boolean isDeleted =false;
+
     @Column
     private int topPrice=0;
 
@@ -94,6 +98,9 @@ public class Product extends BaseTimeEntity { /** 작품 **/
         this.size = size;
     }
 
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
+    }
     public void deleteUser(){
         this.user =null;
     }

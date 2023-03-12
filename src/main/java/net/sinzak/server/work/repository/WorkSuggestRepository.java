@@ -9,6 +9,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface WorkSuggestRepository extends JpaRepository<WorkSuggest, Long> {
-    @Query("select w from WorkSuggest w where w.user.id = :userId and w.work.id = :workId")
+    @Query("select w from WorkSuggest w where w.user.id = :userId and w.work.id = :workId and w.work.isDeleted =false")
     Optional<WorkSuggest> findByUserIdAndWorkId(@Param("userId")Long userId, @Param("workId")Long workId);
 }
