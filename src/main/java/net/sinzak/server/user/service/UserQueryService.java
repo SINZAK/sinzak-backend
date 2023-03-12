@@ -1,6 +1,5 @@
 package net.sinzak.server.user.service;
 
-import com.google.api.client.json.Json;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.CustomJSONArray;
 import net.sinzak.server.common.PropertyUtil;
@@ -11,11 +10,8 @@ import net.sinzak.server.product.domain.ProductWish;
 import net.sinzak.server.product.repository.ProductWishRepository;
 import net.sinzak.server.user.domain.Report;
 import net.sinzak.server.user.domain.SearchHistory;
-import net.sinzak.server.user.dto.respond.GetFollowDto;
+import net.sinzak.server.user.dto.respond.*;
 import net.sinzak.server.user.domain.User;
-import net.sinzak.server.user.dto.respond.ProfileShowForm;
-import net.sinzak.server.user.dto.respond.UserDto;
-import net.sinzak.server.user.dto.respond.WishShowForm;
 import net.sinzak.server.user.repository.ReportRepository;
 import net.sinzak.server.user.repository.SearchHistoryRepository;
 import net.sinzak.server.user.repository.UserRepository;
@@ -25,7 +21,6 @@ import net.sinzak.server.work.repository.WorkWishRepository;
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,7 +39,7 @@ public class UserQueryService {
 
     public JSONObject getMyProfile(User user){
         JSONObject obj = new JSONObject();
-        User findUser = userRepository.findByEmailFetchProductPostList(user.getEmail()).orElseThrow(()-> new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN));
+        User findUser = userRepository.findByIdFetchProductPostList(user.getId()).orElseThrow(()-> new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN));
         List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
         obj.put("products", productShowForms);
         List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList(),false);
@@ -81,15 +76,15 @@ public class UserQueryService {
 
     public JSONObject getWorkEmploys(User user){
         JSONObject obj = new JSONObject();
-        User loginUser = userRepository.findByEmailFetchWorkPostList(user.getEmail()).orElseThrow(()->new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN));
+        User loginUser = userRepository.findByIdFetchWorkPostList(user.getId()).orElseThrow(()->new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN));
         List<ProfileShowForm> workEmploys=  makeWorkShowForm(loginUser.getWorkPostList(),true);
         obj.put("workEmploys",workEmploys);
         return PropertyUtil.response(obj);
     }
 
     public boolean checkReported(User postUser,User loginUser){
-        Optional<Report> report = reportRepository.findByUserIdAndOpponentUserId(postUser.getId(), loginUser.getId());
-        if(report.isPresent()){
+        List<Report> report = reportRepository.findByUserIdAndOpponentUserIdBoth(postUser.getId(), loginUser.getId());
+        if(!report.isEmpty()){
             return true;
         }
         return false;
@@ -220,7 +215,7 @@ public class UserQueryService {
     private JSONObject getGetFollowDtoList(Set<Long> followList) {
         List<GetFollowDto> getFollowDtoList = new ArrayList<>();
         for(Long follow : followList){
-            Optional<User> findUser = userRepository.findById(follow);
+            Optional<User> findUser = userRepository.findByIdNotDeleted(follow);
             if(findUser.isPresent()){
                 GetFollowDto getFollowDto = GetFollowDto.builder().
                         userId(findUser.get().getId()).
@@ -232,10 +227,21 @@ public class UserQueryService {
         }
         return PropertyUtil.response(getFollowDtoList);
     }
+    @Transactional(readOnly = true)
+    public JSONObject showReportList(User User){
+        User loginUser = userRepository.findByIdFetchReportList(User.getId()).orElseThrow(UserNotFoundException::new);
+        List<Report> reportList = reportRepository.findByUserId(loginUser.getId());
+        List<ReportRespondDto> reportRespondDtos = new ArrayList<>();
+        for (Report report : reportList)
+            if(!report.getOpponentUser().isDelete()){
+                reportRespondDtos.add(new ReportRespondDto(report.getOpponentUser().getId(), report.getOpponentUser().getNickName(), report.getOpponentUser().getPicture()));
+            }
+        return PropertyUtil.response(reportRespondDtos);
+    }
 
     @Transactional
     public JSONObject showSearchHistory(User User){
-        User user = historyRepository.findByEmailFetchHistoryList(User.getEmail()).orElseThrow(InstanceNotFoundException::new);
+        User user = historyRepository.findByIdFetchHistoryList(User.getId()).orElseThrow(InstanceNotFoundException::new);
         List<SearchHistory> searchHistoryList = getUserHistoryList(user);
         List<JSONArray> searchList = new ArrayList<>();
         for (SearchHistory history : searchHistoryList) {

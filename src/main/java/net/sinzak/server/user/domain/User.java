@@ -85,8 +85,6 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Column
     private boolean alarm_receive;
 
-    @Column
-    private String fcm_token="";
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -146,6 +144,15 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles = new ArrayList<>();
+
+
+
+
+    @Column
+    private boolean isDelete= false;
+    public void setDelete(boolean delete) {
+        isDelete = delete;
+    }
 
 
     public void makePostNull(){

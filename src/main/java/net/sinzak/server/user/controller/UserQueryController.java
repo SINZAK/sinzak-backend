@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.error.UserNotFoundException;
+import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.service.UserQueryService;
 import org.json.simple.JSONObject;
@@ -67,6 +68,14 @@ public class UserQueryController {
     public JSONObject showWorkEmploy(@AuthenticationPrincipal User user){
         PropertyUtil.checkHeader(user);
         return userQueryService.getWorkEmploys(user);
+    }
+
+    @ApiDocumentResponse
+    @ApiOperation(value = "신고 목록 출력")
+    @PostMapping(value = "/users/reportlist")
+    public JSONObject reportList(@AuthenticationPrincipal User user){
+        PropertyUtil.checkHeader(user);
+        return userQueryService.showReportList(user);
     }
 
 
