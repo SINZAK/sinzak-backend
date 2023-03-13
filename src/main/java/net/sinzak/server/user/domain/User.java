@@ -145,15 +145,11 @@ public class User extends BaseTimeEntity implements UserDetails {
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles = new ArrayList<>();
 
-
-
-
     @Column
     private boolean isDelete= false;
     public void setDelete(boolean delete) {
         isDelete = delete;
     }
-
 
     public void makePostNull(){
         for(Work work : this.workPostList){
@@ -175,8 +171,6 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.roles = Collections.singletonList("ROLE_USER");
         this.role = Role.GUEST;
     }
-
-
 
     @Builder
     public User(String email, String name, String picture, String origin) {
@@ -209,25 +203,17 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     public User update(String name, String introduction){
         this.nickName =name;
-
         this.introduction = introduction;
         return this;
     }
     public void updateCategoryLike(String categoryLike){
         this.categoryLike = categoryLike;
     }
-    public String getRoleKey(){
-        return this.role.getKey();
-    }
 
     public void updateCertifiedUniv(String univName, String univ_email) {
         this.univ_email = univ_email;
         this.univ = univName;
         this.cert_uni = true;
-    }
-
-    public void updateEmailForAppleUser(String email) {
-        this.email = email;
     }
 
     public void updateFollowNumber(){
