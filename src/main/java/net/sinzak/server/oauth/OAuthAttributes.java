@@ -72,7 +72,7 @@ public class OAuthAttributes {
     private static OAuthAttributes ofApple(JSONObject attributes) {
         log.warn(attributes.toJSONString());
         return OAuthAttributes.builder()
-                .name("애플로그인")
+                .name("미정")
                 .email((String) attributes.get("sub"))
                 .origin("Apple")
                 .build();
