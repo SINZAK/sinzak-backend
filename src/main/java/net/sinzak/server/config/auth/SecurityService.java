@@ -92,8 +92,8 @@ public class SecurityService {
         return obj;
     }
 
-    @Transactional //TODO
-    public TokenDto reissue(User User, TokenRequestDto tokenRequestDto) {
+    @Transactional
+    public TokenDto reissue(User User) {
         List<RefreshToken> refreshTokens = refreshTokenRepository.findByKey(User.getId());
         RefreshToken refreshToken = refreshTokens.get(refreshTokens.size()-1); //마지막꺼가 가장 최신반영된 토큰
 

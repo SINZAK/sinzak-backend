@@ -56,11 +56,11 @@ public class UserCommandController {
         return securityService.login(dto.getEmail());
     }
 
-    @ApiOperation(value = "토큰 만료시 재발급, access,refresh 둘 다 보내주세요")
+    @ApiOperation(value = "토큰 만료시 재발급 토큰들은 필요없고 헤더에 Authorization만 있으면 됩니다.")
     @PostMapping("/reissue")
-    public TokenDto reissue(@AuthenticationPrincipal User user, @RequestBody TokenRequestDto tokenRequestDto) {
+    public TokenDto reissue(@AuthenticationPrincipal User user) {
         PropertyUtil.checkHeader(user);
-        return securityService.reissue(user, tokenRequestDto);
+        return securityService.reissue(user);
     }
 
     @ApiDocumentResponse

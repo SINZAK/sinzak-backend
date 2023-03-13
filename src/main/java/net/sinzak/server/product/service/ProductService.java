@@ -336,11 +336,6 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         }
         return followingProductList;
     }
-    @Transactional
-    public List<ChatRoom> getChatRoom(Long productId){
-        Product product = productRepository.findByIdFetchChatRooms(productId).orElseThrow(PostNotFoundException::new);
-        return product.getChatRooms();
-    }
 
     @Transactional
     public JSONObject wish(User User, @RequestBody ActionForm form){   // 찜
@@ -384,8 +379,6 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     }
 
-
-
     @Transactional
     public JSONObject likes(User User, @RequestBody ActionForm form){
         JSONObject obj = new JSONObject();
@@ -426,27 +419,6 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         obj.put("isLike",isLike);
         return obj;
     }
-
-//    @Transactional
-//    public JSONObject trading(@RequestBody ActionForm form){
-//        JSONObject obj = new JSONObject();
-//        boolean isTrading;
-//        Product product = productRepository.findById(form.getId()).orElseThrow(PostNotFoundException::new);
-//        isTrading = product.isTrading();
-//        if (form.isMode() && !isTrading){
-//            product.setTrading(true);
-//            isTrading=true;
-//            obj.put("success",true);
-//        }
-//        else if(!form.isMode() && isTrading){
-//            product.setTrading(false);
-//            obj.put("success",true);
-//        }
-//        else
-//            obj.put("success",false);
-//        obj.put("isTrading",isTrading);
-//        return obj;
-//    }
 
     @Transactional
     public JSONObject sell(User User, @RequestBody SellDto dto){
@@ -549,7 +521,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     private List<ShowForm> makeDetailHomeShowFormList(List<ProductLikes> userLikesList, List<Product> productList) {
         List<ShowForm> showFormList = new ArrayList<>();
-        for (Product product : productList) { /** 추천 목록 중 좋아요 누른거 체크 후 ShowForm 으로 담기 **/
+        for (Product product : productList) {
             boolean isLike = checkIsLikes(userLikesList, product);
             addProductInJSONFormat(showFormList, product, isLike);
         }
