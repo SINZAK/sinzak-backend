@@ -190,7 +190,7 @@ public class UserCommandService {
             return PropertyUtil.response(true);
         }
         catch (Exception e){
-            return PropertyUtil.response(false);
+            return PropertyUtil.responseMessage("탈퇴 처리가 되지 않았습니다. sinzakofficial@gmail.com 으로 문의주세요.");
         }
 
     }
