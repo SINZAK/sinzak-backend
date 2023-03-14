@@ -2,7 +2,6 @@ package net.sinzak.server.product.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.sinzak.server.chatroom.domain.ChatRoom;
 import net.sinzak.server.common.PostService;
 import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.common.dto.SuggestDto;
@@ -336,14 +335,9 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         }
         return followingProductList;
     }
-    @Transactional
-    public List<ChatRoom> getChatRoom(Long productId){
-        Product product = productRepository.findByIdFetchChatRooms(productId).orElseThrow(PostNotFoundException::new);
-        return product.getChatRooms();
-    }
 
     @Transactional
-    public JSONObject wish(User User, @RequestBody ActionForm form){   // 찜
+    public JSONObject wish(User User, @RequestBody ActionForm form){
         JSONObject obj = new JSONObject();
         User user = userRepository.findByIdFetchProductWishList(User.getId()).orElseThrow(UserNotFoundException::new); // 작품 찜까지 페치 조인
         List<ProductWish> wishList = user.getProductWishList(); //wishList == 유저의 찜 리스트
@@ -383,8 +377,6 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return obj;
 
     }
-
-
 
     @Transactional
     public JSONObject likes(User User, @RequestBody ActionForm form){
@@ -426,27 +418,6 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         obj.put("isLike",isLike);
         return obj;
     }
-
-//    @Transactional
-//    public JSONObject trading(@RequestBody ActionForm form){
-//        JSONObject obj = new JSONObject();
-//        boolean isTrading;
-//        Product product = productRepository.findById(form.getId()).orElseThrow(PostNotFoundException::new);
-//        isTrading = product.isTrading();
-//        if (form.isMode() && !isTrading){
-//            product.setTrading(true);
-//            isTrading=true;
-//            obj.put("success",true);
-//        }
-//        else if(!form.isMode() && isTrading){
-//            product.setTrading(false);
-//            obj.put("success",true);
-//        }
-//        else
-//            obj.put("success",false);
-//        obj.put("isTrading",isTrading);
-//        return obj;
-//    }
 
     @Transactional
     public JSONObject sell(User User, @RequestBody SellDto dto){
@@ -549,7 +520,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     private List<ShowForm> makeDetailHomeShowFormList(List<ProductLikes> userLikesList, List<Product> productList) {
         List<ShowForm> showFormList = new ArrayList<>();
-        for (Product product : productList) { /** 추천 목록 중 좋아요 누른거 체크 후 ShowForm 으로 담기 **/
+        for (Product product : productList) {
             boolean isLike = checkIsLikes(userLikesList, product);
             addProductInJSONFormat(showFormList, product, isLike);
         }

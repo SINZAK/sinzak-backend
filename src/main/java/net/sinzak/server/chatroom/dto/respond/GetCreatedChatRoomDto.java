@@ -1,7 +1,6 @@
 package net.sinzak.server.chatroom.dto.respond;
 
 import lombok.*;
-import net.sinzak.server.common.PostType;
 
 @Builder
 @Getter

@@ -2,8 +2,6 @@ package net.sinzak.server.work.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
-import lombok.Setter;
-import org.json.simple.JSONObject;
 
 @Getter
 public class WorkPostDto {

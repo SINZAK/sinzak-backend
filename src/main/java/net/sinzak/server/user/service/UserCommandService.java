@@ -15,7 +15,6 @@ import net.sinzak.server.user.dto.request.ReportRequestDto;
 import net.sinzak.server.user.dto.request.UpdateUserDto;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.common.error.UserNotFoundException;
-import net.sinzak.server.user.dto.respond.ReportRespondDto;
 import net.sinzak.server.user.repository.ReportRepository;
 
 import net.sinzak.server.user.repository.SearchHistoryRepository;
@@ -190,7 +189,7 @@ public class UserCommandService {
             return PropertyUtil.response(true);
         }
         catch (Exception e){
-            return PropertyUtil.response(false);
+            return PropertyUtil.responseMessage("탈퇴 처리가 되지 않았습니다. sinzakofficial@gmail.com 으로 문의주세요.");
         }
 
     }
