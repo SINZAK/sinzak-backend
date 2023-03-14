@@ -67,6 +67,8 @@ public class WorkQDSLRepositoryImpl implements QDSLRepository<Work> {
             return work.popularity.desc();
         else if (align.equals("recent"))
             return work.id.desc();
+        else if(align.equals("popular"))
+            return work.likesCnt.desc();
 
         return work.id.desc();
     }
