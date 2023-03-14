@@ -9,7 +9,6 @@ import net.sinzak.server.common.dto.IdDto;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.config.auth.SecurityService;
 import net.sinzak.server.config.auth.jwt.TokenDto;
-import net.sinzak.server.config.auth.jwt.TokenRequestDto;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.dto.request.*;
 import net.sinzak.server.user.service.UserCommandService;

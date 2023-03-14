@@ -39,8 +39,6 @@ import java.util.stream.Collectors;
 public class ChatRoomQueryService {
     private final ChatRoomRepository chatRoomRepository;
     private final UserChatRoomRepository userChatRoomRepository;
-    private final ProductService productService;
-    private final WorkService workService;
 
     public JSONObject getChatRoomsByPost(User loginUser, PostDto postDto){
         if(loginUser ==null){

@@ -5,8 +5,6 @@ import net.sinzak.server.BaseTimeEntity;
 
 import javax.persistence.*;
 
-import static javax.persistence.FetchType.LAZY;
-
 @Getter
 @Entity
 public class Report extends BaseTimeEntity {

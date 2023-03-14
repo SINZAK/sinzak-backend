@@ -63,13 +63,6 @@ public class ProductQDSLRepositoryImpl implements QDSLRepository<Product> {
         return product.id.desc();
     }
 
-//    private BooleanExpression eqSearch(String keyword) {
-//        if (keyword.isEmpty()){
-//            return null;
-//        }
-//        return product.title.contains(keyword).or(product.content.contains(keyword));
-//    }
-
     private BooleanBuilder eqSearch(String keyword) {
         BooleanBuilder builder = new BooleanBuilder();
         if(keyword.isEmpty())
