@@ -4,19 +4,12 @@ package net.sinzak.server.chatroom.controller;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.sinzak.server.chatroom.domain.ChatMessage;
 import net.sinzak.server.chatroom.dto.request.ChatMessageDto;
-import net.sinzak.server.chatroom.dto.request.ChatRoomUuidDto;
 import net.sinzak.server.chatroom.service.ChatMessageService;
-import net.sinzak.server.user.domain.User;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+
 
 @Api(tags = "채팅-메시지")
 @Controller

@@ -4,10 +4,10 @@ import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.config.auth.CustomUserDetailsService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -21,7 +21,8 @@ import java.util.List;
 @Slf4j
 public class JwtTokenProvider {
 
-    private String secretKey = "sinzak";
+    @Value("${jwt.secret}")
+    private String secretKey;
 
 
     private final long tokenValidTime = 30 * 60 * 10000L; // 액세스토큰 유효시간 300분

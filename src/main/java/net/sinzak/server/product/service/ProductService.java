@@ -2,7 +2,6 @@ package net.sinzak.server.product.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.sinzak.server.chatroom.domain.ChatRoom;
 import net.sinzak.server.common.PostService;
 import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.common.dto.SuggestDto;
@@ -338,7 +337,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional
-    public JSONObject wish(User User, @RequestBody ActionForm form){   // 찜
+    public JSONObject wish(User User, @RequestBody ActionForm form){
         JSONObject obj = new JSONObject();
         User user = userRepository.findByIdFetchProductWishList(User.getId()).orElseThrow(UserNotFoundException::new); // 작품 찜까지 페치 조인
         List<ProductWish> wishList = user.getProductWishList(); //wishList == 유저의 찜 리스트

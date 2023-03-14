@@ -3,8 +3,6 @@ package net.sinzak.server.product.dto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 
-import java.util.List;
-
 @Getter
 public class ShowForm {
     @ApiModelProperty(example = "작품 ID")

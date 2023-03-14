@@ -1,7 +1,6 @@
 package net.sinzak.server.common;
 
 import net.sinzak.server.common.dto.ActionForm;
-import net.sinzak.server.common.dto.DetailForm;
 import net.sinzak.server.common.dto.SuggestDto;
 import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;

@@ -15,7 +15,6 @@ import net.sinzak.server.user.dto.request.ReportRequestDto;
 import net.sinzak.server.user.dto.request.UpdateUserDto;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.common.error.UserNotFoundException;
-import net.sinzak.server.user.dto.respond.ReportRespondDto;
 import net.sinzak.server.user.repository.ReportRepository;
 
 import net.sinzak.server.user.repository.SearchHistoryRepository;

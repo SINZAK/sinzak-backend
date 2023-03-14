@@ -1,6 +1,5 @@
 package net.sinzak.server.work.repository;
 
-import net.sinzak.server.product.domain.ProductSuggest;
 import net.sinzak.server.work.domain.WorkSuggest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
