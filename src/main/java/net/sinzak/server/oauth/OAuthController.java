@@ -12,6 +12,7 @@ import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.dto.request.OauthDto;
 import net.sinzak.server.user.service.UserCommandService;
 import org.json.simple.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -25,11 +26,19 @@ public class OAuthController {
     private final UserCommandService userService;
     private final OAuthService oAuthService;
     private final AppleService appleService;
-    public static final String TEAM_ID = "F7B353LPM3";
-    public static final String CLIENT_ID = "net.sinzak.sinzak";
-    public static final String KEY_ID = "37QTX3F226";
-    public static final String AUTH_URL = "https://appleid.apple.com";
-    public static final String KEY_PATH = "static/apple/AuthKey_37QTX3F226.p8";
+
+    @Value("${google.client-id}")
+    private String GOOGLE_ID;
+    @Value("${kakao.client-id}")
+    private String KAKAO_ID;
+    @Value("${naver.client-id}")
+    private String NAVER_ID;
+
+    private final static String TEAM_ID = "F7B353LPM3";
+    private final static String CLIENT_ID = "net.sinzak.sinzak";
+    private final static String KEY_ID = "37QTX3F226";
+    private final static String AUTH_URL = "https://appleid.apple.com";
+    private final static String KEY_PATH = "static/apple/AuthKey_37QTX3F226.p8";
 
     @ApiOperation(value = "액세스토큰 body에 넣어주세요.", notes = "구글은 액세스토큰, idToken, origin까지 총 3개. " +
             "\n네이버, 카카오는 액세스토큰, origin 총 2개. " +
@@ -53,19 +62,26 @@ public class OAuthController {
         return PropertyUtil.response(jwtToken);
     }
 
-    @ApiOperation(value = "스프링용 카카오로그인 실행(인가코드)",notes = "로컬환경 : https://kauth.kakao.com/oauth/authorize?client_id=3201538a34f65dfa0fb2e96b0d268ca7&redirect_uri=" +
-            "http://localhost:8080/api/login/oauth2/code/kakao&response_type=code" +
-            "배포환경 : https://kauth.kakao.com/oauth/authorize?client_id=3201538a34f65dfa0fb2e96b0d268ca7&redirect_uri=\" +\n" +
-            "\"https://sinzak.net/api/login/oauth2/code/kakao&response_type=code\\n")
+    @ApiOperation(value = "스프링용 카카오로그인 실행(인가코드)",notes = "하단 참고")
     @GetMapping("/test1")
-    public String kakaoLogin() {return "";}
+    public String kakaoLogin() {
+        return "로컬환경 : https://kauth.kakao.com/oauth/authorize?client_id="+KAKAO_ID +
+                "&redirect_uri=http://localhost:8080/api/login/oauth2/code/kakao&response_type=code" +"\n"+
+                "배포환경 : https://kauth.kakao.com/oauth/authorize?client_id="+KAKAO_ID +
+                "&redirect_uri=https://sinzak.net/api/login/oauth2/code/kakao&response_type=code";
+    }
 
     @ApiOperation(value = "스프링용 구글로그인 실행",notes = "로컬환경 : https://accounts.google.com/o/oauth2/v2/auth?client_id=782966145872-6shnmrvqi0q4sihr8etu9nrvh9jv43dh.apps.googleusercontent.com" +
             "&redirect_uri=http://localhost:8080/api/login/oauth2/code/google&response_type=code&scope=profile%20email&include_granted_scopes=true"+'\n'+
             "배포환경 : https://accounts.google.com/o/oauth2/v2/auth?client_id=782966145872-6shnmrvqi0q4sihr8etu9nrvh9jv43dh.apps.googleusercontent.com" +
             "&redirect_uri=https://sinzak.net/api/login/oauth2/code/google&response_type=code&scope=profile%20email&include_granted_scopes=true")
     @GetMapping("/test2")
-    public String googleLogin(){return "";}
+    public String googleLogin(){
+        return "로컬환경 : https://accounts.google.com/o/oauth2/v2/auth?client_id="+GOOGLE_ID+
+                "&redirect_uri=http://localhost:8080/api/login/oauth2/code/google&response_type=code&scope=profile%20email&include_granted_scopes=true" +"\n"+
+                "배포환경 : https://accounts.google.com/o/oauth2/v2/auth?client_id="+GOOGLE_ID+
+                "&redirect_uri=https://sinzak.net/api/login/oauth2/code/google&response_type=code&scope=profile%20email&include_granted_scopes=true";
+    }
 
     @ApiOperation(value = "스프링용 네이버로그인 실행",notes =
             "로컬환경 : https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=DwXMEfKZq0tmkrsn6kLk&state=STATE_STRING" +
@@ -73,7 +89,12 @@ public class OAuthController {
                     "배포환경 : https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=DwXMEfKZq0tmkrsn6kLk&state=STATE_STRING" +
                     "&redirect_uri=https://sinzak.net/api/login/oauth2/code/naver")
     @GetMapping("/test3")
-    public void naverLogin(){}
+    public String naverLogin(){
+        return "로컬환경 : https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id="+NAVER_ID+"&state=9kgsGTfH4j7IyAkg"+
+                "&redirect_uri=http://localhost:8080/api/login/oauth2/code/naver"+ "\n" +
+                "배포환경 : https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id="+NAVER_ID+"&state=9kgsGTfH4j7IyAkg"+
+                "&redirect_uri=https://sinzak.net/api/login/oauth2/code/naver";
+    }
 
     @ApiOperation(value = "스프링용 애플 로그인 실행",notes =
             "배포환경 : "+AUTH_URL+"/auth/authorize?client_id=" + CLIENT_ID + "&redirect_uri=" + "https://sinzak.net/api/login/oauth2/code/apple&response_type=code&id_token&response_mode=form_post")
@@ -131,5 +152,9 @@ public class OAuthController {
         log.warn("액세스토큰 = {}",obj.get("access_token").toString());
         return obj;
     }
+
+
+
+
 
 }
