@@ -11,6 +11,7 @@ import okhttp3.Response;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -21,6 +22,17 @@ public class OAuthService {
     private static final OkHttpClient client = new OkHttpClient();
     private static final String productURL = "https://sinzak.net";
     private static final String developURL = "http://localhost:8080";
+
+    @Value("${google.client-id}")
+    private String GOOGLE_ID;
+    @Value("${google.client-secret}")
+    private String GOOGLE_SECRET;
+    @Value("${kakao.client-id}")
+    private String KAKAO_ID;
+    @Value("${naver.client-id}")
+    private String NAVER_ID;
+    @Value("${naver.client-secret}")
+    private String NAVER_SECRET;
 
     public JSONObject getOauthInfo(OauthDto tokenDto) throws IOException, ParseException {
         JSONObject OauthInfo;
@@ -38,7 +50,7 @@ public class OAuthService {
 
     public String getKakaoAccessToken(String code) throws IOException, ParseException {
         String url = "https://kauth.kakao.com/oauth/token"
-                + "?client_id=3201538a34f65dfa0fb2e96b0d268ca7"
+                + "?client_id="+KAKAO_ID
                 + "&redirect_uri="+productURL+"/api/login/oauth2/code/kakao"
                 + "&grant_type=authorization_code"
                 + "&code=" + code;
@@ -57,8 +69,8 @@ public class OAuthService {
 
     public JSONObject getGoogleAccessToken(String code) throws IOException, ParseException {
         String url = "https://oauth2.googleapis.com/token"
-                + "?client_id=782966145872-6shnmrvqi0q4sihr8etu9nrvh9jv43dh.apps.googleusercontent.com"
-                + "&client_secret=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"
+                + "?client_id="+GOOGLE_ID
+                + "&client_secret="+GOOGLE_SECRET
                 + "&redirect_uri="+productURL+"/api/login/oauth2/code/google"
                 + "&grant_type=authorization_code"
                 + "&code=" + code;
@@ -76,7 +88,8 @@ public class OAuthService {
     }
 
     public JSONObject getNaverAccessToken(String code) throws IOException, ParseException {
-        String url = "https://nid.naver.com/oauth2.0/token?grant_type=authorization_code&client_id=DwXMEfKZq0tmkrsn6kLk&client_secret=2CAzvT18ok&code="+code+"&state=9kgsGTfH4j7IyAkg";
+        String url = "https://nid.naver.com/oauth2.0/token?grant_type=authorization_code&client_id="+NAVER_ID+"&client_secret="+NAVER_SECRET+"&code="+code+"&state=9kgsGTfH4j7IyAkg";;
+        System.out.println(code+'\n'+'\n');
         Request.Builder builder = new Request.Builder().header("Content-type", " application/x-www-form-urlencoded")
                 .url(url);
         JSONObject postObj = new JSONObject();
@@ -154,8 +167,8 @@ public class OAuthService {
 
     public JSONObject getWebGoogleURL(String redirect_uri, String code) throws IOException, ParseException {
         String url = "https://oauth2.googleapis.com/token"
-                + "?client_id=782966145872-6shnmrvqi0q4sihr8etu9nrvh9jv43dh.apps.googleusercontent.com"
-                + "&client_secret=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" + "&grant_type=authorization_code"
+                + "?client_id="+GOOGLE_ID
+                + "&client_secret="+GOOGLE_SECRET + "&grant_type=authorization_code"
                 + "&redirect_uri="+redirect_uri
                 + "&code="+code;
         Request.Builder builder = new Request.Builder().header("Content-type", " application/x-www-form-urlencoded")
@@ -170,6 +183,4 @@ public class OAuthService {
         JSONObject response = (JSONObject) parser.parse(responseHTML.body().string());
         return response;
     }
-
-
 }
