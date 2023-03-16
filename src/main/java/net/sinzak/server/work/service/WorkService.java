@@ -223,38 +223,16 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     }
 
     public boolean checkIsLikes(List<WorkLikes> userLikesList, Work work) {
-        boolean isLike = false;
-        for (WorkLikes likes : userLikesList) {
-            if (likes.getWork().getId().equals(work.getId())) {
-                isLike = true;
-                break;
-            }
-        }
-        return isLike;
+        return userLikesList.stream().anyMatch(x -> x.getWork().getId().equals(work.getId()));
     }
 
     public boolean checkIsWish(User user, List<WorkWish> workWishList) {
-        boolean isWish = false;
-        for (WorkWish workWish : workWishList) {
-            if(workWish.getUser().getId().equals(user.getId())){
-                isWish = true;
-                break;
-            }
-        }
-        return isWish;
+        return workWishList.stream().anyMatch(x -> x.getUser().getId().equals(user.getId()));
     }
 
     public boolean checkIsFollowing(Set<Long> userFollowingList, Work work) {
-        boolean isFollowing = false;
-        for (Long followingId : userFollowingList) {
-            if(work.getUser().getId().equals(followingId)){
-                isFollowing = true;
-                break;
-            }
-        }
-        return isFollowing;
+        return userFollowingList.stream().anyMatch(x -> x.equals(work.getUser().getId()));
     }
-
 
 
     public List<String> getImages(Work work) {
