@@ -8,4 +8,6 @@ public class ChatRoomNotFoundException extends RuntimeException{
     public ChatRoomNotFoundException(String s) {
         super(s);
     }
+    @Override
+    public synchronized Throwable fillInStackTrace() {return this;}
 }
