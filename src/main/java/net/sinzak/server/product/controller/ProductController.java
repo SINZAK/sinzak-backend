@@ -13,6 +13,7 @@ import net.sinzak.server.product.service.ProductService;
 import net.sinzak.server.common.dto.ActionForm;
 import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -76,6 +77,7 @@ public class ProductController {
 
     @PostMapping("/products/{id}")
     @ApiOperation(value = "작품 상세 조회")
+
     public JSONObject showProject(@PathVariable Long id, @AuthenticationPrincipal User user) {
         try{
             return productService.showDetail(id,user);
@@ -145,6 +147,7 @@ public class ProductController {
         PropertyUtil.checkHeader(user);
         return productService.showFollowingDetail(user);
     }
+
 
     @ApiOperation(value = "마켓 작품")
     @PostMapping("/products")

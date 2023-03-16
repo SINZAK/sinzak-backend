@@ -19,6 +19,7 @@ import net.sinzak.server.user.repository.SearchHistoryRepository;
 import net.sinzak.server.user.repository.UserRepository;
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -154,6 +155,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
 
 
+    @Cacheable(value ="showDetailForUserCache",key="{#User.getId(),#id}",cacheManager ="testCacheManager" )
     @Transactional
     public JSONObject showDetail(Long id, User User){   // 글 상세 확인
         User user = userRepository.findByIdFetchFollowingAndLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
@@ -415,6 +417,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return PropertyUtil.response(true);
     }
 
+    @Cacheable(value ="ProductListForUserCache",key="{#User.getId(),#keyword,#categories,#align,#complete,#pageable}",cacheManager ="testCacheManager" )
     @Transactional
     public PageImpl<ShowForm> productListForUser(User User, String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
         User user  = userRepository.findByIdFetchHistoryAndLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
