@@ -13,5 +13,6 @@ public class InstanceNotFoundException extends  RuntimeException {
         super(s);
     }
 
-
+    @Override
+    public synchronized Throwable fillInStackTrace() {return this;}
 }

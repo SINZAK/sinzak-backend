@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -268,18 +270,13 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     private List<Product> getTradingList(List<Product> productList, int limit) {
-        int count = 0;
-        List<Product> tradingList = new ArrayList<>();   /** 지금 거래 중 (홈) **/
-        for (Product product : productList) {
-            if(product.getChatCnt()>=1 && !product.isComplete()){
-                tradingList.add(product);
-                count++;
-                if(count >= limit)  /** 홈화면이니까 3개까지만 **/
-                    break;
-            }
-        }
+        List<Product> tradingList = productList.stream()
+                .filter(p -> p.getChatCnt()>=1 && !p.isComplete())
+                .limit(limit)
+                .collect(Collectors.toList());
         return tradingList;
     }
+
 
     @Transactional(readOnly = true)
     public JSONObject showRecommendDetail(User User){
@@ -302,17 +299,12 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
         return PropertyUtil.response(data);
     }
+
     private List<Product> getFollowingList(User user, List<Product> productList, int limit) {
-        int count = 0;
-        List<Product> followingProductList = new ArrayList<>();
-        for (Product product : productList) {
-            if(checkIsFollowing(user.getFollowingList(), product)){
-                followingProductList.add(product);
-                count++;
-                if(count>=limit) /** 표시할 개수 충족 **/
-                    break;
-            }
-        }
+        List<Product> followingProductList = productList.stream()
+                .filter(p -> checkIsFollowing(user.getFollowingList(), p))
+                .limit(limit)
+                .collect(Collectors.toList());
         return followingProductList;
     }
 

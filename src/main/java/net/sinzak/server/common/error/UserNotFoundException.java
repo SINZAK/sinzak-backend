@@ -11,4 +11,6 @@ public class UserNotFoundException extends RuntimeException {
     public UserNotFoundException() {
         super(USER_NOT_FOUND);
     }
+    @Override
+    public synchronized Throwable fillInStackTrace() {return this;}
 }
