@@ -29,7 +29,7 @@ public class RedisCacheConfig {
 
     @Value("${spring.redis.port}")
     private int port;
-
+    //포트 번호를 달리 해서 Redis 서버를 나눌 수 이씀
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();

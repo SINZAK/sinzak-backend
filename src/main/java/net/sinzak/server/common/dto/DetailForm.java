@@ -29,7 +29,7 @@ public class DetailForm implements Serializable{ //redis에 저장하기 위한 
     @ApiModelProperty(example = "작가 팔로워 수")
     private String followerNum;
     @ApiModelProperty(value = "이미 팔로잉 중인지 여부" , example = "true")
-    private boolean following; //접두사 is 붙히면 에러남 (json은 언제나 자동으로 is를 삭제해줌) Dto에만 적용하면 될듯
+    private boolean following; //접두사 is 붙히면 에러남 (json은 언제나 자동으로 is를 삭제해줌) 컨트롤러 반환객체중 is붙혀져 있는 boolean 에만 적용하면 될듯
     @ApiModelProperty(value = "[이미지[0], 이미지배열[1], 이미지배열[2] ...]")
     private List<String> images;
     @ApiModelProperty(example = "작품 판매글 제목")

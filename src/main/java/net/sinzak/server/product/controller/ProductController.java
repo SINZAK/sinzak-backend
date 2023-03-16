@@ -77,7 +77,6 @@ public class ProductController {
 
     @PostMapping("/products/{id}")
     @ApiOperation(value = "작품 상세 조회")
-
     public JSONObject showProject(@PathVariable Long id, @AuthenticationPrincipal User user) {
         try{
             return productService.showDetail(id,user);

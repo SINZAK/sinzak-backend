@@ -155,7 +155,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
 
 
-    @Cacheable(value ="showDetailForUserCache",key="{#User.getId(),#id}",cacheManager ="testCacheManager" )
+
     @Transactional
     public JSONObject showDetail(Long id, User User){   // 글 상세 확인
         User user = userRepository.findByIdFetchFollowingAndLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
@@ -182,6 +182,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return PropertyUtil.response(detailForm);
     }
 
+    @Cacheable(value ="showProductDetailCache",key="#id",cacheManager ="testCacheManager")
     @Transactional
     public JSONObject showDetail(Long id){   // 비회원 글 보기
         Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(PostNotFoundException::new);
@@ -416,8 +417,6 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         suggestRepository.save(connect);
         return PropertyUtil.response(true);
     }
-
-    @Cacheable(value ="ProductListForUserCache",key="{#User.getId(),#keyword,#categories,#align,#complete,#pageable}",cacheManager ="testCacheManager" )
     @Transactional
     public PageImpl<ShowForm> productListForUser(User User, String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
         User user  = userRepository.findByIdFetchHistoryAndLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
