@@ -61,9 +61,39 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                     .suggest(buildDto.isSuggest())
                     .size(new Size(buildDto.getWidth(), buildDto.getVertical(), buildDto.getHeight()))
                     .build();
-        product.setUser(user); // user 연결 및, user의 외주 글 리스트에 글 추가
+        product.setUser(user);
         Long productId = productRepository.save(product).getId();// 미리 저장해야 이미지도 저장가능..
         return PropertyUtil.response(productId);
+    }
+
+    public JSONObject saveImageInS3AndProduct(User user, List<MultipartFile> multipartFiles, Long id) {
+        Product product = productRepository.findById(id).orElseThrow(PostNotFoundException::new);
+        if(!user.getId().equals(product.getUser().getId()))
+            return PropertyUtil.responseMessage("잘못된 접근입니다.");
+        for (MultipartFile img : multipartFiles) {
+            try{
+                String url = uploadImageAndSetThumbnail(multipartFiles, product, img);
+                saveImageUrl(product, url);
+            }
+            catch (Exception e){
+                return PropertyUtil.responseMessage(multipartFiles.size()+"개의 이미지 저장 실패");
+            }
+        }
+        return PropertyUtil.response(true);
+    }
+
+
+    private String uploadImageAndSetThumbnail(List<MultipartFile> multipartFiles, Product product, MultipartFile img) {
+        String url = s3Service.uploadImage(img);
+        if(img.equals(multipartFiles.get(0)))
+            product.setThumbnail(url);
+        return url;
+    }
+
+    private void saveImageUrl(Product product, String url) {
+        ProductImage image = new ProductImage(url, product);
+        product.addImage(image);
+        imageRepository.save(image);
     }
 
     @Transactional(rollbackFor = {Exception.class})
@@ -87,36 +117,6 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return PropertyUtil.response(productId);
     }
 
-    public JSONObject saveImageInS3AndProduct(User user, List<MultipartFile> multipartFiles, Long id) {
-        Product product = productRepository.findById(id).orElseThrow(PostNotFoundException::new);
-        if(!user.getId().equals(product.getUser().getId()))
-            return PropertyUtil.responseMessage("잘못된 접근입니다.");
-        for (MultipartFile img : multipartFiles) {
-            try{
-                String url = uploadImageAndSetThumbnail(multipartFiles, product, img);
-                saveImageUrl(product, url);
-            }
-            catch (Exception e){
-                return PropertyUtil.responseMessage("이미지 저장 실패");
-            }
-        }
-        return PropertyUtil.response(true);
-    }
-
-
-    private String uploadImageAndSetThumbnail(List<MultipartFile> multipartFiles, Product product, MultipartFile img) {
-        String url = s3Service.uploadImage(img);
-        if(img.equals(multipartFiles.get(0)))
-            product.setThumbnail(url);
-        return url;
-    }
-
-    private void saveImageUrl(Product product, String url) {
-        ProductImage image = new ProductImage(url, product);
-        product.addImage(image);
-        imageRepository.save(image);
-    }
-
     @Transactional(rollbackFor = {Exception.class})
     public JSONObject editPost(User User, Long productId, ProductEditDto editDto){   // 글 생성
         User user = userRepository.findByIdNotDeleted(User.getId()).orElseThrow(UserNotFoundException::new);
@@ -137,13 +137,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
         deleteImagesInPost(product);
         product.setDeleted(true);
-//        beforeDeleteProduct(product);
-//        productRepository.delete(product);
         return PropertyUtil.response(true);
-    }
-
-    private void beforeDeleteProduct(Product product) {
-        product.makeChatRoomNull();
     }
 
     private void deleteImagesInPost(Product product) {
@@ -151,6 +145,12 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
             s3Service.deleteImage(image.getImageUrl());
         }
     }
+
+    private void beforeDeleteProduct(Product product) {
+        product.makeChatRoomNull();
+    }
+
+
 
     @Transactional
     public JSONObject showDetail(Long id, User User){   // 글 상세 확인
@@ -168,7 +168,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
             detailForm.setMyPost();
 
         boolean isLike = checkIsLikes(user.getProductLikesList(), product);
-        boolean isWish = checkIsWish(user, product.getProductWishList());
+        boolean isWish = checkIsWish(user, product.getProductWishList());  /**최적화를 위해 상품의 찜목록과 비교함. (대체적으로 해당 상품 찜개수 < 유저의 찜개수) **/
         boolean isFollowing = false;
         if(!product.getUser().isDelete())
             isFollowing = checkIsFollowing(user.getFollowingList(), product);
@@ -177,12 +177,13 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         product.addViews();
         return PropertyUtil.response(detailForm);
     }
+
     @Transactional
     public JSONObject showDetail(Long id){   // 비회원 글 보기
         Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(PostNotFoundException::new);
         DetailProductForm detailForm = makeProductDetailForm(product);
         if(!product.getUser().isDelete()){
-            User postUser =product.getUser();
+            User postUser = product.getUser();
             detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_celeb(), postUser.getFollowerNum());
         }
         else{
@@ -192,6 +193,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         product.addViews();
         return PropertyUtil.response(detailForm);
     }
+
     private DetailProductForm makeProductDetailForm(Product product) {
         DetailProductForm  detailForm = DetailProductForm.builder()
                 .id(product.getId())
@@ -214,40 +216,18 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                 .complete(product.isComplete()).build();
         return detailForm;
     }
+
     public boolean checkIsLikes(List<ProductLikes> userLikesList, Product product) {
-        boolean isLike = false;
-        for (ProductLikes likes : userLikesList) {
-            if (likes.getProduct().getId().equals(product.getId())) {
-                isLike = true;
-                break;
-            }
-        }
-        return isLike;
+        return userLikesList.stream().anyMatch(x -> x.getProduct().getId().equals(product.getId()));
     }
 
     public boolean checkIsWish(User user, List<ProductWish> productWishList) {
-        boolean isWish = false;
-        for (ProductWish productWish : productWishList) {
-            if(productWish.getUser().getId().equals(user.getId())){
-                isWish = true;
-                break;
-            }
-        }
-        return isWish;
+        return productWishList.stream().anyMatch(x -> x.getUser().getId().equals(user.getId()));
     }
 
     public boolean checkIsFollowing(Set<Long> userFollowingList, Product product) {
-        boolean isFollowing = false;
-        for (Long followingId : userFollowingList) {
-            if(product.getUser().getId().equals(followingId)){
-                isFollowing = true;
-                break;
-            }
-        }
-        return isFollowing;
+        return userFollowingList.stream().anyMatch(x -> x.equals(product.getUser().getId()));
     }
-
-
 
 
     @Transactional(readOnly = true)
