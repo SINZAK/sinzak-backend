@@ -10,4 +10,6 @@ public class UserNotLoginException extends RuntimeException {
         super();
     }
 
+    @Override
+    public synchronized Throwable fillInStackTrace() {return this;}
 }
