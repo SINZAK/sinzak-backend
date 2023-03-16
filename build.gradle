@@ -82,6 +82,8 @@ dependencies {
 	implementation group: 'com.squareup.okhttp3' , name: 'okhttp' , version: '4.2.2'
 //	implementation group: 'com.google.firebase', name: 'firebase-admin', version: '8.1.0'
 
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 
 }
 tasks.named('test') {
