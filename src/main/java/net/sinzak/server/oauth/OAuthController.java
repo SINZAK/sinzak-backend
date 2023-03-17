@@ -116,7 +116,6 @@ public class OAuthController {
     public String oauthGoogle(@RequestParam(value = "code", required = false) String code) throws Exception {
         log.warn("인가코드 = {}",code);
         JSONObject obj = oAuthService.getGoogleAccessToken(productURL+"/google", code);
-        log.warn("액세스토큰 = {}",obj.get("access_token").toString());
         return obj.toJSONString();
     }
 
@@ -125,7 +124,6 @@ public class OAuthController {
     public String oauthNaver(@RequestParam(value = "code", required = false) String code) throws Exception {
         log.warn("인가코드 = {}",code);
         JSONObject obj = oAuthService.getNaverAccessToken(code);
-        log.warn("액세스토큰 = {}",obj.get("access_token").toString());
         return obj.toJSONString();
     }
 
