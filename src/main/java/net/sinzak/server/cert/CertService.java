@@ -32,7 +32,7 @@ public class CertService {
         else
         {
             Cert cert = savedCert.get();
-            if(!cert.isVerified())
+            if(!cert.isCeleb_verified())
                 certId = cert.getId();
             else
                 return PropertyUtil.responseMessage("이미 인증 처리된 이메일입니다.");
@@ -50,6 +50,15 @@ public class CertService {
     }
 
 
-
+    @Transactional
+    public JSONObject applyCertifiedAuthor(User User, String link){
+        User user = userRepository.findById(User.getId()).orElseThrow(UserNotFoundException::new);
+        if(!user.isCert_uni())
+            return PropertyUtil.responseMessage("아직 대학 인증이 완료되지 않았습니다.");
+        if(user.isCert_celeb())
+            return PropertyUtil.responseMessage("이미 처리된 요청입니다.");
+        user.setPortFolioUrl(link);
+        return PropertyUtil.response(true);
+    }
 
 }

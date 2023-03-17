@@ -68,4 +68,11 @@ public class CertController {
         return certService.uploadUnivCard(certId, multipartFile);
     }
 
+    @ApiDocumentResponse
+    @ApiOperation(value = "인증작가 신청", notes = "대학인증 마친 상태에서 요청할 수 있도록 해주세요. 대학인증 안하면 어차피 빠꾸먹어요, 포폴 주소 100자 이하가 안전할 듯")
+    @PostMapping(value = "/certify/author")
+    public JSONObject updateUser(@AuthenticationPrincipal User user, @RequestBody PortFolioDto dto) {
+        return certService.applyCertifiedAuthor(user, dto.getPortFolio());
+    }
+
 }

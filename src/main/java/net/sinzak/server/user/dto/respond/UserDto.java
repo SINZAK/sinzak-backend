@@ -18,5 +18,6 @@ public class UserDto {
     private String categoryLike;
 
     private boolean cert_uni;
+    private boolean cert_celeb;
     private boolean isFollow;
 }
