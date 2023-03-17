@@ -27,6 +27,9 @@ public class OAuthController {
     private final OAuthService oAuthService;
     private final AppleService appleService;
 
+    private static final String productURL = "https://sinzak.net";
+    private static final String developURL = "http://localhost:8080";
+
     @Value("${google.client-id}")
     private String GOOGLE_ID;
     @Value("${kakao.client-id}")
@@ -105,7 +108,7 @@ public class OAuthController {
     @GetMapping(value = "/login/oauth2/code/kakao")
     public String oauthKakao(@RequestParam(value = "code", required = false) String code) throws Exception {
         log.warn("인가코드 = {}",code);
-        String accessToken = oAuthService.getKakaoAccessToken(code);
+        String accessToken = oAuthService.getKakaoAccessToken(productURL, code);
         log.warn("액세스토큰 = {}",accessToken);
         return accessToken;
     }
@@ -114,7 +117,7 @@ public class OAuthController {
     @GetMapping(value = "/login/oauth2/code/google")
     public String oauthGoogle(@RequestParam(value = "code", required = false) String code) throws Exception {
         log.warn("인가코드 = {}",code);
-        JSONObject obj = oAuthService.getGoogleAccessToken(code);
+        JSONObject obj = oAuthService.getGoogleAccessToken(productURL, code);
         log.warn("액세스토큰 = {}",obj.get("access_token").toString());
         return obj.toJSONString();
     }
@@ -145,16 +148,31 @@ public class OAuthController {
         return apiResponse;
     }
 
-    @ApiOperation(value = "리액트용 구글 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
+    @ApiOperation(value = "웹용 카카오 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
+    @GetMapping(value = "/web/kakao")
+    public String oauthWebKakao(@RequestParam(value = "code", required = false) String code, @RequestParam(value = "redirect_uri") String redirect_uri) throws Exception {
+        log.warn("인가코드 = {}",code);
+        String accessToken = oAuthService.getKakaoAccessToken(redirect_uri, code);
+        log.warn("액세스토큰 = {}",accessToken);
+        return accessToken;
+    }
+
+    @ApiOperation(value = "웹용 구글 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
     @GetMapping(value = "/web/google")
     public JSONObject oauthWebGoogle(@RequestParam(value = "code") String code, @RequestParam(value = "redirect_uri") String redirect_uri) throws Exception {
-        JSONObject obj = oAuthService.getWebGoogleURL(redirect_uri,code);
+        JSONObject obj = oAuthService.getGoogleAccessToken(redirect_uri, code);
         log.warn("액세스토큰 = {}",obj.get("access_token").toString());
         return obj;
     }
 
-
-
+    @ApiOperation(value = "웹용 네이버 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
+    @GetMapping(value = "/web/naver")
+    public String oauthWebNaver(@RequestParam(value = "code", required = false) String code) throws Exception {
+        log.warn("인가코드 = {}",code);
+        JSONObject obj = oAuthService.getNaverAccessToken(code);
+        log.warn("액세스토큰 = {}",obj.get("access_token").toString());
+        return obj.toJSONString();
+    }
 
 
 }
