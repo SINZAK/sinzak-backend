@@ -69,7 +69,7 @@ public class CertController {
     }
 
     @ApiDocumentResponse
-    @ApiOperation(value = "인증작가 신청", notes = "대학인증 마친 상태에서 요청할 수 있도록 해주세요. 대학인증 안하면 어차피 빠꾸먹어요, 포폴 주소 100자 이하가 안전할 듯")
+    @ApiOperation(value = "인증작가 신청", notes = "대학인증 마친 상태에서 요청할 수 있도록 해주세요. \n 테스트 할 때는  my-profile에서 port_folio_url이 바뀌는 지 체킹 하면 됩니다. cert_celeb은 저희가 직접 확인하기 전까지 false")
     @PostMapping(value = "/certify/author")
     public JSONObject updateUser(@AuthenticationPrincipal User user, @RequestBody PortFolioDto dto) {
         return certService.applyCertifiedAuthor(user, dto.getPortFolio());

@@ -184,6 +184,7 @@ public class UserQueryService {
                 .userId(findUser.getId())
                 .name(findUser.getNickName())
                 .introduction(findUser.getIntroduction())
+                .portFolioUrl(findUser.getPortFolioUrl())
                 .followingNumber(findUser.getFollowingNum())
                 .followerNumber(findUser.getFollowerNum())
                 .myProfile(checkIfMyProfile(user,findUser))
