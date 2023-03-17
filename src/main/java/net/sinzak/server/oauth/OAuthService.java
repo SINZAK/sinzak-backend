@@ -3,6 +3,7 @@ package net.sinzak.server.oauth;
 import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
+import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.user.dto.request.OauthDto;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -47,7 +48,7 @@ public class OAuthService {
         return OauthInfo;
     }
 
-    public String getKakaoAccessToken(String redirect_uri, String code) throws IOException, ParseException {
+    public JSONObject getKakaoAccessToken(String redirect_uri, String code) throws IOException, ParseException {
         String url = "https://kauth.kakao.com/oauth/token"
                 + "?client_id="+KAKAO_ID
                 + "&redirect_uri="+ redirect_uri
@@ -62,8 +63,10 @@ public class OAuthService {
 
         Response responseHTML = client.newCall(request).execute();
         JSONParser parser = new JSONParser();
-        JSONObject response = (JSONObject) parser.parse(responseHTML.body().string());
-        return response.get("access_token").toString();
+        JSONObject obj = (JSONObject) parser.parse(responseHTML.body().string());
+        JSONObject response = new JSONObject();
+        response.put("access_token",obj.get("access_token").toString());
+        return PropertyUtil.response(response);
     }
 
     public JSONObject getGoogleAccessToken(String redirect_uri, String code) throws IOException, ParseException {
@@ -82,8 +85,11 @@ public class OAuthService {
 
         Response responseHTML = client.newCall(request).execute();
         JSONParser parser = new JSONParser();
-        JSONObject response = (JSONObject) parser.parse(responseHTML.body().string());
-        return response;
+        JSONObject obj = (JSONObject) parser.parse(responseHTML.body().string());
+        JSONObject response = new JSONObject();
+        response.put("access_token", obj.get("access_token").toString());
+        response.put("id_token", obj.get("id_token").toString());
+        return PropertyUtil.response(response);
     }
 
     public JSONObject getNaverAccessToken(String code) throws IOException, ParseException {
@@ -98,8 +104,10 @@ public class OAuthService {
 
         Response responseHTML = client.newCall(request).execute();
         JSONParser parser = new JSONParser();
-        JSONObject response = (JSONObject) parser.parse(responseHTML.body().string());
-        return response;
+        JSONObject obj = (JSONObject) parser.parse(responseHTML.body().string());
+        JSONObject response = new JSONObject();
+        response.put("access_token", obj.get("access_token").toString());
+        return PropertyUtil.response(response);
     }
 
     public JSONObject getGoogleInfo(OauthDto dto) throws IOException, ParseException {

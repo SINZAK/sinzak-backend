@@ -106,11 +106,9 @@ public class OAuthController {
 
     @ApiOperation(value = "스프링용 카카오 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
     @GetMapping(value = "/login/oauth2/code/kakao")
-    public String oauthKakao(@RequestParam(value = "code", required = false) String code) throws Exception {
+    public JSONObject oauthKakao(@RequestParam(value = "code", required = false) String code) throws Exception {
         log.warn("인가코드 = {}",code);
-        String accessToken = oAuthService.getKakaoAccessToken(productURL+"/kakao", code);
-        log.warn("액세스토큰 = {}",accessToken);
-        return accessToken;
+        return oAuthService.getKakaoAccessToken(productURL+"/kakao", code);
     }
 
     @ApiOperation(value = "스프링용 구글 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
@@ -150,11 +148,9 @@ public class OAuthController {
 
     @ApiOperation(value = "웹용 카카오 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
     @GetMapping(value = "/web/kakao")
-    public String oauthWebKakao(@RequestParam(value = "code", required = false) String code, @RequestParam(value = "redirect_uri") String redirect_uri) throws Exception {
+    public JSONObject oauthWebKakao(@RequestParam(value = "code", required = false) String code, @RequestParam(value = "redirect_uri") String redirect_uri) throws Exception {
         log.warn("인가코드 = {}",code);
-        String accessToken = oAuthService.getKakaoAccessToken(redirect_uri, code);
-        log.warn("액세스토큰 = {}",accessToken);
-        return accessToken;
+        return oAuthService.getKakaoAccessToken(redirect_uri, code);
     }
 
     @ApiOperation(value = "웹용 구글 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
