@@ -27,7 +27,7 @@ public class OAuthController {
     private final OAuthService oAuthService;
     private final AppleService appleService;
 
-    private static final String productURL = "https://sinzak.net";
+    private static final String productURL = "https://sinzak.net/api/login/oauth2/code";
     private static final String developURL = "http://localhost:8080";
 
     @Value("${google.client-id}")
@@ -108,7 +108,7 @@ public class OAuthController {
     @GetMapping(value = "/login/oauth2/code/kakao")
     public String oauthKakao(@RequestParam(value = "code", required = false) String code) throws Exception {
         log.warn("인가코드 = {}",code);
-        String accessToken = oAuthService.getKakaoAccessToken(productURL, code);
+        String accessToken = oAuthService.getKakaoAccessToken(productURL+"/kakao", code);
         log.warn("액세스토큰 = {}",accessToken);
         return accessToken;
     }
@@ -117,7 +117,7 @@ public class OAuthController {
     @GetMapping(value = "/login/oauth2/code/google")
     public String oauthGoogle(@RequestParam(value = "code", required = false) String code) throws Exception {
         log.warn("인가코드 = {}",code);
-        JSONObject obj = oAuthService.getGoogleAccessToken(productURL, code);
+        JSONObject obj = oAuthService.getGoogleAccessToken(productURL+"/google", code);
         log.warn("액세스토큰 = {}",obj.get("access_token").toString());
         return obj.toJSONString();
     }
