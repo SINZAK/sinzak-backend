@@ -9,7 +9,4 @@ public interface CertRepository extends JpaRepository<Cert, Long> {
 
     @Query("select c from Cert c where c.email = :mail")
     Optional<Cert> findCertByUnivEmail(String mail);
-
-    @Query("select c from Cert c where c.univName = :univ")
-    Optional<Cert> findCertByUnivName(String univ);
 }
