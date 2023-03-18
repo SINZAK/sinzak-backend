@@ -62,7 +62,7 @@ public class OAuthAttributes {
 
     private static OAuthAttributes ofGoogle(JSONObject attributes) {
         return OAuthAttributes.builder()
-                .name((String) attributes.get("name"))
+                .name("")
                 .email((String) attributes.get("email"))
                 .picture("")
                 .origin("Google")
