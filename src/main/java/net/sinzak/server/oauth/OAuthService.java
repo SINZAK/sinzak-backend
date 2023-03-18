@@ -3,6 +3,7 @@ package net.sinzak.server.oauth;
 import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.user.dto.request.OauthDto;
 import okhttp3.OkHttpClient;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OAuthService {
@@ -76,6 +78,9 @@ public class OAuthService {
                 + "&grant_type=authorization_code"
                 + "&redirect_uri="+redirect_uri
                 + "&code="+code;
+        log.error(url);
+        log.error(url);
+        log.error(url);
         Request.Builder builder = new Request.Builder().header("Content-type", " application/x-www-form-urlencoded")
                 .url(url);
         JSONObject postObj = new JSONObject();
