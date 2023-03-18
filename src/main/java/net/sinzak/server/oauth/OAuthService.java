@@ -79,8 +79,6 @@ public class OAuthService {
                 + "&redirect_uri="+redirect_uri
                 + "&code="+code;
         log.error(url);
-        log.error(url);
-        log.error(url);
         Request.Builder builder = new Request.Builder().header("Content-type", " application/x-www-form-urlencoded")
                 .url(url);
         JSONObject postObj = new JSONObject();
@@ -91,6 +89,7 @@ public class OAuthService {
         Response responseHTML = client.newCall(request).execute();
         JSONParser parser = new JSONParser();
         JSONObject obj = (JSONObject) parser.parse(responseHTML.body().string());
+        log.error(obj.toJSONString());
         JSONObject response = new JSONObject();
         response.put("access_token", obj.get("access_token").toString());
         response.put("id_token", obj.get("id_token").toString());
