@@ -51,7 +51,7 @@ public class OAuthAttributes {
         System.out.println(attributes.toJSONString());
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
         return OAuthAttributes.builder()
-                .name((String) response.get("name"))
+                .name("")
                 .email((String) response.get("email"))
                 .picture("")
 //                .picture((String) response.get("profile_image"))
