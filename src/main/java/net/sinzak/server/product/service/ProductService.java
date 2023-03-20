@@ -337,8 +337,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
             success = true;
         }
 
-        obj.put("isWish",isWish);
-        obj.put("success",success);
+        obj.put("isWish", isWish);
+        obj.put("success", success);
         return obj;
 
     }
@@ -351,8 +351,6 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         boolean isLike = false;
         boolean success = false;
         Product product = productRepository.findById(form.getId()).orElseThrow(PostNotFoundException::new);
-
-
 
         if(likesList.size()!=0){
             if(likesList.stream().anyMatch(likes -> likes.getProduct().equals(product)))
@@ -373,8 +371,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                     .ifPresent(likesRepository::delete);
             success = true;
         }
-        obj.put("isLike",isLike);
-        obj.put("success",success);
+        obj.put("isLike", isLike);
+        obj.put("success", success);
         return obj;
     }
 
