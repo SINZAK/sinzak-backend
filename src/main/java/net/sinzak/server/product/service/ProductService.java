@@ -182,7 +182,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return PropertyUtil.response(detailForm);
     }
 
-    @Cacheable(value ="showProductDetailCache",key="#id",cacheManager ="testCacheManager")
+//    @Cacheable(value ="showProductDetailCache",key="#id",cacheManager ="testCacheManager")
     @Transactional
     public JSONObject showDetail(Long id){   // 비회원 글 보기
         Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(PostNotFoundException::new);
