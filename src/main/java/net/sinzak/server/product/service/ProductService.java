@@ -78,7 +78,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                 saveImageUrl(product, url);
             }
             catch (Exception e){
-                return PropertyUtil.responseMessage(multipartFiles.size()+"개의 이미지 저장 실패");
+                return PropertyUtil.responseMessage(multipartFiles.indexOf(img)+"번째 이미지부터 저장 실패");
             }
         }
         return PropertyUtil.response(true);
@@ -313,39 +313,32 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         JSONObject obj = new JSONObject();
         User user = userRepository.findByIdFetchProductWishList(User.getId()).orElseThrow(UserNotFoundException::new); // 작품 찜까지 페치 조인
         List<ProductWish> wishList = user.getProductWishList(); //wishList == 유저의 찜 리스트
+        boolean success = false;
         boolean isWish=false;
         Product product = productRepository.findById(form.getId()).orElseThrow(PostNotFoundException::new);
 
-        if(wishList.size()!=0){ /** 유저가 찜이 누른 적이 있다면 이미 누른 작품인지 비교 **/
-            for (ProductWish wish : wishList) { //유저의 찜목록과 현재 누른 작품의 찜과 비교
-                if(product.equals(wish.getProduct())) {  //같으면 이미 찜 누른 항목
-                    isWish = true;
-                    break;
-                }
-            }
+        if(wishList.size()!=0){
+            if(wishList.stream().anyMatch(wish -> wish.getProduct().equals(product)))
+                isWish = true;
         }
 
         if (form.isMode() && !isWish){
             product.plusWishCnt();
             ProductWish connect = ProductWish.createConnect(product, user);
             productWishRepository.save(connect);
-            isWish=true;
-            obj.put("success",true);
+            isWish = true;
+            success = true;
         }
         else if(!form.isMode() && isWish){
             product.minusWishCnt();
-            for (ProductWish wish : wishList) {
-                if(product.equals(wish.getProduct())) {  //같으면 이미 찜 누른 항목
-                    productWishRepository.delete(wish);
-                    isWish = false;
-                    break;
-                }
-            }
-            obj.put("success",true);
+            wishList.stream()
+                    .filter(wish -> wish.getProduct().equals(product)).findFirst()
+                    .ifPresent(productWishRepository::delete);
+            success = true;
         }
-        else
-            obj.put("success",false);
+
         obj.put("isWish",isWish);
+        obj.put("success",success);
         return obj;
 
     }
