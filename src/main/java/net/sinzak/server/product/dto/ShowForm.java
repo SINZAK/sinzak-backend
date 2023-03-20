@@ -3,8 +3,10 @@ package net.sinzak.server.product.dto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 
+import java.io.Serializable;
+
 @Getter
-public class ShowForm {
+public class ShowForm implements Serializable {
     @ApiModelProperty(example = "작품 ID")
     private Long id;
     @ApiModelProperty(example = "작품 판매글 제목")
