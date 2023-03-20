@@ -96,6 +96,8 @@ jobs:
             docker container stop sinzak
             docker build -t sinzak .
             docker run -d --rm -p 8080:8080 --name sinzak sinzak
-            docker start sinzak
-            docker run -p 6379:6379 redis
+            #docker ps
+          
+
+
 
