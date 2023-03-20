@@ -184,6 +184,7 @@ public class UserQueryService {
                 .userId(findUser.getId())
                 .name(findUser.getNickName())
                 .introduction(findUser.getIntroduction())
+                .portFolioUrl(findUser.getPortFolioUrl())
                 .followingNumber(findUser.getFollowingNum())
                 .followerNumber(findUser.getFollowerNum())
                 .myProfile(checkIfMyProfile(user,findUser))
@@ -191,6 +192,7 @@ public class UserQueryService {
                 .univ(findUser.getUniv())
                 .isFollow(checkIfFollowFindUser(user,findUser))
                 .cert_uni(findUser.isCert_uni())
+                .cert_celeb(findUser.isCert_celeb())
                 .categoryLike(findUser.getCategoryLike())
                 .build();
         return userDto;

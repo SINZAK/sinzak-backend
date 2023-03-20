@@ -38,7 +38,7 @@ public class CertController {
     }
 
     @ApiDocumentResponse
-    @ApiOperation(value = "대학 메일 인증 시작", notes = "인증코드 필수, 1000~9999의 인증번호 양식준수 \n" +
+    @ApiOperation(value = "인증코드 입력", notes = "인증코드 필수, 1000~9999의 인증번호 양식준수 \n" +
             "success : true 면 끝이고 아니면 학생증 인증이나 나중에 하기 버튼 클릭 유도")
     @PostMapping("/certify/mail/receive")
     public JSONObject receiveUnivCertMail(@AuthenticationPrincipal User user, @RequestBody MailDto mailDto) throws IOException {
@@ -52,7 +52,8 @@ public class CertController {
 
 
     @ApiDocumentResponse
-    @ApiOperation(value = "대학교 학생증 인증", notes = "{\"success\":true, \"id\":3}\n해당 유저의 id를 전해드리니 이 /certify/{id}/univ 에 넘겨주세요)")
+    @ApiOperation(value = "대학교 학생증 인증", notes = "대학명만 보내주세요. 메일은 무시.\n" +
+            "{\"success\":true, \"id\":3}\n해당 유저의 id를 전해드리니 이 /certify/{id}/univ 에 넘겨주세요)")
     @PostMapping(value = "/certify/univ", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public JSONObject certifyUniv(@AuthenticationPrincipal User user, @RequestBody UnivDto univDto) {
         PropertyUtil.checkHeader(user);
@@ -66,6 +67,14 @@ public class CertController {
             value = "파일 보내주시면 파일 s3서버에 저장 및, 해당 파일이 저장되어 있는 URL을 디비에 저장합니다")
     public JSONObject uploadUnivCard(@PathVariable("id") Long certId, @RequestPart MultipartFile multipartFile) {
         return certService.uploadUnivCard(certId, multipartFile);
+    }
+
+    @ApiDocumentResponse
+    @ApiOperation(value = "인증작가 신청", notes = "대학인증 마친 상태에서 요청할 수 있도록 해주세요. 대학인증 여부는 /my-profile에서 받았던거 그대로 됩니다 \n" +
+            "테스트 할 때는  my-profile에서 port_folio_url이 바뀌는 지 체킹 하면 됩니다. cert_celeb은 저희가 직접 확인하기 전까지 false")
+    @PostMapping(value = "/certify/author")
+    public JSONObject updateUser(@AuthenticationPrincipal User user, @RequestBody PortFolioDto dto) {
+        return certService.applyCertifiedAuthor(user, dto.getPortFolio());
     }
 
 }

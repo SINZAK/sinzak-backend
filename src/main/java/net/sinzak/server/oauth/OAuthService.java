@@ -3,6 +3,8 @@ package net.sinzak.server.oauth;
 import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.user.dto.request.OauthDto;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -16,12 +18,12 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OAuthService {
     private static final OkHttpClient client = new OkHttpClient();
-    private static final String productURL = "https://sinzak.net";
-    private static final String developURL = "http://localhost:8080";
+
 
     @Value("${google.client-id}")
     private String GOOGLE_ID;
@@ -48,10 +50,10 @@ public class OAuthService {
         return OauthInfo;
     }
 
-    public String getKakaoAccessToken(String code) throws IOException, ParseException {
+    public JSONObject getKakaoAccessToken(String redirect_uri, String code) throws IOException, ParseException {
         String url = "https://kauth.kakao.com/oauth/token"
                 + "?client_id="+KAKAO_ID
-                + "&redirect_uri="+productURL+"/api/login/oauth2/code/kakao"
+                + "&redirect_uri="+ redirect_uri
                 + "&grant_type=authorization_code"
                 + "&code=" + code;
         Request.Builder builder = new Request.Builder().header("Content-type", " application/x-www-form-urlencoded")
@@ -63,17 +65,20 @@ public class OAuthService {
 
         Response responseHTML = client.newCall(request).execute();
         JSONParser parser = new JSONParser();
-        JSONObject response = (JSONObject) parser.parse(responseHTML.body().string());
-        return response.get("access_token").toString();
+        JSONObject obj = (JSONObject) parser.parse(responseHTML.body().string());
+        JSONObject response = new JSONObject();
+        response.put("access_token",obj.get("access_token").toString());
+        return PropertyUtil.response(response);
     }
 
-    public JSONObject getGoogleAccessToken(String code) throws IOException, ParseException {
+    public JSONObject getGoogleAccessToken(String redirect_uri, String code) throws IOException, ParseException {
         String url = "https://oauth2.googleapis.com/token"
                 + "?client_id="+GOOGLE_ID
                 + "&client_secret="+GOOGLE_SECRET
-                + "&redirect_uri="+productURL+"/api/login/oauth2/code/google"
                 + "&grant_type=authorization_code"
-                + "&code=" + code;
+                + "&redirect_uri="+redirect_uri
+                + "&code="+code;
+        log.error(url);
         Request.Builder builder = new Request.Builder().header("Content-type", " application/x-www-form-urlencoded")
                 .url(url);
         JSONObject postObj = new JSONObject();
@@ -83,8 +88,12 @@ public class OAuthService {
 
         Response responseHTML = client.newCall(request).execute();
         JSONParser parser = new JSONParser();
-        JSONObject response = (JSONObject) parser.parse(responseHTML.body().string());
-        return response;
+        JSONObject obj = (JSONObject) parser.parse(responseHTML.body().string());
+        log.error(obj.toJSONString());
+        JSONObject response = new JSONObject();
+        response.put("access_token", obj.get("access_token").toString());
+        response.put("id_token", obj.get("id_token").toString());
+        return PropertyUtil.response(response);
     }
 
     public JSONObject getNaverAccessToken(String code) throws IOException, ParseException {
@@ -99,8 +108,10 @@ public class OAuthService {
 
         Response responseHTML = client.newCall(request).execute();
         JSONParser parser = new JSONParser();
-        JSONObject response = (JSONObject) parser.parse(responseHTML.body().string());
-        return response;
+        JSONObject obj = (JSONObject) parser.parse(responseHTML.body().string());
+        JSONObject response = new JSONObject();
+        response.put("access_token", obj.get("access_token").toString());
+        return PropertyUtil.response(response);
     }
 
     public JSONObject getGoogleInfo(OauthDto dto) throws IOException, ParseException {
@@ -164,23 +175,4 @@ public class OAuthService {
         return null;
     }
 
-
-    public JSONObject getWebGoogleURL(String redirect_uri, String code) throws IOException, ParseException {
-        String url = "https://oauth2.googleapis.com/token"
-                + "?client_id="+GOOGLE_ID
-                + "&client_secret="+GOOGLE_SECRET + "&grant_type=authorization_code"
-                + "&redirect_uri="+redirect_uri
-                + "&code="+code;
-        Request.Builder builder = new Request.Builder().header("Content-type", " application/x-www-form-urlencoded")
-                .url(url);
-        JSONObject postObj = new JSONObject();
-        RequestBody requestBody = RequestBody.create(postObj.toJSONString().getBytes());
-        builder.post(requestBody);
-        Request request = builder.build();
-
-        Response responseHTML = client.newCall(request).execute();
-        JSONParser parser = new JSONParser();
-        JSONObject response = (JSONObject) parser.parse(responseHTML.body().string());
-        return response;
-    }
 }

@@ -65,7 +65,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     private String followerNum="0";
 
     @Column
-    private String stack;  //전문 분야
+    private String portFolioUrl;
 
     @Column
     private String categoryLike="";  //관심 장르
@@ -84,7 +84,6 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     @Column
     private boolean alarm_receive;
-
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -129,8 +128,6 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     @Column
     private String fcm ="";
-//    @Column
-//    private boolean alarm_receive;
 
     @ElementCollection
     @CollectionTable(name = "FOLLOWING_LIST", joinColumns = @JoinColumn(name = "user_id"))
@@ -245,6 +242,9 @@ public class User extends BaseTimeEntity implements UserDetails {
         return "";
     }
 
+    public void setPortFolioUrl(String portFolioUrl) {
+        this.portFolioUrl = portFolioUrl;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

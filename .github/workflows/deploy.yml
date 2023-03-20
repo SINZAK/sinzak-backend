@@ -80,17 +80,6 @@ jobs:
           target: "/home/ec2-user/deploy"
           strip_components: 2
 
-#      - name: Execute Server Init Script
-#        uses: appleboy/ssh-action@master
-#        id: deploy-prod
-#        with:
-#          host: ${{ secrets.HOST_DEV }}
-#          username: ec2-user
-#          key: ${{ secrets.SSH_PEM_KEY }}
-#          passphrase: ${{ secrets.PASSPHRASE }}
-#          port: 22
-#          envs: GITHUB_SHA
-#          script: chmod +x /home/ec2-user/deploy/deploy.sh && sh /home/ec2-user/deploy/deploy.sh
 
       - name: Execute Server Init Script
         uses: appleboy/ssh-action@master
@@ -105,9 +94,8 @@ jobs:
           script: |
             cd deploy
             docker container stop sinzak
-            docker container stop sinzak-web
             docker build -t sinzak .
             docker run -d --rm -p 8080:8080 --name sinzak sinzak
-#            cd front
-#            docker build -t sinzak-web .
-#            docker run -d --rm -it -p 3000:3000  --name sinzak-web sinzak-web
+            docker start sinzak
+            docker run -p 6379:6379 redis
+
