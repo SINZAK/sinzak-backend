@@ -150,11 +150,9 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     }
 
 
-
     private void deleteImagesInPost(Work work) {
-        for (WorkImage image : work.getImages()) {
-            s3Service.deleteImage(image.getImageUrl());
-        }
+        work.getImages()
+                .forEach(img -> s3Service.deleteImage(img.getImageUrl()));
     }
 
     @Transactional
@@ -237,9 +235,8 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
 
     public List<String> getImages(Work work) {
         List<String> imagesUrl = new ArrayList<>();
-        for (WorkImage image : work.getImages()) {
-            imagesUrl.add(image.getImageUrl());
-        }
+        work.getImages()
+                .forEach(img -> imagesUrl.add(img.getImageUrl()));
         return imagesUrl;
     }
 

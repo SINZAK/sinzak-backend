@@ -143,16 +143,9 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     private void deleteImagesInPost(Product product) {
-        for (ProductImage image : product.getImages()) {
-            s3Service.deleteImage(image.getImageUrl());
-        }
+        product.getImages()
+                .forEach(img -> s3Service.deleteImage(img.getImageUrl()));
     }
-
-    private void beforeDeleteProduct(Product product) {
-        product.makeChatRoomNull();
-    }
-
-
 
     @Transactional
     public JSONObject showDetail(Long id, User User){   // 글 상세 확인
@@ -338,7 +331,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         }
 
         obj.put("isWish", isWish);
-        obj.put("success", success);
+        obj.put("success",success);
         return obj;
 
     }
@@ -442,9 +435,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     public List<String> getImages(Product product) {
         List<String> imagesUrl = new ArrayList<>();
-        for (ProductImage image : product.getImages()) {
-            imagesUrl.add(image.getImageUrl());  /** 이미지 엔티티에서 url만 빼오기 **/
-        }
+        product.getImages()
+                .forEach(img -> imagesUrl.add(img.getImageUrl()));
         return imagesUrl;
     }
 
