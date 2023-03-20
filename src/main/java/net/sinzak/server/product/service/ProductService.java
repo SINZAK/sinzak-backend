@@ -347,40 +347,34 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     public JSONObject likes(User User, @RequestBody ActionForm form){
         JSONObject obj = new JSONObject();
         User user = userRepository.findByIdFetchLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
-        List<ProductLikes> userLikesList = user.getProductLikesList();
-        boolean isLike=false;
+        List<ProductLikes> likesList = user.getProductLikesList();
+        boolean isLike = false;
+        boolean success = false;
         Product product = productRepository.findById(form.getId()).orElseThrow(PostNotFoundException::new);
 
-        if(userLikesList.size()!=0){
-            for (ProductLikes like : userLikesList) {
-                if(product.equals(like.getProduct())) {
-                    isLike = true;
-                    break;
-                }
-            }
+
+
+        if(likesList.size()!=0){
+            if(likesList.stream().anyMatch(likes -> likes.getProduct().equals(product)))
+                isLike = true;
         }
 
         if (form.isMode() && !isLike){
             product.plusLikesCnt();
             ProductLikes connect = ProductLikes.createConnect(product, user);
             likesRepository.save(connect);
-            isLike=true;
-            obj.put("success",true);
+            isLike = true;
+            success = true;
         }
         else if(!form.isMode() && isLike){
             product.minusLikesCnt();
-            for (ProductLikes like : userLikesList) {
-                if(product.equals(like.getProduct())) {
-                    likesRepository.delete(like);
-                    isLike = false;
-                    break;
-                }
-            }
-            obj.put("success",true);
+            likesList.stream()
+                    .filter(likes -> likes.getProduct().equals(product)).findFirst()
+                    .ifPresent(likesRepository::delete);
+            success = true;
         }
-        else
-            obj.put("success",false);
         obj.put("isLike",isLike);
+        obj.put("success",success);
         return obj;
     }
 
