@@ -94,6 +94,7 @@ jobs:
           script: |
             cd deploy
             docker container stop sinzak
+            docker container stop redis
             docker build -t sinzak .
             docker run -d --rm -p 8080:8080 --name sinzak sinzak
             docker start sinzak
