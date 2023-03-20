@@ -108,6 +108,7 @@ jobs:
             docker container stop sinzak-web
             docker build -t sinzak .
             docker run -d --rm -p 8080:8080 --name sinzak sinzak
+            docker run -p 6379:6379 redis
 #            cd front
 #            docker build -t sinzak-web .
 #            docker run -d --rm -it -p 3000:3000  --name sinzak-web sinzak-web
