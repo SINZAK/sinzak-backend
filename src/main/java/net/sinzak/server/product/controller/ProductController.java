@@ -13,6 +13,7 @@ import net.sinzak.server.product.service.ProductService;
 import net.sinzak.server.common.dto.ActionForm;
 import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -145,6 +146,7 @@ public class ProductController {
         PropertyUtil.checkHeader(user);
         return productService.showFollowingDetail(user);
     }
+
 
     @ApiOperation(value = "마켓 작품")
     @PostMapping("/products")
