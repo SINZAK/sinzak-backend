@@ -147,7 +147,6 @@ public class OAuthController {
     @ApiOperation(value = "웹용 카카오 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
     @GetMapping(value = "/web/kakao")
     public JSONObject oauthWebKakao(@RequestParam(value = "code", required = false) String code, @RequestParam(value = "redirect_uri") String redirect_uri) throws Exception {
-        log.warn("인가코드 = {}",code);
         return oAuthService.getKakaoAccessToken(redirect_uri, code);
     }
 
@@ -155,16 +154,13 @@ public class OAuthController {
     @GetMapping(value = "/web/google")
     public JSONObject oauthWebGoogle(@RequestParam(value = "code") String code, @RequestParam(value = "redirect_uri") String redirect_uri) throws Exception {
         JSONObject obj = oAuthService.getGoogleAccessToken(redirect_uri, code);
-        log.warn("액세스토큰 = {}",obj.get("access_token").toString());
         return obj;
     }
 
     @ApiOperation(value = "웹용 네이버 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
     @GetMapping(value = "/web/naver")
     public String oauthWebNaver(@RequestParam(value = "code", required = false) String code) throws Exception {
-        log.warn("인가코드 = {}",code);
         JSONObject obj = oAuthService.getNaverAccessToken(code);
-        log.warn("액세스토큰 = {}",obj.get("access_token").toString());
         return obj.toJSONString();
     }
 

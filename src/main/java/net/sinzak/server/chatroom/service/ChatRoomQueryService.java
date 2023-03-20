@@ -104,12 +104,13 @@ public class ChatRoomQueryService {
     }
     public Page<GetChatMessageDto> getChatRoomMessage(String roomUuid, Pageable pageable){
         ChatRoom findChatRoom = chatRoomRepository.findByRoomUuidFetchChatMessage(roomUuid)
-                .orElseThrow(()->new ChatRoomNotFoundException());
+                .orElseThrow(ChatRoomNotFoundException::new);
         List<GetChatMessageDto> getChatMessageDtos = findChatRoom.getChatMessages()
                 .stream()
                 .sorted(Comparator.comparing(ChatMessage::getId).reversed())
                 .map(
                 chatMessage -> GetChatMessageDto.builder()
+                        .messageId(chatMessage.getId())
                         .senderName(chatMessage.getSenderName())
                         .sendAt(chatMessage.getCreatedDate())
                         .message(chatMessage.getMessage())

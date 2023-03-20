@@ -24,13 +24,13 @@ public class Cert extends BaseTimeEntity {
     private String univCardUrl;  //학생증 url
 
     @Column
-    private boolean verified = false;
+    private boolean celeb_verified = false;
 
-    public Cert(String email, String univName, String univCardUrl, boolean verified) {
+    public Cert(String email, String univName, String univCardUrl, boolean celeb_verified) {
         this.email = email;
         this.univName = univName;
         this.univCardUrl = univCardUrl;
-        this.verified = verified;
+        this.celeb_verified = celeb_verified;
     }
 
     protected Cert() {}
@@ -40,6 +40,6 @@ public class Cert extends BaseTimeEntity {
     }
 
     public void setVerified() {
-        this.verified = true;
+        this.celeb_verified = true;
     }
 }

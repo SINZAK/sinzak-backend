@@ -36,6 +36,7 @@ public class UserQueryController {
     public JSONObject getAllUser(){
         return userQueryService.getAllUser();
     }
+
     @ApiOperation(value ="팔로워리스트")
     @GetMapping(value ="/users/{userId}/followers")
     public JSONObject getFollowerList(@PathVariable Long userId) {

@@ -11,6 +11,7 @@ public class UserDto {
     private boolean myProfile;
     private String name;
     private String introduction;
+    private String portFolioUrl;
     private String followingNumber;
     private String followerNumber;
     private String imageUrl;
@@ -18,5 +19,6 @@ public class UserDto {
     private String categoryLike;
 
     private boolean cert_uni;
+    private boolean cert_celeb;
     private boolean isFollow;
 }
