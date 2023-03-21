@@ -30,7 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -79,7 +78,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                 saveImageUrl(product, url);
             }
             catch (Exception e){
-                return PropertyUtil.responseMessage(multipartFiles.size()+"개의 이미지 저장 실패");
+                return PropertyUtil.responseMessage(multipartFiles.indexOf(img)+"번째 이미지부터 저장 실패");
             }
         }
         return PropertyUtil.response(true);
@@ -144,16 +143,9 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     private void deleteImagesInPost(Product product) {
-        for (ProductImage image : product.getImages()) {
-            s3Service.deleteImage(image.getImageUrl());
-        }
+        product.getImages()
+                .forEach(img -> s3Service.deleteImage(img.getImageUrl()));
     }
-
-    private void beforeDeleteProduct(Product product) {
-        product.makeChatRoomNull();
-    }
-
-
 
 
     @Transactional
@@ -242,15 +234,13 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         List<String> userCategories = Arrays.asList(user.getCategoryLike().split(","));
 
         List<Product> productList = productRepository.findAllProductNotDeleted();
-        obj.put("new", makeHomeShowFormList(user.getProductLikesList(), productList));   /** 신작 3개 **/
-
+        obj.put("new", makeHomeShowForms(user.getProductLikesList(), productList));   /** 신작 3개 **/
 
         List<Product> list = QDSLRepository.findCountByCategoriesDesc(userCategories, HOME_OBJECTS);
-        obj.put("recommend", makeHomeShowFormList(user.getProductLikesList(), list)); /** 추천목록 3개 **/
-
+        obj.put("recommend", makeHomeShowForms(user.getProductLikesList(), list)); /** 추천목록 3개 **/
 
         List<Product> followingList = getFollowingList(user, productList, HOME_OBJECTS);
-        obj.put("following", makeHomeShowFormList(user.getProductLikesList(),followingList)); /** 팔로잉 관련 3개 **/
+        obj.put("following", makeHomeShowForms(user.getProductLikesList(),followingList)); /** 팔로잉 관련 3개 **/
 
         return PropertyUtil.response(obj);
     }
@@ -261,13 +251,13 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         JSONObject obj = new JSONObject();
         List<Product> productList = productRepository.findAllProductNotDeleted();
 
-        obj.put("new",makeHomeShowFormListForGuest(productList));
+        obj.put("new", makeHomeShowFormsForGuest(productList));
 
         List<Product> tradingList = getTradingList(productList, HOME_OBJECTS); /** Trading = 최신 목록 내림차순 중 채팅수가 1이상, 거래 완료되지 않은 것 **/
-        obj.put("trading", makeHomeShowFormListForGuest(tradingList));
+        obj.put("trading", makeHomeShowFormsForGuest(tradingList));
 
         productList.sort((o1, o2) -> o2.getLikesCnt() - o1.getLikesCnt()); /** hot : 좋아요 순 정렬!! **/
-        obj.put("hot", makeHomeShowFormListForGuest(productList));
+        obj.put("hot", makeHomeShowFormsForGuest(productList));
 
         return PropertyUtil.response(obj);
     }
@@ -287,7 +277,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         List<String> userCategories = Arrays.asList(user.getCategoryLike().split(","));
 
         List<Product> recommendList = QDSLRepository.findCountByCategoriesDesc(userCategories, HOME_DETAIL_OBJECTS);
-        List<ShowForm> data = makeDetailHomeShowFormList(user.getProductLikesList(), recommendList);
+        List<ShowForm> data = makeDetailHomeShowForms(user.getProductLikesList(), recommendList);
 
         return PropertyUtil.response(data);
     }
@@ -298,7 +288,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         List<Product> productList = productRepository.findAllProductNotDeleted();
 
         List<Product> followingList = getFollowingList(user, productList, HOME_DETAIL_OBJECTS);
-        List<ShowForm> data = makeDetailHomeShowFormList(user.getProductLikesList(), followingList);
+        List<ShowForm> data = makeDetailHomeShowForms(user.getProductLikesList(), followingList);
 
         return PropertyUtil.response(data);
     }
@@ -316,39 +306,32 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         JSONObject obj = new JSONObject();
         User user = userRepository.findByIdFetchProductWishList(User.getId()).orElseThrow(UserNotFoundException::new); // 작품 찜까지 페치 조인
         List<ProductWish> wishList = user.getProductWishList(); //wishList == 유저의 찜 리스트
+        boolean success = false;
         boolean isWish=false;
         Product product = productRepository.findById(form.getId()).orElseThrow(PostNotFoundException::new);
 
-        if(wishList.size()!=0){ /** 유저가 찜이 누른 적이 있다면 이미 누른 작품인지 비교 **/
-            for (ProductWish wish : wishList) { //유저의 찜목록과 현재 누른 작품의 찜과 비교
-                if(product.equals(wish.getProduct())) {  //같으면 이미 찜 누른 항목
-                    isWish = true;
-                    break;
-                }
-            }
+        if(wishList.size()!=0){
+            if(wishList.stream().anyMatch(wish -> wish.getProduct().equals(product)))
+                isWish = true;
         }
 
         if (form.isMode() && !isWish){
             product.plusWishCnt();
             ProductWish connect = ProductWish.createConnect(product, user);
             productWishRepository.save(connect);
-            isWish=true;
-            obj.put("success",true);
+            isWish = true;
+            success = true;
         }
         else if(!form.isMode() && isWish){
             product.minusWishCnt();
-            for (ProductWish wish : wishList) {
-                if(product.equals(wish.getProduct())) {  //같으면 이미 찜 누른 항목
-                    productWishRepository.delete(wish);
-                    isWish = false;
-                    break;
-                }
-            }
-            obj.put("success",true);
+            wishList.stream()
+                    .filter(wish -> wish.getProduct().equals(product)).findFirst()
+                    .ifPresent(productWishRepository::delete);
+            success = true;
         }
-        else
-            obj.put("success",false);
-        obj.put("isWish",isWish);
+
+        obj.put("isWish", isWish);
+        obj.put("success",success);
         return obj;
 
     }
@@ -357,40 +340,32 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     public JSONObject likes(User User, @RequestBody ActionForm form){
         JSONObject obj = new JSONObject();
         User user = userRepository.findByIdFetchLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
-        List<ProductLikes> userLikesList = user.getProductLikesList();
-        boolean isLike=false;
+        List<ProductLikes> likesList = user.getProductLikesList();
+        boolean success = false;
+        boolean isLike = false;
         Product product = productRepository.findById(form.getId()).orElseThrow(PostNotFoundException::new);
 
-        if(userLikesList.size()!=0){
-            for (ProductLikes like : userLikesList) {
-                if(product.equals(like.getProduct())) {
-                    isLike = true;
-                    break;
-                }
-            }
+        if(likesList.size()!=0){
+            if(likesList.stream().anyMatch(likes -> likes.getProduct().equals(product)))
+                isLike = true;
         }
 
         if (form.isMode() && !isLike){
             product.plusLikesCnt();
             ProductLikes connect = ProductLikes.createConnect(product, user);
             likesRepository.save(connect);
-            isLike=true;
-            obj.put("success",true);
+            isLike = true;
+            success = true;
         }
         else if(!form.isMode() && isLike){
             product.minusLikesCnt();
-            for (ProductLikes like : userLikesList) {
-                if(product.equals(like.getProduct())) {
-                    likesRepository.delete(like);
-                    isLike = false;
-                    break;
-                }
-            }
-            obj.put("success",true);
+            likesList.stream()
+                    .filter(likes -> likes.getProduct().equals(product)).findFirst()
+                    .ifPresent(likesRepository::delete);
+            success = true;
         }
-        else
-            obj.put("success",false);
-        obj.put("isLike",isLike);
+        obj.put("isLike", isLike);
+        obj.put("success", success);
         return obj;
     }
 
@@ -424,7 +399,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
             saveSearchHistory(keyword, user);
         Page<Product> productList = QDSLRepository.findAllByCompleteAndCategoriesAligned(complete, keyword, categories, align, pageable);
 
-        List<ShowForm> showList = makeDetailHomeShowFormList(user.getProductLikesList(), productList.getContent());
+        List<ShowForm> showList = makeDetailHomeShowForms(user.getProductLikesList(), productList.getContent());
         return new PageImpl<>(showList, pageable, productList.getTotalElements());
     }
 
@@ -444,62 +419,42 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     @Transactional(readOnly = true)
     public PageImpl<ShowForm> productListForGuest(String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
         Page<Product> productList = QDSLRepository.findAllByCompleteAndCategoriesAligned(complete, keyword, categories, align, pageable);
-        List<ShowForm> showList = makeShowForm(productList);
+        List<ShowForm> showList = makeShowFormsForGuest(productList);
         return new PageImpl<>(showList, pageable, productList.getTotalElements());
     }
 
     @NotNull
-    private List<ShowForm> makeShowForm(Page<Product> productList) {
-        List<ShowForm> showList = new ArrayList<>();
-        for (Product product : productList) {
-            addProductInJSONFormat(showList, product, false);
-        }
-        return showList;
+    private List<ShowForm> makeShowFormsForGuest(Page<Product> productList) {
+        return productList.stream()
+                .map(product -> makeShowForm(product, false))
+                .collect(Collectors.toList());
     }
 
     public List<String> getImages(Product product) {
         List<String> imagesUrl = new ArrayList<>();
-        for (ProductImage image : product.getImages()) {
-            imagesUrl.add(image.getImageUrl());  /** 이미지 엔티티에서 url만 빼오기 **/
-        }
+        product.getImages()
+                .forEach(img -> imagesUrl.add(img.getImageUrl()));
         return imagesUrl;
     }
 
-
-    private void addProductInJSONFormat(List<ShowForm> showFormList, Product product, boolean isLike) {
-        ShowForm showForm = new ShowForm(product.getId(), product.getTitle(), product.getContent(), product.getAuthor(), product.getPrice(), product.getThumbnail(), product.getCreatedDate().toString(), product.isSuggest(), isLike, product.getLikesCnt(), product.isComplete(), product.getPopularity());
-        showFormList.add(showForm);
+    private List<ShowForm> makeHomeShowForms(List<ProductLikes> userLikesList, List<Product> productList) {
+        return productList.stream()
+                .map(product -> makeShowForm(product, checkIsLikes(userLikesList, product))).limit(HOME_OBJECTS)
+                .collect(Collectors.toList());
     }
 
-    private List<ShowForm> makeHomeShowFormList(List<ProductLikes> userLikesList, List<Product> productList) {
-        List<ShowForm> showFormList = new ArrayList<>();
-        for (int i = 0; i < productList.size(); i++) {
-            if(i == HOME_OBJECTS)
-                break;  /** 홈화면이니까 10개까지만 가져오자 **/
-            boolean isLike = checkIsLikes(userLikesList, productList.get(i));
-            addProductInJSONFormat(showFormList, productList.get(i), isLike);
-        }
-        return showFormList;
+    private List<ShowForm> makeHomeShowFormsForGuest(List<Product> productList) {
+        return productList.stream()
+                .map(product -> makeShowForm(product, false)).limit(HOME_OBJECTS)
+                .collect(Collectors.toList());
     }
 
-    private List<ShowForm> makeHomeShowFormListForGuest(List<Product> productList) {
-        List<ShowForm> showForms = new ArrayList<>();
-        for (int i = 0; i < productList.size(); i++) {
-            if (i >= HOME_OBJECTS)
-                break;
-            addProductInJSONFormat(showForms, productList.get(i), false);
-        }
-        return showForms;
+    private List<ShowForm> makeDetailHomeShowForms(List<ProductLikes> userLikesList, List<Product> productList) {
+        return productList.stream()
+                .map(product -> makeShowForm(product, checkIsLikes(userLikesList, product)))
+                .collect(Collectors.toList());
     }
-
-    private List<ShowForm> makeDetailHomeShowFormList(List<ProductLikes> userLikesList, List<Product> productList) {
-        List<ShowForm> showFormList = new ArrayList<>();
-        for (Product product : productList) {
-            boolean isLike = checkIsLikes(userLikesList, product);
-            addProductInJSONFormat(showFormList, product, isLike);
-        }
-        return showFormList;
+    private ShowForm makeShowForm(Product product, boolean isLike) {
+        return new ShowForm(product.getId(), product.getTitle(), product.getContent(), product.getAuthor(), product.getPrice(), product.getThumbnail(), product.getCreatedDate().toString(), product.isSuggest(), isLike, product.getLikesCnt(), product.isComplete(), product.getPopularity());
     }
-
-
 }

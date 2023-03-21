@@ -150,11 +150,9 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     }
 
 
-
     private void deleteImagesInPost(Work work) {
-        for (WorkImage image : work.getImages()) {
-            s3Service.deleteImage(image.getImageUrl());
-        }
+        work.getImages()
+                .forEach(img -> s3Service.deleteImage(img.getImageUrl()));
     }
 
     @Transactional
@@ -237,9 +235,8 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
 
     public List<String> getImages(Work work) {
         List<String> imagesUrl = new ArrayList<>();
-        for (WorkImage image : work.getImages()) {
-            imagesUrl.add(image.getImageUrl());
-        }
+        work.getImages()
+                .forEach(img -> imagesUrl.add(img.getImageUrl()));
         return imagesUrl;
     }
 
@@ -248,16 +245,13 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         JSONObject obj = new JSONObject();
         User user = userRepository.findByIdFetchWorkWishList(User.getId()).orElseThrow(UserNotFoundException::new);
         List<WorkWish> wishList = user.getWorkWishList();
-        boolean isWish=false;
+        boolean isWish = false;
+        boolean success = false;
         Work work = workRepository.findByIdNotDeleted(form.getId()).orElseThrow(PostNotFoundException::new);
 
         if(wishList.size()!=0){
-            for (WorkWish wish : wishList) {
-                if(work.equals(wish.getWork())) {
-                    isWish = true;
-                    break;
-                }
-            }
+            if(wishList.stream().anyMatch(wish -> wish.getWork().equals(work)))
+                isWish = true;
         }
 
         if (form.isMode() && !isWish){
@@ -265,22 +259,17 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
             WorkWish connect = WorkWish.createConnect(work, user);
             workWishRepository.save(connect);
             isWish=true;
-            obj.put("success",true);
+            success = true;
         }
         else if(!form.isMode() && isWish){
             work.minusWishCnt();
-            for (WorkWish wish : wishList) {
-                if(work.equals(wish.getWork())) {
-                    workWishRepository.delete(wish);
-                    isWish = false;
-                    break;
-                }
-            }
-            obj.put("success",true);
+            wishList.stream()
+                    .filter(wish -> wish.getWork().equals(work)).findFirst()
+                    .ifPresent(workWishRepository::delete);
+            success = true;
         }
-        else
-            obj.put("success",false);
-        obj.put("isWish",isWish);
+        obj.put("isWish", isWish);
+        obj.put("success", success);
         return obj;
 
     }
@@ -289,40 +278,32 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     public JSONObject likes(User User, @RequestBody ActionForm form){
         JSONObject obj = new JSONObject();
         User user = userRepository.findByIdFetchLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
-        List<WorkLikes> userLikesList = user.getWorkLikesList();
-        boolean isLike=false;
+        List<WorkLikes> likesList = user.getWorkLikesList();
+        boolean isLike = false;
+        boolean success = false;
         Work work = workRepository.findByIdNotDeleted(form.getId()).orElseThrow(PostNotFoundException::new);
 
-        if(userLikesList.size()!=0){
-            for (WorkLikes like : userLikesList) {
-                if(work.equals(like.getWork())) {
-                    isLike = true;
-                    break;
-                }
-            }
+        if(likesList.size()!=0){
+            if(likesList.stream().anyMatch(likes -> likes.getWork().equals(work)))
+                isLike = true;
         }
 
         if (form.isMode() && !isLike){
             work.plusLikesCnt();
             WorkLikes connect = WorkLikes.createConnect(work, user);
             likesRepository.save(connect);
-            isLike=true;
-            obj.put("success",true);
+            isLike = true;
+            success = true;
         }
         else if(!form.isMode() && isLike){
             work.minusLikesCnt();
-            for (WorkLikes like : userLikesList) { //유저의 찜목록과 현재 누른 작품의 찜과 비교
-                if(work.equals(like.getWork())) {  //같으면 이미 찜 누른 항목
-                    likesRepository.delete(like);
-                    isLike = false;
-                    break;
-                }
-            }
-            obj.put("success",true);
+            likesList.stream()
+                    .filter(likes -> likes.getWork().equals(work)).findFirst()
+                    .ifPresent(likesRepository::delete);
+            success = true;
         }
-        else
-            obj.put("success",false);
-        obj.put("isLike",isLike);
+        obj.put("isLike", isLike);
+        obj.put("success", success);
         return obj;
     }
 
