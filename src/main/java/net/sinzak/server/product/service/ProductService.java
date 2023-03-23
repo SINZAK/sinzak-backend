@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -51,7 +52,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     private final int HOME_DETAIL_OBJECTS = 50;
 
     @Transactional(rollbackFor = {Exception.class})
-    public JSONObject makePost(User User, ProductPostDto buildDto){   // 글 생성
+    public JSONObject makePost(User User, @Valid ProductPostDto buildDto){   // 글 생성
         User user = userRepository.findByIdFetchProductPostList(User.getId()).orElseThrow(UserNotFoundException::new);
         Product product = Product.builder()
                     .title(buildDto.getTitle())
