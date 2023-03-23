@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,7 +66,7 @@ public class SecurityService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public JSONObject join(User User, @RequestBody JoinDto dto) {
+    public JSONObject join(User User, @Valid @RequestBody JoinDto dto) {
         if(!User.getNickName().isBlank())
             return PropertyUtil.responseMessage("이미 회원가입된 유저입니다.");
         JSONObject obj = new JSONObject();

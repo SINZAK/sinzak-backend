@@ -3,15 +3,20 @@ package net.sinzak.server.work.dto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotEmpty;
+
 @Getter
 public class WorkPostDto {
     @ApiModelProperty(example = "외주 모집글 제목")
+    @NotEmpty
     private String title;
     @ApiModelProperty(example = "외주 모집글 내용")
     private String content;
     @ApiModelProperty(example = "외주 카테고리")
     private String category;
     @ApiModelProperty(value ="페이",example = "100000",notes = "int 값 이상 안들어오게 프론트라인 체크 필수")
+    @Max(value = Integer.MAX_VALUE, message = "가격 값 초과 Integer Max Value 미만으로 전송바람")
     private int price;
     @ApiModelProperty(value = "외주 모집글 가격 제안 여부 true/false", example = "true", notes = "true -> 체크 한 사람(제안 받겠다는 사람)")
     private boolean suggest;
