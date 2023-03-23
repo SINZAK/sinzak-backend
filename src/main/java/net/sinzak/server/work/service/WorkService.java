@@ -35,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -52,11 +53,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     private final SearchHistoryRepository historyRepository;
     private final S3Service s3Service;
 
-    @Transactional
-    public List<ChatRoom> getChatRoom(Long productId){
-        Work work = workRepository.findByIdFetchChatRooms(productId).orElseThrow(PostNotFoundException::new);
-        return work.getChatRooms();
-    }
+
     @Transactional(rollbackFor = {Exception.class})
     public JSONObject makePost(User User, WorkPostDto postDto){
         User user = userRepository.findByIdFetchWorkPostList(User.getId()).orElseThrow(UserNotFoundException::new);
@@ -337,7 +334,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         if(!keyword.isEmpty())
             saveSearchHistory(keyword, user);
         Page<Work> workList = QDSLRepository.findSearchingByEmploymentAndCategoriesAligned(employment, keyword, categories, align, pageable);
-        List<ShowForm> showList = makeShowFormList(user.getWorkLikesList(), workList.getContent());
+        List<ShowForm> showList = makeShowForms(user.getWorkLikesList(), workList.getContent());
         return new PageImpl(showList, pageable, workList.getTotalElements());
     }
     public void saveSearchHistory(String keyword, User user) {
@@ -348,30 +345,26 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     @Transactional(readOnly = true)
     public PageImpl<ShowForm> workListForGuest(String keyword, List<String> categories, String align, boolean employment, Pageable pageable){
         Page<Work> workList = QDSLRepository.findSearchingByEmploymentAndCategoriesAligned(employment, keyword, categories, align, pageable);
-        List<ShowForm> showList = makeShowForm(workList);
+        List<ShowForm> showList = makeShowForms(workList);
         return new PageImpl<>(showList, pageable, workList.getTotalElements());
     }
 
-    private List<ShowForm> makeShowForm(Page<Work> workList) {
-        List<ShowForm> showList = new ArrayList<>();
-        for (Work work : workList.getContent()) {
-            addWorkInJSONFormat(showList, work, false);
-        }
-        return showList;
+
+    private List<ShowForm> makeShowForms(Page<Work> workList) {
+        return workList.stream()
+                .map(work -> makeShowForm(work, false))
+                .collect(Collectors.toList());
     }
 
-    private List<ShowForm> makeShowFormList(List<WorkLikes> userLikesList, List<Work> workList) {
-        List<ShowForm> showFormList = new ArrayList<>();
-        for (Work work : workList) {
-            boolean isLike = checkIsLikes(userLikesList, work);
-            addWorkInJSONFormat(showFormList, work, isLike);
-        }
-        return showFormList;
+
+    private List<ShowForm> makeShowForms(List<WorkLikes> userLikesList, List<Work> workList) {
+        return workList.stream()
+                .map(work -> makeShowForm(work, checkIsLikes(userLikesList, work)))
+                .collect(Collectors.toList());
     }
 
-    private void addWorkInJSONFormat(List<ShowForm> showFormList, Work work, boolean isLike) {
-        ShowForm showForm = new ShowForm(work.getId(), work.getTitle(), work.getContent(), work.getAuthor(), work.getPrice(), work.getThumbnail(), work.getCreatedDate().toString(), work.isSuggest(), isLike, work.getLikesCnt(), work.isComplete(), work.getPopularity());
-        showFormList.add(showForm);
+    private ShowForm makeShowForm(Work work, boolean isLike) {
+        return new ShowForm(work.getId(), work.getTitle(), work.getContent(), work.getAuthor(), work.getPrice(), work.getThumbnail(), work.getCreatedDate().toString(), work.isSuggest(), isLike, work.getLikesCnt(), work.isComplete(), work.getPopularity());
     }
 
 }
