@@ -30,8 +30,7 @@ public class SwaggerConfig {
 
     private static final String API_NAME = "신작 API";
     private static final String API_VERSION = "1.0.0";
-    private static final String API_DESCRIPTION = "신작 API 명세서\n" +
-            "1.에러 코드 Response가 없는 API는 실패시 Error 로그 ";
+    private static final String API_DESCRIPTION = "신작 API 명세서";
 
 
 
