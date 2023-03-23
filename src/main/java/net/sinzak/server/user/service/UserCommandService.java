@@ -8,7 +8,6 @@ import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.firebase.FireBaseService;
 import net.sinzak.server.image.S3Service;
 import net.sinzak.server.user.domain.Report;
-import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.user.dto.request.CategoryDto;
 import net.sinzak.server.user.dto.request.FcmDto;
 import net.sinzak.server.user.dto.request.ReportRequestDto;
@@ -25,8 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -45,13 +42,8 @@ public class UserCommandService {
     }
 
     public JSONObject updateUser(UpdateUserDto dto, User loginUser){
-        Optional<User> duplicateNameUser = userRepository.findByNickNameExceptOriginalNickName(dto.getName(),loginUser.getNickName());
-        if(duplicateNameUser.isPresent()){
-            return PropertyUtil.responseMessage("이미 가입된 닉네임입니다");
-        }
-        PropertyUtil.checkHeader(loginUser);
         User user = userRepository.findByIdNotDeleted(loginUser.getId()).orElseThrow(UserNotFoundException::new);
-        user.update(dto.getName(),dto.getIntroduction());
+        user.updateProfile(dto.getName(),dto.getIntroduction());
         return PropertyUtil.response(true);
     }
 
@@ -168,10 +160,10 @@ public class UserCommandService {
 
     public JSONObject deleteSearchHistory(Long id, User User){
         User user = historyRepository.findByIdFetchHistoryList(User.getId()).orElseThrow(InstanceNotFoundException::new);
-        for (SearchHistory history : user.getHistoryList()) {
-            if(history.getId().equals(id))
-                historyRepository.delete(history);
-        }
+        user.getHistoryList().stream()
+                .filter(history -> history.getId().equals(id))
+                .findFirst()
+                .ifPresent(historyRepository::delete);
         return PropertyUtil.response(true);
     }
 

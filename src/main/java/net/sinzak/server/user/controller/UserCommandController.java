@@ -63,9 +63,10 @@ public class UserCommandController {
     }
 
     @ApiDocumentResponse
-    @ApiOperation(value = "유저 정보변경", notes = "이름,한줄 소개, 학교(보류) ")
+    @ApiOperation(value = "유저 정보변경", notes = "이름, 한줄 소개")
     @PostMapping(value = "/users/edit")
-    public JSONObject updateUser( @RequestBody UpdateUserDto dto , @AuthenticationPrincipal User user) {
+    public JSONObject updateUser(@AuthenticationPrincipal User user, @RequestBody UpdateUserDto dto) {
+        PropertyUtil.checkHeader(user);
         return userCommandService.updateUser(dto,user);
     }
     @ApiDocumentResponse

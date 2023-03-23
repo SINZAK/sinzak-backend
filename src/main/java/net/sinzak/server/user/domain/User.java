@@ -198,10 +198,9 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.picture = "https://sinzakimage.s3.ap-northeast-2.amazonaws.com/static/profile"+randomNumber+".png";
     }
 
-    public User update(String name, String introduction){
+    public void updateProfile(String name, String introduction){
         this.nickName =name;
         this.introduction = introduction;
-        return this;
     }
     public void updateCategoryLike(String categoryLike){
         this.categoryLike = categoryLike;
