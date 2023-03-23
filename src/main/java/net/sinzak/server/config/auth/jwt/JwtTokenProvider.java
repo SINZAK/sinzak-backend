@@ -4,6 +4,7 @@ import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.config.auth.CustomUserDetailsService;
+import net.sinzak.server.user.domain.Role;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -37,7 +38,7 @@ public class JwtTokenProvider {
     }
 
     // JWT 토큰 생성
-    public TokenDto createToken(String userPk, Long userId, List<String> roles) {
+    public TokenDto createToken(String userPk, Long userId, Role roles) {
         Claims claims = Jwts.claims().setSubject(userPk); // JWT payload 에 저장되는 정보단위
         claims.put("id", userId);
         claims.put("roles", roles); // 정보는 key / value 쌍으로 저장된다.

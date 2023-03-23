@@ -71,6 +71,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     public JSONObject saveImageInS3AndProduct(User user, List<MultipartFile> multipartFiles, Long id) {
         Product product = productRepository.findById(id).orElseThrow(PostNotFoundException::new);
+        if(multipartFiles.size() == 0)
+            return PropertyUtil.responseMessage("사진 1개이상 첨부해주세요.");
         if(!user.getId().equals(product.getUser().getId()))
             return PropertyUtil.responseMessage("잘못된 접근입니다.");
         for (MultipartFile img : multipartFiles) {
@@ -175,7 +177,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return PropertyUtil.response(detailForm);
     }
 
-    @Cacheable(value ="showProductDetailCache",key="#id",cacheManager ="testCacheManager")
+//    @Cacheable(value ="showProductDetailCache",key="#id",cacheManager ="testCacheManager")
     @Transactional
     public JSONObject showDetail(Long id){   // 비회원 글 보기
         Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(PostNotFoundException::new);
