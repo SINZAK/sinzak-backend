@@ -19,12 +19,12 @@ import net.sinzak.server.work.domain.Work;
 import net.sinzak.server.work.domain.WorkWish;
 import net.sinzak.server.work.repository.WorkWishRepository;
 import org.jetbrains.annotations.NotNull;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -49,22 +49,11 @@ public class UserQueryService {
         obj.put("profile",makeUserDto(user,findUser));
         return PropertyUtil.response(obj);
     }
-    public JSONObject getAllUser(){
-        List<User> users = userRepository.findAll();
-        List<JSONObject> obj = new ArrayList<>();
-        for(User user : users){
-            JSONObject jsonObject =new JSONObject();
-            jsonObject.put("id",user.getId());
-            jsonObject.put("email",user.getEmail());
-            obj.add(jsonObject);
-        }
 
-        return PropertyUtil.response(obj);
-    }
     public JSONObject getWishList(User loginUser){
         List<WorkWish> workWishes= Optional
                 .ofNullable(workWishRepository.findByUserIdFetchWork(loginUser.getId()))
-                .orElseThrow(()->new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN));
+                .orElseThrow(() -> new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN));
         List<ProductWish> productWishes = productWishRepository.findByUserIdFetchProduct(loginUser.getId());
         JSONObject obj = new JSONObject();
         List<WishShowForm> workWishShowForms = makeWorkWishShowForms(workWishes);
@@ -77,96 +66,74 @@ public class UserQueryService {
     public JSONObject getWorkEmploys(User user){
         JSONObject obj = new JSONObject();
         User loginUser = userRepository.findByIdFetchWorkPostList(user.getId()).orElseThrow(()->new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN));
-        List<ProfileShowForm> workEmploys=  makeWorkShowForm(loginUser.getWorkPostList(),true);
+        List<ProfileShowForm> workEmploys = makeWorkShowForm(loginUser.getWorkPostList(),true);
         obj.put("workEmploys",workEmploys);
         return PropertyUtil.response(obj);
     }
 
     public boolean checkReported(User postUser,User loginUser){
         List<Report> report = reportRepository.findByUserIdAndOpponentUserIdBoth(postUser.getId(), loginUser.getId());
-        if(!report.isEmpty()){
-            return true;
+        if(report.isEmpty()){
+            return false;
         }
-        return false;
+        return true;
     }
 
-    @NotNull
+
     private List<WishShowForm> makeProductWishShowForms(List<ProductWish> productWishes) {
-        List<WishShowForm> productWishShowForms = new ArrayList<>();
-        for(ProductWish productWish : productWishes){
-            Product product = productWish.getProduct();
-            if(product.isDeleted()){
-                continue;
-            }
-            WishShowForm wishShowForm = WishShowForm.builder()
-                    .id(product.getId())
-                    .thumbnail(product.getThumbnail())
-                    .complete(product.isComplete())
-                    .title(product.getTitle())
-                    .price(product.getPrice())
-                    .build();
-            productWishShowForms.add(wishShowForm);
-        }
-        return productWishShowForms;
+        return productWishes.stream()
+                .map(productWish -> productWish.getProduct())
+                .filter(product -> !product.isDeleted())
+                .map(product -> WishShowForm.builder()
+                        .id(product.getId())
+                        .thumbnail(product.getThumbnail())
+                        .complete(product.isComplete())
+                        .title(product.getTitle())
+                        .price(product.getPrice())
+                        .build())
+                .collect(Collectors.toList());
     }
 
-    @NotNull
+
     private List<WishShowForm> makeWorkWishShowForms(List<WorkWish> workWishes) {
-        List<WishShowForm> workWishShowForms = new ArrayList<>();
-        for(WorkWish workWish : workWishes){
-            Work work = workWish.getWork();
-            if(work.isDeleted()){
-                continue;
-            }
-            WishShowForm wishShowForm = WishShowForm.builder()
-                    .id(work.getId())
-                    .complete(work.isComplete())
-                    .price(work.getPrice())
-                    .title(work.getTitle())
-                    .thumbnail(work.getThumbnail())
-                    .build();
-            workWishShowForms.add(wishShowForm);
-        }
-        return workWishShowForms;
+        return workWishes.stream()
+                .map(workWish -> workWish.getWork())
+                .filter(work -> !work.isDeleted())
+                .map(work -> WishShowForm.builder()
+                        .id(work.getId())
+                        .complete(work.isComplete())
+                        .price(work.getPrice())
+                        .title(work.getTitle())
+                        .thumbnail(work.getThumbnail())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     private List<ProfileShowForm> makeProductShowForm(List<Product> productList) {
-        List<ProfileShowForm> showFormList = new ArrayList<>();
-        System.out.println(productList.size());
-        for (Product product : productList) {
-            if(product.isDeleted()){
-                continue;
-            }
-            ProfileShowForm form = ProfileShowForm.builder()
-                    .id(product.getId())
-                    .complete(product.isComplete())
-                    .date(product.getCreatedDate())
-                    .thumbnail(product.getThumbnail())
-                    .title(product.getTitle()).build();
-            showFormList.add(form);
-        }
-        return showFormList;
+        return productList.stream()
+                .filter(product -> !product.isDeleted())
+                .map(product -> ProfileShowForm.builder()
+                        .id(product.getId())
+                        .complete(product.isComplete())
+                        .date(product.getCreatedDate())
+                        .thumbnail(product.getThumbnail())
+                        .title(product.getTitle()).build())
+                .collect(Collectors.toList());
     }
 
-    private List<ProfileShowForm> makeWorkShowForm(Set<Work> workList,boolean isEmploy) {
-        List<ProfileShowForm> showFormList = new ArrayList<>();
-        for (Work work : workList) {
-            if(work.isDeleted()){
-                continue;
-            }
-            if(work.isEmployment()==isEmploy){
-                ProfileShowForm form = ProfileShowForm.builder()
+    private List<ProfileShowForm> makeWorkShowForm(Set<Work> workList, boolean isEmploy) {
+        return workList.stream()
+                .filter(work -> !work.isDeleted() && work.isEmployment() == isEmploy)
+                .map(work -> ProfileShowForm.builder()
                         .id(work.getId())
                         .complete(work.isComplete())
                         .date(work.getCreatedDate())
                         .thumbnail(work.getThumbnail())
-                        .title(work.getTitle()).build();
-                showFormList.add(form);
-            }
-        }
-        showFormList.sort((o1, o2) -> (int) (o2.getId()-o1.getId()));
-        return showFormList;
+                        .title(work.getTitle()).build())
+                .sorted((o1, o2) -> (int) (o2.getId()-o1.getId()))
+                .collect(Collectors.toList());
     }
+
 
     public JSONObject getUserProfile(Long userId, User user) {
         JSONObject obj = new JSONObject();
@@ -176,11 +143,10 @@ public class UserQueryService {
         List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList(),false);
         obj.put("works", workShowForms);
         obj.put("profile",makeUserDto(user,findUser));
-        //System.out.println("쿼리 수 확인");
         return PropertyUtil.response(obj);
     }
     private UserDto makeUserDto(User user, User findUser) {
-        UserDto userDto = UserDto.builder()
+        return UserDto.builder()
                 .userId(findUser.getId())
                 .name(findUser.getNickName())
                 .introduction(findUser.getIntroduction())
@@ -195,7 +161,6 @@ public class UserQueryService {
                 .cert_celeb(findUser.isCert_celeb())
                 .categoryLike(findUser.getCategoryLike())
                 .build();
-        return userDto;
     }
     public boolean checkIfFollowFindUser(User user,User findUser){
         if(user== null){
@@ -215,60 +180,76 @@ public class UserQueryService {
         }
         return false;
     }
-    //팔로워가져오기
+
+
     public JSONObject getFollowerDtoList(Long userId){
         Set<Long> followerList = userRepository.findByIdFetchFollowerList(userId).orElseThrow(UserNotFoundException::new).getFollowerList();
-        return getGetFollowDtoList(followerList);
-    }
-    //팔로잉가져오기
-    public JSONObject getFollowingDtoList(Long userId){
-        Set<Long> followingList = userRepository.findByIdFetchFollowingList(userId).orElseThrow(UserNotFoundException::new).getFollowingList();
-        return getGetFollowDtoList(followingList);
+        return makeFollowDtos(followerList);
     }
 
-    private JSONObject getGetFollowDtoList(Set<Long> followList) {
+
+    public JSONObject getFollowingDtoList(Long userId){
+        Set<Long> followingList = userRepository.findByIdFetchFollowingList(userId).orElseThrow(UserNotFoundException::new).getFollowingList();
+        return makeFollowDtos(followingList);
+    }
+
+    private JSONObject makeFollowDtos(Set<Long> followList) {
         List<GetFollowDto> getFollowDtoList = new ArrayList<>();
         for(Long follow : followList){
             Optional<User> findUser = userRepository.findByIdNotDeleted(follow);
             if(findUser.isPresent()){
-                GetFollowDto getFollowDto = GetFollowDto.builder().
-                        userId(findUser.get().getId()).
-                        name(findUser.get().getNickName()).
-                        picture(findUser.get().getPicture()).
-                        build();
+                GetFollowDto getFollowDto = GetFollowDto.builder()
+                        .userId(findUser.get().getId())
+                        .name(findUser.get().getNickName())
+                        .picture(findUser.get().getPicture())
+                        .build();
                 getFollowDtoList.add(getFollowDto);
             }
         }
         return PropertyUtil.response(getFollowDtoList);
     }
-    @Transactional(readOnly = true)
+
+
     public JSONObject showReportList(User User){
         User loginUser = userRepository.findByIdFetchReportList(User.getId()).orElseThrow(UserNotFoundException::new);
         List<Report> reportList = reportRepository.findByUserId(loginUser.getId());
-        List<ReportRespondDto> reportRespondDtos = new ArrayList<>();
-        for (Report report : reportList)
-            if(!report.getOpponentUser().isDelete()){
-                reportRespondDtos.add(new ReportRespondDto(report.getOpponentUser().getId(), report.getOpponentUser().getNickName(), report.getOpponentUser().getPicture()));
-            }
+
+        List<ReportRespondDto> reportRespondDtos = reportList.stream()
+                .filter(report -> !report.getOpponentUser().isDelete())
+                .map(report -> new ReportRespondDto(report.getOpponentUser().getId(), report.getOpponentUser().getNickName(), report.getOpponentUser().getPicture()))
+                .collect(Collectors.toList());
         return PropertyUtil.response(reportRespondDtos);
     }
 
-    @Transactional
+
     public JSONObject showSearchHistory(User User){
         User user = historyRepository.findByIdFetchHistoryList(User.getId()).orElseThrow(InstanceNotFoundException::new);
         List<SearchHistory> searchHistoryList = getUserHistoryList(user);
-        List<JSONArray> searchList = new ArrayList<>();
-        for (SearchHistory history : searchHistoryList) {
-            CustomJSONArray tuple = new CustomJSONArray(history.getId(),history.getWord()); /** [358,"가나"] */
-            searchList.add(tuple);
-        }
-        return PropertyUtil.response(searchList);
+
+        List<CustomJSONArray> histories = searchHistoryList.stream()
+                .map(history -> new CustomJSONArray(history.getId(), history.getWord()))
+                .collect(Collectors.toList());
+        return PropertyUtil.response(histories);
     }
 
     private List<SearchHistory> getUserHistoryList(User user) {
         List<SearchHistory> historyList = new ArrayList<>(user.getHistoryList());
         historyList.sort((o1, o2) -> (int) (o2.getId()-o1.getId()));
         return historyList;
+    }
+
+
+    public JSONObject getAllUser(){
+        List<User> users = userRepository.findAll();
+        List<JSONObject> obj = new ArrayList<>();
+        for(User user : users){
+            JSONObject jsonObject =new JSONObject();
+            jsonObject.put("id",user.getId());
+            jsonObject.put("email",user.getEmail());
+            obj.add(jsonObject);
+        }
+
+        return PropertyUtil.response(obj);
     }
 
 }

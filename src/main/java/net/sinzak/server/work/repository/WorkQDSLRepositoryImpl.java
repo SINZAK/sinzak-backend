@@ -5,7 +5,6 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import net.sinzak.server.common.QDSLRepository;
 import net.sinzak.server.work.domain.Work;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,14 +17,14 @@ import static net.sinzak.server.work.domain.QWork.work;
 
 @Repository
 @RequiredArgsConstructor
-public class WorkQDSLRepositoryImpl implements QDSLRepository<Work> {
+public class WorkQDSLRepositoryImpl {
 
     private final JPAQueryFactory queryFactory;
 
     public Page<Work> findSearchingByEmploymentAndCategoriesAligned(boolean employment, String keyword, List<String> categories, String align, Pageable pageable) {
         List<Work> result = queryFactory
                 .selectFrom(work)
-                .where(work.employment.eq(employment), eqCategories(categories), eqSearch(keyword),work.isDeleted.eq(false))
+                .where(work.employment.eq(employment), eqCategories(categories), eqSearch(keyword), work.isDeleted.eq(false))
                 .orderBy(standardAlign(align))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -69,13 +68,5 @@ public class WorkQDSLRepositoryImpl implements QDSLRepository<Work> {
 
         return work.id.desc();
     }
-
-//    @Override
-//    public Page<Work> findAllByCompletePopularityDesc(boolean complete, List<String> categories, String keyword, Pageable pageable) {return null;}
-//
-//    @Override
-//    public Page<Work> findNByCategoriesDesc(List<String> categories, String keyword, Pageable pageable) {
-//        return null;
-//    }
 
 }

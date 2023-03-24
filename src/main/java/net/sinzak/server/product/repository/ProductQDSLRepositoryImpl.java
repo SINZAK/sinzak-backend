@@ -6,7 +6,6 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import net.sinzak.server.common.QDSLRepository;
 import net.sinzak.server.product.domain.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,14 +20,14 @@ import static net.sinzak.server.product.domain.QProduct.product;
 
 @Repository
 @RequiredArgsConstructor
-public class ProductQDSLRepositoryImpl implements QDSLRepository<Product> {
+public class ProductQDSLRepositoryImpl {
 
     private final JPAQueryFactory queryFactory;
 
     public Page<Product> findAllByCompleteAndCategoriesAligned(boolean complete, String keyword, List<String> categories, String align, Pageable pageable) {
         List<Product> result = queryFactory
                 .selectFrom(product)
-                .where(eqComplete(complete), eqCategories(categories), eqSearch(keyword),product.isDeleted.eq(false))
+                .where(eqComplete(complete), eqCategories(categories), eqSearch(keyword), product.isDeleted.eq(false))
                 .orderBy(standardAlign(align))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -77,19 +76,16 @@ public class ProductQDSLRepositoryImpl implements QDSLRepository<Product> {
             if(category != null)
                 builder.or(product.category.contains(category));
         }
-
         return builder;
     }
     public List<Product> findCountByCategoriesDesc(List<String> categories, int count) {
-        List<Product> result = queryFactory
+        return queryFactory
                 .selectFrom(product)
                 .where(eqCategories(categories)
                         .and(product.isDeleted.eq(false)))
                 .orderBy(product.id.desc())
                 .limit(count)
                 .fetch();
-
-        return result;
     }
 
 }
