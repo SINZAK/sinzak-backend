@@ -87,7 +87,7 @@ public class ChatMessageService {
     public void leaveChatRoom(ChatMessageDto chatMessageDto){
         log.info(chatMessageDto.getRoomId()+":uuid");
         ChatRoom findChatroom = chatRoomRepository.findByRoomUuidFetchUserChatRoom(chatMessageDto.getRoomId())
-                .orElseThrow(()->new ChatRoomNotFoundException());
+                .orElseThrow(ChatRoomNotFoundException::new);
         UserChatRoom userChatRoom = findChatroom.leaveChatRoom(chatMessageDto.getSenderId());
         if(userChatRoom == null){
             throw new ChatRoomNotFoundException();
@@ -112,9 +112,7 @@ public class ChatMessageService {
 
     private void deleteChatRoom(ChatRoom findChatroom) {
         if(findChatroom.getParticipantsNumber()==0){
-            for(UserChatRoom userChatRoom : findChatroom.getUserChatRooms()){
-                userChatRoomRepository.delete(userChatRoom);
-            }
+            userChatRoomRepository.deleteAll(findChatroom.getUserChatRooms());
             chatRoomRepository.delete(findChatroom);
         }
     }

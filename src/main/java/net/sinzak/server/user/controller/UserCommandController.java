@@ -72,7 +72,7 @@ public class UserCommandController {
     @ApiDocumentResponse
     @ApiOperation(value ="프로필 이미지 변경")
     @PostMapping(value ="/users/edit/image")
-    public JSONObject updateUserImage(@AuthenticationPrincipal User user,@RequestPart MultipartFile multipartFile){
+    public JSONObject updateUserImage(@AuthenticationPrincipal User user, @RequestPart MultipartFile multipartFile){
         PropertyUtil.checkHeader(user);
         return userCommandService.updateUserImage(user,multipartFile);
     }
@@ -80,7 +80,7 @@ public class UserCommandController {
     @ApiDocumentResponse
     @ApiOperation(value ="관심장르 업데이트")
     @PostMapping(value ="/users/edit/category")
-    public JSONObject updateCategoryLike(@AuthenticationPrincipal User user,@RequestBody CategoryDto categoryDto){
+    public JSONObject updateCategoryLike(@AuthenticationPrincipal User user, @RequestBody CategoryDto categoryDto){
         PropertyUtil.checkHeader(user);
         return userCommandService.updateCategoryLike(user,categoryDto);
     }

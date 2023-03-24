@@ -36,7 +36,7 @@ public class SecurityService {
                 .orElseThrow(() -> new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND));
         TokenDto tokenDto = jwtProvider.createToken(user.getId().toString(), user.getId(), user.getRole());
         //리프레시 토큰 저장
-        log.error(user.getNickName());
+        log.error(user.getNickName()+" 로그인!");
         if(user.getNickName().isEmpty())
             tokenDto.setIsJoined(false);
         tokenDto.setOrigin(user.getOrigin());
@@ -66,17 +66,17 @@ public class SecurityService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public JSONObject join(User User, @Valid @RequestBody JoinDto dto) {
-        if(!User.getNickName().isBlank())
+    public JSONObject join(User user, @Valid @RequestBody JoinDto dto) {
+        if(!user.getNickName().isBlank())
             return PropertyUtil.responseMessage("이미 회원가입된 유저입니다.");
         JSONObject obj = new JSONObject();
-        User user = userRepository.findByEmailNotDeleted(User.getEmail()).orElseThrow(UserNotFoundException::new);
         user.saveJoinInfo(dto.getNickName(), dto.getCategory_like());
         user.setRandomProfileImage();
         JoinTerms terms = new JoinTerms(dto.isTerm());
         terms.setUser(user);
         JoinTerms saveTerms = joinTermsRepository.save(terms);
-        if(user.getId() == null || saveTerms.getId() == null)
+        Long savedId = userRepository.save(user).getId();
+        if(savedId == null || saveTerms.getId() == null)
             throw new InstanceNotFoundException("서버 오류로 저장되지 않았습니다.");
         TokenDto tokenDto = jwtProvider.createToken(user.getUsername(), user.getId(), user.getRole());
         tokenDto.setIsJoined(true);

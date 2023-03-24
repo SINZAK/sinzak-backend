@@ -41,7 +41,7 @@ public class ChatRoomQueryService {
     private final UserChatRoomRepository userChatRoomRepository;
 
     public JSONObject getChatRoomsByPost(User loginUser, PostDto postDto){
-        if(loginUser ==null){
+        if(loginUser == null){
             throw new UserNotLoginException();
         }
         List<GetChatRoomsDto> getChatRoomsDtos = new ArrayList<>();

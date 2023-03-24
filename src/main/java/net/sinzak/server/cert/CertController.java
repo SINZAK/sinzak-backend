@@ -45,9 +45,9 @@ public class CertController {
         PropertyUtil.checkHeader(user);
         Map<String, Object> response = UnivCert.certifyCode(API_KEY, mailDto.getUniv_email(), mailDto.getUnivName(), mailDto.getCode());
         boolean success = (boolean) response.get("success");
-        System.out.println(success+"\n");
         if(success)
-            user.updateCertifiedUniv(mailDto.getUnivName(), mailDto.getUniv_email());
+            certService.updateCertifiedUniv(user, mailDto);
+
         return new JSONObject(response);
     }
 
