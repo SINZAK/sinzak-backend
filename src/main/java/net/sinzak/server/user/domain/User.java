@@ -17,6 +17,7 @@ import net.sinzak.server.work.domain.WorkWish;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.util.*;
@@ -194,6 +195,7 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.categoryLike = categoryLike;
     }
 
+    @Transactional
     public void updateCertifiedUniv(String univName, String univ_email) {
         this.univ_email = univ_email;
         this.univ = univName;
