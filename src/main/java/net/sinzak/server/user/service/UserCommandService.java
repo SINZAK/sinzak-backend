@@ -42,8 +42,8 @@ public class UserCommandService {
     }
 
     public JSONObject updateUser(UpdateUserDto dto, User loginUser){
-        loginUser.updateProfile(dto.getName(),dto.getIntroduction());
-        userRepository.save(loginUser);
+        User user = userRepository.findByIdNotDeleted(loginUser.getId()).orElseThrow(UserNotFoundException::new);
+        user.updateProfile(dto.getName(),dto.getIntroduction());
         return PropertyUtil.response(true);
     }
 
@@ -61,9 +61,10 @@ public class UserCommandService {
         return PropertyUtil.response(obj);
     }
 
-    public JSONObject updateCategoryLike(User user, CategoryDto categoryDto){
+
+    public JSONObject updateCategoryLike(User User, CategoryDto categoryDto){
+        User user = userRepository.findByIdNotDeleted(User.getId()).orElseThrow(UserNotFoundException::new);
         user.updateCategoryLike(categoryDto.getCategoryLike());
-        userRepository.save(user);
         return PropertyUtil.response(true);
     }
 
