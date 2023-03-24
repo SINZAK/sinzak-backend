@@ -17,6 +17,7 @@ import net.sinzak.server.work.domain.WorkWish;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.util.*;
@@ -186,15 +187,15 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.picture = "https://sinzakimage.s3.ap-northeast-2.amazonaws.com/static/profile"+randomNumber+".png";
     }
 
-    public User update(String name, String introduction){
+    public void updateProfile(String name, String introduction){
         this.nickName =name;
         this.introduction = introduction;
-        return this;
     }
     public void updateCategoryLike(String categoryLike){
         this.categoryLike = categoryLike;
     }
 
+    @Transactional
     public void updateCertifiedUniv(String univName, String univ_email) {
         this.univ_email = univ_email;
         this.univ = univName;

@@ -18,9 +18,7 @@ public class RestControllerAdvisor {
 
     @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(HttpStatus.OK)
-    protected JSONObject handleUserNotFoundException(UserNotFoundException e) {
-        return PropertyUtil.responseMessage(e.getMessage());
-    }
+    protected JSONObject handleUserNotFoundException(UserNotFoundException e) {return PropertyUtil.responseMessage(e.getMessage());}
 
     @ExceptionHandler(PostNotFoundException.class)
     @ResponseStatus(HttpStatus.OK)

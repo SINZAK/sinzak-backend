@@ -15,8 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -48,9 +46,6 @@ public class S3Service {
         amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileUrl.substring(substr)));
     }
 
-    public void getImage(String fileName) {
-        amazonS3.getUrl(bucket,fileName);
-    }
 
     private String createFileName(String fileName) {
         return UUID.randomUUID().toString().concat(getFileExtension(fileName));
