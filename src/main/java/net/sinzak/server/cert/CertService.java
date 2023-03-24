@@ -61,4 +61,10 @@ public class CertService {
         return PropertyUtil.response(true);
     }
 
+    @Transactional
+    public void updateCertifiedUniv(User User, MailDto dto){
+        User user = userRepository.findById(User.getId()).orElseThrow(UserNotFoundException::new);
+        user.updateCertifiedUniv(dto.getUnivName(), dto.getUniv_email());
+    }
+
 }

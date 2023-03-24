@@ -195,7 +195,6 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.categoryLike = categoryLike;
     }
 
-    @Transactional
     public void updateCertifiedUniv(String univName, String univ_email) {
         this.univ_email = univ_email;
         this.univ = univName;
