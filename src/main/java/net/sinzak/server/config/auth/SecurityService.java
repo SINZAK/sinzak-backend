@@ -34,8 +34,9 @@ public class SecurityService {
     public TokenDto login(String email) {
         User user = userRepository.findByEmailNotDeleted(email)
                 .orElseThrow(() -> new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND));
-        TokenDto tokenDto = jwtProvider.createToken(user.getId().toString(), user.getId(), user.getRoles());
-        log.warn(user.getNickName() +"로그인 !!!");
+        TokenDto tokenDto = jwtProvider.createToken(user.getId().toString(), user.getId(), user.getRole());
+        //리프레시 토큰 저장
+        log.error(user.getNickName());
         if(user.getNickName().isEmpty())
             tokenDto.setIsJoined(false);
         tokenDto.setOrigin(user.getOrigin());
@@ -50,7 +51,8 @@ public class SecurityService {
     @Transactional
     public TokenDto login(User user) {
         PropertyUtil.checkHeader(user);
-        TokenDto tokenDto = jwtProvider.createToken(user.getId().toString(), user.getId(), user.getRoles());
+        TokenDto tokenDto = jwtProvider.createToken(user.getId().toString(), user.getId(), user.getRole());
+        //리프레시 토큰 저장
         tokenDto.setIsJoined(false);
         tokenDto.setOrigin(user.getOrigin());
         RefreshToken refreshToken = RefreshToken.builder()
@@ -76,7 +78,7 @@ public class SecurityService {
         JoinTerms saveTerms = joinTermsRepository.save(terms);
         if(user.getId() == null || saveTerms.getId() == null)
             throw new InstanceNotFoundException("서버 오류로 저장되지 않았습니다.");
-        TokenDto tokenDto = jwtProvider.createToken(user.getUsername(), user.getId(), user.getRoles());
+        TokenDto tokenDto = jwtProvider.createToken(user.getUsername(), user.getId(), user.getRole());
         tokenDto.setIsJoined(true);
         tokenDto.setOrigin(user.getOrigin());
         RefreshToken refreshToken = RefreshToken.builder()
@@ -95,7 +97,7 @@ public class SecurityService {
         RefreshToken refreshToken = refreshTokens.get(refreshTokens.size()-1); //마지막꺼가 가장 최신반영된 토큰
 
         // AccessToken, RefreshToken 토큰 재발급, 리프레쉬 토큰 저장
-        TokenDto newCreatedToken = jwtProvider.createToken(User.getId().toString(), User.getId(), User.getRoles());
+        TokenDto newCreatedToken = jwtProvider.createToken(User.getId().toString(), User.getId(), User.getRole());
         RefreshToken updateRefreshToken = refreshToken.updateToken(newCreatedToken.getRefreshToken());
         refreshTokenRepository.save(updateRefreshToken);
 

@@ -1,5 +1,6 @@
 package net.sinzak.server.user.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +20,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Getter
 @Entity
@@ -56,6 +56,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     private String univ="";
 
     @Column
+    @JsonIgnore
     private String major;
 
     @Column
@@ -83,6 +84,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     private String origin;
 
     @Column
+    @JsonIgnore
     private boolean alarm_receive;
 
     @Enumerated(EnumType.STRING)
@@ -139,22 +141,10 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Column(name = "FOLLOWER_ID")
     private Set<Long> followerList =new HashSet<>();
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<String> roles = new ArrayList<>();
-
     @Column
     private boolean isDelete= false;
     public void setDelete(boolean delete) {
         isDelete = delete;
-    }
-
-    public void makePostNull(){
-        for(Work work : this.workPostList){
-            work.deleteUser();
-        }
-        for(Product product : this.productPostList){
-            product.deleteUser();
-        }
     }
 
 
@@ -165,8 +155,7 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.nickName = nickName;
         this.categoryLike = categoryLike;
         this.origin = origin;
-        this.roles = Collections.singletonList("ROLE_USER");
-        this.role = Role.GUEST;
+        this.role = Role.USER;
     }
 
     @Builder
@@ -177,8 +166,7 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.picture = picture;
         this.origin = origin;
         this.categoryLike = "";
-        this.roles = Collections.singletonList("ROLE_USER");
-        this.role = Role.GUEST;
+        this.role = Role.USER;
 //        this.alarm_receive = false;
     }
 
@@ -247,9 +235,9 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.roles.stream()
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+        List<SimpleGrantedAuthority> list = new ArrayList<>();
+        list.add(new SimpleGrantedAuthority(this.role.getKey()));
+        return list;
     }
 
     @Override
