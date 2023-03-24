@@ -11,4 +11,9 @@ public class MailDto {
     private int code;
     @ApiModelProperty(value = "선택한 대학교", example = "홍익대학교")
     private String univName;
+
+    public MailDto(String univ_email, String univName) {
+        this.univ_email = univ_email;
+        this.univName = univName;
+    }
 }

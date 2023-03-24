@@ -28,7 +28,6 @@ public class UserQueryController {
     @GetMapping(value ="/users/{userId}/profile")
     public JSONObject getUserProfile(@PathVariable Long userId, @AuthenticationPrincipal User user){
        return userQueryService.getUserProfile(userId, user);
-
     }
 
     @ApiOperation(value ="모든 유저 목록 보기")
@@ -56,7 +55,7 @@ public class UserQueryController {
         return userQueryService.showSearchHistory(user);
     }
 
-    @ApiOperation(value ="스크랩 목록 ")
+    @ApiOperation(value ="찜 목록")
     @GetMapping(value ="/users/wish")
     public JSONObject showWish(@AuthenticationPrincipal User user){
         PropertyUtil.checkHeader(user);

@@ -63,7 +63,7 @@ public class PropertyUtil implements EnvironmentAware {
     }
 
     public static void checkHeader(User user) {
-        if(user ==null)
+        if(user == null)
             throw new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN);
     }
 

@@ -42,30 +42,31 @@ public class UserCommandService {
     }
 
     public JSONObject updateUser(UpdateUserDto dto, User loginUser){
-        User user = userRepository.findByIdNotDeleted(loginUser.getId()).orElseThrow(UserNotFoundException::new);
-        user.updateProfile(dto.getName(),dto.getIntroduction());
+        loginUser.updateProfile(dto.getName(),dto.getIntroduction());
+        userRepository.save(loginUser);
         return PropertyUtil.response(true);
     }
 
     public JSONObject updateUserImage(User loginUser, MultipartFile multipartFile){
-        User findUser = userRepository.findByIdNotDeleted(loginUser.getId()).orElseThrow(UserNotFoundException::new);
         try{
             String url = s3Service.uploadImage(multipartFile);
-            findUser.setPicture(url);
+            loginUser.setPicture(url);
+            userRepository.save(loginUser);
         }
         catch (Exception e){
             return PropertyUtil.responseMessage("이미지 저장 실패");
         }
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("picture", findUser.getPicture());
-        return PropertyUtil.response(jsonObject);
+        JSONObject obj = new JSONObject();
+        obj.put("picture", loginUser.getPicture());
+        return PropertyUtil.response(obj);
     }
 
     public JSONObject updateCategoryLike(User user, CategoryDto categoryDto){
-        User findUser = userRepository.findByIdNotDeleted(user.getId()).orElseThrow(UserNotFoundException::new);
-        findUser.updateCategoryLike(categoryDto.getCategoryLike());
+        user.updateCategoryLike(categoryDto.getCategoryLike());
+        userRepository.save(user);
         return PropertyUtil.response(true);
     }
+
     public JSONObject setToken(FcmDto fcmDto){
         User loginUser = userRepository.findByIdNotDeleted(fcmDto.getUserId()).orElseThrow(UserNotFoundException::new);
         loginUser.setFcm(fcmDto.getFcmToken());
@@ -75,7 +76,7 @@ public class UserCommandService {
 
     public JSONObject follow(Long userId, User loginUser){
         User findUser = userRepository.findByIdNotDeleted(userId).orElseThrow(UserNotFoundException::new);
-        if(loginUser ==null){
+        if(loginUser == null){
             return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
         }
         if(loginUser.getId().equals(findUser.getId())){
@@ -85,7 +86,7 @@ public class UserCommandService {
     }
     public JSONObject unFollow(Long userId,User loginUser){
         User findUser = userRepository.findByIdNotDeleted(userId).orElseThrow(UserNotFoundException::new);
-        if(loginUser ==null){
+        if(loginUser == null){
             return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
         }
         if(loginUser.getId().equals(findUser.getId())){

@@ -23,8 +23,7 @@ public class CertService {
     private final S3Service s3Service;
 
     @Transactional
-    public JSONObject certifyUniv(User User, UnivDto dto){
-        User user = userRepository.findByIdNotDeleted(User.getId()).orElseThrow(UserNotFoundException::new);
+    public JSONObject certifyUniv(User user, UnivDto dto){
         Optional<Cert> savedCert = certRepository.findCertByUnivEmail(dto.getUniv_email());
         Long certId;
         if(savedCert.isEmpty())
@@ -38,6 +37,7 @@ public class CertService {
                 return PropertyUtil.responseMessage("이미 인증 처리된 이메일입니다.");
         }
         user.updateCertifiedUniv(dto.getUniv(),dto.getUniv_email());
+        userRepository.save(user);
         return PropertyUtil.response(certId);
     }
 
@@ -51,20 +51,20 @@ public class CertService {
 
 
     @Transactional
-    public JSONObject applyCertifiedAuthor(User User, String link){
-        User user = userRepository.findById(User.getId()).orElseThrow(UserNotFoundException::new);
+    public JSONObject applyCertifiedAuthor(User user, String link){
         if(!user.isCert_uni())
             return PropertyUtil.responseMessage("아직 대학 인증이 완료되지 않았습니다.");
         if(user.isCert_celeb())
             return PropertyUtil.responseMessage("이미 처리된 요청입니다.");
         user.setPortFolioUrl(link);
+        userRepository.save(user);
         return PropertyUtil.response(true);
     }
 
     @Transactional
     public void updateCertifiedUniv(User User, MailDto dto){
-        User user = userRepository.findById(User.getId()).orElseThrow(UserNotFoundException::new);
-        user.updateCertifiedUniv(dto.getUnivName(), dto.getUniv_email());
+        User.updateCertifiedUniv(dto.getUnivName(), dto.getUniv_email());
+        userRepository.save(User);
     }
 
 }

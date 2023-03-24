@@ -33,7 +33,7 @@ public class ProductLikes {
     }
 
     private void setUser(User user){
-        user.getProductLikesList().add(this); //스크랩!
+        user.getProductLikesList().add(this);
         this.user=user;
     }
     public void setProduct(Product product) {
