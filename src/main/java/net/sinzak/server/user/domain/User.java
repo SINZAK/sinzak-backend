@@ -14,7 +14,6 @@ import net.sinzak.server.work.domain.Work;
 import net.sinzak.server.work.domain.WorkLikes;
 import net.sinzak.server.work.domain.WorkSell;
 import net.sinzak.server.work.domain.WorkWish;
-import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,7 +25,6 @@ import java.util.*;
 @Getter
 @Entity
 @SequenceGenerator(name = "User_SEQ_GEN",sequenceName = "User_SEQ")
-@DynamicUpdate
 public class User extends BaseTimeEntity implements UserDetails {
     private static final int hundredMillion = 100000000;
     private static final int tenThousand =10000;
@@ -96,7 +94,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<UserChatRoom> userChatRooms = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user",cascade = CascadeType.MERGE)
     private List<Product> productPostList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user" ,cascade = CascadeType.MERGE)
@@ -274,10 +272,4 @@ public class User extends BaseTimeEntity implements UserDetails {
     }
 
     protected User() {}
-
-    public User(Long id, String email, String name) {
-        this.id = id;
-        this.email = email;
-        this.name = name;
-    }
 }
