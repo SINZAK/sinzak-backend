@@ -95,9 +95,7 @@ public class ChatRoom extends BaseTimeEntity {
     }
 
     public UserChatRoom leaveChatRoom(Long userId){
-        System.out.println(this.userChatRooms.size()+":사이즈,"+userId+":userId") ;
         for(UserChatRoom userChatRoom :this.userChatRooms){
-            System.out.println(userChatRoom.getUser().getId());
             if(userChatRoom.getUser().getId().equals(userId)){
                 userChatRoom.setDisable(true);
                 this.participantsNumber--;

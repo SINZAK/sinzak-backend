@@ -3,12 +3,9 @@ package net.sinzak.server.user.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
-import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.service.UserQueryService;
 import org.json.simple.JSONObject;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Api(tags = "유저-조회")
@@ -19,15 +16,14 @@ public class UserQueryController {
 
     @ApiOperation(value ="내 프로필 보기")
     @GetMapping(value ="/users/my-profile")
-    public JSONObject getMyProfile(@AuthenticationPrincipal User user){
-        PropertyUtil.checkHeader(user);
-        return userQueryService.getMyProfile(user);
+    public JSONObject getMyProfile(){
+        return userQueryService.getMyProfile();
     }
 
     @ApiOperation(value ="유저 프로필 보기")
     @GetMapping(value ="/users/{userId}/profile")
-    public JSONObject getUserProfile(@PathVariable Long userId, @AuthenticationPrincipal User user){
-       return userQueryService.getUserProfile(userId, user);
+    public JSONObject getUserProfile(@PathVariable Long userId){
+       return userQueryService.getUserProfile(userId);
     }
 
     @ApiOperation(value ="모든 유저 목록 보기")
@@ -50,30 +46,26 @@ public class UserQueryController {
 
     @ApiOperation(value = "검색기록 출력", notes = "GetMapping에 유의 삭제는 Post로")
     @GetMapping(value = "/users/history")
-    public JSONObject showHistory(@AuthenticationPrincipal User user) {
-        PropertyUtil.checkHeader(user);
-        return userQueryService.showSearchHistory(user);
+    public JSONObject showHistory() {
+        return userQueryService.showSearchHistory();
     }
 
     @ApiOperation(value ="찜 목록")
     @GetMapping(value ="/users/wish")
-    public JSONObject showWish(@AuthenticationPrincipal User user){
-        PropertyUtil.checkHeader(user);
-        return userQueryService.getWishList(user);
+    public JSONObject showWish(){
+        return userQueryService.getWishList();
     }
     @ApiOperation(value ="의뢰해요 목록")
     @GetMapping(value ="/users/work-employ")
-    public JSONObject showWorkEmploy(@AuthenticationPrincipal User user){
-        PropertyUtil.checkHeader(user);
-        return userQueryService.getWorkEmploys(user);
+    public JSONObject showWorkEmploy(){
+        return userQueryService.getWorkEmploys();
     }
 
     @ApiDocumentResponse
     @ApiOperation(value = "신고 목록 출력")
     @PostMapping(value = "/users/reportlist")
-    public JSONObject reportList(@AuthenticationPrincipal User user){
-        PropertyUtil.checkHeader(user);
-        return userQueryService.showReportList(user);
+    public JSONObject reportList(){
+        return userQueryService.showReportList();
     }
 
 
