@@ -50,7 +50,7 @@ public class ChatMessageService {
         ChatRoom findChatRoom =
                 chatRoomRepository
                         .findByRoomUuidFetchChatMessage(message.getRoomId())
-                        .orElseThrow(()->new ChatRoomNotFoundException());
+                        .orElseThrow(ChatRoomNotFoundException::new);
         if(findChatRoom.isBlocked() || findChatRoom.getParticipantsNumber()<2){
             //차단 되어있거나 한 명이 나간 상태라면 보내지 않음
             return;
@@ -61,14 +61,13 @@ public class ChatMessageService {
         template.convertAndSend("/sub/chat/rooms/"+message.getRoomId(),getChatMessageDto);
     }
     private GetChatMessageDto makeMessageDto(ChatMessageDto message) {
-        GetChatMessageDto getChatMessageDto = GetChatMessageDto.builder()
+        return GetChatMessageDto.builder()
                 .message(message.getMessage())
                 .senderId(message.getSenderId())
                 .senderName(message.getSenderName())
                 .sendAt(LocalDateTime.now())
                 .messageType(message.getMessageType().name())
                 .build();
-        return getChatMessageDto;
     }
 
     private User addChatMessageToChatRoom(ChatMessageDto message, ChatRoom findChatRoom) {
@@ -79,8 +78,7 @@ public class ChatMessageService {
                 .senderId(message.getSenderId())
                 .build();
 //        chatMessageRepository.save(newChatMessage);
-        User opponentUser = findChatRoom.addChatMessage(newChatMessage);
-        return opponentUser;
+        return findChatRoom.addChatMessage(newChatMessage);
     }
 
     @Transactional
@@ -96,18 +94,16 @@ public class ChatMessageService {
         addLeaveChatMessageToChatRoom(chatMessageDto, findChatroom);
         GetChatMessageDto getChatMessageDto = makeLeaveChatMessageDto(chatMessageDto);
         template.convertAndSend("/sub/chat/rooms/"+chatMessageDto.getRoomId(),getChatMessageDto);
-        return;
     }
 
 
     private GetChatMessageDto makeLeaveChatMessageDto(ChatMessageDto chatMessageDto) {
-        GetChatMessageDto getChatMessageDto = GetChatMessageDto.builder()
+        return GetChatMessageDto.builder()
                 .message("님이 채팅방을 나가셨습니다")
                 .senderName(chatMessageDto.getSenderName())
                 .sendAt(LocalDateTime.now())
                 .messageType(MessageType.LEAVE.name())
                 .build();
-        return getChatMessageDto;
     }
 
     private void deleteChatRoom(ChatRoom findChatroom) {
@@ -127,15 +123,4 @@ public class ChatMessageService {
         findChatroom.addChatMessage(leaveChatMessage);
     }
 
-
-//    public ChatMessage getChatMessage(String id) throws Exception{
-//        Firestore firestore = FirestoreClient.getFirestore();
-//        DocumentReference documentReference = firestore.collection(COLLECTION_NAME).document(id);
-//        ApiFuture<DocumentSnapshot> apiFuture = documentReference.get();
-//        DocumentSnapshot documentSnapshot = apiFuture.get();
-//        if(documentSnapshot.exists()){
-//            return documentSnapshot.toObject(ChatMessage.class);
-//        }
-//        return null;
-//    }
 }

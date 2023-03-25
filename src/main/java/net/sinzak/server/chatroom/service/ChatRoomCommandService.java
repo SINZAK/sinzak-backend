@@ -11,6 +11,7 @@ import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.repository.UserChatRoomRepository;
 import net.sinzak.server.common.PostType;
 import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.common.error.ChatRoomNotFoundException;
 import net.sinzak.server.common.error.PostNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
@@ -38,7 +39,7 @@ import java.util.Optional;
 @Slf4j
 @Transactional
 public class ChatRoomCommandService {
-
+    private final UserUtils userUtils;
     private final ChatRoomRepository chatRoomRepository;
     private final UserChatRoomRepository userChatRoomRepository;
     private final WorkRepository workRepository;
@@ -47,7 +48,8 @@ public class ChatRoomCommandService {
     private final S3Service s3Service;
     private final UserQueryService userQueryService;
 
-    public JSONObject createUserChatRoom(PostDto postDto, User user) { //상대방 아바타를 초대
+    public JSONObject createUserChatRoom(PostDto postDto) { //상대방 아바타를 초대
+        User user = userUtils.getCurrentUser();
         User postUser =null;
         List<ChatRoom> postChatRooms = null;
         Product product = null;
@@ -64,7 +66,7 @@ public class ChatRoomCommandService {
         if(postDto.getPostType().equals(PostType.WORK.getName())){
             Optional<Work> findWork = workRepository.
                     findByIdFetchChatRooms(postDto.getPostId());
-            if(!findWork.isPresent()){
+            if(findWork.isEmpty()){
                 throw new PostNotFoundException();
             }
             postUser = findWork.get().getUser();
@@ -72,7 +74,6 @@ public class ChatRoomCommandService {
             work = findWork.get();
         }
 
-        log.info("게시글 확인");
         checkUserStatus(user,postUser);
         User loginUser = userRepository.findByIdNotDeleted(user.getId()).orElseThrow(UserNotFoundException::new);
 
@@ -83,14 +84,12 @@ public class ChatRoomCommandService {
         GetCreatedChatRoomDto getCreatedChatRoomDto =new GetCreatedChatRoomDto();
         ChatRoom chatRoom = checkIfUserIsAlreadyChatting(user, postChatRooms);
         if (chatRoom == null) { //상대랑 해당 포스트에 대해서 대화하고 있는 채팅방이 없다면 (만들어 줘야함)
-            log.info("채팅방 새로 생성");
             chatRoom = makeChatRoomAndUserChatRoom(postUser, loginUser);
             addChatRoomToPost(postDto, product, work, chatRoom);
             chatRoomRepository.save(chatRoom);
             getCreatedChatRoomDto.setNewChatRoom(true);
         }
         else{
-            log.info("원래 채팅방 반환");
             getCreatedChatRoomDto.setNewChatRoom(false);
         }
         getCreatedChatRoomDto.setRoomUuid(chatRoom.getRoomUuid());
@@ -107,7 +106,7 @@ public class ChatRoomCommandService {
     public JSONObject uploadImage(String roomUuid, List<MultipartFile> multipartFiles){
         Optional<ChatRoom> chatRoom = chatRoomRepository.findByRoomId(roomUuid);
         List<JSONObject> obj = new ArrayList<>();
-        if(!chatRoom.isPresent()){
+        if(chatRoom.isEmpty()){
             throw new ChatRoomNotFoundException();
         }
         for(MultipartFile multipartFile : multipartFiles ){
@@ -138,10 +137,9 @@ public class ChatRoomCommandService {
         return chatRoom;
     }
     private GetCreatedChatRoomDto makeChatRoomDto( ChatRoom chatRoom) {
-        GetCreatedChatRoomDto getCreatedChatRoomDto = GetCreatedChatRoomDto.builder()
+        return GetCreatedChatRoomDto.builder()
                 .roomUuid(chatRoom.getRoomUuid())
                 .build();
-        return getCreatedChatRoomDto;
     }
 
     public void makeChatRoomBlocked(User user,User opponentUser,boolean isBlock){
@@ -173,29 +171,6 @@ public class ChatRoomCommandService {
             throw new UserNotFoundException();
         }
     }
-
-    ///밑은 타임리프 테스트
-    public void makeChatRoom(String roomName) {
-        ChatRoom chatRoom = new ChatRoom(roomName);
-        chatRoomRepository.save(chatRoom);
-    }
-
-//    private ChatRoom checkIfChatRoomExist(User postUser, User findUser, ChatRoom chatRoom) {
-//
-//        List<UserChatRoom> userChatRooms =
-//                userChatRoomRepository.findUserChatRoomByEmail(findUser.getEmail());
-//        chatRoom = getChatRoom(postUser, userChatRooms, chatRoom);
-//        return chatRoom;
-//    }
-//    private ChatRoom getChatRoom(User PostUser, List<UserChatRoom> userChatRooms, ChatRoom chatRoom) {
-//        for (UserChatRoom userChatRoom : userChatRooms) {
-//            if (userChatRoom.getOpponentUserId().equals(PostUser.getEmail())) { //만약에 이미 상대랑 같이 메시지하고 있는 방이 있다면
-//                chatRoom = userChatRoom.getChatRoom();
-//                break;
-//            }
-//        }
-//        return chatRoom;
-//    }
 
 }
 

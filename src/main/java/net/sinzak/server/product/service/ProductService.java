@@ -3,6 +3,7 @@ package net.sinzak.server.product.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.common.PostService;
+import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.common.dto.SuggestDto;
 import net.sinzak.server.common.error.UserNotFoundException;
@@ -36,6 +37,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class ProductService implements PostService<Product,ProductPostDto,ProductWish,ProductLikes> {
+    private final UserUtils userUtils;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final ProductSellRepository productSellRepository;
@@ -52,8 +54,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     private final int HOME_DETAIL_OBJECTS = 50;
 
     @Transactional(rollbackFor = {Exception.class})
-    public JSONObject makePost(User User, @Valid ProductPostDto buildDto){   // 글 생성
-        User user = userRepository.findByIdFetchProductPostList(User.getId()).orElseThrow(UserNotFoundException::new);
+    public JSONObject makePost(@Valid ProductPostDto buildDto){   // 글 생성
+        User user = userRepository.findByIdFetchProductPostList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
         Product product = Product.builder()
                     .title(buildDto.getTitle())
                     .content(buildDto.getContent())
@@ -69,11 +71,11 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return PropertyUtil.response(productId);
     }
 
-    public JSONObject saveImageInS3AndProduct(User user, List<MultipartFile> multipartFiles, Long id) {
+    public JSONObject saveImageInS3AndProduct(List<MultipartFile> multipartFiles, Long id) {
         Product product = productRepository.findById(id).orElseThrow(PostNotFoundException::new);
         if(multipartFiles.size() == 0)
             return PropertyUtil.responseMessage("사진 1개이상 첨부해주세요.");
-        if(!user.getId().equals(product.getUser().getId()))
+        if(!userUtils.getCurrentUserId().equals(product.getUser().getId()))
             return PropertyUtil.responseMessage("잘못된 접근입니다.");
         for (MultipartFile img : multipartFiles) {
             try{
@@ -102,9 +104,9 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional(rollbackFor = {Exception.class})
-    public JSONObject deleteImage(User User, Long productId, String url){   // 글 생성
+    public JSONObject deleteImage(Long productId, String url){   // 글 생성
         Product product = productRepository.findById(productId).orElseThrow(PostNotFoundException::new);
-        if(!User.getId().equals(product.getUser().getId()))
+        if(!userUtils.getCurrentUserId().equals(product.getUser().getId()))
             return PropertyUtil.responseMessage("해당 작품의 작가가 아닙니다.");
         if(product.getImages().size()==1)
             return PropertyUtil.responseMessage("최소 1개 이상의 이미지를 보유해야 합니다.");
@@ -123,8 +125,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional(rollbackFor = {Exception.class})
-    public JSONObject editPost(User User, Long productId, ProductEditDto editDto){   // 글 생성
-        User user = userRepository.findByIdNotDeleted(User.getId()).orElseThrow(UserNotFoundException::new);
+    public JSONObject editPost(Long productId, ProductEditDto editDto){   // 글 생성
+        User user = userUtils.getCurrentUser();
         Product product = productRepository.findById(productId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(product.getUser().getId()))
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
@@ -135,8 +137,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional(rollbackFor = {Exception.class})
-    public JSONObject deletePost(User User, Long productId){   // 글 생성
-        User user = userRepository.findByIdNotDeleted(User.getId()).orElseThrow(UserNotFoundException::new);
+    public JSONObject deletePost(Long productId){   // 글 생성
+        User user = userUtils.getCurrentUser();
         Product product = productRepository.findByIdFetchChatRooms(productId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(product.getUser().getId()))
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
@@ -152,8 +154,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
 
     @Transactional
-    public JSONObject showDetail(Long id, User User){   // 글 상세 확인
-        User user = userRepository.findByIdFetchFollowingAndLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
+    public JSONObject showDetailForUser(Long id){   // 글 상세 확인
+        User user = userRepository.findByIdFetchFollowingAndLikesList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
         Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(PostNotFoundException::new);
         DetailProductForm detailForm = makeProductDetailForm(product);
         if(!product.getUser().isDelete()){
@@ -179,7 +181,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
 //    @Cacheable(value ="showProductDetailCache",key="#id",cacheManager ="testCacheManager")
     @Transactional
-    public JSONObject showDetail(Long id){   // 비회원 글 보기
+    public JSONObject showDetailForGuest(Long id){   // 비회원 글 보기
         Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(PostNotFoundException::new);
         DetailProductForm detailForm = makeProductDetailForm(product);
         if(!product.getUser().isDelete()){
@@ -231,9 +233,9 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
 
     @Transactional(readOnly = true)
-    public JSONObject showHome(User User){
+    public JSONObject showHomeForUser(){
         JSONObject obj = new JSONObject();
-        User user = userRepository.findByIdFetchFollowingAndLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdFetchFollowingAndLikesList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
         List<String> userCategories = Arrays.asList(user.getCategoryLike().split(","));
 
         List<Product> productList = productRepository.findAllProductNotDeleted();
@@ -250,7 +252,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
 
     @Transactional(readOnly = true)
-    public JSONObject showHome(){
+    public JSONObject showHomeForGuest(){
         JSONObject obj = new JSONObject();
         List<Product> productList = productRepository.findAllProductNotDeleted();
 
@@ -275,8 +277,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
 
     @Transactional(readOnly = true)
-    public JSONObject showRecommendDetail(User User){
-        User user = userRepository.findByIdFetchLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
+    public JSONObject showRecommendDetail(){
+        User user = userRepository.findByIdFetchLikesList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
         List<String> userCategories = Arrays.asList(user.getCategoryLike().split(","));
 
         List<Product> recommendList = QDSLRepository.findCountByCategoriesDesc(userCategories, HOME_DETAIL_OBJECTS);
@@ -286,8 +288,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional(readOnly = true)
-    public JSONObject showFollowingDetail(User User){
-        User user = userRepository.findByIdFetchFollowingAndLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
+    public JSONObject showFollowingDetail(){
+        User user = userRepository.findByIdFetchFollowingAndLikesList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
         List<Product> productList = productRepository.findAllProductNotDeleted();
 
         List<Product> followingList = getFollowingList(user, productList, HOME_DETAIL_OBJECTS);
@@ -305,9 +307,9 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional
-    public JSONObject wish(User User, @RequestBody ActionForm form){
+    public JSONObject wish(@RequestBody ActionForm form){
         JSONObject obj = new JSONObject();
-        User user = userRepository.findByIdFetchProductWishList(User.getId()).orElseThrow(UserNotFoundException::new); // 작품 찜까지 페치 조인
+        User user = userRepository.findByIdFetchProductWishList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new); // 작품 찜까지 페치 조인
         List<ProductWish> wishList = user.getProductWishList(); //wishList == 유저의 찜 리스트
         boolean success = false;
         boolean isWish=false;
@@ -340,9 +342,9 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional
-    public JSONObject likes(User User, @RequestBody ActionForm form){
+    public JSONObject likes(@RequestBody ActionForm form){
         JSONObject obj = new JSONObject();
-        User user = userRepository.findByIdFetchLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdFetchLikesList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
         List<ProductLikes> likesList = user.getProductLikesList();
         boolean success = false;
         boolean isLike = false;
@@ -373,8 +375,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional
-    public JSONObject sell(User User, @RequestBody SellDto dto){
-        User user = userRepository.findByIdFetchProductSellList(User.getId()).orElseThrow(UserNotFoundException::new);
+    public JSONObject sell(@RequestBody SellDto dto){
+        User user = userRepository.findByIdFetchProductSellList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
         Product product = productRepository.findById(dto.getPostId()).orElseThrow(PostNotFoundException::new);
         if(product.isComplete())
             return PropertyUtil.responseMessage("이미 판매완료된 작품입니다.");
@@ -385,8 +387,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional
-    public JSONObject suggest(User User, @RequestBody SuggestDto dto){
-        User user = userRepository.findByIdNotDeleted(User.getId()).orElseThrow(UserNotFoundException::new);
+    public JSONObject suggest(@RequestBody SuggestDto dto){
+        User user = userUtils.getCurrentUser();
         if(suggestRepository.findByUserIdAndProductId(user.getId(),dto.getId()).isPresent())
             return PropertyUtil.responseMessage("이미 제안을 하신 작품입니다.");
         Product product = productRepository.findById(dto.getId()).orElseThrow();
@@ -396,8 +398,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return PropertyUtil.response(true);
     }
     @Transactional
-    public PageImpl<ShowForm> productListForUser(User User, String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
-        User user  = userRepository.findByIdFetchHistoryAndLikesList(User.getId()).orElseThrow(UserNotFoundException::new);
+    public PageImpl<ShowForm> productListForUser(String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
+        User user  = userRepository.findByIdFetchHistoryAndLikesList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
         if(!keyword.isEmpty())
             saveSearchHistory(keyword, user);
         Page<Product> productList = QDSLRepository.findAllByCompleteAndCategoriesAligned(complete, keyword, categories, align, pageable);
