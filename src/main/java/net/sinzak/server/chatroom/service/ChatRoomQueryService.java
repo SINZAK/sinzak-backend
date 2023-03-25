@@ -155,7 +155,7 @@ public class ChatRoomQueryService {
     }
 
     private GetChatRoomDto makeWorkChatRoomDto(UserChatRoom userChatRoom, ChatRoom chatRoom,UserChatRoom opponentUserChatRoom) {
-        GetChatRoomDto getChatRoomDto = GetChatRoomDto.builder()
+        return GetChatRoomDto.builder()
                 .postType(PostType.WORK)
                 .postUserId(chatRoom.getPostUserId())
                 .roomName(userChatRoom.getRoomName())
@@ -168,11 +168,10 @@ public class ChatRoomQueryService {
                 .suggest(chatRoom.getWork().isSuggest())
                 .opponentUserId(opponentUserChatRoom.getUser().getId())
                 .build();
-        return getChatRoomDto;
     }
 
     private GetChatRoomDto makeProductChatRoomDto(UserChatRoom myUserChatRoom, ChatRoom chatRoom,UserChatRoom opponentUserChatRoom) {
-        GetChatRoomDto getChatRoomDto = GetChatRoomDto.builder()
+        return GetChatRoomDto.builder()
                 .postType(PostType.PRODUCT)
                 .postUserId(chatRoom.getPostUserId())
                 .roomName(myUserChatRoom.getRoomName())
@@ -185,24 +184,6 @@ public class ChatRoomQueryService {
                 .suggest(chatRoom.getProduct().isSuggest())
                 .opponentUserId(opponentUserChatRoom.getUser().getId())
                 .build();
-        return getChatRoomDto;
     }
 
-//    public List<ChatRoomDto> getChatRooms(User user){
-//        List<UserChatRoom> userChatRooms = userChatRoomRepository.findUserChatRoomBySessionUserEmail(user.getEmail());
-//        List<ChatRoomDto> chatRoomDtos =new ArrayList<>();
-//        for(UserChatRoom userChatRoom: userChatRooms){
-//            ChatRoomDto chatRoomDto = makeChatRoomDto(userChatRoom);
-//            chatRoomDtos.add(chatRoomDto);
-//        }
-//        return chatRoomDtos;
-//    }
-//    private ChatRoomDto makeChatRoomDto(UserChatRoom userChatRoom) {
-//        ChatRoomDto chatRoomDto = ChatRoomDto.builder()
-//                .image(userChatRoom.getImage())
-//                .roomName(userChatRoom.getRoomName())
-//                .uuid(userChatRoom.getChatRoom().getUuid())
-//                .build();
-//        return chatRoomDto;
-//    }
 }

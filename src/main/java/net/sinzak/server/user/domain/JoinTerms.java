@@ -20,14 +20,17 @@ public class JoinTerms extends BaseTimeEntity {
     private boolean term2 = true;
 
     @Column
-    private boolean term3;
+    private boolean term3 = true;
+
+    @Column
+    private boolean term4;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
     public JoinTerms(boolean term4) {
-        this.term3 = term3;
+        this.term4 = term4;
     }
 
     protected JoinTerms() {}

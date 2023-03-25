@@ -20,6 +20,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.*;
 
 @Getter
@@ -150,7 +152,7 @@ public class User extends BaseTimeEntity implements UserDetails {
 
 
     @Builder
-    public User(String email, String name, String nickName, String categoryLike, String origin) {
+    public User(String email, String name, String nickName, String categoryLike, String origin) throws NoSuchAlgorithmException {
         this.email = email;
         this.name = name;
         this.nickName = nickName;
@@ -160,7 +162,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     }
 
     @Builder
-    public User(String email, String name, String picture, String origin) {
+    public User(String email, String name, String picture, String origin) throws NoSuchAlgorithmException {
         this.email = email;
         this.name = name;
         this.nickName = "";
@@ -181,9 +183,11 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.categoryLike = categoryLike;
     }
 
+    @Transient
+    private Random random = SecureRandom.getInstanceStrong();
+
     public void setRandomProfileImage() {
-        Random ran = new Random();
-        int randomNumber = ran.nextInt(10)+1;
+        int randomNumber = random.nextInt(10)+1;
         this.picture = "https://sinzakimage.s3.ap-northeast-2.amazonaws.com/static/profile"+randomNumber+".png";
     }
 
@@ -271,5 +275,5 @@ public class User extends BaseTimeEntity implements UserDetails {
         return true;
     }
 
-    protected User() {}
+    protected User() throws NoSuchAlgorithmException {}
 }
