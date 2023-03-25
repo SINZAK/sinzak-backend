@@ -3,6 +3,7 @@ package net.sinzak.server.user.service;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.CustomJSONArray;
 import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.product.domain.Product;
@@ -30,31 +31,31 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserQueryService {
-
+    private final UserUtils userUtils;
     private final UserRepository userRepository;
     private final SearchHistoryRepository historyRepository;
     private final WorkWishRepository workWishRepository;
     private final ProductWishRepository productWishRepository;
     private final ReportRepository reportRepository;
 
-    public JSONObject getMyProfile(User user){
+    public JSONObject getMyProfile(){
         JSONObject obj = new JSONObject();
-        User findUser = userRepository.findByIdFetchProductPostList(user.getId()).orElseThrow(()-> new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN));
+        User findUser = userRepository.findByIdFetchProductPostList(userUtils.getCurrentUserId()).orElseThrow(()-> new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN));
         List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
         obj.put("products", productShowForms);
         List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList(),false);
         obj.put("works", workShowForms);
         List<ProfileShowForm> workEmployShowForms = makeWorkShowForm(findUser.getWorkPostList(),true);
         obj.put("workEmploys",workEmployShowForms);
-        obj.put("profile",makeUserDto(user,findUser));
+        obj.put("profile",makeUserDto(userUtils.getCurrentUserId(), findUser));
         return PropertyUtil.response(obj);
     }
 
-    public JSONObject getWishList(User loginUser){
+    public JSONObject getWishList(){
         List<WorkWish> workWishes= Optional
-                .ofNullable(workWishRepository.findByUserIdFetchWork(loginUser.getId()))
+                .ofNullable(workWishRepository.findByUserIdFetchWork(userUtils.getCurrentUserId()))
                 .orElseThrow(() -> new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN));
-        List<ProductWish> productWishes = productWishRepository.findByUserIdFetchProduct(loginUser.getId());
+        List<ProductWish> productWishes = productWishRepository.findByUserIdFetchProduct(userUtils.getCurrentUserId());
         JSONObject obj = new JSONObject();
         List<WishShowForm> workWishShowForms = makeWorkWishShowForms(workWishes);
         obj.put("workWishes",workWishShowForms);
@@ -63,9 +64,9 @@ public class UserQueryService {
         return PropertyUtil.response(obj);
     }
 
-    public JSONObject getWorkEmploys(User user){
+    public JSONObject getWorkEmploys(){
         JSONObject obj = new JSONObject();
-        User loginUser = userRepository.findByIdFetchWorkPostList(user.getId()).orElseThrow(()->new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN));
+        User loginUser = userRepository.findByIdFetchWorkPostList(userUtils.getCurrentUserId()).orElseThrow(()->new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN));
         List<ProfileShowForm> workEmploys = makeWorkShowForm(loginUser.getWorkPostList(),true);
         obj.put("workEmploys",workEmploys);
         return PropertyUtil.response(obj);
@@ -135,17 +136,17 @@ public class UserQueryService {
     }
 
 
-    public JSONObject getUserProfile(Long userId, User user) {
+    public JSONObject getUserProfile(Long userId) {
         JSONObject obj = new JSONObject();
         User findUser = userRepository.findByIdFetchProductPostList(userId).orElseThrow(()->new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND));
         List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
         obj.put("products", productShowForms);
         List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList(),false);
         obj.put("works", workShowForms);
-        obj.put("profile",makeUserDto(user,findUser));
+        obj.put("profile",makeUserDto(userUtils.getCurrentUserId(), findUser));
         return PropertyUtil.response(obj);
     }
-    private UserDto makeUserDto(User user, User findUser) {
+    private UserDto makeUserDto(Long loginUserId, User findUser) {
         return UserDto.builder()
                 .userId(findUser.getId())
                 .name(findUser.getNickName())
@@ -153,29 +154,29 @@ public class UserQueryService {
                 .portFolioUrl(findUser.getPortFolioUrl())
                 .followingNumber(findUser.getFollowingNum())
                 .followerNumber(findUser.getFollowerNum())
-                .myProfile(checkIfMyProfile(user,findUser))
+                .myProfile(checkIfMyProfile(loginUserId,findUser))
                 .imageUrl(findUser.getPicture())
                 .univ(findUser.getUniv())
-                .isFollow(checkIfFollowFindUser(user,findUser))
+                .isFollow(checkIfFollowFindUser(loginUserId,findUser))
                 .cert_uni(findUser.isCert_uni())
                 .cert_celeb(findUser.isCert_celeb())
                 .categoryLike(findUser.getCategoryLike())
                 .build();
     }
-    public boolean checkIfFollowFindUser(User user,User findUser){
-        if(user== null){
+    public boolean checkIfFollowFindUser(Long loginUserId,User findUser){
+        if(loginUserId == null){
             return false;
         }
-        if(findUser.getFollowerList().contains(user.getId())){
+        if(findUser.getFollowerList().contains(loginUserId)){
             return true;
         }
         return false;
     }
-    public boolean checkIfMyProfile(User user, User findUser){
-        if(user == null){
+    public boolean checkIfMyProfile(Long loginUserId, User findUser){
+        if(loginUserId == null){
             return false;
         }
-        if(findUser.getId().equals(user.getId())){
+        if(findUser.getId().equals(loginUserId)){
             return true;
         }
         return false;
@@ -210,8 +211,8 @@ public class UserQueryService {
     }
 
 
-    public JSONObject showReportList(User User){
-        User loginUser = userRepository.findByIdFetchReportList(User.getId()).orElseThrow(UserNotFoundException::new);
+    public JSONObject showReportList(){
+        User loginUser = userRepository.findByIdFetchReportList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
         List<Report> reportList = reportRepository.findByUserId(loginUser.getId());
 
         List<ReportRespondDto> reportRespondDtos = reportList.stream()
@@ -222,8 +223,8 @@ public class UserQueryService {
     }
 
 
-    public JSONObject showSearchHistory(User User){
-        User user = historyRepository.findByIdFetchHistoryList(User.getId()).orElseThrow(InstanceNotFoundException::new);
+    public JSONObject showSearchHistory(){
+        User user = historyRepository.findByIdFetchHistoryList(userUtils.getCurrentUserId()).orElseThrow(InstanceNotFoundException::new);
         List<SearchHistory> searchHistoryList = getUserHistoryList(user);
 
         List<CustomJSONArray> histories = searchHistoryList.stream()

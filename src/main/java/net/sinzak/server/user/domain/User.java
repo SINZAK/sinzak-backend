@@ -210,6 +210,7 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.followerNum = followNumberTrans(this.getFollowerList().size());
         this.followingNum = followNumberTrans(this.getFollowingList().size());
     }
+
     public String followNumberTrans(int number){
         String unit =getUnit(number);
         if(number>=hundredMillion){

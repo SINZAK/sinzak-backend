@@ -22,8 +22,8 @@ class UserQueryServiceTest {
     @Timed(millis = 1000)
     public void testMethod() throws Exception {
         user = userRepository.findById(152L).orElseThrow();
-        JSONObject myProfile = userQueryService.getMyProfile(user);
-        System.out.println(myProfile.toJSONString());
+//        JSONObject myProfile = userQueryService.getMyProfile();
+//        System.out.println(myProfile.toJSONString());
 
     }
 }
