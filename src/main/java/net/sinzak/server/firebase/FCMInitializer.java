@@ -32,7 +32,7 @@ public class FCMInitializer {
                 log.info("FirebaseApp initialization complete");
             }
         }catch (Exception e){
-            e.printStackTrace();
+            log.error("파이어베이스 이니셜라이저 오류 {}", e.getMessage());
         }
 
     }

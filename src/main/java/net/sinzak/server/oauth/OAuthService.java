@@ -170,7 +170,7 @@ public class OAuthService {
                 return payload;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("getAppleInfo 오류 {}", e.getMessage());
         }
         return null;
     }

@@ -32,12 +32,10 @@ public class FireBaseService {
                 .build();
         try{
             FirebaseMessaging.getInstance().sendAsync(message);
-            log.warn("알림 전송에 성공하였습니다.");
+            log.info("알림 전송에 성공하였습니다.");
         }
         catch (Exception e){
-            e.printStackTrace();
-
-            log.warn("알림 전송에 실패하였습니다.");
+            log.error("알림 전송에 실패하였습니다. {}", e.getMessage());
         }
     }
     public void sendToAllNotification(List<String> tokenList,String title, String body, String route){

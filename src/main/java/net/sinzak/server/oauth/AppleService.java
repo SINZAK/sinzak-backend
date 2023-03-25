@@ -8,6 +8,7 @@ import com.nimbusds.jose.crypto.ECDSASigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -32,6 +33,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AppleService {
@@ -57,7 +59,7 @@ public class AppleService {
             JWSSigner jwsSigner = new ECDSASigner(ecPrivateKey.getS());
             jwt.sign(jwsSigner);
         } catch (JOSEException | InvalidKeySpecException e) {
-            e.printStackTrace();
+            log.error("애플 로그인 ClientSecret 생성 오류 {}", e.getMessage());
         }
         return jwt.serialize();
     }
@@ -74,7 +76,7 @@ public class AppleService {
                 content = pemObject.getContent();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("애플 로그인 private Key 오류 {}", e.getMessage());
         }
 
         return content;
@@ -104,11 +106,11 @@ public class AppleService {
             result = EntityUtils.toString(entity, "UTF-8");
 
             if (statusCode != 200) {
-                System.out.println("애플로그인 애러");
+                log.error("애플 로그인 전송 에러(상태코드 != 200)");
             }
             EntityUtils.consume(entity);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("애플 로그인 private Key 오류 {}", e.getMessage());
         } finally {
             try {
                 if (response != null) {
@@ -118,7 +120,7 @@ public class AppleService {
                     httpclient.close();
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("애플 로그인 response or httpclient close 오류 {}", e.getMessage());
             }
         }
         return result;

@@ -21,7 +21,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CertController {
     private final CertService certService;
-    private final static String API_KEY ="df6ea145-4134-40a3-a298-764cd7d5d7bb";
+    private final static String univCertAPI ="df6ea145-4134-40a3-a298-764cd7d5d7bb";
 
     @ApiDocumentResponse
     @ApiOperation(value = "대학 메일 인증 시작", notes = "인증코드는 아예 생략하시고, univ_email, univName 주시면 됩니다  1000~9999의 인증번호 메일전송 예정 \n" +
@@ -32,7 +32,7 @@ public class CertController {
         Map<String, Object> check = UnivCert.check(mailDto.getUnivName());
         if((boolean) check.get("success"))
             univ_check = true;
-        Map<String, Object> response = UnivCert.certify(API_KEY, mailDto.getUniv_email(), mailDto.getUnivName(), univ_check);
+        Map<String, Object> response = UnivCert.certify(univCertAPI, mailDto.getUniv_email(), mailDto.getUnivName(), univ_check);
 
         return new JSONObject(response);
     }
@@ -43,7 +43,7 @@ public class CertController {
     @PostMapping("/certify/mail/receive")
     public JSONObject receiveUnivCertMail(@AuthenticationPrincipal User user, @RequestBody MailDto mailDto) throws IOException {
         PropertyUtil.checkHeader(user);
-        Map<String, Object> response = UnivCert.certifyCode(API_KEY, mailDto.getUniv_email(), mailDto.getUnivName(), mailDto.getCode());
+        Map<String, Object> response = UnivCert.certifyCode(univCertAPI, mailDto.getUniv_email(), mailDto.getUnivName(), mailDto.getCode());
         boolean success = (boolean) response.get("success");
         if(success)
             certService.updateCertifiedUniv(user, mailDto);
