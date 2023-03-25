@@ -4,6 +4,7 @@ package net.sinzak.server.user.service;
 import lombok.RequiredArgsConstructor;
 
 import net.sinzak.server.chatroom.service.ChatRoomCommandService;
+import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.firebase.FireBaseService;
 import net.sinzak.server.image.S3Service;
@@ -30,6 +31,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional
 public class UserCommandService {
+    private final UserUtils userUtils;
     private final UserRepository userRepository;
     private final ReportRepository reportRepository;
     private final SearchHistoryRepository historyRepository;
@@ -41,13 +43,14 @@ public class UserCommandService {
         return userRepository.save(user);
     }
 
-    public JSONObject updateUser(UpdateUserDto dto, User loginUser){
-        User user = userRepository.findByIdNotDeleted(loginUser.getId()).orElseThrow(UserNotFoundException::new);
+    public JSONObject updateUser(UpdateUserDto dto){
+        User user = userUtils.getCurrentUser();
         user.updateProfile(dto.getName(),dto.getIntroduction());
         return PropertyUtil.response(true);
     }
 
-    public JSONObject updateUserImage(User loginUser, MultipartFile multipartFile){
+    public JSONObject updateUserImage(MultipartFile multipartFile){
+        User loginUser = userUtils.getCurrentUser();
         try{
             String url = s3Service.uploadImage(multipartFile);
             loginUser.setPicture(url);
@@ -62,8 +65,8 @@ public class UserCommandService {
     }
 
 
-    public JSONObject updateCategoryLike(User User, CategoryDto categoryDto){
-        User user = userRepository.findByIdNotDeleted(User.getId()).orElseThrow(UserNotFoundException::new);
+    public JSONObject updateCategoryLike(CategoryDto categoryDto){
+        User user = userUtils.getCurrentUser();
         user.updateCategoryLike(categoryDto.getCategoryLike());
         return PropertyUtil.response(true);
     }
@@ -75,40 +78,43 @@ public class UserCommandService {
     }
 
 
-    public JSONObject follow(Long userId, User loginUser){
+    public JSONObject follow(Long userId){
+        Long loginUserId = userUtils.getCurrentUserId();
         User findUser = userRepository.findByIdNotDeleted(userId).orElseThrow(UserNotFoundException::new);
-        if(loginUser == null){
+        if(loginUserId == null){
             return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
         }
-        if(loginUser.getId().equals(findUser.getId())){
+        if(loginUserId.equals(findUser.getId())){
             return PropertyUtil.responseMessage("본인한테는 팔로우 불가능");
         }
-        return addFollow(findUser,loginUser);
-    }
-    public JSONObject unFollow(Long userId,User loginUser){
-        User findUser = userRepository.findByIdNotDeleted(userId).orElseThrow(UserNotFoundException::new);
-        if(loginUser == null){
-            return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
-        }
-        if(loginUser.getId().equals(findUser.getId())){
-            return PropertyUtil.responseMessage("본인한테는 언팔로우 불가능");
-        }
-        return removeFollow(findUser,loginUser);
+        return addFollow(findUser,loginUserId);
     }
 
-    public JSONObject removeFollow(User findUser, User loginUser){
-        User user = userRepository.findByIdFetchFollowingList(loginUser.getId()).orElseThrow(UserNotFoundException::new);
+    public JSONObject unFollow(Long userId){
+        Long loginUserId = userUtils.getCurrentUserId();
+        User findUser = userRepository.findByIdNotDeleted(userId).orElseThrow(UserNotFoundException::new);
+        if(loginUserId == null){
+            return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
+        }
+        if(loginUserId.equals(findUser.getId())){
+            return PropertyUtil.responseMessage("본인한테는 언팔로우 불가능");
+        }
+        return removeFollow(findUser,loginUserId);
+    }
+
+    public JSONObject removeFollow(User findUser, Long loginUserId){
+        User user = userRepository.findByIdFetchFollowingList(loginUserId).orElseThrow(UserNotFoundException::new);
         user.getFollowingList().remove(findUser.getId());
-        findUser.getFollowerList().remove(loginUser.getId());
+        findUser.getFollowerList().remove(loginUserId);
         user.updateFollowNumber();
         findUser.updateFollowNumber();
         return PropertyUtil.response(true);
     }
 
-    public JSONObject addFollow(User findUser, User loginUser){
-        User user = userRepository.findByIdFetchFollowingList(loginUser.getId()).orElseThrow(UserNotFoundException::new);
+    public JSONObject addFollow(User findUser, Long loginUserId){
+        User user = userRepository.findByIdFetchFollowingList(loginUserId).orElseThrow(UserNotFoundException::new);
         user.getFollowingList().add(findUser.getId());
-        findUser.getFollowerList().add(loginUser.getId());
+        findUser.getFollowerList().add(loginUserId);
         fireBaseService.sendIndividualNotification(findUser,"팔로우 알림",findUser.getNickName(),findUser.getId().toString());
 
         user.updateFollowNumber();
@@ -124,9 +130,9 @@ public class UserCommandService {
     }
 
 
-    public JSONObject report(ReportRequestDto dto, User User){
+    public JSONObject report(ReportRequestDto dto){
         Long opponentUserId = dto.getUserId();
-        User loginUser = userRepository.findByIdFetchReportList(User.getId()).orElseThrow(UserNotFoundException::new);
+        User loginUser = userUtils.getCurrentUser();
         if(loginUser.getId().equals(opponentUserId))
             return PropertyUtil.responseMessage("본인을 신고할 수 없습니다.");
         if(checkReportHistory(opponentUserId, loginUser).isPresent())
@@ -138,9 +144,9 @@ public class UserCommandService {
         return PropertyUtil.response(true);
     }
 
-    public JSONObject reportCancel(ReportRequestDto dto, User User){
+    public JSONObject reportCancel(ReportRequestDto dto){
         Long opponentUserId = dto.getUserId();
-        User loginUser = userRepository.findByIdFetchReportList(User.getId()).orElseThrow(UserNotFoundException::new);
+        User loginUser = userUtils.getCurrentUser();
         if(loginUser.getId().equals(opponentUserId))
             return PropertyUtil.responseMessage("본인을 신고 취소 할 수 없습니다.");
         Report report = checkReportHistory(opponentUserId, loginUser).orElseThrow(InstanceNotFoundException::new);
@@ -160,8 +166,8 @@ public class UserCommandService {
 
 
 
-    public JSONObject deleteSearchHistory(Long id, User User){
-        User user = historyRepository.findByIdFetchHistoryList(User.getId()).orElseThrow(InstanceNotFoundException::new);
+    public JSONObject deleteSearchHistory(Long id){
+        User user = userUtils.getCurrentUser();
         user.getHistoryList().stream()
                 .filter(history -> history.getId().equals(id))
                 .findFirst()
@@ -169,16 +175,16 @@ public class UserCommandService {
         return PropertyUtil.response(true);
     }
 
-    public JSONObject deleteSearchHistory(User User){
-        User user = historyRepository.findByIdFetchHistoryList(User.getId()).orElseThrow(InstanceNotFoundException::new);
+    public JSONObject deleteSearchHistory(){
+        User user = userUtils.getCurrentUser();
         historyRepository.deleteAll(user.getHistoryList());
         return PropertyUtil.response(true);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public JSONObject resign(User user){
+    public JSONObject resign(){
         try{
-            User loginUser = userRepository.findById(user.getId()).orElseThrow(UserNotFoundException::new);
+            User loginUser = userUtils.getCurrentUser();
             loginUser.setDelete(true);
             return PropertyUtil.response(true);
         }

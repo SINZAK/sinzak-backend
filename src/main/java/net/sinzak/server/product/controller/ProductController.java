@@ -5,19 +5,18 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.common.dto.SuggestDto;
+import net.sinzak.server.common.error.UserNotFoundException;
+import net.sinzak.server.common.error.UserNotLoginException;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.product.dto.*;
 import net.sinzak.server.product.service.ProductService;
 import net.sinzak.server.common.dto.ActionForm;
-import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,9 +34,8 @@ public class ProductController {
     @ApiOperation(value = "작품 판매 글 생성",notes = "{\"success\":true, \"id\":52}\n해당 글의 id를 전해드리니 이 /products/{id}/image 에 넘겨주세요\n" +
             "category = painting,orient,sculpture,print,craft,other")
     @PostMapping(value = "/products/build", consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public JSONObject makePost(@AuthenticationPrincipal User user, @RequestBody ProductPostDto buildDto) {
-        PropertyUtil.checkHeader(user);
-        return productService.makePost(user, buildDto);
+    public JSONObject makePost(@RequestBody ProductPostDto buildDto) {
+        return productService.makePost(buildDto);
     }
 
     @ApiDocumentResponse
@@ -45,78 +43,70 @@ public class ProductController {
     @PostMapping(value = "/products/{id}/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @ApiImplicitParam(name = "multipartFile", dataType = "multipartFile",
             value = "파일 보내주시면 파일 s3서버에 저장 및, 해당 파일이 저장되어 있는 URL을 디비에 저장합니다")
-    public JSONObject makePost(@AuthenticationPrincipal User user, @PathVariable("id") Long productId, @RequestPart List<MultipartFile> multipartFile) {
-        PropertyUtil.checkHeader(user);
-        return productService.saveImageInS3AndProduct(user, multipartFile, productId);
+    public JSONObject makePost(@PathVariable("id") Long productId, @RequestPart List<MultipartFile> multipartFile) {
+        return productService.saveImageInS3AndProduct(multipartFile, productId);
     }
 
     @ApiDocumentResponse
     @ApiOperation(value = "작품 이미지 삭제", notes = "하나씩만 처리할게요, 썸네일(첫번째 사진)은 불가능하게 가시죠")
     @PostMapping(value = "/products/{id}/deleteimage")
-    public JSONObject deleteProductImage(@AuthenticationPrincipal User user, @PathVariable("id") Long productId, @RequestBody ImageUrlDto dto) {
-        PropertyUtil.checkHeader(user);
-        return productService.deleteImage(user, productId, dto.getUrl());
+    public JSONObject deletePostImage(@PathVariable("id") Long productId, @RequestBody ImageUrlDto dto) {
+        return productService.deleteImage(productId, dto.getUrl());
     }
 
     @ApiDocumentResponse
     @ApiOperation(value = "작품 수정")
     @PostMapping(value = "/products/{id}/edit")
-    public JSONObject editPost(@AuthenticationPrincipal User user, @PathVariable("id") Long productId, @RequestBody ProductEditDto editDto) {
-        PropertyUtil.checkHeader(user);
-        return productService.editPost(user, productId, editDto);
+    public JSONObject editPost(@PathVariable("id") Long productId, @RequestBody ProductEditDto editDto) {
+        return productService.editPost(productId, editDto);
     }
 
     @ApiDocumentResponse
     @ApiOperation(value = "작품 삭제")
     @PostMapping(value = "/products/{id}/delete")
-    public JSONObject deletePost(@AuthenticationPrincipal User user, @PathVariable("id") Long productId) {
-        PropertyUtil.checkHeader(user);
-        return productService.deletePost(user, productId);
+    public JSONObject deletePost(@PathVariable("id") Long productId) {
+        return productService.deletePost(productId);
     }
 
 
     @PostMapping("/products/{id}")
     @ApiOperation(value = "작품 상세 조회")
-    public JSONObject showProject(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    public JSONObject showProducts(@PathVariable Long id) {
         try{
-            return productService.showDetail(id,user);
+            UserUtils.getContextHolderId();
+            return productService.showDetailForUser(id);
         }
-        catch (NullPointerException e){
-            return productService.showDetail(id); /** 비회원용 **/
+        catch (UserNotFoundException | UserNotLoginException e){
+            return productService.showDetailForGuest(id); /** 비회원용 **/
         }
     }
 
     @ApiDocumentResponse
     @PostMapping("/products/wish")
     @ApiOperation(value = "작품 찜")
-    public JSONObject wish(@AuthenticationPrincipal User user, @RequestBody ActionForm form) {
-        PropertyUtil.checkHeader(user);
-        return productService.wish(user, form);
+    public JSONObject wish(@RequestBody ActionForm form) {
+        return productService.wish(form);
     }
 
     @ApiDocumentResponse
     @PostMapping("/products/likes")
     @ApiOperation(value = "작품 좋아요", notes = "{\"success\":true, \"isfav\" : true} 이런식으로 보냅니다. 요청 이후 좋아요 버튼이 어떻게 되어있어야 하는지 알려주기위해서")
-    public JSONObject likes(@AuthenticationPrincipal User user, @RequestBody ActionForm form) {
-        PropertyUtil.checkHeader(user);
-        return productService.likes(user, form);
+    public JSONObject likes(@RequestBody ActionForm form) {
+        return productService.likes(form);
     }
-
 
     @ApiDocumentResponse
     @PostMapping("/products/sell")
     @ApiOperation(value = "작품 판매", notes = "회원의 구매목록에 추가, 해당 작품 판매완료 설정")
-    public JSONObject sell(@AuthenticationPrincipal User user, @RequestBody SellDto dto) {
-        PropertyUtil.checkHeader(user);
-        return productService.sell(user, dto);
+    public JSONObject sell(@RequestBody SellDto dto) {
+        return productService.sell(dto);
     }
 
     @ApiDocumentResponse
     @PostMapping("/products/suggest")
     @ApiOperation(value = "작품 가격제안")
-    public JSONObject suggest(@AuthenticationPrincipal User user, @RequestBody SuggestDto dto) {
-        PropertyUtil.checkHeader(user);
-        return productService.suggest(user, dto);
+    public JSONObject suggest(@RequestBody SuggestDto dto) {
+        return productService.suggest(dto);
     }
 
     @ApiDocumentResponse
@@ -124,27 +114,26 @@ public class ProductController {
             "비회원 : new(최신순), trading(채팅 수 1이상, 판매완료 안된 것), hot(좋아요 순)\n" +
             "비회원은 더보기 버튼 클릭 시 로그인 창으로")
     @PostMapping("/home/products")
-    public JSONObject showHomeProduct(@AuthenticationPrincipal User user) {
-        try {
-            return productService.showHome(user);
+    public JSONObject showHomeProduct() {
+        try{
+            UserUtils.getContextHolderId();
+            return productService.showHomeForUser();
         }
-        catch (NullPointerException e) {
-            return productService.showHome(); /** 비회원용 **/
+        catch (UserNotFoundException | UserNotLoginException e){
+            return productService.showHomeForGuest(); /** 비회원용 **/
         }
     }
 
     @ApiOperation(value = "홈 - 추천 더보기")
     @PostMapping("/home/recommend")
-    public JSONObject showRecommendDetail(@AuthenticationPrincipal User user) {
-        PropertyUtil.checkHeader(user);
-        return productService.showRecommendDetail(user);
+    public JSONObject showRecommendDetail() {
+        return productService.showRecommendDetail();
     }
 
     @ApiOperation(value = "홈 - 팔로잉 더보기")
     @PostMapping("/home/following")
-    public JSONObject showFollowingDetail(@AuthenticationPrincipal User user) {
-        PropertyUtil.checkHeader(user);
-        return productService.showFollowingDetail(user);
+    public JSONObject showFollowingDetail() {
+        return productService.showFollowingDetail();
     }
 
 
@@ -176,11 +165,12 @@ public class ProductController {
             @ApiImplicitParam(name = "search", dataType = "string", paramType = "query",
                     value = "String 값으로 주시고 최소 2글자 이상은 받아야 합니다. contain 메서드로 db에서 검색할 예정.")
     })
-    public PageImpl<ShowForm> showMarketProduct(@AuthenticationPrincipal User user, @RequestParam(required=false, defaultValue="") String search, @RequestParam(required=false, defaultValue="") List<String> categories, @RequestParam(required=false, defaultValue="recommend") String align, @RequestParam(required=false, defaultValue="false") Boolean sale, @ApiIgnore Pageable pageable) {
+    public PageImpl<ShowForm> showMarketProduct(@RequestParam(required=false, defaultValue="") String search, @RequestParam(required=false, defaultValue="") List<String> categories, @RequestParam(required=false, defaultValue="recommend") String align, @RequestParam(required=false, defaultValue="false") Boolean sale, @ApiIgnore Pageable pageable) {
         try{
-            return productService.productListForUser(user, search, categories, align, sale, pageable);
+            UserUtils.getContextHolderId();
+            return productService.productListForUser(search, categories, align, sale, pageable);
         }
-        catch (NullPointerException e){
+        catch (UserNotFoundException | UserNotLoginException e){
             return productService.productListForGuest(search, categories, align, sale, pageable);
         }
     }

@@ -11,6 +11,7 @@ import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.repository.UserChatRoomRepository;
 import net.sinzak.server.common.PostType;
 import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.common.error.ChatRoomNotFoundException;
 import net.sinzak.server.common.error.PostNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
@@ -38,7 +39,7 @@ import java.util.Optional;
 @Slf4j
 @Transactional
 public class ChatRoomCommandService {
-
+    private final UserUtils userUtils;
     private final ChatRoomRepository chatRoomRepository;
     private final UserChatRoomRepository userChatRoomRepository;
     private final WorkRepository workRepository;
@@ -47,7 +48,8 @@ public class ChatRoomCommandService {
     private final S3Service s3Service;
     private final UserQueryService userQueryService;
 
-    public JSONObject createUserChatRoom(PostDto postDto, User user) { //상대방 아바타를 초대
+    public JSONObject createUserChatRoom(PostDto postDto) { //상대방 아바타를 초대
+        User user = userUtils.getCurrentUser();
         User postUser =null;
         List<ChatRoom> postChatRooms = null;
         Product product = null;

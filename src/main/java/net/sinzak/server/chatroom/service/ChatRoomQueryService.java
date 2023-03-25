@@ -15,6 +15,7 @@ import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.repository.UserChatRoomRepository;
 import net.sinzak.server.common.PostType;
 import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.common.error.ChatRoomNotFoundException;
 import net.sinzak.server.common.error.UserNotLoginException;
 import net.sinzak.server.product.service.ProductService;
@@ -37,15 +38,13 @@ import java.util.stream.Collectors;
 @Slf4j
 @Transactional(readOnly = true)
 public class ChatRoomQueryService {
+    private final UserUtils userUtils;
     private final ChatRoomRepository chatRoomRepository;
     private final UserChatRoomRepository userChatRoomRepository;
 
-    public JSONObject getChatRoomsByPost(User loginUser, PostDto postDto){
-        if(loginUser == null){
-            throw new UserNotLoginException();
-        }
+    public JSONObject getChatRoomsByPost(PostDto postDto){
         List<GetChatRoomsDto> getChatRoomsDtos = new ArrayList<>();
-        List<UserChatRoom> userChatRooms = userChatRoomRepository.findUserChatRoomByUserIdWhereNotDisabled(loginUser.getId());
+        List<UserChatRoom> userChatRooms = userChatRoomRepository.findUserChatRoomByUserIdWhereNotDisabled(userUtils.getCurrentUserId());
         List<ChatRoom> postChatRoom = null;
         if(postDto.getPostType().equals(PostType.PRODUCT.getName())){
             postChatRoom = chatRoomRepository.findChatRoomByProductId(postDto.getPostId());
@@ -85,9 +84,9 @@ public class ChatRoomQueryService {
                 .build();
     }
 
-    public JSONObject getChatRooms(User user){
+    public JSONObject getChatRooms(){
         List<GetChatRoomsDto> chatRoomsDtos = userChatRoomRepository
-                .findUserChatRoomByIdFetchChatRoomWhereNotDisabled(user.getId()).stream()
+                .findUserChatRoomByIdFetchChatRoomWhereNotDisabled(userUtils.getCurrentUserId()).stream()
                 .map(
                         userChatRoom ->
                                 GetChatRoomsDto.builder()
@@ -125,12 +124,12 @@ public class ChatRoomQueryService {
                 ,getChatMessageDtos.size());
     }
 
-    public JSONObject getChatRoom(String roomUuid,User user){
+    public JSONObject getChatRoom(String roomUuid){
         ChatRoom chatRoom = chatRoomRepository.findByRoomUuidFetchUserChatRoom(roomUuid).orElseThrow(ChatRoomNotFoundException::new);
         UserChatRoom myUserChatRoom =null;
         UserChatRoom opponentUserChatRoom = null;
         for(UserChatRoom userChatRoom : chatRoom.getUserChatRooms()){
-            if(userChatRoom.getUser().getId().equals(user.getId())){
+            if(userChatRoom.getUser().getId().equals(userUtils.getCurrentUserId())){
                 myUserChatRoom =  userChatRoom;
             }
             else{

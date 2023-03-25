@@ -2,6 +2,7 @@ package net.sinzak.server.cert;
 
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.image.S3Service;
@@ -18,12 +19,13 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class CertService {
+    private final UserUtils userUtils;
     private final UserRepository userRepository;
     private final CertRepository certRepository;
     private final S3Service s3Service;
 
     @Transactional
-    public JSONObject certifyUniv(User user, UnivDto dto){
+    public JSONObject certifyUniv(UnivDto dto){
         Optional<Cert> savedCert = certRepository.findCertByUnivEmail(dto.getUniv_email());
         Long certId;
         if(savedCert.isEmpty())
@@ -36,6 +38,7 @@ public class CertService {
             else
                 return PropertyUtil.responseMessage("이미 인증 처리된 이메일입니다.");
         }
+        User user = userUtils.getCurrentUser();
         user.updateCertifiedUniv(dto.getUniv(),dto.getUniv_email());
         userRepository.save(user);
         return PropertyUtil.response(certId);
@@ -51,7 +54,8 @@ public class CertService {
 
 
     @Transactional
-    public JSONObject applyCertifiedAuthor(User user, String link){
+    public JSONObject applyCertifiedAuthor(String link){
+        User user = userUtils.getCurrentUser();
         if(!user.isCert_uni())
             return PropertyUtil.responseMessage("아직 대학 인증이 완료되지 않았습니다.");
         if(user.isCert_celeb())
@@ -62,9 +66,9 @@ public class CertService {
     }
 
     @Transactional
-    public void updateCertifiedUniv(User User, MailDto dto){
-        User.updateCertifiedUniv(dto.getUnivName(), dto.getUniv_email());
-        userRepository.save(User);
+    public void updateCertifiedUniv(MailDto dto){
+        User user = userUtils.getCurrentUser();
+        user.updateCertifiedUniv(dto.getUnivName(), dto.getUniv_email());
     }
 
 }

@@ -3,6 +3,7 @@ package net.sinzak.server.config.auth;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.config.auth.jwt.*;
@@ -25,6 +26,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class SecurityService {
+    private final UserUtils userUtils;
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtProvider;
     private final RefreshTokenRepository refreshTokenRepository;
@@ -66,7 +68,8 @@ public class SecurityService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public JSONObject join(User user, @Valid @RequestBody JoinDto dto) {
+    public JSONObject join(@Valid @RequestBody JoinDto dto) {
+        User user = userUtils.getCurrentUser();
         if(!user.getNickName().isBlank())
             return PropertyUtil.responseMessage("이미 회원가입된 유저입니다.");
         JSONObject obj = new JSONObject();
@@ -92,12 +95,13 @@ public class SecurityService {
     }
 
     @Transactional
-    public TokenDto reissue(User User) {
-        List<RefreshToken> refreshTokens = refreshTokenRepository.findByKey(User.getId());
+    public TokenDto reissue() {
+        User user = userUtils.getCurrentUser();
+        List<RefreshToken> refreshTokens = refreshTokenRepository.findByKey(user.getId());
         RefreshToken refreshToken = refreshTokens.get(refreshTokens.size()-1); //마지막꺼가 가장 최신반영된 토큰
 
         // AccessToken, RefreshToken 토큰 재발급, 리프레쉬 토큰 저장
-        TokenDto newCreatedToken = jwtProvider.createToken(User.getId().toString(), User.getId(), User.getRole());
+        TokenDto newCreatedToken = jwtProvider.createToken(user.getId().toString(), user.getId(), user.getRole());
         RefreshToken updateRefreshToken = refreshToken.updateToken(newCreatedToken.getRefreshToken());
         refreshTokenRepository.save(updateRefreshToken);
 
