@@ -14,10 +14,10 @@ import net.sinzak.server.work.domain.Work;
 import net.sinzak.server.work.domain.WorkLikes;
 import net.sinzak.server.work.domain.WorkSell;
 import net.sinzak.server.work.domain.WorkWish;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.util.*;
@@ -25,6 +25,7 @@ import java.util.*;
 @Getter
 @Entity
 @SequenceGenerator(name = "User_SEQ_GEN",sequenceName = "User_SEQ")
+@DynamicUpdate
 public class User extends BaseTimeEntity implements UserDetails {
     private static final int hundredMillion = 100000000;
     private static final int tenThousand =10000;
