@@ -15,6 +15,7 @@ import java.util.List;
 @Getter
 @Entity
 @SequenceGenerator(name = "Product_SEQ_GEN",sequenceName = "Product_SEQ")
+@Table(indexes = @Index(name = "IDX_PRODUCT_IS_DELETED",columnList = "isDeleted"))
 public class Product extends BaseTimeEntity { /** 작품 **/
 
     @Id
@@ -38,7 +39,7 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     private boolean suggest = false;
 
 
-    @Column
+    @Column(name = "isDeleted")
     private boolean isDeleted =false;
 
     @Column
