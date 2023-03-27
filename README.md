@@ -88,6 +88,13 @@
     <a href="https://github.com/starwook"><I>starwook</I></a>
     </td>
     <td>Back-end</td>
+    <td align = "left">
+    - 기획 및 DB 설계(ERD) <br>
+    - 유저 프로필,팔로우 API
+    - Websocket,Stomp를 이용한 채팅 API
+    - firebase를 이용한 알림 기능
+    - 캐시를 위한 redis 적용
+    - jmeter를 이용한 성능 테스트 
     <td></td>
   </tr>
 </table>
