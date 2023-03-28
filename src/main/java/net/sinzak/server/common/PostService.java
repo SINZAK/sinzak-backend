@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 import java.util.Set;
 
-public interface PostService<T,R,V,N> {
+public interface PostService<T,R,V,N,I> {
     JSONObject makePost(R postDto);
     JSONObject showDetailForUser(Long id);
     JSONObject showDetailForGuest(Long id);
     JSONObject wish(@RequestBody ActionForm form);
     JSONObject likes(@RequestBody ActionForm form);
     JSONObject suggest(@RequestBody SuggestDto dto);
-    List<String> getImages(T t);
+    List<String> getImages(List<I> i);
 
     boolean checkIsLikes(List<N> userLikesList, T t);
     boolean checkIsWish(User user, List<V> wishList);
