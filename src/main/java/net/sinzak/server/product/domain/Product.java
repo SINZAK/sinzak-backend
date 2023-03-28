@@ -38,7 +38,6 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     @Column
     private boolean suggest = false;
 
-
     @Column(name = "isDeleted")
     private boolean isDeleted =false;
 
@@ -79,7 +78,7 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     @JoinColumn(name = "user_id")
     private User user;  //수취인
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER) /** 사진은 무조건 EAGER로 같이 불러오기 **/
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
     private List<ProductImage> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
@@ -87,6 +86,8 @@ public class Product extends BaseTimeEntity { /** 작품 **/
 
     @OneToMany(mappedBy = "product",cascade= CascadeType.MERGE)
     private List<ChatRoom> chatRooms  = new ArrayList<>();
+
+
     @Builder
     public Product(String title, String content, String category, int price, boolean suggest, String author, String univ, Size size) {
         this.title = title;
@@ -101,9 +102,6 @@ public class Product extends BaseTimeEntity { /** 작품 **/
 
     public void setDeleted(boolean deleted) {
         isDeleted = deleted;
-    }
-    public void deleteUser(){
-        this.user =null;
     }
     public void setUser(User user) {
         user.getProductPostList().add(this);

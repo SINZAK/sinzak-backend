@@ -2,7 +2,6 @@ package net.sinzak.server.work.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.sinzak.server.chatroom.domain.ChatRoom;
 import net.sinzak.server.common.PostService;
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.UserUtils;
@@ -33,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,7 +40,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class WorkService implements PostService<Work, WorkPostDto, WorkWish, WorkLikes> {
+public class WorkService implements PostService<Work, WorkPostDto, WorkWish, WorkLikes, WorkImage> {
     private final UserUtils userUtils;
     private final UserRepository userRepository;
     private final WorkRepository workRepository;
@@ -156,7 +154,8 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     public JSONObject showDetailForUser(Long id){   // 글 상세 확인
         User user = userRepository.findByIdFetchFollowingAndLikesList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
         Work work = workRepository.findByIdFetchWorkNotDeletedWishAndUser(id).orElseThrow(PostNotFoundException::new);
-        DetailWorkForm detailForm = makeWorkDetailForm(work);
+        List<WorkImage> images = imageRepository.findByWorkId(work.getId());
+        DetailWorkForm detailForm = makeWorkDetailForm(work, images);
         if(!work.getUser().isDelete()){
             User postUser = work.getUser();
             detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_celeb(), postUser.getFollowerNum());
@@ -178,12 +177,12 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         return PropertyUtil.response(detailForm);
     }
 
-    private DetailWorkForm makeWorkDetailForm(Work work) {
+    private DetailWorkForm makeWorkDetailForm(Work work, List<WorkImage> images) {
         DetailWorkForm detailForm;
         detailForm = DetailWorkForm.builder()
                 .id(work.getId())
                 .author(work.getAuthor())
-                .images(getImages(work))
+                .images(getImages(images))
                 .title(work.getTitle())
                 .price(work.getPrice())
                 .topPrice(work.getTopPrice())
@@ -202,8 +201,8 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
 
     @Transactional
     public JSONObject showDetailForGuest(Long id){   // 글 상세 확인
-        Work work = workRepository.findByIdFetchWorkNotDeletedWishAndUser(id).orElseThrow(PostNotFoundException::new);
-        DetailWorkForm detailForm =makeWorkDetailForm(work);
+        Work work = workRepository.findByIdFetchImages(id).orElseThrow(PostNotFoundException::new);
+        DetailWorkForm detailForm = makeWorkDetailForm(work, work.getImages());
         if(!work.getUser().isDelete()){
             User postUser = work.getUser();
             detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_celeb(), postUser.getFollowerNum());
@@ -230,11 +229,9 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     }
 
 
-    public List<String> getImages(Work work) {
-        List<String> imagesUrl = new ArrayList<>();
-        work.getImages()
-                .forEach(img -> imagesUrl.add(img.getImageUrl()));
-        return imagesUrl;
+    public List<String> getImages(List<WorkImage> images) {
+        return images.stream()
+                .map(WorkImage::getImageUrl).collect(Collectors.toList());
     }
 
     @Transactional

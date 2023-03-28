@@ -20,7 +20,6 @@ import net.sinzak.server.user.repository.SearchHistoryRepository;
 import net.sinzak.server.user.repository.UserRepository;
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -36,7 +35,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ProductService implements PostService<Product,ProductPostDto,ProductWish,ProductLikes> {
+public class ProductService implements PostService<Product,ProductPostDto,ProductWish,ProductLikes,ProductImage> {
     private final UserUtils userUtils;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
@@ -105,7 +104,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     @Transactional(rollbackFor = {Exception.class})
     public JSONObject deleteImage(Long productId, String url){   // 글 생성
-        Product product = productRepository.findById(productId).orElseThrow(PostNotFoundException::new);
+        Product product = productRepository.findByIdFetchImages(productId).orElseThrow(PostNotFoundException::new);
         if(!userUtils.getCurrentUserId().equals(product.getUser().getId()))
             return PropertyUtil.responseMessage("해당 작품의 작가가 아닙니다.");
         if(product.getImages().size()==1)
@@ -157,7 +156,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     public JSONObject showDetailForUser(Long id){   // 글 상세 확인
         User user = userRepository.findByIdFetchFollowingAndLikesList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
         Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(PostNotFoundException::new);
-        DetailProductForm detailForm = makeProductDetailForm(product);
+        List<ProductImage> images = imageRepository.findByProductId(product.getId());
+        DetailProductForm detailForm = makeProductDetailForm(product, images);
         if(!product.getUser().isDelete()){
             User postUser = product.getUser();
             detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_celeb(), postUser.getFollowerNum());
@@ -182,8 +182,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 //    @Cacheable(value ="showProductDetailCache",key="#id",cacheManager ="testCacheManager")
     @Transactional
     public JSONObject showDetailForGuest(Long id){   // 비회원 글 보기
-        Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(PostNotFoundException::new);
-        DetailProductForm detailForm = makeProductDetailForm(product);
+        Product product = productRepository.findByIdFetchImages(id).orElseThrow(PostNotFoundException::new);
+        DetailProductForm detailForm = makeProductDetailForm(product, product.getImages());
         if(!product.getUser().isDelete()){
             User postUser = product.getUser();
             detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_celeb(), postUser.getFollowerNum());
@@ -196,11 +196,11 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return PropertyUtil.response(detailForm);
     }
 
-    private DetailProductForm makeProductDetailForm(Product product) {
-        DetailProductForm  detailForm = DetailProductForm.builder()
+    private DetailProductForm makeProductDetailForm(Product product, List<ProductImage> images) {
+        return DetailProductForm.builder()
                 .id(product.getId())
                 .author(product.getAuthor())
-                .images(getImages(product))
+                .images(getImages(images))
                 .title(product.getTitle())
                 .price(product.getPrice())
                 .topPrice(product.getTopPrice())
@@ -216,7 +216,6 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                 .vertical(product.getSize().vertical)
                 .height(product.getSize().height)
                 .complete(product.isComplete()).build();
-        return detailForm;
     }
 
     public boolean checkIsLikes(List<ProductLikes> userLikesList, Product product) {
@@ -435,11 +434,9 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                 .collect(Collectors.toList());
     }
 
-    public List<String> getImages(Product product) {
-        List<String> imagesUrl = new ArrayList<>();
-        product.getImages()
-                .forEach(img -> imagesUrl.add(img.getImageUrl()));
-        return imagesUrl;
+    public List<String> getImages(List<ProductImage> images) {
+        return images.stream()
+                .map(ProductImage::getImageUrl).collect(Collectors.toList());
     }
 
     private List<ShowForm> makeHomeShowForms(List<ProductLikes> userLikesList, List<Product> productList) {
