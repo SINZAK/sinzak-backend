@@ -20,11 +20,14 @@ public class Banner {
 
     private String imageUrl;
 
+    private Long userId;
+
     @Builder
     public Banner(String title, String content, String imageUrl) {
         this.title = title;
         this.content = content;
         this.imageUrl = imageUrl;
+        this.userId = 0L;
     }
 
     protected Banner() {}
@@ -32,4 +35,11 @@ public class Banner {
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+
+    public void setUserInfo(Long userId, String nickName) {
+        this.userId = userId;
+        this.content = nickName;
+    }
+
+
 }

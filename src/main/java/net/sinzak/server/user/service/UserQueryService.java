@@ -19,11 +19,12 @@ import net.sinzak.server.user.repository.UserRepository;
 import net.sinzak.server.work.domain.Work;
 import net.sinzak.server.work.domain.WorkWish;
 import net.sinzak.server.work.repository.WorkWishRepository;
-import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -251,6 +252,25 @@ public class UserQueryService {
         }
 
         return PropertyUtil.response(obj);
+    }
+
+    public Optional<String> getUserNickName(Long id){
+        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+        return Optional.of(user.getNickName());
+    }
+
+
+    public Optional<User> getCertifiedRandomUser() throws NoSuchAlgorithmException {
+        List<User> users = userRepository.findAllNotDeleted();
+        List<User> certUsers = users.stream()
+                .filter(User::isCert_celeb)
+                .collect(Collectors.toList());
+        if(certUsers.size() == 0)
+            return Optional.empty();
+        Random random = SecureRandom.getInstanceStrong();
+        int randomNumber = random.nextInt(certUsers.size() + 1);
+        User randomUser = certUsers.get(randomNumber);
+        return Optional.of(randomUser);
     }
 
 }

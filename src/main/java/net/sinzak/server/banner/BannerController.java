@@ -4,11 +4,15 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import net.sinzak.server.common.dto.IdDto;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import org.json.simple.JSONObject;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.security.NoSuchAlgorithmException;
 
 
 @Api(tags = "배너")
@@ -35,9 +39,23 @@ public class BannerController {
     }
 
     @ApiDocumentResponse
-    @ApiOperation(value = "배너 정보 출력")
+    @ApiOperation(value = "배너 정보 출력", notes = "떠오르는 작가 배너는 user_id까지 같이 드립니다 해당 유저 프로필로 이동할 수 있게 프로필 링크해주세요")
     @GetMapping(value = "/banner")
     public JSONObject showBannerList() {
         return bannerService.getList();
+    }
+
+    @ApiDocumentResponse
+    @ApiOperation(value = "떠오르는 작가 임의 설정",notes = "이거는 추후에 수익창출을 위해 필요할 듯 프론트단은 신경 안쓰셔도됩니다")
+    @PostMapping(value = "/banner/pick", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public JSONObject pickUser(@RequestBody IdDto idDto) {
+        return bannerService.pick(idDto.getId());
+    }
+
+    @Scheduled(fixedDelay = 21600000, initialDelay = 30000) /** 6시간 **/
+    @ApiOperation(value = "무시", hidden = true)
+    @PostMapping("/banner/reset")
+    public void resetBanner() throws NoSuchAlgorithmException {
+        bannerService.randomPick();
     }
 }
