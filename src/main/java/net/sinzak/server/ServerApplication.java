@@ -11,6 +11,7 @@ import java.util.TimeZone;
 
 @EnableJpaAuditing
 @EnableCaching
+@EnableScheduling
 @SpringBootApplication
 public class ServerApplication {
 	@PostConstruct
