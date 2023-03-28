@@ -52,7 +52,7 @@ public class BannerController {
         return bannerService.pick(idDto.getId());
     }
 
-    @Scheduled(fixedDelay = 21600000, initialDelay = 30000) /** 6시간 **/
+    @Scheduled(fixedDelay = 21600000, initialDelay = 100000) /** 6시간 **/
     @ApiOperation(value = "무시", hidden = true)
     @PostMapping("/banner/reset")
     public void resetBanner() throws NoSuchAlgorithmException {

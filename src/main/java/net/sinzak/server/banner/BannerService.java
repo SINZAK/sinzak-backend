@@ -1,6 +1,7 @@
 package net.sinzak.server.banner;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.image.S3Service;
@@ -11,11 +12,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BannerService {
     private final UserQueryService userQueryService;
     private final BannerRepository bannerRepository;
@@ -50,18 +54,17 @@ public class BannerService {
 
     @Transactional
     public JSONObject pick(Long id){
-        Banner banner = bannerRepository.findAuthorBanner();
+        List<Banner> banners = bannerRepository.findAuthorBanner();
         userQueryService.getUserNickName(id)
-                .ifPresent(name -> banner.setUserInfo(id, name));
+                .ifPresent(name -> banners.forEach((banner) -> banner.setUserInfo(id, name)));
         return PropertyUtil.response(true);
     }
 
     @Transactional
-    public JSONObject randomPick() throws NoSuchAlgorithmException {
-        AtomicBoolean success = new AtomicBoolean(true);
-        Banner banner = bannerRepository.findAuthorBanner();
+    public void randomPick() throws NoSuchAlgorithmException {
+        List<Banner> banners = bannerRepository.findAuthorBanner();
         userQueryService.getCertifiedRandomUser()
-                .ifPresentOrElse(user -> banner.setUserInfo(user.getId(), user.getNickName()), () -> success.set(false));
-        return PropertyUtil.response(success.get());
+                .ifPresent(user -> banners.forEach((banner) -> banner.setUserInfo(user.getId(), user.getNickName())));
+        log.warn("{} 떠오르는 작가 재설정", LocalDateTime.now());
     }
 }
