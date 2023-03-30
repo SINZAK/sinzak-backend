@@ -20,6 +20,8 @@ import net.sinzak.server.user.repository.SearchHistoryRepository;
 import net.sinzak.server.user.repository.UserRepository;
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -52,6 +54,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     private final int HOME_OBJECTS = 10;
     private final int HOME_DETAIL_OBJECTS = 50;
 
+    @CacheEvict(value = {"home_user","home_guest"}, allEntries = true)
     @Transactional(rollbackFor = {Exception.class})
     public JSONObject makePost(@Valid ProductPostDto buildDto){   // 글 생성
         User user = userRepository.findByIdFetchProductPostList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
@@ -103,7 +106,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional(rollbackFor = {Exception.class})
-    public JSONObject deleteImage(Long productId, String url){   // 글 생성
+    public JSONObject deleteImage(Long productId, String url){
         Product product = productRepository.findByIdFetchImages(productId).orElseThrow(PostNotFoundException::new);
         if(!userUtils.getCurrentUserId().equals(product.getUser().getId()))
             return PropertyUtil.responseMessage("해당 작품의 작가가 아닙니다.");
@@ -124,7 +127,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional(rollbackFor = {Exception.class})
-    public JSONObject editPost(Long productId, ProductEditDto editDto){   // 글 생성
+    @CacheEvict(value = {"home_user","home_guest"}, allEntries = true)
+    public JSONObject editPost(Long productId, ProductEditDto editDto){
         User user = userUtils.getCurrentUser();
         Product product = productRepository.findById(productId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(product.getUser().getId()))
@@ -136,7 +140,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional(rollbackFor = {Exception.class})
-    public JSONObject deletePost(Long productId){   // 글 생성
+    @CacheEvict(value = {"home_user","home_guest"}, allEntries = true)
+    public JSONObject deletePost(Long productId){
         User user = userUtils.getCurrentUser();
         Product product = productRepository.findByIdFetchChatRooms(productId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(product.getUser().getId()))
@@ -179,7 +184,6 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return PropertyUtil.response(detailForm);
     }
 
-//    @Cacheable(value ="showProductDetailCache",key="#id",cacheManager ="testCacheManager")
     @Transactional
     public JSONObject showDetailForGuest(Long id){   // 비회원 글 보기
         Product product = productRepository.findByIdFetchImages(id).orElseThrow(PostNotFoundException::new);
@@ -231,6 +235,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
 
+
     @Transactional(readOnly = true)
     public JSONObject showHomeForUser(){
         JSONObject obj = new JSONObject();
@@ -249,7 +254,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return PropertyUtil.response(obj);
     }
 
-
+    @Cacheable(value ="home_guest", cacheManager ="testCacheManager")
     @Transactional(readOnly = true)
     public JSONObject showHomeForGuest(){
         JSONObject obj = new JSONObject();
