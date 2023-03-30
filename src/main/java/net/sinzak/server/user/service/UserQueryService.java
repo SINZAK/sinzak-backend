@@ -268,7 +268,7 @@ public class UserQueryService {
         if(certUsers.size() == 0)
             return Optional.empty();
         Random random = SecureRandom.getInstanceStrong();
-        int randomNumber = random.nextInt(certUsers.size() + 1);
+        int randomNumber = random.nextInt(certUsers.size());
         User randomUser = certUsers.get(randomNumber);
         return Optional.of(randomUser);
     }
