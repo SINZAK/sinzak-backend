@@ -35,4 +35,16 @@ public class AlarmService {
         }
         return PropertyUtil.response(getAlarmDtos);
     }
+
+    @Transactional
+    public void makeAlarm(User user,String thumbnail,String link,String detail){
+        Alarm alarm = Alarm.builder()
+                .user(user)
+                .thumbnail(thumbnail)
+                .link(link)
+                .detail(detail)
+                .build();
+        user.getAlarms().add(alarm);
+        alarmRepository.save(alarm);
+    }
 }
