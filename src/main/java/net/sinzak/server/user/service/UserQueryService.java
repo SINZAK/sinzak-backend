@@ -137,7 +137,7 @@ public class UserQueryService {
     }
 
 
-    public JSONObject getUserProfile(Long userId) {
+    public JSONObject getUserProfileForUser(Long userId) {
         JSONObject obj = new JSONObject();
         User findUser = userRepository.findByIdFetchProductPostList(userId).orElseThrow(()->new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND));
         List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
@@ -145,6 +145,17 @@ public class UserQueryService {
         List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList(),false);
         obj.put("works", workShowForms);
         obj.put("profile",makeUserDto(userUtils.getCurrentUserId(), findUser));
+        return PropertyUtil.response(obj);
+    }
+
+    public JSONObject getUserProfileForGuest(Long userId) {
+        JSONObject obj = new JSONObject();
+        User findUser = userRepository.findByIdFetchProductPostList(userId).orElseThrow(()->new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND));
+        List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
+        obj.put("products", productShowForms);
+        List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList(),false);
+        obj.put("works", workShowForms);
+        obj.put("profile",makeUserDto(0L, findUser));
         return PropertyUtil.response(obj);
     }
     private UserDto makeUserDto(Long loginUserId, User findUser) {
@@ -165,7 +176,7 @@ public class UserQueryService {
                 .build();
     }
     public boolean checkIfFollowFindUser(Long loginUserId,User findUser){
-        if(loginUserId == null){
+        if(loginUserId.equals(0L)){
             return false;
         }
         if(findUser.getFollowerList().contains(loginUserId)){
@@ -174,7 +185,7 @@ public class UserQueryService {
         return false;
     }
     public boolean checkIfMyProfile(Long loginUserId, User findUser){
-        if(loginUserId == null){
+        if(loginUserId.equals(0L)){
             return false;
         }
         if(findUser.getId().equals(loginUserId)){
