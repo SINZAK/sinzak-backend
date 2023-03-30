@@ -24,6 +24,9 @@ public interface ProductRepository extends JpaRepository<Product, Long>{
     @Query("select p from Product p left join fetch p.user where p.isDeleted = false and p.id = :id")
     Optional<Product> findByIdFetchUser(@Param("id") Long id);
 
+    @Query("select p from Product p left join fetch p.images where p.id = :id and p.isDeleted =false")
+    Optional<Product> findByIdFetchImages(@Param("id")Long id);
+
     @Query("select p from Product p left join fetch p.chatRooms where p.id = :id and p.isDeleted = false ")
     Optional<Product> findByIdFetchChatRooms(@Param("id") Long id);
 

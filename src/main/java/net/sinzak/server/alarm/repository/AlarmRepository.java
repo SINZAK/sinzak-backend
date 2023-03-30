@@ -9,6 +9,6 @@ import java.util.Set;
 
 public interface AlarmRepository extends JpaRepository<Alarm,Long> {
 
-    @Query("select A from Alarm A where a.user.id =: userId")
+    @Query("select a from Alarm a where a.user.id =: userId")
     Set<Alarm> findByUserId(@Param("userId") Long userId);
 }
