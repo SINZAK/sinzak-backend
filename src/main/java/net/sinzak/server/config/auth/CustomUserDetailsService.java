@@ -14,7 +14,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-//    @Cacheable(value ="loginUserDetail",key="#username",cacheManager ="testCacheManager" )
+//    @Cacheable(value ="loginUser", key="#username")
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByIdNotDeleted(Long.valueOf(username))
