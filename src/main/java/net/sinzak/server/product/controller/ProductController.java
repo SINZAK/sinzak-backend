@@ -116,8 +116,7 @@ public class ProductController {
     @PostMapping("/home/products")
     public JSONObject showHomeProduct() {
         try{
-            UserUtils.getContextHolderId();
-            return productService.showHomeForUser();
+            return productService.showHomeForUser(UserUtils.getContextHolderId());
         }
         catch (UserNotFoundException | UserNotLoginException e){
             return productService.showHomeForGuest(); /** 비회원용 **/
