@@ -15,9 +15,6 @@ import net.sinzak.server.work.domain.WorkLikes;
 import net.sinzak.server.work.domain.WorkSell;
 import net.sinzak.server.work.domain.WorkWish;
 import org.hibernate.annotations.DynamicUpdate;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.security.NoSuchAlgorithmException;
@@ -28,6 +25,7 @@ import java.util.*;
 @Entity
 @SequenceGenerator(name = "User_SEQ_GEN",sequenceName = "User_SEQ")
 @DynamicUpdate
+@Table(indexes = {@Index(name = "CoveringIndexUser", columnList = "user_id, role")})
 public class User extends BaseTimeEntity{
     private static final int hundredMillion = 100000000;
     private static final int tenThousand =10000;
@@ -94,6 +92,12 @@ public class User extends BaseTimeEntity{
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column
+    private String fcm ="";
+
+    @Column
+    private boolean isDelete= false;
+
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<UserChatRoom> userChatRooms = new ArrayList<>();
 
@@ -112,7 +116,6 @@ public class User extends BaseTimeEntity{
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ProductLikes> productLikesList = new ArrayList<>();
 
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<WorkSell> workSellList = new ArrayList<>();
 
@@ -128,12 +131,6 @@ public class User extends BaseTimeEntity{
     @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<SearchHistory> historyList = new HashSet<>();
 
-    public void setFcm(String fcmToken) {
-        this.fcm = fcmToken;
-    }
-
-    @Column
-    private String fcm ="";
 
     @ElementCollection
     @CollectionTable(name = "FOLLOWING_LIST", joinColumns = @JoinColumn(name = "user_id"))
@@ -145,8 +142,10 @@ public class User extends BaseTimeEntity{
     @Column(name = "FOLLOWER_ID")
     private Set<Long> followerList =new HashSet<>();
 
-    @Column
-    private boolean isDelete= false;
+
+    public void setFcm(String fcmToken) {
+        this.fcm = fcmToken;
+    }
     public void setDelete(boolean delete) {
         isDelete = delete;
     }
@@ -174,9 +173,6 @@ public class User extends BaseTimeEntity{
 //        this.alarm_receive = false;
     }
 
-//    public void setAlarm_receive(boolean receive){
-//        this.alarm_receive = receive;
-//    }
 
 
     public void saveJoinInfo(String nickName, String categoryLike) {
