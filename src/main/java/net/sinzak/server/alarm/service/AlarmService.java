@@ -30,7 +30,7 @@ public class AlarmService {
                     .date(alarm.getCreatedDate().toString())
                     .alarmType(alarm.getAlarmType())
                     .thumbnail(alarm.getThumbnail())
-                    .link(alarm.getLink())
+                    .route(alarm.getRoute())
                     .opponentUserName(alarm.getOpponentUserName())
                     .build();
             getAlarmDtos.add(getAlarmDto);
@@ -39,11 +39,11 @@ public class AlarmService {
     }
 
     @Transactional
-    public void makeAlarm(User user, String thumbnail, String link, AlarmType alarmType,String opponentUserName){
+    public void makeAlarm(User user, String thumbnail, String route, AlarmType alarmType,String opponentUserName){
         Alarm alarm = Alarm.builder()
                 .user(user)
                 .thumbnail(thumbnail)
-                .link(link)
+                .route(route)
                 .alarmType(alarmType)
                 .opponentUserName(opponentUserName)
                 .build();

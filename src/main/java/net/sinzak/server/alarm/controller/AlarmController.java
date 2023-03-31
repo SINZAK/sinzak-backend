@@ -3,10 +3,10 @@ package net.sinzak.server.alarm.controller;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.alarm.service.AlarmService;
 import org.json.simple.JSONObject;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class AlarmController {
     private final AlarmService alarmService;
