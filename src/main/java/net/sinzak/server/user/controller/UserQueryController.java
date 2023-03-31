@@ -30,7 +30,7 @@ public class UserQueryController {
             UserUtils.getContextHolderId();
             return userQueryService.getUserProfileForUser(userId);
         }
-        catch (UserNotFoundException | UserNotLoginException e){
+        catch (UserNotLoginException e){
             return userQueryService.getUserProfileForGuest(userId); /** 비회원용 **/
         }
     }

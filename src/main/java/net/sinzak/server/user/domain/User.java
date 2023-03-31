@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import net.sinzak.server.BaseTimeEntity;
+import net.sinzak.server.alarm.domain.Alarm;
 import net.sinzak.server.chatroom.domain.UserChatRoom;
 import net.sinzak.server.product.domain.ProductLikes;
 import net.sinzak.server.product.domain.Product;
@@ -130,6 +131,10 @@ public class User extends BaseTimeEntity{
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<SearchHistory> historyList = new HashSet<>();
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<Alarm> alarms = new HashSet<>();
+
 
 
     @ElementCollection

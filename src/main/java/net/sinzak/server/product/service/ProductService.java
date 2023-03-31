@@ -2,6 +2,7 @@ package net.sinzak.server.product.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.sinzak.server.alarm.service.AlarmService;
 import net.sinzak.server.common.PostService;
 import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.user.domain.SearchHistory;
@@ -49,6 +50,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     private final S3Service s3Service;
     private final ProductQDSLRepositoryImpl QDSLRepository;
     private final SearchHistoryRepository historyRepository;
+    private final AlarmService alarmService;
 
     private final static int HistoryMaxCount = 10;
     private final int HOME_OBJECTS = 10;
@@ -395,9 +397,10 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         User user = userUtils.getCurrentUser();
         if(suggestRepository.findByUserIdAndProductId(user.getId(),dto.getId()).isPresent())
             return PropertyUtil.responseMessage("이미 제안을 하신 작품입니다.");
-        Product product = productRepository.findById(dto.getId()).orElseThrow();
+        Product product = productRepository.findByIdFetchUser(dto.getId()).orElseThrow();
         ProductSuggest connect = ProductSuggest.createConnect(product, user);
         product.setTopPrice(dto.getPrice());
+//        alarmService.makeAlarm(product.getUser(),product.getThumbnail(),product.getId().toString(),Integer.toString(dto.getPrice()));
         suggestRepository.save(connect);
         return PropertyUtil.response(true);
     }
