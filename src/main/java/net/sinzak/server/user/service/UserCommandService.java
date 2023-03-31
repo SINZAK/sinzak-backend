@@ -3,6 +3,8 @@ package net.sinzak.server.user.service;
 
 import lombok.RequiredArgsConstructor;
 
+import net.sinzak.server.alarm.domain.AlarmType;
+import net.sinzak.server.alarm.service.AlarmService;
 import net.sinzak.server.chatroom.service.ChatRoomCommandService;
 import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.common.error.InstanceNotFoundException;
@@ -39,6 +41,7 @@ public class UserCommandService {
     private final ChatRoomCommandService chatRoomCommandService;
     private final S3Service s3Service;
     private final FireBaseService fireBaseService;
+    private final AlarmService alarmService;
 
     public User saveTempUser(User user){
         return userRepository.save(user);
@@ -84,7 +87,7 @@ public class UserCommandService {
         User findUser = userRepository.findByIdNotDeleted(userId).orElseThrow(UserNotFoundException::new);
         if(currentUserId.equals(findUser.getId()))
             return PropertyUtil.responseMessage("본인한테는 팔로우 불가능");
-
+        alarmService.makeAlarm(userUtils.getCurrentUser(),findUser.getPicture(),findUser.getId().toString(), AlarmType.FOLLOW, findUser.getNickName());
         return addFollow(findUser, currentUserId);
     }
 
