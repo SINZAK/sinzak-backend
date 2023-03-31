@@ -26,7 +26,9 @@ public class Alarm extends BaseTimeEntity {
     @JoinColumn(name ="user_id")
     private User user;
 
-    private String detail;
+
+    private String opponentUserName;
+    private AlarmType alarmType;
     private String thumbnail;
     private String link;
 

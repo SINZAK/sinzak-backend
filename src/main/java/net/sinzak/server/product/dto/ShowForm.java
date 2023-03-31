@@ -24,7 +24,7 @@ public class ShowForm implements Serializable {
     @ApiModelProperty(example = "boolean",notes = "true -> 체크 한 사람(가격 제안 받겠다는 사람)")
     private boolean suggest;
     @ApiModelProperty(example = "좋아요 누른 사람인지 여부",notes = "true -> 누른 사람")
-    private boolean isLike;
+    private boolean like;
     @ApiModelProperty(value = "좋아요 수",example = "1",notes = "true -> 누른 사람")
     private int likesCnt;
     @ApiModelProperty(example = "판매완료 여부",notes = "true -> 판매완료")
@@ -32,7 +32,9 @@ public class ShowForm implements Serializable {
     @ApiModelProperty(hidden = true)
     private int popularity;
 
-    public ShowForm(Long id, String title, String content, String author, int price, String thumbnail, String date, boolean suggest, boolean isLike, int likesCnt, boolean complete, int popularity) {
+    public ShowForm() {}
+
+    public ShowForm(Long id, String title, String content, String author, int price, String thumbnail, String date, boolean suggest, boolean like, int likesCnt, boolean complete, int popularity) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -41,7 +43,7 @@ public class ShowForm implements Serializable {
         this.thumbnail = thumbnail;
         this.date = date;
         this.suggest = suggest;
-        this.isLike = isLike;
+        this.like = like;
         this.likesCnt = likesCnt;
         this.complete = complete;
         this.popularity = popularity;

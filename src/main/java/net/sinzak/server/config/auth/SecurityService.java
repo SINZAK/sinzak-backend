@@ -81,7 +81,7 @@ public class SecurityService {
         Long savedId = userRepository.save(user).getId();
         if(savedId == null || saveTerms.getId() == null)
             throw new InstanceNotFoundException("서버 오류로 저장되지 않았습니다.");
-        TokenDto tokenDto = jwtProvider.createToken(user.getUsername(), user.getId(), user.getRole());
+        TokenDto tokenDto = jwtProvider.createToken(String.valueOf(user.getId()), user.getId(), user.getRole());
         tokenDto.setIsJoined(true);
         tokenDto.setOrigin(user.getOrigin());
         RefreshToken refreshToken = RefreshToken.builder()

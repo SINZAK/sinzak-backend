@@ -237,21 +237,21 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
 
-
+    @Cacheable(value ="home_user", key = "#userId", cacheManager ="testCacheManager")
     @Transactional(readOnly = true)
-    public JSONObject showHomeForUser(){
+    public JSONObject showHomeForUser(Long userId){
         JSONObject obj = new JSONObject();
         User user = userRepository.findByIdFetchFollowingAndLikesList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
         List<String> userCategories = Arrays.asList(user.getCategoryLike().split(","));
 
         List<Product> productList = productRepository.findAllProductNotDeleted();
-        obj.put("new", makeHomeShowForms(user.getProductLikesList(), productList));   /** 신작 3개 **/
+        obj.put("new", makeHomeShowForms(user.getProductLikesList(), productList));   /** 신작 **/
 
         List<Product> list = QDSLRepository.findCountByCategoriesDesc(userCategories, HOME_OBJECTS);
-        obj.put("recommend", makeHomeShowForms(user.getProductLikesList(), list)); /** 추천목록 3개 **/
+        obj.put("recommend", makeHomeShowForms(user.getProductLikesList(), list)); /** 추천목록  **/
 
         List<Product> followingList = getFollowingList(user, productList, HOME_OBJECTS);
-        obj.put("following", makeHomeShowForms(user.getProductLikesList(),followingList)); /** 팔로잉 관련 3개 **/
+        obj.put("following", makeHomeShowForms(user.getProductLikesList(),followingList)); /** 팔로잉 **/
 
         return PropertyUtil.response(obj);
     }
@@ -400,7 +400,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         Product product = productRepository.findByIdFetchUser(dto.getId()).orElseThrow();
         ProductSuggest connect = ProductSuggest.createConnect(product, user);
         product.setTopPrice(dto.getPrice());
-        alarmService.makeAlarm(product.getUser(),product.getThumbnail(),product.getId().toString(),Integer.toString(dto.getPrice()));
+//        alarmService.makeAlarm(product.getUser(),product.getThumbnail(),product.getId().toString(),Integer.toString(dto.getPrice()));
         suggestRepository.save(connect);
         return PropertyUtil.response(true);
     }

@@ -3,6 +3,8 @@ package net.sinzak.server.user.service;
 
 import lombok.RequiredArgsConstructor;
 
+import net.sinzak.server.alarm.domain.AlarmType;
+import net.sinzak.server.alarm.service.AlarmService;
 import net.sinzak.server.chatroom.service.ChatRoomCommandService;
 import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.common.error.InstanceNotFoundException;
@@ -21,6 +23,7 @@ import net.sinzak.server.user.repository.SearchHistoryRepository;
 import net.sinzak.server.user.repository.UserRepository;
 import net.sinzak.server.common.PropertyUtil;
 import org.json.simple.JSONObject;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,6 +41,7 @@ public class UserCommandService {
     private final ChatRoomCommandService chatRoomCommandService;
     private final S3Service s3Service;
     private final FireBaseService fireBaseService;
+    private final AlarmService alarmService;
 
     public User saveTempUser(User user){
         return userRepository.save(user);
@@ -78,28 +82,22 @@ public class UserCommandService {
     }
 
 
-    public JSONObject follow(Long userId){
-        Long loginUserId = userUtils.getCurrentUserId();
+    @CacheEvict(value = {"home_user"}, key = "#currentUserId", cacheManager = "testCacheManager")
+    public JSONObject follow(Long currentUserId, Long userId){
         User findUser = userRepository.findByIdNotDeleted(userId).orElseThrow(UserNotFoundException::new);
-        if(loginUserId == null){
-            return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
-        }
-        if(loginUserId.equals(findUser.getId())){
+        if(currentUserId.equals(findUser.getId()))
             return PropertyUtil.responseMessage("본인한테는 팔로우 불가능");
-        }
-        return addFollow(findUser,loginUserId);
+        alarmService.makeAlarm(userUtils.getCurrentUser(),findUser.getPicture(),findUser.getId().toString(), AlarmType.FOLLOW, findUser.getNickName());
+        return addFollow(findUser, currentUserId);
     }
 
-    public JSONObject unFollow(Long userId){
-        Long loginUserId = userUtils.getCurrentUserId();
+    @CacheEvict(value = {"home_user"}, key = "#currentUserId", cacheManager = "testCacheManager")
+    public JSONObject unFollow(Long currentUserId, Long userId){
         User findUser = userRepository.findByIdNotDeleted(userId).orElseThrow(UserNotFoundException::new);
-        if(loginUserId == null){
-            return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
-        }
-        if(loginUserId.equals(findUser.getId())){
+        if(currentUserId.equals(findUser.getId()))
             return PropertyUtil.responseMessage("본인한테는 언팔로우 불가능");
-        }
-        return removeFollow(findUser,loginUserId);
+
+        return removeFollow(findUser, currentUserId);
     }
 
     public JSONObject removeFollow(User findUser, Long loginUserId){

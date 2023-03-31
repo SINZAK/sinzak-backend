@@ -2,6 +2,7 @@ package net.sinzak.server.alarm.service;
 
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.alarm.domain.Alarm;
+import net.sinzak.server.alarm.domain.AlarmType;
 import net.sinzak.server.alarm.dto.GetAlarmDto;
 import net.sinzak.server.alarm.repository.AlarmRepository;
 import net.sinzak.server.common.PropertyUtil;
@@ -27,9 +28,10 @@ public class AlarmService {
         for(Alarm alarm : alarms){
             GetAlarmDto getAlarmDto = GetAlarmDto.builder()
                     .date(alarm.getCreatedDate().toString())
-                    .detail(alarm.getDetail())
+                    .alarmType(alarm.getAlarmType())
                     .thumbnail(alarm.getThumbnail())
                     .link(alarm.getLink())
+                    .opponentUserName(alarm.getOpponentUserName())
                     .build();
             getAlarmDtos.add(getAlarmDto);
         }
@@ -37,12 +39,13 @@ public class AlarmService {
     }
 
     @Transactional
-    public void makeAlarm(User user,String thumbnail,String link,String detail){
+    public void makeAlarm(User user, String thumbnail, String link, AlarmType alarmType,String opponentUserName){
         Alarm alarm = Alarm.builder()
                 .user(user)
                 .thumbnail(thumbnail)
                 .link(link)
-                .detail(detail)
+                .alarmType(alarmType)
+                .opponentUserName(opponentUserName)
                 .build();
         user.getAlarms().add(alarm);
         alarmRepository.save(alarm);

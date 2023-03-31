@@ -1,6 +1,7 @@
 package net.sinzak.server.user.repository;
 
 
+import net.sinzak.server.config.auth.UserProjection;
 import net.sinzak.server.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,8 +13,8 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     /**유저 이메일로 구분 및 검색 **/
-    @Query("select u from User u where u.email= :email")
-    Optional<User> findByEmail(@Param("email")String email);
+    @Query(value = "select user_id, role from user u where user_id= :id and is_delete = false", nativeQuery = true)
+    Optional<UserProjection> findCurrentUserInfo(@Param("id")Long id);
 
     @Query("select u from User u where u.email= :email and u.isDelete = false")
     Optional<User> findByEmailNotDeleted(@Param("email")String email);
