@@ -76,6 +76,7 @@
     - EC2 세팅 및 RDS, s3 이미지 서버 연결 <br>
     - Github Action + 도커를 이용한 CI/CD 자동화 구축 <br>
     - Lazy Loading, DTO 전달, 커버링 인덱스, 페치 조인등을 통한 백엔드 최적화 <br>
+    - 캐시를 위한 redis 적용 <br>
     - QueryDSL을 이용한 동적 쿼리 생성 <br>
     - 스트림, 람다 등 함수형 프로그래밍 적용. 가독성 향상, sonarcloud로 리팩터링 <br>
     - 구글 SEO 최적화 <br>
