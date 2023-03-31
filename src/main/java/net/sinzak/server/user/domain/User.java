@@ -28,7 +28,7 @@ import java.util.*;
 @Entity
 @SequenceGenerator(name = "User_SEQ_GEN",sequenceName = "User_SEQ")
 @DynamicUpdate
-public class User extends BaseTimeEntity implements UserDetails {
+public class User extends BaseTimeEntity{
     private static final int hundredMillion = 100000000;
     private static final int tenThousand =10000;
 
@@ -238,43 +238,6 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     public void setPortFolioUrl(String portFolioUrl) {
         this.portFolioUrl = portFolioUrl;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<SimpleGrantedAuthority> list = new ArrayList<>();
-        list.add(new SimpleGrantedAuthority(this.role.getKey()));
-        return list;
-    }
-
-    @Override
-    public String getPassword() {
-        return null;
-    }
-
-    @Override
-    public String getUsername() {  /** email 사용 !!! **/
-        return String.valueOf(id);
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
     }
 
     protected User() throws NoSuchAlgorithmException {}
