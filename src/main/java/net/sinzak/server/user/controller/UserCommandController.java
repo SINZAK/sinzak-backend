@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
+import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.common.dto.IdDto;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.config.auth.SecurityService;
@@ -83,14 +84,14 @@ public class UserCommandController {
     @ApiOperation(value = "팔로우하기")
     @PostMapping(value = "/users/follow")
     public JSONObject followUser(@RequestBody UserIdDto userIdDto){
-        return userCommandService.follow(userIdDto.getUserId());
+        return userCommandService.follow(UserUtils.getContextHolderId(), userIdDto.getUserId());
     }
 
     @ApiDocumentResponse
     @ApiOperation(value = "언팔로우하기")
     @PostMapping(value = "/users/unfollow")
     public JSONObject unFollowUser(@RequestBody UserIdDto userIdDto){
-        return userCommandService.unFollow(userIdDto.getUserId());
+        return userCommandService.unFollow(UserUtils.getContextHolderId(), userIdDto.getUserId());
     }
 
     @ApiDocumentResponse

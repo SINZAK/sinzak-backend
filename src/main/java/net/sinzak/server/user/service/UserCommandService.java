@@ -21,6 +21,7 @@ import net.sinzak.server.user.repository.SearchHistoryRepository;
 import net.sinzak.server.user.repository.UserRepository;
 import net.sinzak.server.common.PropertyUtil;
 import org.json.simple.JSONObject;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -78,28 +79,22 @@ public class UserCommandService {
     }
 
 
-    public JSONObject follow(Long userId){
-        Long loginUserId = userUtils.getCurrentUserId();
+    @CacheEvict(value = {"home_user"}, key = "#currentUserId", cacheManager = "testCacheManager")
+    public JSONObject follow(Long currentUserId, Long userId){
         User findUser = userRepository.findByIdNotDeleted(userId).orElseThrow(UserNotFoundException::new);
-        if(loginUserId == null){
-            return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
-        }
-        if(loginUserId.equals(findUser.getId())){
+        if(currentUserId.equals(findUser.getId()))
             return PropertyUtil.responseMessage("본인한테는 팔로우 불가능");
-        }
-        return addFollow(findUser,loginUserId);
+
+        return addFollow(findUser, currentUserId);
     }
 
-    public JSONObject unFollow(Long userId){
-        Long loginUserId = userUtils.getCurrentUserId();
+    @CacheEvict(value = {"home_user"}, key = "#currentUserId", cacheManager = "testCacheManager")
+    public JSONObject unFollow(Long currentUserId, Long userId){
         User findUser = userRepository.findByIdNotDeleted(userId).orElseThrow(UserNotFoundException::new);
-        if(loginUserId == null){
-            return PropertyUtil.responseMessage(UserNotFoundException.USER_NOT_LOGIN);
-        }
-        if(loginUserId.equals(findUser.getId())){
+        if(currentUserId.equals(findUser.getId()))
             return PropertyUtil.responseMessage("본인한테는 언팔로우 불가능");
-        }
-        return removeFollow(findUser,loginUserId);
+
+        return removeFollow(findUser, currentUserId);
     }
 
     public JSONObject removeFollow(User findUser, Long loginUserId){
