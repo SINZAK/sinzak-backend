@@ -28,6 +28,7 @@ public class Alarm extends BaseTimeEntity {
 
 
     private String opponentUserName;
+    @Enumerated(EnumType.STRING)
     private AlarmType alarmType;
     private String thumbnail;
     private String link;
