@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     /**유저 이메일로 구분 및 검색 **/
-    @Query(value = "select user_id, role from user u where user_id= :id", nativeQuery = true)
+    @Query(value = "select user_id, role from user u where user_id= :id and is_delete = false", nativeQuery = true)
     Optional<UserProjection> findCurrentUserInfo(@Param("id")Long id);
 
     @Query("select u from User u where u.email= :email and u.isDelete = false")
