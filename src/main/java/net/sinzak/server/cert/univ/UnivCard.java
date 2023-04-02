@@ -1,13 +1,14 @@
-package net.sinzak.server.cert;
+package net.sinzak.server.cert.univ;
 
 import lombok.Getter;
 import net.sinzak.server.BaseTimeEntity;
+import net.sinzak.server.cert.Status;
 
 import javax.persistence.*;
 
 @Getter
 @Entity
-public class Cert extends BaseTimeEntity {
+public class UnivCard extends BaseTimeEntity { //대학 학생증인증.
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,31 +16,30 @@ public class Cert extends BaseTimeEntity {
     private Long id;
 
     @Column
-    private String email;
-
-    @Column
     private String univName;
 
     @Column
     private String univCardUrl;  //학생증 url
 
-    @Column
-    private boolean celeb_verified = false;
+    @Enumerated(value = EnumType.STRING)
+    private Status status = Status.YET;
 
-    public Cert(String email, String univName, String univCardUrl, boolean celeb_verified) {
-        this.email = email;
+    @Column
+    private Long userId;
+
+    public UnivCard(String univName, String univCardUrl, Long userId) {
         this.univName = univName;
         this.univCardUrl = univCardUrl;
-        this.celeb_verified = celeb_verified;
+        this.userId = userId;
     }
 
-    protected Cert() {}
+    protected UnivCard() {}
 
     public void updateImageUrl(String imageUrl) {
         this.univCardUrl = imageUrl;
     }
 
-    public void setVerified() {
-        this.celeb_verified = true;
+    public void setStatus(Status status) {
+        this.status = status;
     }
 }
