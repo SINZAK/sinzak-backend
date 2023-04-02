@@ -14,22 +14,33 @@ public class Banner {
     @Column(name = "banner_id")
     private Long id;  //작품 번호
 
-    private String title;
-
     private String content;
 
     private String imageUrl;
 
+    private String pcImageUrl;
+
+    private String href;
+
     @Builder
-    public Banner(String title, String content, String imageUrl) {
-        this.title = title;
+    public Banner(String content, String imageUrl, String pcImageUrl) {
         this.content = content;
         this.imageUrl = imageUrl;
+        this.pcImageUrl = pcImageUrl;
+        this.href = "";
     }
 
     protected Banner() {}
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+        this.pcImageUrl = imageUrl;
     }
+
+    public void setUserInfo(Long userId, String nickName) {
+        this.href = "/profile/"+userId.toString();
+        this.content = nickName;
+    }
+
+
 }

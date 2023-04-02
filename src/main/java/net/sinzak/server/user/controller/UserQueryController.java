@@ -3,6 +3,9 @@ package net.sinzak.server.user.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import net.sinzak.server.common.UserUtils;
+import net.sinzak.server.common.error.UserNotFoundException;
+import net.sinzak.server.common.error.UserNotLoginException;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.user.service.UserQueryService;
 import org.json.simple.JSONObject;
@@ -23,7 +26,13 @@ public class UserQueryController {
     @ApiOperation(value ="유저 프로필 보기")
     @GetMapping(value ="/users/{userId}/profile")
     public JSONObject getUserProfile(@PathVariable Long userId){
-       return userQueryService.getUserProfile(userId);
+        try{
+            UserUtils.getContextHolderId();
+            return userQueryService.getUserProfileForUser(userId);
+        }
+        catch (UserNotLoginException e){
+            return userQueryService.getUserProfileForGuest(userId); /** 비회원용 **/
+        }
     }
 
     @ApiOperation(value ="모든 유저 목록 보기")

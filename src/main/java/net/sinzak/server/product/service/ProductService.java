@@ -2,6 +2,7 @@ package net.sinzak.server.product.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.sinzak.server.alarm.service.AlarmService;
 import net.sinzak.server.common.PostService;
 import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.user.domain.Role;
@@ -21,6 +22,8 @@ import net.sinzak.server.user.repository.SearchHistoryRepository;
 import net.sinzak.server.user.repository.UserRepository;
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -48,11 +51,13 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     private final S3Service s3Service;
     private final ProductQDSLRepositoryImpl QDSLRepository;
     private final SearchHistoryRepository historyRepository;
+    private final AlarmService alarmService;
 
     private final static int HistoryMaxCount = 10;
     private final int HOME_OBJECTS = 10;
     private final int HOME_DETAIL_OBJECTS = 50;
 
+    @CacheEvict(value = {"home_user","home_guest"}, allEntries = true)
     @Transactional(rollbackFor = {Exception.class})
     public JSONObject makePost(@Valid ProductPostDto buildDto){   // 글 생성
         User user = userRepository.findByIdFetchProductPostList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
@@ -125,6 +130,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional(rollbackFor = {Exception.class})
+    @CacheEvict(value = {"home_user","home_guest"}, allEntries = true)
     public JSONObject editPost(Long productId, ProductEditDto editDto){
         User user = userUtils.getCurrentUser();
         Product product = productRepository.findById(productId).orElseThrow(PostNotFoundException::new);
@@ -137,7 +143,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional(rollbackFor = {Exception.class})
-    public JSONObject deletePost(Long productId){   // 글 생성
+    @CacheEvict(value = {"home_user","home_guest"}, allEntries = true)
+    public JSONObject deletePost(Long productId){
         User user = userUtils.getCurrentUser();
         Product product = productRepository.findByIdFetchChatRooms(productId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(product.getUser().getId()) && user.getRole() != Role.ADMIN)
@@ -180,7 +187,6 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return PropertyUtil.response(detailForm);
     }
 
-//    @Cacheable(value ="showProductDetailCache",key="#id",cacheManager ="testCacheManager")
     @Transactional
     public JSONObject showDetailForGuest(Long id){   // 비회원 글 보기
         Product product = productRepository.findByIdFetchImages(id).orElseThrow(PostNotFoundException::new);
@@ -232,25 +238,26 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
 
+    @Cacheable(value ="home_user", key = "#userId", cacheManager ="testCacheManager")
     @Transactional(readOnly = true)
-    public JSONObject showHomeForUser(){
+    public JSONObject showHomeForUser(Long userId){
         JSONObject obj = new JSONObject();
         User user = userRepository.findByIdFetchFollowingAndLikesList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
         List<String> userCategories = Arrays.asList(user.getCategoryLike().split(","));
 
         List<Product> productList = productRepository.findAllProductNotDeleted();
-        obj.put("new", makeHomeShowForms(user.getProductLikesList(), productList));   /** 신작 3개 **/
+        obj.put("new", makeHomeShowForms(user.getProductLikesList(), productList));   /** 신작 **/
 
         List<Product> list = QDSLRepository.findCountByCategoriesDesc(userCategories, HOME_OBJECTS);
-        obj.put("recommend", makeHomeShowForms(user.getProductLikesList(), list)); /** 추천목록 3개 **/
+        obj.put("recommend", makeHomeShowForms(user.getProductLikesList(), list)); /** 추천목록  **/
 
         List<Product> followingList = getFollowingList(user, productList, HOME_OBJECTS);
-        obj.put("following", makeHomeShowForms(user.getProductLikesList(),followingList)); /** 팔로잉 관련 3개 **/
+        obj.put("following", makeHomeShowForms(user.getProductLikesList(),followingList)); /** 팔로잉 **/
 
         return PropertyUtil.response(obj);
     }
 
-
+    @Cacheable(value ="home_guest", cacheManager ="testCacheManager")
     @Transactional(readOnly = true)
     public JSONObject showHomeForGuest(){
         JSONObject obj = new JSONObject();
@@ -391,9 +398,10 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         User user = userUtils.getCurrentUser();
         if(suggestRepository.findByUserIdAndProductId(user.getId(),dto.getId()).isPresent())
             return PropertyUtil.responseMessage("이미 제안을 하신 작품입니다.");
-        Product product = productRepository.findById(dto.getId()).orElseThrow();
+        Product product = productRepository.findByIdFetchUser(dto.getId()).orElseThrow();
         ProductSuggest connect = ProductSuggest.createConnect(product, user);
         product.setTopPrice(dto.getPrice());
+//        alarmService.makeAlarm(product.getUser(),product.getThumbnail(),product.getId().toString(),Integer.toString(dto.getPrice()));
         suggestRepository.save(connect);
         return PropertyUtil.response(true);
     }

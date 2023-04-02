@@ -41,6 +41,6 @@ public class UserUtils {
             return Long.valueOf(authentication.getName());
         }
 
-        throw new UserNotFoundException();
+        throw new UserNotLoginException();
     }
 }

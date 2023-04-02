@@ -23,6 +23,8 @@ import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -135,7 +137,7 @@ public class UserQueryService {
     }
 
 
-    public JSONObject getUserProfile(Long userId) {
+    public JSONObject getUserProfileForUser(Long userId) {
         JSONObject obj = new JSONObject();
         User findUser = userRepository.findByIdFetchProductPostList(userId).orElseThrow(()->new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND));
         List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
@@ -143,6 +145,17 @@ public class UserQueryService {
         List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList(),false);
         obj.put("works", workShowForms);
         obj.put("profile",makeUserDto(userUtils.getCurrentUserId(), findUser));
+        return PropertyUtil.response(obj);
+    }
+
+    public JSONObject getUserProfileForGuest(Long userId) {
+        JSONObject obj = new JSONObject();
+        User findUser = userRepository.findByIdFetchProductPostList(userId).orElseThrow(()->new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND));
+        List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
+        obj.put("products", productShowForms);
+        List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList(),false);
+        obj.put("works", workShowForms);
+        obj.put("profile",makeUserDto(0L, findUser));
         return PropertyUtil.response(obj);
     }
     private UserDto makeUserDto(Long loginUserId, User findUser) {
@@ -162,7 +175,7 @@ public class UserQueryService {
                 .build();
     }
     public boolean checkIfFollowFindUser(Long loginUserId,User findUser){
-        if(loginUserId == null){
+        if(loginUserId.equals(0L)){
             return false;
         }
         if(findUser.getFollowerList().contains(loginUserId)){
@@ -171,7 +184,7 @@ public class UserQueryService {
         return false;
     }
     public boolean checkIfMyProfile(Long loginUserId, User findUser){
-        if(loginUserId == null){
+        if(loginUserId.equals(0L)){
             return false;
         }
         if(findUser.getId().equals(loginUserId)){
@@ -249,6 +262,25 @@ public class UserQueryService {
         }
 
         return PropertyUtil.response(obj);
+    }
+
+    public Optional<String> getUserNickName(Long id){
+        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+        return Optional.of(user.getNickName());
+    }
+
+
+    public Optional<User> getCertifiedRandomUser() throws NoSuchAlgorithmException {
+        List<User> users = userRepository.findAllNotDeleted();
+        List<User> certUsers = users.stream()
+                .filter(User::isCert_celeb)
+                .collect(Collectors.toList());
+        if(certUsers.size() == 0)
+            return Optional.empty();
+        Random random = SecureRandom.getInstanceStrong();
+        int randomNumber = random.nextInt(certUsers.size());
+        User randomUser = certUsers.get(randomNumber);
+        return Optional.of(randomUser);
     }
 
 }
