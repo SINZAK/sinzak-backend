@@ -19,7 +19,6 @@ import net.sinzak.server.user.repository.UserRepository;
 import net.sinzak.server.work.domain.Work;
 import net.sinzak.server.work.domain.WorkWish;
 import net.sinzak.server.work.repository.WorkWishRepository;
-import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -158,7 +157,7 @@ public class UserQueryService {
                 .univ(findUser.getUniv())
                 .isFollow(checkIfFollowFindUser(loginUserId,findUser))
                 .cert_uni(findUser.isCert_uni())
-                .cert_celeb(findUser.isCert_celeb())
+                .cert_celeb(findUser.isCert_author())
                 .categoryLike(findUser.getCategoryLike())
                 .build();
     }

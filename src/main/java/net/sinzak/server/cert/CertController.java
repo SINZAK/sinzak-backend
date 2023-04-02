@@ -3,6 +3,8 @@ package net.sinzak.server.cert;
 import com.univcert.api.UnivCert;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
+import net.sinzak.server.cert.dto.MailDto;
+import net.sinzak.server.cert.dto.PortFolioDto;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.user.dto.request.UnivDto;
 import org.json.simple.JSONObject;
@@ -65,17 +67,31 @@ public class CertController {
     }
 
     @ApiDocumentResponse
+    @ApiOperation(value = "대학교 학생증 인증 허용",notes = "프론트에서 구현은 X 관리자용")
+    @PostMapping(value = "/certify/{id}/univ/complete")
+    public JSONObject completeUnivCard(@PathVariable("id") Long certId) {
+        return certService.completeUnivCard(certId);
+    }
+
+    @ApiDocumentResponse
     @ApiOperation(value = "인증작가 신청", notes = "대학인증 마친 상태에서 요청할 수 있도록 해주세요. \n ***중요*** " +
             "인증작가 신청하기 시 status가 'PROCESS'면 처리 중인거니까 더 이상 요청 못 보내게 해주세요. status가 YET인 상황일 때만 보낼 수 있도록 해주세요. 완료시 status = COMPLETE\n" +
             "대학인증 여부는 /my-profile에서 받았던거 그대로 됩니다 \n" +
             "cert_celeb은 저희가 직접 확인하기 전까지 false")
     @PostMapping(value = "/certify/author")
-    public JSONObject updateUser(@RequestBody PortFolioDto dto) {
+    public JSONObject updateCertifiedAuthor(@RequestBody PortFolioDto dto) {
         return certService.applyCertifiedAuthor(dto.getPortFolio());
     }
 
+    @ApiDocumentResponse
+    @ApiOperation(value = "대학교 학생증 인증 허용",notes = "프론트에서 구현은 X 관리자용")
+    @PostMapping(value = "/certify/{id}/author/complete")
+    public JSONObject completeCeleb(@PathVariable("id") Long certId) {
+        return certService.completeCeleb(certId);
+    }
 
-    @ApiOperation(value = "인증상태 여부 보기!!!", notes = "")
+
+    @ApiOperation(value = "인증상태 여부 보기!!!", notes = "status가 process(처리중) 일 경우 재인증 못하게 해주세요 !")
     @GetMapping(value = "/certify/status")
     public JSONObject getStatus() {
         return certService.getStatus();

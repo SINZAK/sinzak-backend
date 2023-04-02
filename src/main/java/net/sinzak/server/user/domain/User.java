@@ -77,7 +77,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     private boolean cert_uni=false; //대학 인증여부
 
     @Column
-    private boolean cert_celeb=false; //인플루언서 인증여부
+    private boolean cert_author =false; //인플루언서 인증여부
 
     @Column
     private int popularity=0;  //'지금 뜨는 아티스트' 때문에 만듦
@@ -149,8 +149,16 @@ public class User extends BaseTimeEntity implements UserDetails {
         isDelete = delete;
     }
 
+    public void setUniv(String univName) {
+        this.univ = univName;
+    }
+
     public void setCertifiedUniv() {
         this.cert_uni = true;
+    }
+
+    public void setCertifiedCeleb() {
+        this.cert_author = true;
     }
 
     @Builder
@@ -237,7 +245,7 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     public void setCertifiedAuthor(String portFolioUrl) {
         this.portFolioUrl = portFolioUrl;
-        this.cert_celeb = true;
+        this.cert_author = true;
     }
 
     @Override

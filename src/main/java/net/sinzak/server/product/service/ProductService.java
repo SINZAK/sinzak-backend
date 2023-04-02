@@ -161,7 +161,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         DetailProductForm detailForm = makeProductDetailForm(product, images);
         if(!product.getUser().isDelete()){
             User postUser = product.getUser();
-            detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_celeb(), postUser.getFollowerNum());
+            detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_author(), postUser.getFollowerNum());
         }
         else
             detailForm.setUserInfo(null, "탈퇴한 회원", null, "??", false, false, "0");
@@ -187,7 +187,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         DetailProductForm detailForm = makeProductDetailForm(product, product.getImages());
         if(!product.getUser().isDelete()){
             User postUser = product.getUser();
-            detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_celeb(), postUser.getFollowerNum());
+            detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_author(), postUser.getFollowerNum());
         }
         else{
             detailForm.setUserInfo(null, "탈퇴한 회원", null, "??", false, false, "0");

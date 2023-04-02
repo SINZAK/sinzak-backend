@@ -161,7 +161,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         DetailWorkForm detailForm = makeWorkDetailForm(work, images);
         if(!work.getUser().isDelete()){
             User postUser = work.getUser();
-            detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_celeb(), postUser.getFollowerNum());
+            detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_author(), postUser.getFollowerNum());
         }
         else
             detailForm.setUserInfo(null, "탈퇴한 회원", null, "??", false, false, "0");
@@ -208,7 +208,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         DetailWorkForm detailForm = makeWorkDetailForm(work, work.getImages());
         if(!work.getUser().isDelete()){
             User postUser = work.getUser();
-            detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_celeb(), postUser.getFollowerNum());
+            detailForm.setUserInfo(postUser.getId(),postUser.getNickName(),postUser.getPicture(),postUser.getUniv(),postUser.isCert_uni(),postUser.isCert_author(), postUser.getFollowerNum());
         }
         else{
             detailForm.setUserInfo(null, "탈퇴한 회원", null, "??", false, false, "0");
