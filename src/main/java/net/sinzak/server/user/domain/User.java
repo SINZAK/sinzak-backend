@@ -58,10 +58,6 @@ public class User extends BaseTimeEntity implements UserDetails {
     private String univ="";
 
     @Column
-    @JsonIgnore
-    private String major;
-
-    @Column
     private String followingNum="0";
 
     @Column
