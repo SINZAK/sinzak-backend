@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 
 @Service
@@ -26,10 +25,11 @@ public class BannerService {
     private final S3Service s3Service;
 
     @Transactional(rollbackFor = {Exception.class})
-    public JSONObject make(BannerDto dto){   // 글 생성
+    public JSONObject make(BannerDto dto){   // 배너 생성
         Banner banner = Banner.builder()
-                        .title(dto.getTitle())
-                        .content(dto.getContent()).build();
+                    .pcImageUrl("")
+                    .imageUrl("")
+                    .content(dto.getContent()).build();
         Long id = bannerRepository.save(banner).getId();
         return PropertyUtil.response(id);
     }

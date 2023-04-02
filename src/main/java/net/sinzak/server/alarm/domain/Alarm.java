@@ -31,6 +31,6 @@ public class Alarm extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private AlarmType alarmType;
     private String thumbnail;
-    private String link;
+    private String route;
 
 }

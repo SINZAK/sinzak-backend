@@ -87,7 +87,7 @@ public class UserCommandService {
         User findUser = userRepository.findByIdNotDeleted(userId).orElseThrow(UserNotFoundException::new);
         if(currentUserId.equals(findUser.getId()))
             return PropertyUtil.responseMessage("본인한테는 팔로우 불가능");
-        alarmService.makeAlarm(userUtils.getCurrentUser(),findUser.getPicture(),findUser.getId().toString(), AlarmType.FOLLOW, findUser.getNickName());
+
         return addFollow(findUser, currentUserId);
     }
 
@@ -110,13 +110,13 @@ public class UserCommandService {
     }
 
     public JSONObject addFollow(User findUser, Long loginUserId){
-        User user = userRepository.findByIdFetchFollowingList(loginUserId).orElseThrow(UserNotFoundException::new);
-        user.getFollowingList().add(findUser.getId());
+        User loginUser = userRepository.findByIdFetchFollowingList(loginUserId).orElseThrow(UserNotFoundException::new);
+        loginUser.getFollowingList().add(findUser.getId());
         findUser.getFollowerList().add(loginUserId);
-        fireBaseService.sendIndividualNotification(findUser,"팔로우 알림",findUser.getNickName(),findUser.getId().toString());
-
-        user.updateFollowNumber();
+        loginUser.updateFollowNumber();
         findUser.updateFollowNumber();
+        alarmService.makeAlarm(findUser,loginUser.getPicture(),loginUser.getId().toString(), AlarmType.FOLLOW, loginUser.getNickName());
+//        fireBaseService.sendIndividualNotification(findUser,"팔로우 알림",loginUser.getNickName(),loginUser.getId().toString());
         return PropertyUtil.response(true);
     }
 
