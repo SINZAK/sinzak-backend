@@ -172,11 +172,6 @@ public class ChatRoomCommandService {
         chatRoomRepository.save(chatRoom);
         return chatRoom;
     }
-    private GetCreatedChatRoomDto makeChatRoomDto( ChatRoom chatRoom) {
-        return GetCreatedChatRoomDto.builder()
-                .roomUuid(chatRoom.getRoomUuid())
-                .build();
-    }
 
     public void makeChatRoomBlocked(User user,User opponentUser,boolean isBlock){
         List<UserChatRoom> userChatRooms = userChatRoomRepository.findUserChatRoomByIdFetchChatRoom(user.getId());
