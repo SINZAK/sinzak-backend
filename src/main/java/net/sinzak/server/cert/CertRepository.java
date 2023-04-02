@@ -2,6 +2,7 @@ package net.sinzak.server.cert;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
@@ -9,4 +10,7 @@ public interface CertRepository extends JpaRepository<Cert, Long> {
 
     @Query("select c from Cert c where c.email = :mail")
     Optional<Cert> findCertByUnivEmail(String mail);
+
+    @Query("select c from Cert c where c.userId = :userId")
+    Optional<Cert> findCertByUserId(@Param("userId")Long userId);
 }

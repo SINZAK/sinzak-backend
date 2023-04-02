@@ -43,14 +43,13 @@ public class CertController {
         boolean success = (boolean) response.get("success");
         if(success)
             certService.updateCertifiedUniv(mailDto);
-
         return new JSONObject(response);
     }
 
 
     @ApiDocumentResponse
     @ApiOperation(value = "대학교 학생증 인증", notes = "대학명만 보내주세요. 메일은 무시.\n" +
-            "{\"success\":true, \"id\":3}\n해당 유저의 id를 전해드리니 이 /certify/{id}/univ 에 넘겨주세요)")
+            "{\"success\":true, \"id\":3}\n해당 유저의 id를 전해드리니 이 /certify/{id}/univ 에 넘겨주세요), \n 학생증 인증은 디폴트로 대학인증 된거로 처리 할 예정. 나중에 시간날 때 아니다 싶으면 인증 해제 하면됨.")
     @PostMapping(value = "/certify/univ", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public JSONObject certifyUniv(@RequestBody UnivDto univDto) {
         return certService.certifyUniv(univDto);
@@ -60,17 +59,26 @@ public class CertController {
     @ApiOperation(value = "대학교 학생증 사진 업로드")
     @PostMapping(value = "/certify/{id}/univ", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     @ApiImplicitParam(name = "multipartFile", dataType = "multipartFile",
-            value = "파일 보내주시면 파일 s3서버에 저장 및, 해당 파일이 저장되어 있는 URL을 디비에 저장합니다")
+            value = "파일 보내주시면 파일 s3서버에 저장 및, 해당 파일이 저장되어 있는 URL을 디비에 저장합니다, \n 학생증 인증은 디폴트로 대학인증 된거로 처리 할 예정. 나중에 시간날 때 아니다 싶으면 인증 해제 하면됨.")
     public JSONObject uploadUnivCard(@PathVariable("id") Long certId, @RequestPart MultipartFile multipartFile) {
         return certService.uploadUnivCard(certId, multipartFile);
     }
 
     @ApiDocumentResponse
-    @ApiOperation(value = "인증작가 신청", notes = "대학인증 마친 상태에서 요청할 수 있도록 해주세요. 대학인증 여부는 /my-profile에서 받았던거 그대로 됩니다 \n" +
-            "테스트 할 때는  my-profile에서 port_folio_url이 바뀌는 지 체킹 하면 됩니다. cert_celeb은 저희가 직접 확인하기 전까지 false")
+    @ApiOperation(value = "인증작가 신청", notes = "대학인증 마친 상태에서 요청할 수 있도록 해주세요. \n ***중요*** " +
+            "인증작가 신청하기 시 status가 'PROCESS'면 처리 중인거니까 더 이상 요청 못 보내게 해주세요. status가 YET인 상황일 때만 보낼 수 있도록 해주세요. 완료시 status = COMPLETE\n" +
+            "대학인증 여부는 /my-profile에서 받았던거 그대로 됩니다 \n" +
+            "cert_celeb은 저희가 직접 확인하기 전까지 false")
     @PostMapping(value = "/certify/author")
     public JSONObject updateUser(@RequestBody PortFolioDto dto) {
         return certService.applyCertifiedAuthor(dto.getPortFolio());
+    }
+
+
+    @ApiOperation(value = "인증상태 여부 보기!!!", notes = "")
+    @GetMapping(value = "/certify/status")
+    public JSONObject getStatus() {
+        return certService.getStatus();
     }
 
 }

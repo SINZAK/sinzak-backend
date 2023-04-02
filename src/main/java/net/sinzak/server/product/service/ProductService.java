@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.common.PostService;
 import net.sinzak.server.common.UserUtils;
+import net.sinzak.server.user.domain.Role;
 import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.common.dto.SuggestDto;
 import net.sinzak.server.common.error.UserNotFoundException;
@@ -103,7 +104,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional(rollbackFor = {Exception.class})
-    public JSONObject deleteImage(Long productId, String url){   // 글 생성
+    public JSONObject deleteImage(Long productId, String url){
         Product product = productRepository.findByIdFetchImages(productId).orElseThrow(PostNotFoundException::new);
         if(!userUtils.getCurrentUserId().equals(product.getUser().getId()))
             return PropertyUtil.responseMessage("해당 작품의 작가가 아닙니다.");
@@ -124,10 +125,10 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional(rollbackFor = {Exception.class})
-    public JSONObject editPost(Long productId, ProductEditDto editDto){   // 글 생성
+    public JSONObject editPost(Long productId, ProductEditDto editDto){
         User user = userUtils.getCurrentUser();
         Product product = productRepository.findById(productId).orElseThrow(PostNotFoundException::new);
-        if(!user.getId().equals(product.getUser().getId()))
+        if(!user.getId().equals(product.getUser().getId()) && user.getRole() != Role.ADMIN)
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
 
         product.editPost(editDto);
@@ -139,7 +140,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     public JSONObject deletePost(Long productId){   // 글 생성
         User user = userUtils.getCurrentUser();
         Product product = productRepository.findByIdFetchChatRooms(productId).orElseThrow(PostNotFoundException::new);
-        if(!user.getId().equals(product.getUser().getId()))
+        if(!user.getId().equals(product.getUser().getId()) && user.getRole() != Role.ADMIN)
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
         deleteImagesInPost(product);
         product.setDeleted(true);

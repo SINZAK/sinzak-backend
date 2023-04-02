@@ -41,9 +41,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     private String email;
 
     @Column
-    private String univ_email="";
-
-    @Column
+    @JsonIgnore
     private String name;
 
     @Column
@@ -151,6 +149,9 @@ public class User extends BaseTimeEntity implements UserDetails {
         isDelete = delete;
     }
 
+    public void setCertifiedUniv() {
+        this.cert_uni = true;
+    }
 
     @Builder
     public User(String email, String name, String nickName, String categoryLike, String origin) throws NoSuchAlgorithmException {
@@ -200,10 +201,8 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.categoryLike = categoryLike;
     }
 
-    public void updateCertifiedUniv(String univName, String univ_email) {
-        this.univ_email = univ_email;
+    public void updateStatus(String univName) {
         this.univ = univName;
-        this.cert_uni = true;
     }
 
     public void updateFollowNumber(){
@@ -236,8 +235,9 @@ public class User extends BaseTimeEntity implements UserDetails {
         return "";
     }
 
-    public void setPortFolioUrl(String portFolioUrl) {
+    public void setCertifiedAuthor(String portFolioUrl) {
         this.portFolioUrl = portFolioUrl;
+        this.cert_celeb = true;
     }
 
     @Override

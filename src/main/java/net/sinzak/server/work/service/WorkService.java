@@ -12,6 +12,7 @@ import net.sinzak.server.image.S3Service;
 import net.sinzak.server.common.dto.SuggestDto;
 import net.sinzak.server.product.dto.SellDto;
 import net.sinzak.server.product.dto.ShowForm;
+import net.sinzak.server.user.domain.Role;
 import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.repository.SearchHistoryRepository;
@@ -125,8 +126,9 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
 
     @Transactional(rollbackFor = {Exception.class})
     public JSONObject editPost(Long workId, WorkEditDto editDto){
+        User user = userUtils.getCurrentUser();
         Work work = workRepository.findByIdNotDeleted(workId).orElseThrow(PostNotFoundException::new);
-        if(!userUtils.getCurrentUserId().equals(work.getUser().getId()))
+        if(!user.getId().equals(work.getUser().getId()) && user.getRole() != Role.ADMIN)
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
 
         work.editPost(editDto);
@@ -136,8 +138,9 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
 
     @Transactional(rollbackFor = {Exception.class})
     public JSONObject deletePost(Long workId){   // 글 생성
+        User user = userUtils.getCurrentUser();
         Work work = workRepository.findByIdFetchChatRooms(workId).orElseThrow(PostNotFoundException::new);
-        if(!userUtils.getCurrentUserId().equals(work.getUser().getId()))
+        if(!user.getId().equals(work.getUser().getId()) && user.getRole() != Role.ADMIN)
             return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
         deleteImagesInPost(work);
         work.setDeleted(true);

@@ -20,14 +20,14 @@ public class BannerController {
 
     @ApiDocumentResponse
     @ApiOperation(value = "배너 생성",notes = "{\"success\":true, \"id\":2}\n해당 글의 id를 전해드리니 이 /banner/{id}/image 에 넘겨주세요\n")
-    @PostMapping(value = "/banner/build", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping(value = "/admin/banner/build", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public JSONObject makeProductPost(@RequestBody BannerDto buildDto) {
         return bannerService.make(buildDto);
     }
 
     @ApiDocumentResponse
     @ApiOperation(value = "배너 이미지 등록")
-    @PostMapping(value = "/banner/{id}/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/admin/banner/{id}/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @ApiImplicitParam(name = "multipartFile", dataType = "multipartFile",
             value = "파일 보내주시면 파일 s3서버에 저장 및, 해당 파일이 저장되어 있는 URL을 디비에 저장합니다")
     public JSONObject makeProductPost(@PathVariable("id") Long bannerId, @RequestPart MultipartFile multipartFile) {
