@@ -1,4 +1,4 @@
-package net.sinzak.server.cert;
+package net.sinzak.server.cert.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;

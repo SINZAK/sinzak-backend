@@ -16,7 +16,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -26,15 +25,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .headers().frameOptions().disable() // h2-console 화면을 사용하기 위해 해당 옵션 disable
                 .and()
                 .authorizeRequests()// URL별 권한 권리
-                .antMatchers(AUTH_WHITELIST).permitAll()
+                .antMatchers("/admin/**").hasRole("ADMIN")
+                .anyRequest().permitAll()
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
                         UsernamePasswordAuthenticationFilter.class)
                 .logout()
                 .logoutSuccessUrl("/");
     }
-
-    private static final String[] AUTH_WHITELIST ={
-            "/","/css/**","/images/**","/js/**","/h2-console/**","/swagger-ui/**","/swagger-ui.html"
-    };
 }

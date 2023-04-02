@@ -1,5 +1,6 @@
 package net.sinzak.server.cert;
 
+import net.sinzak.server.cert.dto.MailDto;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,7 @@ import javax.transaction.Transactional;
 
 @SpringBootTest
 @EnableAspectJAutoProxy
-class CertServiceTest {
+class UnivCardServiceTest {
 
     @Autowired
     private UserRepository userRepository;
@@ -37,7 +38,7 @@ class CertServiceTest {
 
         User user = userRepository.findById(202L).orElseThrow();
         MailDto dto = new MailDto("New University","new_univ_email@example.com");
-        user.updateCertifiedUniv(dto.getUnivName(), dto.getUniv_email());
+//        user.updateCertifiedUniv(dto.getUnivName(), dto.getUniv_email());
 
         stopWatch.stop();
         System.out.println("실행 시간: " + stopWatch.getTotalTimeMillis() + "ms");
@@ -47,9 +48,9 @@ class CertServiceTest {
     @Transactional
     @Rollback(false)
     public void testUpdateCertifiedUniv2() {
-        User user = new User(203L,"test@example.com","test");
-        userRepository.save(user);
-        USER = user;
+//        User user = new User(203L,"test@example.com","test");
+//        userRepository.save(user);
+//        USER = user;
         entityManager.merge(USER);
     }
 
@@ -63,7 +64,7 @@ class CertServiceTest {
 
         MailDto dto = new MailDto("New University","new_univ_email@example.com");
         User managedUser = entityManager.contains(USER) ? USER : entityManager.merge(USER);
-        managedUser.updateCertifiedUniv(dto.getUnivName(), dto.getUniv_email());
+//        managedUser.updateCertifiedUniv(dto.getUnivName(), dto.getUniv_email());
         entityManager.flush();
 
         stopWatch.stop();

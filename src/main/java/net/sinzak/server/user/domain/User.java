@@ -40,9 +40,7 @@ public class User extends BaseTimeEntity{
     private String email;
 
     @Column
-    private String univ_email="";
-
-    @Column
+    @JsonIgnore
     private String name;
 
     @Column
@@ -57,10 +55,6 @@ public class User extends BaseTimeEntity{
 
     @Column
     private String univ="";
-
-    @Column
-    @JsonIgnore
-    private String major;
 
     @Column
     private String followingNum="0";
@@ -78,7 +72,7 @@ public class User extends BaseTimeEntity{
     private boolean cert_uni=false; //대학 인증여부
 
     @Column
-    private boolean cert_celeb=false; //인플루언서 인증여부
+    private boolean cert_author =false; //인플루언서 인증여부
 
     @Column
     private int popularity=0;  //'지금 뜨는 아티스트' 때문에 만듦
@@ -155,6 +149,17 @@ public class User extends BaseTimeEntity{
         isDelete = delete;
     }
 
+    public void setUniv(String univName) {
+        this.univ = univName;
+    }
+
+    public void setCertifiedUniv() {
+        this.cert_uni = true;
+    }
+
+    public void setCertifiedCeleb() {
+        this.cert_author = true;
+    }
 
     @Builder
     public User(String email, String name, String nickName, String categoryLike, String origin) throws NoSuchAlgorithmException {
@@ -201,10 +206,8 @@ public class User extends BaseTimeEntity{
         this.categoryLike = categoryLike;
     }
 
-    public void updateCertifiedUniv(String univName, String univ_email) {
-        this.univ_email = univ_email;
+    public void updateStatus(String univName) {
         this.univ = univName;
-        this.cert_uni = true;
     }
 
     public void updateFollowNumber(){
@@ -237,8 +240,9 @@ public class User extends BaseTimeEntity{
         return "";
     }
 
-    public void setPortFolioUrl(String portFolioUrl) {
+    public void setCertifiedAuthor(String portFolioUrl) {
         this.portFolioUrl = portFolioUrl;
+        this.cert_author = true;
     }
 
     protected User() throws NoSuchAlgorithmException {}
