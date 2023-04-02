@@ -39,7 +39,20 @@ public class BannerController {
     }
 
     @ApiDocumentResponse
-    @ApiOperation(value = "배너 정보 출력", notes = "떠오르는 작가 배너는 user_id까지 같이 드립니다 해당 유저 프로필로 이동할 수 있게 프로필 링크해주세요")
+    @ApiOperation(value = "배너 정보 출력", notes = "{\n" +
+            "      \"id\": 3,\n" +
+            "      \"content\": \"TEST\",\n" +
+            "      \"imageUrl\": \"https://sinzakimage.s3.ap-northeast-2.amazonaws.com/static/banner3.png\",\n" +
+            "      \"pcImageUrl\": \"https://sinzakimage.s3.ap-northeast-2.amazonaws.com/static/webBanner3.png\",\n" +
+            "      \"href\": \"\"\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"id\": 4,\n" +
+            "      \"content\": \"신작\",\n" +
+            "      \"imageUrl\": \"https://sinzakimage.s3.ap-northeast-2.amazonaws.com/static/banner4.png\",\n" +
+            "      \"pcImageUrl\": \"https://sinzakimage.s3.ap-northeast-2.amazonaws.com/static/webBanner4.png\",\n" +
+            "      \"href\": \"/profile/106\"\n" +
+            "    }")
     @GetMapping(value = "/banner")
     public JSONObject showBannerList() {
         return bannerService.getList();
