@@ -77,7 +77,7 @@ public class CertService {
         Celeb celeb = celebRepository.findById(id).orElseThrow(InstanceNotFoundException::new);
         celeb.setStatus(Status.COMPLETE);
         User user = userRepository.findByIdNotDeleted(celeb.getUserId()).orElseThrow(UserNotFoundException::new);
-        user.setCertifiedCeleb();
+        user.setCertifiedAuthor();
         return PropertyUtil.response(true);
     }
 
