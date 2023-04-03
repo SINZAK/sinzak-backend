@@ -170,7 +170,7 @@ public class UserQueryService {
                 .univ(findUser.getUniv())
                 .isFollow(checkIfFollowFindUser(loginUserId,findUser))
                 .cert_uni(findUser.isCert_uni())
-                .cert_celeb(findUser.isCert_author())
+                .cert_author(findUser.isCert_author())
                 .categoryLike(findUser.getCategoryLike())
                 .build();
     }
