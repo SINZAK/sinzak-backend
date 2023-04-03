@@ -69,10 +69,10 @@ public class User extends BaseTimeEntity{
     private String categoryLike="";  //관심 장르
 
     @Column
-    private boolean cert_uni=false; //대학 인증여부
+    private boolean cert_uni =false; //대학 인증여부
 
     @Column
-    private boolean cert_author =false; //인플루언서 인증여부
+    private boolean cert_author =false; //인증작가 인증여부
 
     @Column
     private int popularity=0;  //'지금 뜨는 아티스트' 때문에 만듦
@@ -157,7 +157,7 @@ public class User extends BaseTimeEntity{
         this.cert_uni = true;
     }
 
-    public void setCertifiedCeleb() {
+    public void setCertifiedAuthor() {
         this.cert_author = true;
     }
 
@@ -168,6 +168,8 @@ public class User extends BaseTimeEntity{
         this.nickName = nickName;
         this.categoryLike = categoryLike;
         this.origin = origin;
+        this.cert_uni = false;
+        this.cert_author = false;
         this.role = Role.USER;
     }
 
@@ -179,6 +181,8 @@ public class User extends BaseTimeEntity{
         this.picture = picture;
         this.origin = origin;
         this.categoryLike = "";
+        this.cert_uni = false;
+        this.cert_author = false;
         this.role = Role.USER;
 //        this.alarm_receive = false;
     }

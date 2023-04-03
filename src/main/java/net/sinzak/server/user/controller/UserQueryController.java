@@ -3,6 +3,7 @@ package net.sinzak.server.user.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import net.sinzak.server.common.PropertyUtil;
 import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.error.UserNotLoginException;
@@ -27,12 +28,13 @@ public class UserQueryController {
     @GetMapping(value ="/users/{userId}/profile")
     public JSONObject getUserProfile(@PathVariable Long userId){
         try{
-            UserUtils.getContextHolderId();
-            return userQueryService.getUserProfileForUser(userId);
+            Long currentUserId = UserUtils.getContextHolderId();
+            return userQueryService.getUserProfileForUser(currentUserId, userId);
         }
-        catch (UserNotLoginException e){
+        catch (UserNotFoundException | UserNotLoginException e){
             return userQueryService.getUserProfileForGuest(userId); /** 비회원용 **/
         }
+
     }
 
     @ApiOperation(value ="모든 유저 목록 보기")
@@ -77,6 +79,8 @@ public class UserQueryController {
         return userQueryService.showReportList();
     }
 
-
-
+    @ApiDocumentResponse
+    @ApiOperation(value = "안드로이드 버전 출력", notes = "무시")
+    @PostMapping(value = "/aos/version")
+    public JSONObject version(){return PropertyUtil.response(12);}
 }

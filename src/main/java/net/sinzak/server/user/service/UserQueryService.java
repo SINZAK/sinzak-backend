@@ -137,14 +137,14 @@ public class UserQueryService {
     }
 
 
-    public JSONObject getUserProfileForUser(Long userId) {
+    public JSONObject getUserProfileForUser(Long currentUserId, Long userId) {
         JSONObject obj = new JSONObject();
         User findUser = userRepository.findByIdFetchProductPostList(userId).orElseThrow(()->new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND));
         List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
         obj.put("products", productShowForms);
         List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList(),false);
         obj.put("works", workShowForms);
-        obj.put("profile",makeUserDto(userUtils.getCurrentUserId(), findUser));
+        obj.put("profile",makeUserDto(currentUserId, findUser));
         return PropertyUtil.response(obj);
     }
 
@@ -170,7 +170,7 @@ public class UserQueryService {
                 .univ(findUser.getUniv())
                 .isFollow(checkIfFollowFindUser(loginUserId,findUser))
                 .cert_uni(findUser.isCert_uni())
-                .cert_celeb(findUser.isCert_author())
+                .cert_author(findUser.isCert_author())
                 .categoryLike(findUser.getCategoryLike())
                 .build();
     }
@@ -273,7 +273,7 @@ public class UserQueryService {
     public Optional<User> getCertifiedRandomUser() throws NoSuchAlgorithmException {
         List<User> users = userRepository.findAllNotDeleted();
         List<User> certUsers = users.stream()
-                .filter(User::isCert_celeb)
+                .filter(User::isCert_author)
                 .collect(Collectors.toList());
         if(certUsers.size() == 0)
             return Optional.empty();
