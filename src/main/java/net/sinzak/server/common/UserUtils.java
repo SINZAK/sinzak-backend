@@ -1,7 +1,6 @@
 package net.sinzak.server.common;
 
 import lombok.RequiredArgsConstructor;
-import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.error.UserNotLoginException;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.service.UserAdaptor;

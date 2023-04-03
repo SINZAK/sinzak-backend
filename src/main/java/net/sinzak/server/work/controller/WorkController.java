@@ -77,8 +77,8 @@ public class WorkController {
     @ApiOperation(value = "의뢰 상세 조회")
     public JSONObject showWorks(@PathVariable Long id) {
         try{
-            UserUtils.getContextHolderId();
-            return workService.showDetailForUser(id);
+            Long currentUserId = UserUtils.getContextHolderId();
+            return workService.showDetailForUser(currentUserId, id);
         }
         catch (UserNotFoundException | UserNotLoginException e){
             return workService.showDetailForGuest(id); /** 비회원용 **/
@@ -133,7 +133,7 @@ public class WorkController {
                             "design\n" +
                             "editorial\n" +
                             "label\n" +
-                            "other", defaultValue = ""),
+                            "other"),
             @ApiImplicitParam(name = "search", dataType = "string", paramType = "query",
                     value = "String 값으로 주시고 최소 2글자 이상은 받아야 합니다. contain 메서드로 db에서 검색할 예정.")
     })
