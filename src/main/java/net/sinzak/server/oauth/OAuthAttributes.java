@@ -12,14 +12,12 @@ import java.util.Map;
 @Slf4j
 @ToString
 public class OAuthAttributes {
-    private String name;
     private String email;
     private String picture="";
     private String origin;
 
     @Builder
-    public OAuthAttributes(String name, String email, String picture, String origin) {
-        this.name = name;
+    public OAuthAttributes(String email, String picture, String origin) {
         this.email = email;
         this.picture = picture;
         this.origin = origin;
@@ -39,7 +37,7 @@ public class OAuthAttributes {
         JSONObject kakao_account = (JSONObject) attributes.get("kakao_account");
         JSONObject profile = (JSONObject) kakao_account.get("profile");
         return OAuthAttributes.builder()
-                .name((String) profile.get("nickname"))
+//                .name((String) profile.get("nickname"))
                 .email((String) kakao_account.get("email"))
                 .picture("")
 //                .picture((String) profile.get("profile_image_url"))
@@ -51,7 +49,6 @@ public class OAuthAttributes {
         System.out.println(attributes.toJSONString());
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
         return OAuthAttributes.builder()
-                .name("")
                 .email((String) response.get("email"))
                 .picture("")
 //                .picture((String) response.get("profile_image"))
@@ -62,7 +59,6 @@ public class OAuthAttributes {
 
     private static OAuthAttributes ofGoogle(JSONObject attributes) {
         return OAuthAttributes.builder()
-                .name("")
                 .email((String) attributes.get("email"))
                 .picture("")
                 .origin("Google")
@@ -72,7 +68,6 @@ public class OAuthAttributes {
     private static OAuthAttributes ofApple(JSONObject attributes) {
         log.warn(attributes.toJSONString());
         return OAuthAttributes.builder()
-                .name("")
                 .email((String) attributes.get("sub"))
                 .origin("Apple")
                 .build();

@@ -53,7 +53,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     private final SearchHistoryRepository historyRepository;
     private final AlarmService alarmService;
 
-    private final static int HistoryMaxCount = 10;
+    private final int HistoryMaxCount = 10;
     private final int HOME_OBJECTS = 10;
     private final int HOME_DETAIL_OBJECTS = 50;
 

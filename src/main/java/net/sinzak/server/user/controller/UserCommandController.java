@@ -15,6 +15,8 @@ import org.json.simple.JSONObject;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
+
 import java.security.NoSuchAlgorithmException;
 
 @Api(tags = "유저-명령")
@@ -63,7 +65,7 @@ public class UserCommandController {
     @ApiDocumentResponse
     @ApiOperation(value = "유저 정보변경", notes = "이름, 한줄 소개")
     @PostMapping(value = "/users/edit")
-    public JSONObject updateUser(@RequestBody UpdateUserDto dto) {
+    public JSONObject updateUser(@Valid @RequestBody UpdateUserDto dto) {
         return userCommandService.updateUser(dto);
     }
 

@@ -185,7 +185,7 @@ public class UserCommandService {
     public JSONObject resign(){
         try{
             User loginUser = userUtils.getCurrentUser();
-            loginUser.setDelete(true);
+            loginUser.setDelete();
             return PropertyUtil.response(true);
         }
         catch (Exception e){
