@@ -40,10 +40,6 @@ public class User extends BaseTimeEntity{
     private String email;
 
     @Column
-    @JsonIgnore
-    private String name;
-
-    @Column
     private String nickName="";
 
     @Column
@@ -162,9 +158,8 @@ public class User extends BaseTimeEntity{
     }
 
     @Builder
-    public User(String email, String name, String nickName, String categoryLike, String origin) throws NoSuchAlgorithmException {
+    public User(String email, String nickName, String categoryLike, String origin) throws NoSuchAlgorithmException {
         this.email = email;
-        this.name = name;
         this.nickName = nickName;
         this.categoryLike = categoryLike;
         this.origin = origin;
@@ -174,9 +169,8 @@ public class User extends BaseTimeEntity{
     }
 
     @Builder
-    public User(String email, String name, String picture, String origin) throws NoSuchAlgorithmException {
+    public User(String email, String picture, String origin) throws NoSuchAlgorithmException {
         this.email = email;
-        this.name = name;
         this.nickName = "";
         this.picture = picture;
         this.origin = origin;
