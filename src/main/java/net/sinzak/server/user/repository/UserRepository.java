@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
@@ -57,6 +58,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("select u from User u left join fetch u.followingList where u.id =:id and u.isDelete = false")
     Optional<User> findByIdFetchFollowingList(@Param("id") Long id);
+
+    @Query(value = "select following_id from following_list where user_id = :id", nativeQuery = true)
+    Set<Long> findFollowings(@Param("id") Long id);
+
+    @Query(value = "select follower_id from follower_list where user_id = :id", nativeQuery = true)
+    Set<Long> findFollowers(@Param("id") Long id);
 
     @Query("select u from User u left join fetch u.followingList left join fetch u.productLikesList where u.id = :id and u.isDelete = false")
     Optional<User> findByIdFetchFollowingAndLikesList(@Param("id") Long id);
