@@ -3,6 +3,8 @@ package net.sinzak.server.user.repository;
 
 import net.sinzak.server.config.auth.UserProjection;
 import net.sinzak.server.user.domain.User;
+import net.sinzak.server.user.domain.follow.Follower;
+import net.sinzak.server.user.domain.follow.Following;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -73,4 +75,16 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("select u from User u left join fetch u.productLikesList left join fetch u.historyList where u.id = :id and u.isDelete = false")
     Optional<User> findByIdFetchHistoryAndLikesList(@Param("id")Long id);
+
+    ////Follow 관련
+    @Query("select fr from Follower fr " +
+            "left join fetch fr.followerUser.id,fr.followerUser.nickName,fr.followerUser.picture " +
+            "where fr.user.id = :userId and fr.followerUser.isDelete = false")
+    Set<Follower> findFollowerByUserIdFetchFollowerUserIdAndNickNameAndPicture(@Param("userId") Long userId);
+
+    @Query("select fg from Following fg " +
+            "left join fetch fg.followingUser.id,fg.followingUser.nickName,fg.followingUser.picture " +
+            "where fg.user.id = :userId and fg.followingUser.isDelete = false")
+    Set<Following> findFollowingByUserIdFetchFollowingUserIdAndNickNameAndPicture(@Param("userId") Long userId);
+
 }

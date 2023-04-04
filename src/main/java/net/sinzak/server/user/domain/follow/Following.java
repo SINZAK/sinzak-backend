@@ -22,5 +22,5 @@ public class Following {
     User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    User opponentUser;
+    User followingUser;
 }
