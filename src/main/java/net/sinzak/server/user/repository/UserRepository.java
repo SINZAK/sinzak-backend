@@ -3,6 +3,7 @@ package net.sinzak.server.user.repository;
 
 import net.sinzak.server.config.auth.UserProjection;
 import net.sinzak.server.user.domain.User;
+import net.sinzak.server.user.dto.respond.GetFollowDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,6 +23,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     //유저 Id
     @Query("select u from User u where u.id = :id and u.isDelete = false")
     Optional<User> findByIdNotDeleted(@Param("id")Long id);
+
+    @Query("select u.id, u.nickName, u.picture from User u where u.id = :id and u.isDelete = false")
+    Optional<GetFollowDto> findByIdForFollow(@Param("id")Long id);
 
     @Query("select u from User u where u.isDelete = false")
     List<User> findAllNotDeleted();
