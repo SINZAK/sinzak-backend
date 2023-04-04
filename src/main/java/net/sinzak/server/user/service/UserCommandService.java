@@ -28,6 +28,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -189,6 +191,18 @@ public class UserCommandService {
         catch (Exception e){
             return PropertyUtil.responseMessage("탈퇴 처리가 되지 않았습니다. sinzakofficial@gmail.com 으로 문의주세요.");
         }
-
     }
+
+//    public JSONObject insert() throws NoSuchAlgorithmException {
+//        User user = User.builder().
+//                email(LocalDateTime.now().toString())
+//                .name("하이")
+//                .origin("KAKAO")
+//                .categoryLike("orient")
+//                .build();
+//        User loginUser = userRepository.findByIdNotDeleted(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
+//        userRepository.save(user);
+//        loginUser.getFollowingList().add(user.getId());
+//        return PropertyUtil.response(true);
+//    }
 }

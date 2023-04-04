@@ -15,6 +15,8 @@ import org.json.simple.JSONObject;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.NoSuchAlgorithmException;
+
 @Api(tags = "유저-명령")
 @RestController
 @RequiredArgsConstructor
@@ -133,6 +135,12 @@ public class UserCommandController {
     public JSONObject resign(){
         return userCommandService.resign();
     }
+
+//    @PostMapping(value ="/users/insert")
+//    public JSONObject insertUser() throws NoSuchAlgorithmException {
+//        return userCommandService.insert();
+//    }
+
 
 }
 
