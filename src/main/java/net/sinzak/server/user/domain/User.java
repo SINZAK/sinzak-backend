@@ -145,8 +145,8 @@ public class User extends BaseTimeEntity{
     public void setFcm(String fcmToken) {
         this.fcm = fcmToken;
     }
-    public void setDelete(boolean delete) {
-        isDelete = delete;
+    public void setDelete() {
+        isDelete = true;
     }
 
     public void setUniv(String univName) {
@@ -210,10 +210,6 @@ public class User extends BaseTimeEntity{
         this.categoryLike = categoryLike;
     }
 
-    public void updateStatus(String univName) {
-        this.univ = univName;
-    }
-
     public void updateFollowNumber(){
         this.followerNum = followNumberTrans(this.getFollowerList().size());
         this.followingNum = followNumberTrans(this.getFollowingList().size());
@@ -242,11 +238,6 @@ public class User extends BaseTimeEntity{
             return "만";
         }
         return "";
-    }
-
-    public void setCertifiedAuthor(String portFolioUrl) {
-        this.portFolioUrl = portFolioUrl;
-        this.cert_author = true;
     }
 
     protected User() throws NoSuchAlgorithmException {}

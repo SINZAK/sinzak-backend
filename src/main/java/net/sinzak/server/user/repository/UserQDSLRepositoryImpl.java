@@ -6,7 +6,6 @@ import net.sinzak.server.user.dto.respond.GetFollowDto;
 import net.sinzak.server.user.dto.respond.QGetFollowDto;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 import static net.sinzak.server.user.domain.QUser.user;

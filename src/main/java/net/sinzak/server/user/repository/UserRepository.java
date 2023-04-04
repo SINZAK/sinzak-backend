@@ -3,13 +3,13 @@ package net.sinzak.server.user.repository;
 
 import net.sinzak.server.config.auth.UserProjection;
 import net.sinzak.server.user.domain.User;
-import net.sinzak.server.user.dto.respond.GetFollowDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
@@ -23,9 +23,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     //유저 Id
     @Query("select u from User u where u.id = :id and u.isDelete = false")
     Optional<User> findByIdNotDeleted(@Param("id")Long id);
-
-    @Query("select u.id, u.nickName, u.picture from User u where u.id = :id and u.isDelete = false")
-    Optional<GetFollowDto> findByIdForFollow(@Param("id")Long id);
 
     @Query("select u from User u where u.isDelete = false")
     List<User> findAllNotDeleted();
@@ -61,6 +58,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("select u from User u left join fetch u.followingList where u.id =:id and u.isDelete = false")
     Optional<User> findByIdFetchFollowingList(@Param("id") Long id);
+
+    @Query(value = "select following_id from following_list where user_id = :id", nativeQuery = true)
+    Set<Long> findFollowings(@Param("id") Long id);
+
+    @Query(value = "select follower_id from follower_list where user_id = :id", nativeQuery = true)
+    Set<Long> findFollowers(@Param("id") Long id);
 
     @Query("select u from User u left join fetch u.followingList left join fetch u.productLikesList where u.id = :id and u.isDelete = false")
     Optional<User> findByIdFetchFollowingAndLikesList(@Param("id") Long id);

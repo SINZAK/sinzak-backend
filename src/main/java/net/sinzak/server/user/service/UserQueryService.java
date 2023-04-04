@@ -197,13 +197,13 @@ public class UserQueryService {
 
 
     public JSONObject getFollowerDtoList(Long userId){
-        Set<Long> followerList = userRepository.findByIdFetchFollowerList(userId).orElseThrow(UserNotFoundException::new).getFollowerList();
+        Set<Long> followerList = userRepository.findFollowers(userId);
         return makeFollowDtos(followerList);
     }
 
 
     public JSONObject getFollowingDtoList(Long userId){
-        Set<Long> followingList = userRepository.findByIdFetchFollowingList(userId).orElseThrow(UserNotFoundException::new).getFollowingList();
+        Set<Long> followingList = userRepository.findFollowings(userId);
         return makeFollowDtos(followingList);
     }
 
