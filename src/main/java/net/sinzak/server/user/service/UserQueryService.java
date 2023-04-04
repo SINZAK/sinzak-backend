@@ -15,6 +15,7 @@ import net.sinzak.server.user.dto.respond.*;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.repository.ReportRepository;
 import net.sinzak.server.user.repository.SearchHistoryRepository;
+import net.sinzak.server.user.repository.UserQDSLRepositoryImpl;
 import net.sinzak.server.user.repository.UserRepository;
 import net.sinzak.server.work.domain.Work;
 import net.sinzak.server.work.domain.WorkWish;
@@ -38,6 +39,7 @@ public class UserQueryService {
     private final WorkWishRepository workWishRepository;
     private final ProductWishRepository productWishRepository;
     private final ReportRepository reportRepository;
+    private final UserQDSLRepositoryImpl QDSLRepository;
 
     public JSONObject getMyProfile(){
         JSONObject obj = new JSONObject();
@@ -208,15 +210,12 @@ public class UserQueryService {
     private JSONObject makeFollowDtos(Set<Long> followList) {
         List<GetFollowDto> getFollowDtoList = new ArrayList<>();
         for(Long follow : followList){
-            Optional<User> findUser = userRepository.findByIdNotDeleted(follow);
-            if(findUser.isPresent()){
-                GetFollowDto getFollowDto = GetFollowDto.builder()
-                        .userId(findUser.get().getId())
-                        .name(findUser.get().getNickName())
-                        .picture(findUser.get().getPicture())
-                        .build();
-                getFollowDtoList.add(getFollowDto);
-            }
+            Optional<GetFollowDto> findUser = QDSLRepository.findByIdForFollow(follow);
+            findUser.ifPresent(user -> getFollowDtoList.add(GetFollowDto.builder()
+                    .userId(user.getUserId())
+                    .name(user.getName())
+                    .picture(user.getPicture())
+                    .build()));
         }
         return PropertyUtil.response(getFollowDtoList);
     }
