@@ -16,11 +16,14 @@ import javax.persistence.*;
 public class Following {
 
     @Id
+    @GeneratedValue
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id")
     User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="following_user_id")
     User followingUser;
 }

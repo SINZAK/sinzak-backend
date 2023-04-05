@@ -15,10 +15,7 @@ import net.sinzak.server.user.domain.follow.Follower;
 import net.sinzak.server.user.domain.follow.Following;
 import net.sinzak.server.user.dto.respond.*;
 import net.sinzak.server.user.domain.User;
-import net.sinzak.server.user.repository.ReportRepository;
-import net.sinzak.server.user.repository.SearchHistoryRepository;
-import net.sinzak.server.user.repository.UserQDSLRepositoryImpl;
-import net.sinzak.server.user.repository.UserRepository;
+import net.sinzak.server.user.repository.*;
 import net.sinzak.server.work.domain.Work;
 import net.sinzak.server.work.domain.WorkWish;
 import net.sinzak.server.work.repository.WorkWishRepository;
@@ -41,6 +38,8 @@ public class UserQueryService {
     private final WorkWishRepository workWishRepository;
     private final ProductWishRepository productWishRepository;
     private final ReportRepository reportRepository;
+    private final FollowingRepository followingRepository;
+    private final FollowerRepository followerRepository;
     private final UserQDSLRepositoryImpl QDSLRepository;
 
     public JSONObject getMyProfile(){
@@ -199,22 +198,21 @@ public class UserQueryService {
 
 
     public JSONObject getFollowerDtoList(Long userId){
-        Set<Follower> followers = userRepository.findFollowerByUserIdFetchFollowerUserIdAndNickNameAndPicture(userId);
+        Set<Follower> followers = followerRepository.findFollowerByUserIdFetchFollowerUserIdAndNickNameAndPicture(userId);
         List<User> users = followers.stream()
-                .map(Follower::getUser)
+                .map(Follower::getFollowerUser)
                 .collect(Collectors.toList());
         return makeFollowDtos(users);
     }
 
 
     public JSONObject getFollowingDtoList(Long userId){
-        Set<Following> followings = userRepository.findFollowingByUserIdFetchFollowingUserIdAndNickNameAndPicture(userId);
+        Set<Following> followings = followingRepository.findFollowingByUserIdFetchFollowingUserIdAndNickNameAndPicture(userId);
         List<User> users = followings.stream()
-                .map(Following::getUser)
+                .map(Following::getFollowingUser)
                 .collect(Collectors.toList());
         return makeFollowDtos(users);
     }
-
     private JSONObject makeFollowDtos(List<User> users) {
         List<GetFollowDto> getFollowDtoList = new ArrayList<>();
         for(User user :users){

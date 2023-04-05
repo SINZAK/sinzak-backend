@@ -138,10 +138,10 @@ public class UserCommandController {
         return userCommandService.resign();
     }
 
-//    @PostMapping(value ="/users/insert")
-//    public JSONObject insertUser() throws NoSuchAlgorithmException {
-//        return userCommandService.insert();
-//    }
+    @PostMapping(value ="/users/insert")
+    public JSONObject insertUser() throws NoSuchAlgorithmException {
+        return userCommandService.insert();
+    }
 
 
 }

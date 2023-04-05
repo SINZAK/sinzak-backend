@@ -16,6 +16,7 @@ import javax.persistence.*;
 public class Follower {
 
     @Id
+    @GeneratedValue
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -23,5 +24,6 @@ public class Follower {
     User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="follower_user_id")
     User followerUser;
 }
