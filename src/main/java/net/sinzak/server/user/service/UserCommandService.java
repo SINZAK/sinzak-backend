@@ -11,16 +11,16 @@ import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.firebase.FireBaseService;
 import net.sinzak.server.image.S3Service;
 import net.sinzak.server.user.domain.Report;
+import net.sinzak.server.user.domain.follow.Follower;
+import net.sinzak.server.user.domain.follow.Following;
 import net.sinzak.server.user.dto.request.CategoryDto;
 import net.sinzak.server.user.dto.request.FcmDto;
 import net.sinzak.server.user.dto.request.ReportRequestDto;
 import net.sinzak.server.user.dto.request.UpdateUserDto;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.common.error.UserNotFoundException;
-import net.sinzak.server.user.repository.ReportRepository;
+import net.sinzak.server.user.repository.*;
 
-import net.sinzak.server.user.repository.SearchHistoryRepository;
-import net.sinzak.server.user.repository.UserRepository;
 import net.sinzak.server.common.PropertyUtil;
 import org.json.simple.JSONObject;
 import org.springframework.cache.annotation.CacheEvict;
@@ -28,6 +28,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -42,6 +45,8 @@ public class UserCommandService {
     private final S3Service s3Service;
     private final FireBaseService fireBaseService;
     private final AlarmService alarmService;
+    private final FollowingRepository followingRepository;
+    private final FollowerRepository followerRepository;
 
     public User saveTempUser(User user){
         return userRepository.save(user);
@@ -189,6 +194,24 @@ public class UserCommandService {
         catch (Exception e){
             return PropertyUtil.responseMessage("탈퇴 처리가 되지 않았습니다. sinzakofficial@gmail.com 으로 문의주세요.");
         }
+    }
 
+    public JSONObject insert() throws NoSuchAlgorithmException {
+        User loginUser = userRepository.findByIdNotDeleted(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
+        List<User> users = userRepository.findAll();
+        for(User user: users){
+            if(user.getId().equals(loginUser.getId()))continue;
+            Following following = Following.builder()
+                    .user(loginUser)
+                    .followingUser(user)
+                    .build();
+            Follower follower = Follower.builder()
+                    .user(loginUser)
+                    .followerUser(user)
+                    .build();
+            followerRepository.save(follower);
+            followingRepository.save(following);
+        }
+        return PropertyUtil.response(true);
     }
 }

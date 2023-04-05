@@ -3,6 +3,8 @@ package net.sinzak.server.user.repository;
 
 import net.sinzak.server.config.auth.UserProjection;
 import net.sinzak.server.user.domain.User;
+import net.sinzak.server.user.domain.follow.Follower;
+import net.sinzak.server.user.domain.follow.Following;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -73,4 +75,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("select u from User u left join fetch u.productLikesList left join fetch u.historyList where u.id = :id and u.isDelete = false")
     Optional<User> findByIdFetchHistoryAndLikesList(@Param("id")Long id);
+
+
+
+
+
 }
