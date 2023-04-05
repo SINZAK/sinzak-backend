@@ -11,6 +11,8 @@ import net.sinzak.server.product.domain.ProductLikes;
 import net.sinzak.server.product.domain.Product;
 import net.sinzak.server.product.domain.ProductSell;
 import net.sinzak.server.product.domain.ProductWish;
+import net.sinzak.server.user.domain.follow.Follower;
+import net.sinzak.server.user.domain.follow.Following;
 import net.sinzak.server.work.domain.Work;
 import net.sinzak.server.work.domain.WorkLikes;
 import net.sinzak.server.work.domain.WorkSell;
@@ -125,6 +127,12 @@ public class User extends BaseTimeEntity{
     @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<Alarm> alarms = new HashSet<>();
 
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<Follower> followers = new HashSet<>();
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<Following> followings = new HashSet<>();
 
 
     @ElementCollection

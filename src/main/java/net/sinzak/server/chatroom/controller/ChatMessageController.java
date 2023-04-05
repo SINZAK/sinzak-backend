@@ -44,6 +44,7 @@ public class ChatMessageController {
         chatMessageService.leaveChatRoom(chatMessageDto);
     }
 
+
 //    @GetMapping("/getChatMessage")
 //    public ChatMessage getChatMessage(@RequestParam String id) throws Exception{
 //        return chatMessageService.getChatMessage(id);

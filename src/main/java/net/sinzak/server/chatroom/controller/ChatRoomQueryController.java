@@ -50,4 +50,5 @@ public class ChatRoomQueryController {
         return chatRoomQueryService.getChatRoomMessage(roomUuid,pageRequest);
     }
 
+
 }
