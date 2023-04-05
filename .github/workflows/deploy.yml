@@ -13,6 +13,7 @@ jobs:
     steps:
       - name: Check out source code
         uses: actions/checkout@v2
+
       - name: 📦️ Setup JDK 11.0.12
         uses: actions/setup-java@v1
         with:
@@ -69,6 +70,14 @@ jobs:
           chmod +x ./gradlew
           ./gradlew clean build -x test
 
+      - name: Build Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          outputs: type=docker,dest=./sinzak-backend.tar
+          push: false
+          tags: sinzak:latest
+
       - name: Deploy Prod use SCP
         uses: appleboy/scp-action@master
         with:
@@ -76,7 +85,7 @@ jobs:
           host: ${{ secrets.HOST_DEV }}
           key: ${{ secrets.SSH_PEM_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
-          source: "./build/libs/*.jar"
+          source: "./sinzak-backend.tar"
           target: "/home/ec2-user/deploy"
           strip_components: 2
 
@@ -93,9 +102,9 @@ jobs:
           envs: GITHUB_SHA
           script: |
             cd deploy
+            docker load -i ./sinzak-backend.tar
             docker container stop sinzak
             docker container stop redis
-            docker build -t sinzak .
             docker run -d --rm -p 8080:8080 --name sinzak --network redis-network --memory 512m --memory-swap 1g sinzak
             docker run -d --rm -p 6379:6379 --name redis --network redis-network --memory 256m --memory-swap 512m redis
 
