@@ -93,7 +93,7 @@ public class UserCommandService {
         if(currentUserId.equals(findUser.getId()))
             return PropertyUtil.responseMessage("본인한테는 팔로우 불가능");
 
-        return addFollow(findUser, currentUserId);
+        return addFollow(findUser);
     }
 
     @CacheEvict(value = {"home_user"}, key = "#currentUserId", cacheManager = "testCacheManager")
@@ -114,10 +114,14 @@ public class UserCommandService {
         return PropertyUtil.response(true);
     }
 
-    public JSONObject addFollow(User findUser, Long loginUserId){
-        User loginUser = userRepository.findByIdFetchFollowingList(loginUserId).orElseThrow(UserNotFoundException::new);
-        loginUser.getFollowingList().add(findUser.getId());
-        findUser.getFollowerList().add(loginUserId);
+    public JSONObject addFollow(User findUser){
+        User loginUser = userUtils.getCurrentUser();
+        Follower follower = Follower.builder().followerUser(loginUser).user(findUser).build();
+        Following following =Following.builder().followingUser(findUser).user(loginUser).build();
+        followerRepository.save(follower);
+        followingRepository.save(following);
+        loginUser.getFollowings().add(following);
+        findUser.getFollowers().add(follower);
         loginUser.updateFollowNumber();
         findUser.updateFollowNumber();
         alarmService.makeAlarm(findUser,loginUser.getPicture(),loginUser.getId().toString(), AlarmType.FOLLOW, loginUser.getNickName());

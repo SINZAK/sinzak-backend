@@ -213,8 +213,8 @@ public class User extends BaseTimeEntity{
     }
 
     public void updateFollowNumber(){
-        this.followerNum = followNumberTrans(this.getFollowerList().size());
-        this.followingNum = followNumberTrans(this.getFollowingList().size());
+        this.followerNum = followNumberTrans(this.getFollowers().size());
+        this.followingNum = followNumberTrans(this.getFollowings().size());
     }
 
     public String followNumberTrans(int number){
