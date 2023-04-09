@@ -22,7 +22,7 @@ public class CertDto {
     @Setter
     @Enumerated(value = EnumType.STRING)
     @ApiModelProperty(value = "인증 상태(인증작가)", notes = "YET = 미인증, PROCESS = 처리중, COMPLETE = 처리완료")
-    private Status celebStatus = Status.YET;
+    private Status authorStatus = Status.YET;
 
     @ApiModelProperty(value = "대학 인증 여부!")
     private boolean cert_uni;
