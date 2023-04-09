@@ -170,7 +170,7 @@ public class UserQueryService {
                 .univ(findUser.getUniv())
                 .isFollow(checkIfFollowFindUser(loginUserId,findUser))
                 .cert_uni(findUser.isCert_uni())
-                .cert_celeb(findUser.isCert_author())
+                .cert_author(findUser.isCert_author())
                 .categoryLike(findUser.getCategoryLike())
                 .build();
     }
@@ -273,7 +273,7 @@ public class UserQueryService {
     public Optional<User> getCertifiedRandomUser() throws NoSuchAlgorithmException {
         List<User> users = userRepository.findAllNotDeleted();
         List<User> certUsers = users.stream()
-                .filter(User::isCert_celeb)
+                .filter(User::isCert_author)
                 .collect(Collectors.toList());
         if(certUsers.size() == 0)
             return Optional.empty();

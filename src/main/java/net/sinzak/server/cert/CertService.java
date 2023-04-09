@@ -1,8 +1,8 @@
 package net.sinzak.server.cert;
 
 import lombok.RequiredArgsConstructor;
-import net.sinzak.server.cert.author.Celeb;
-import net.sinzak.server.cert.author.CelebRepository;
+import net.sinzak.server.cert.author.Author;
+import net.sinzak.server.cert.author.AuthorRepository;
 import net.sinzak.server.cert.dto.CertDto;
 import net.sinzak.server.cert.dto.MailDto;
 import net.sinzak.server.cert.univ.UnivCard;
@@ -29,7 +29,7 @@ public class CertService {
     private final UserUtils userUtils;
     private final UserRepository userRepository;
     private final UnivCardRepository univCardRepository;
-    private final CelebRepository celebRepository;
+    private final AuthorRepository authorRepository;
     private final S3Service s3Service;
 
 
@@ -62,22 +62,22 @@ public class CertService {
 
     public JSONObject applyCertifiedAuthor(String link){
         User user = userUtils.getCurrentUser();
-        Optional<Celeb> existCeleb = celebRepository.findCertByUserId(user.getId());
+        Optional<Author> existCeleb = authorRepository.findCertByUserId(user.getId());
         if(!user.isCert_uni())
             return PropertyUtil.responseMessage("아직 대학 인증이 완료되지 않았습니다.");
 
         if(existCeleb.isPresent() || user.isCert_author())
             return PropertyUtil.responseMessage("처리중이거나, 이미 인증된 요청입니다.");
-        Celeb celeb = new Celeb(link, user.getId());
-        celeb.setStatus(Status.PROCESS);
-        celebRepository.save(celeb);
+        Author author = new Author(link, user.getId());
+        author.setStatus(Status.PROCESS);
+        authorRepository.save(author);
         return PropertyUtil.response(true);
     }
-    public JSONObject completeCeleb(Long id){
-        Celeb celeb = celebRepository.findById(id).orElseThrow(InstanceNotFoundException::new);
-        celeb.setStatus(Status.COMPLETE);
-        User user = userRepository.findByIdNotDeleted(celeb.getUserId()).orElseThrow(UserNotFoundException::new);
-        user.setCertifiedCeleb();
+    public JSONObject completeAuthor(Long id){
+        Author author = authorRepository.findById(id).orElseThrow(InstanceNotFoundException::new);
+        author.setStatus(Status.COMPLETE);
+        User user = userRepository.findByIdNotDeleted(author.getUserId()).orElseThrow(UserNotFoundException::new);
+        user.setCertifiedAuthor();
         return PropertyUtil.response(true);
     }
 
@@ -97,8 +97,8 @@ public class CertService {
                 .build();
         univCardRepository.findCertByUserId(user.getId())
                 .ifPresent(card -> certDto.setUnivcardStatus(card.getStatus()));
-        celebRepository.findCertByUserId(user.getId())
-                .ifPresent(celeb -> certDto.setCelebStatus(celeb.getStatus()));
+        authorRepository.findCertByUserId(user.getId())
+                .ifPresent(author -> certDto.setAuthorStatus(author.getStatus()));
 
         return PropertyUtil.response(certDto);
     }

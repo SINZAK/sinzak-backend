@@ -2,7 +2,6 @@ package net.sinzak.server.user.dto.respond;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
@@ -19,6 +18,6 @@ public class UserDto {
     private String categoryLike;
 
     private boolean cert_uni;
-    private boolean cert_celeb;
+    private boolean cert_author;
     private boolean isFollow;
 }

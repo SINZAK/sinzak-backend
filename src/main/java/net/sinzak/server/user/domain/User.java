@@ -157,7 +157,7 @@ public class User extends BaseTimeEntity{
         this.cert_uni = true;
     }
 
-    public void setCertifiedCeleb() {
+    public void setCertifiedAuthor() {
         this.cert_author = true;
     }
 

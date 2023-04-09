@@ -123,17 +123,17 @@ public class ProductController {
         }
     }
 
-    @ApiOperation(value = "홈 - 추천 더보기")
-    @PostMapping("/home/recommend")
-    public JSONObject showRecommendDetail() {
-        return productService.showRecommendDetail();
-    }
-
-    @ApiOperation(value = "홈 - 팔로잉 더보기")
-    @PostMapping("/home/following")
-    public JSONObject showFollowingDetail() {
-        return productService.showFollowingDetail();
-    }
+//    @ApiOperation(value = "홈 - 추천 더보기")
+//    @PostMapping("/home/recommend")
+//    public JSONObject showRecommendDetail() {
+//        return productService.showRecommendDetail();
+//    }
+//
+//    @ApiOperation(value = "홈 - 팔로잉 더보기")
+//    @PostMapping("/home/following")
+//    public JSONObject showFollowingDetail() {
+//        return productService.showFollowingDetail();
+//    }
 
 
     @ApiOperation(value = "마켓 작품")
