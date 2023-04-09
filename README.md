@@ -93,7 +93,10 @@
     - 기획 및 DB 설계(ERD) <br>
     - 유저 프로필,팔로우 API  <br>
     - Websocket,Stomp를 이용한 채팅 API <br>
-    - firebase를 이용한 알림 기능 <br>
+    - db인덱스를 구축하여 작품 정렬 성능 향상
+    - sql문을 적절히 활용, db 접근 로직 리펙토링으로 N+1문제 해결 및 쿼리 최적화 <br>
+    - Websocket,Stomp를 이용한 채팅 API <br>
+    - Firebase Messaging을 활용한 알림 기능 구현를 이용한 알림 기능 <br>
     - 캐시를 위한 redis 적용 <br>
     - jmeter를 이용한 성능 테스트  <br>
     <td></td>
