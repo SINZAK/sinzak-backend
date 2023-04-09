@@ -11,11 +11,11 @@ import net.sinzak.server.product.domain.ProductWish;
 import net.sinzak.server.product.repository.ProductWishRepository;
 import net.sinzak.server.user.domain.Report;
 import net.sinzak.server.user.domain.SearchHistory;
+import net.sinzak.server.user.domain.follow.Follower;
+import net.sinzak.server.user.domain.follow.Following;
 import net.sinzak.server.user.dto.respond.*;
 import net.sinzak.server.user.domain.User;
-import net.sinzak.server.user.repository.ReportRepository;
-import net.sinzak.server.user.repository.SearchHistoryRepository;
-import net.sinzak.server.user.repository.UserRepository;
+import net.sinzak.server.user.repository.*;
 import net.sinzak.server.work.domain.Work;
 import net.sinzak.server.work.domain.WorkWish;
 import net.sinzak.server.work.repository.WorkWishRepository;
@@ -38,6 +38,9 @@ public class UserQueryService {
     private final WorkWishRepository workWishRepository;
     private final ProductWishRepository productWishRepository;
     private final ReportRepository reportRepository;
+    private final FollowingRepository followingRepository;
+    private final FollowerRepository followerRepository;
+    private final UserQDSLRepositoryImpl QDSLRepository;
 
     public JSONObject getMyProfile(){
         JSONObject obj = new JSONObject();
@@ -137,14 +140,14 @@ public class UserQueryService {
     }
 
 
-    public JSONObject getUserProfileForUser(Long userId) {
+    public JSONObject getUserProfileForUser(Long currentUserId, Long userId) {
         JSONObject obj = new JSONObject();
         User findUser = userRepository.findByIdFetchProductPostList(userId).orElseThrow(()->new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND));
         List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
         obj.put("products", productShowForms);
         List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList(),false);
         obj.put("works", workShowForms);
-        obj.put("profile",makeUserDto(userUtils.getCurrentUserId(), findUser));
+        obj.put("profile",makeUserDto(currentUserId, findUser));
         return PropertyUtil.response(obj);
     }
 
@@ -195,28 +198,31 @@ public class UserQueryService {
 
 
     public JSONObject getFollowerDtoList(Long userId){
-        Set<Long> followerList = userRepository.findByIdFetchFollowerList(userId).orElseThrow(UserNotFoundException::new).getFollowerList();
-        return makeFollowDtos(followerList);
+        Set<Follower> followers = followerRepository.findFollowerByUserIdFetchFollowerUserIdAndNickNameAndPicture(userId);
+        List<User> users = followers.stream()
+                .map(Follower::getFollowerUser)
+                .collect(Collectors.toList());
+        return makeFollowDtos(users);
     }
 
 
     public JSONObject getFollowingDtoList(Long userId){
-        Set<Long> followingList = userRepository.findByIdFetchFollowingList(userId).orElseThrow(UserNotFoundException::new).getFollowingList();
-        return makeFollowDtos(followingList);
+        Set<Following> followings = followingRepository.findFollowingByUserIdFetchFollowingUserIdAndNickNameAndPicture(userId);
+        List<User> users = followings.stream()
+                .map(Following::getFollowingUser)
+                .collect(Collectors.toList());
+        return makeFollowDtos(users);
     }
-
-    private JSONObject makeFollowDtos(Set<Long> followList) {
+    private JSONObject makeFollowDtos(List<User> users) {
         List<GetFollowDto> getFollowDtoList = new ArrayList<>();
-        for(Long follow : followList){
-            Optional<User> findUser = userRepository.findByIdNotDeleted(follow);
-            if(findUser.isPresent()){
-                GetFollowDto getFollowDto = GetFollowDto.builder()
-                        .userId(findUser.get().getId())
-                        .name(findUser.get().getNickName())
-                        .picture(findUser.get().getPicture())
-                        .build();
-                getFollowDtoList.add(getFollowDto);
-            }
+        for(User user :users){
+            getFollowDtoList.add(
+                    GetFollowDto.builder()
+                            .userId(user.getId())
+                            .name(user.getNickName())
+                            .picture(user.getPicture())
+                            .build()
+            );
         }
         return PropertyUtil.response(getFollowDtoList);
     }

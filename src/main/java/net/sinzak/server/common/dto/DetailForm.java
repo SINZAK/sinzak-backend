@@ -24,7 +24,7 @@ public class DetailForm implements Serializable{ //redis에 저장하기 위한 
     private String univ;
     @ApiModelProperty(value = "작가 대학 인증여부", example = "true")
     private boolean cert_uni;
-    @ApiModelProperty(value = "작가 인플루언서 여부", example = "false")
+    @ApiModelProperty(value = "인증 작가 여부", example = "false")
     private boolean cert_author;
     @ApiModelProperty(example = "작가 팔로워 수")
     private String followerNum;
@@ -89,13 +89,13 @@ public class DetailForm implements Serializable{ //redis에 저장하기 위한 
         this.complete = complete;
     }
 
-    public void setUserInfo(Long userId, String author, String author_picture, String univ, boolean cert_uni, boolean cert_celeb, String followerNum) {
+    public void setUserInfo(Long userId, String author, String author_picture, String univ, boolean cert_uni, boolean cert_author, String followerNum) {
         this.userId = userId;
         this.author = author;
         this.author_picture = author_picture;
         this.univ = univ;
         this.cert_uni = cert_uni;
-        this.cert_author = cert_celeb;
+        this.cert_author = cert_author;
         this.followerNum = followerNum;
     }
 

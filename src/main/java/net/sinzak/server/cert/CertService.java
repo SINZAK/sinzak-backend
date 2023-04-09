@@ -59,7 +59,6 @@ public class CertService {
         return PropertyUtil.response(true);
     }
 
-
     public JSONObject applyCertifiedAuthor(String link){
         User user = userUtils.getCurrentUser();
         Optional<Author> existCeleb = authorRepository.findCertByUserId(user.getId());
@@ -73,6 +72,7 @@ public class CertService {
         authorRepository.save(author);
         return PropertyUtil.response(true);
     }
+    
     public JSONObject completeAuthor(Long id){
         Author author = authorRepository.findById(id).orElseThrow(InstanceNotFoundException::new);
         author.setStatus(Status.COMPLETE);

@@ -73,8 +73,8 @@ public class ProductController {
     @ApiOperation(value = "작품 상세 조회")
     public JSONObject showProducts(@PathVariable Long id) {
         try{
-            UserUtils.getContextHolderId();
-            return productService.showDetailForUser(id);
+            Long currentUserId = UserUtils.getContextHolderId();
+            return productService.showDetailForUser(currentUserId, id);
         }
         catch (UserNotFoundException | UserNotLoginException e){
             return productService.showDetailForGuest(id); /** 비회원용 **/
@@ -116,7 +116,8 @@ public class ProductController {
     @PostMapping("/home/products")
     public JSONObject showHomeProduct() {
         try{
-            return productService.showHomeForUser(UserUtils.getContextHolderId());
+            Long currentUserId = UserUtils.getContextHolderId();
+            return productService.showHomeForUser(currentUserId);
         }
         catch (UserNotFoundException | UserNotLoginException e){
             return productService.showHomeForGuest(); /** 비회원용 **/

@@ -11,6 +11,8 @@ import net.sinzak.server.product.domain.ProductLikes;
 import net.sinzak.server.product.domain.Product;
 import net.sinzak.server.product.domain.ProductSell;
 import net.sinzak.server.product.domain.ProductWish;
+import net.sinzak.server.user.domain.follow.Follower;
+import net.sinzak.server.user.domain.follow.Following;
 import net.sinzak.server.work.domain.Work;
 import net.sinzak.server.work.domain.WorkLikes;
 import net.sinzak.server.work.domain.WorkSell;
@@ -40,10 +42,6 @@ public class User extends BaseTimeEntity{
     private String email;
 
     @Column
-    @JsonIgnore
-    private String name;
-
-    @Column
     private String nickName="";
 
     @Column
@@ -69,10 +67,10 @@ public class User extends BaseTimeEntity{
     private String categoryLike="";  //관심 장르
 
     @Column
-    private boolean cert_uni=false; //대학 인증여부
+    private boolean cert_uni =false; //대학 인증여부
 
     @Column
-    private boolean cert_author =false; //인플루언서 인증여부
+    private boolean cert_author =false; //인증작가 인증여부
 
     @Column
     private int popularity=0;  //'지금 뜨는 아티스트' 때문에 만듦
@@ -130,6 +128,12 @@ public class User extends BaseTimeEntity{
     private Set<Alarm> alarms = new HashSet<>();
 
 
+    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<Follower> followers = new HashSet<>();
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<Following> followings = new HashSet<>();
+
 
     @ElementCollection
     @CollectionTable(name = "FOLLOWING_LIST", joinColumns = @JoinColumn(name = "user_id"))
@@ -145,8 +149,8 @@ public class User extends BaseTimeEntity{
     public void setFcm(String fcmToken) {
         this.fcm = fcmToken;
     }
-    public void setDelete(boolean delete) {
-        isDelete = delete;
+    public void setDelete() {
+        isDelete = true;
     }
 
     public void setUniv(String univName) {
@@ -162,23 +166,25 @@ public class User extends BaseTimeEntity{
     }
 
     @Builder
-    public User(String email, String name, String nickName, String categoryLike, String origin) throws NoSuchAlgorithmException {
+    public User(String email, String nickName, String categoryLike, String origin) throws NoSuchAlgorithmException {
         this.email = email;
-        this.name = name;
         this.nickName = nickName;
         this.categoryLike = categoryLike;
         this.origin = origin;
+        this.cert_uni = false;
+        this.cert_author = false;
         this.role = Role.USER;
     }
 
     @Builder
-    public User(String email, String name, String picture, String origin) throws NoSuchAlgorithmException {
+    public User(String email, String picture, String origin) throws NoSuchAlgorithmException {
         this.email = email;
-        this.name = name;
         this.nickName = "";
         this.picture = picture;
         this.origin = origin;
         this.categoryLike = "";
+        this.cert_uni = false;
+        this.cert_author = false;
         this.role = Role.USER;
 //        this.alarm_receive = false;
     }
@@ -204,10 +210,6 @@ public class User extends BaseTimeEntity{
     }
     public void updateCategoryLike(String categoryLike){
         this.categoryLike = categoryLike;
-    }
-
-    public void updateStatus(String univName) {
-        this.univ = univName;
     }
 
     public void updateFollowNumber(){
@@ -238,11 +240,6 @@ public class User extends BaseTimeEntity{
             return "만";
         }
         return "";
-    }
-
-    public void setCertifiedAuthor(String portFolioUrl) {
-        this.portFolioUrl = portFolioUrl;
-        this.cert_author = true;
     }
 
     protected User() throws NoSuchAlgorithmException {}

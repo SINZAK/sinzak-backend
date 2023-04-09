@@ -7,12 +7,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReportRespondDto {
     private Long userId;
-    private String nickName;
-    private String picture;
+    private String name;
+    private String imageUrl;
 
-    public ReportRespondDto(Long userId, String nickName, String picture) {
+    public ReportRespondDto(Long userId, String name, String imageUrl) {
         this.userId = userId;
-        this.nickName = nickName;
-        this.picture = picture;
+        this.name = name;
+        this.imageUrl = imageUrl;
     }
 }

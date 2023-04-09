@@ -53,7 +53,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     private final SearchHistoryRepository historyRepository;
     private final AlarmService alarmService;
 
-    private final static int HistoryMaxCount = 10;
+    private final int HistoryMaxCount = 10;
     private final int HOME_OBJECTS = 10;
     private final int HOME_DETAIL_OBJECTS = 50;
 
@@ -161,8 +161,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
 
     @Transactional
-    public JSONObject showDetailForUser(Long id){   // 글 상세 확인
-        User user = userRepository.findByIdFetchFollowingAndLikesList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
+    public JSONObject showDetailForUser(Long currentUserId, Long id){   // 글 상세 확인
+        User user = userRepository.findByIdFetchFollowingAndLikesList(currentUserId).orElseThrow(UserNotFoundException::new);
         Product product = productRepository.findByIdFetchProductWishAndUser(id).orElseThrow(PostNotFoundException::new);
         List<ProductImage> images = imageRepository.findByProductId(product.getId());
         DetailProductForm detailForm = makeProductDetailForm(product, images);

@@ -29,6 +29,11 @@ public class ChatRoomCommandController {
     public JSONObject createChatRoom(@RequestBody PostDto postDto){
         return chatRoomCommandService.createUserChatRoom(postDto);
     }
+    @PostMapping(value ="/chat/rooms/check")
+    @ApiOperation(value="채팅방 존재하는지 체크",notes ="있다면 exist true 없다면 False, 있을 떈 방 uuid 없을 떈 안 돌려줌")
+    public JSONObject checkChatRoom(@RequestBody PostDto postDto){
+        return chatRoomCommandService.checkChatRoom(postDto);
+    }
     @PostMapping(value ="/chat/rooms/{uuid}/image",consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public JSONObject uploadImage(@PathVariable("uuid") String uuid, @RequestPart List<MultipartFile> multipartFile){
         return chatRoomCommandService.uploadImage(uuid,multipartFile);

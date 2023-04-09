@@ -154,8 +154,8 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     }
 
     @Transactional
-    public JSONObject showDetailForUser(Long id){   // 글 상세 확인
-        User user = userRepository.findByIdFetchFollowingAndLikesList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
+    public JSONObject showDetailForUser(Long currentUserId, Long id){   // 글 상세 확인
+        User user = userRepository.findByIdFetchFollowingAndLikesList(currentUserId).orElseThrow(UserNotFoundException::new);
         Work work = workRepository.findByIdFetchWorkNotDeletedWishAndUser(id).orElseThrow(PostNotFoundException::new);
         List<WorkImage> images = imageRepository.findByWorkId(work.getId());
         DetailWorkForm detailForm = makeWorkDetailForm(work, images);
