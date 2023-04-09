@@ -86,8 +86,8 @@ public class CertController {
     @ApiDocumentResponse
     @ApiOperation(value = "대학교 학생증 인증 허용",notes = "프론트에서 구현은 X 관리자용")
     @PostMapping(value = "/certify/{id}/author/complete")
-    public JSONObject completeCeleb(@PathVariable("id") Long certId) {
-        return certService.completeCeleb(certId);
+    public JSONObject completeAuthor(@PathVariable("id") Long certId) {
+        return certService.completeAuthor(certId);
     }
 
 

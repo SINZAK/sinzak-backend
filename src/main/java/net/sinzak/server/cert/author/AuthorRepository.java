@@ -6,8 +6,8 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
-public interface CelebRepository extends JpaRepository<Celeb, Long> {
+public interface AuthorRepository extends JpaRepository<Author, Long> {
 
-    @Query("select c from Celeb c where c.userId = :userId")
-    Optional<Celeb> findCertByUserId(@Param("userId")Long userId);
+    @Query("select a from Author a where a.userId = :userId")
+    Optional<Author> findCertByUserId(@Param("userId")Long userId);
 }
