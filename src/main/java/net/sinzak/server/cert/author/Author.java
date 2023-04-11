@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 @Getter
 @Entity
-public class Celeb extends BaseTimeEntity { //대학 학생증인증.
+public class Author extends BaseTimeEntity { //인증 작가
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,12 +24,12 @@ public class Celeb extends BaseTimeEntity { //대학 학생증인증.
     @Column
     private Long userId;
 
-    public Celeb(String portFolio, Long userId) {
+    public Author(String portFolio, Long userId) {
         this.portFolio = portFolio;
         this.userId = userId;
     }
 
-    protected Celeb() {}
+    protected Author() {}
 
     public void setPortFolio(String portFolio) {
         this.portFolio = portFolio;
