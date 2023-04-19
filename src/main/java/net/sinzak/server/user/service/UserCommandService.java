@@ -11,6 +11,7 @@ import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.firebase.FireBaseService;
 import net.sinzak.server.image.S3Service;
 import net.sinzak.server.user.domain.Report;
+import net.sinzak.server.user.domain.follow.Follow;
 import net.sinzak.server.user.domain.follow.Follower;
 import net.sinzak.server.user.domain.follow.Following;
 import net.sinzak.server.user.dto.request.CategoryDto;
@@ -29,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.NoSuchAlgorithmException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,6 +47,7 @@ public class UserCommandService {
     private final AlarmService alarmService;
     private final FollowingRepository followingRepository;
     private final FollowerRepository followerRepository;
+    private final FollowRepository followRepository;
 
     public User saveTempUser(User user){
         return userRepository.save(user);
@@ -107,8 +108,8 @@ public class UserCommandService {
 
     public JSONObject removeFollow(User findUser, Long loginUserId){
         User user = userRepository.findByIdFetchFollowingList(loginUserId).orElseThrow(UserNotFoundException::new);
-        user.getFollowingList().remove(findUser.getId());
-        findUser.getFollowerList().remove(loginUserId);
+        Optional<Follow> follow = followRepository.findFollowingsByFollowerUserAndFollowingUser(findUser.getId(), loginUserId);
+        followRepository.delete(follow.get());
         user.updateFollowNumber();
         findUser.updateFollowNumber();
         return PropertyUtil.response(true);
@@ -116,12 +117,13 @@ public class UserCommandService {
 
     public JSONObject addFollow(User findUser){
         User loginUser = userUtils.getCurrentUser();
-        Follower follower = Follower.builder().followerUser(loginUser).user(findUser).build();
-        Following following =Following.builder().followingUser(findUser).user(loginUser).build();
-        followerRepository.save(follower);
-        followingRepository.save(following);
-        loginUser.getFollowings().add(following);
-        findUser.getFollowers().add(follower);
+        Follow follow = Follow.builder()
+                .followerUser(loginUser)
+                .followingUser(findUser)
+                .build();
+        followRepository.save(follow);
+        loginUser.getFollowings().add(follow);
+        findUser.getFollowers().add(follow);
         loginUser.updateFollowNumber();
         findUser.updateFollowNumber();
         alarmService.makeAlarm(findUser,loginUser.getPicture(),loginUser.getId().toString(), AlarmType.FOLLOW, loginUser.getNickName());
