@@ -110,8 +110,8 @@ public class UserCommandService {
         User user = userRepository.findByIdFetchFollowingList(loginUserId).orElseThrow(UserNotFoundException::new);
         Optional<Follow> follow = followRepository.findFollowingsByFollowerUserAndFollowingUser(findUser.getId(), loginUserId);
         followRepository.delete(follow.get());
-        user.updateFollowNumber();
-        findUser.updateFollowNumber();
+        user.updateFollowNumber(-1);
+        findUser.updateFollowNumber(-1);
         return PropertyUtil.response(true);
     }
 
@@ -122,10 +122,8 @@ public class UserCommandService {
                 .followingUser(findUser)
                 .build();
         followRepository.save(follow);
-        loginUser.getFollowings().add(follow);
-        findUser.getFollowers().add(follow);
-        loginUser.updateFollowNumber();
-        findUser.updateFollowNumber();
+        loginUser.updateFollowNumber(1);
+        findUser.updateFollowNumber(1);
         alarmService.makeAlarm(findUser,loginUser.getPicture(),loginUser.getId().toString(), AlarmType.FOLLOW, loginUser.getNickName());
 //        fireBaseService.sendIndividualNotification(findUser,"팔로우 알림",loginUser.getNickName(),loginUser.getId().toString());
         return PropertyUtil.response(true);

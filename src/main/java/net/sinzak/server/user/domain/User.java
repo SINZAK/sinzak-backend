@@ -213,9 +213,11 @@ public class User extends BaseTimeEntity{
         this.categoryLike = categoryLike;
     }
 
-    public void updateFollowNumber(){
-        this.followerNum = followNumberTrans(this.getFollowers().size());
-        this.followingNum = followNumberTrans(this.getFollowings().size());
+    public void updateFollowNumber(int changeNum){
+        int newFollowerNum = Integer.parseInt(this.followerNum)+changeNum;
+        int newFollowingNum = Integer.parseInt(this.followingNum)+changeNum;
+        this.followerNum = Integer.toString(newFollowerNum);
+        this.followingNum = Integer.toString(newFollowingNum);
     }
 
     public String followNumberTrans(int number){
