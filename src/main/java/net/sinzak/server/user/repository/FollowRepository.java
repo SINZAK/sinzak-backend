@@ -10,7 +10,7 @@ import java.util.Set;
 
 public interface FollowRepository extends JpaRepository<Follow,Long> {
     @Query("select f  from Follow f where f.followingUser.id = :followingUserId and f.followerUser.id = :followerUserId")
-    Optional<Follow> findFollowingsByFollowerUserAndFollowingUser(@Param("followingUserId")Long followingId, @Param("followerUserId")Long followerId);
+    Optional<Follow> findFollowByFollowingAndFollower(@Param("followingUserId")Long followingId, @Param("followerUserId")Long followerId);
 
     @Query("select f,fg.id,fg.nickName,fg.picture from Follow f left join fetch f.followingUser fg where f.followerUser.id = :loginUserId")
     Set<Follow> findByFollowerUserIdFetchFollowings(@Param("loginUserId") Long loginUserId);
