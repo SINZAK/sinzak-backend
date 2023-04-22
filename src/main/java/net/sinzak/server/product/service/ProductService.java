@@ -18,6 +18,7 @@ import net.sinzak.server.product.repository.*;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.domain.embed.Size;
 import net.sinzak.server.common.dto.ActionForm;
+import net.sinzak.server.user.domain.follow.Follow;
 import net.sinzak.server.user.repository.SearchHistoryRepository;
 import net.sinzak.server.user.repository.UserRepository;
 import org.jetbrains.annotations.NotNull;
@@ -180,7 +181,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         boolean isWish = checkIsWish(user, product.getProductWishList());  /**최적화를 위해 상품의 찜목록과 비교함. (대체적으로 해당 상품 찜개수 < 유저의 찜개수) **/
         boolean isFollowing = false;
         if(!product.getUser().isDelete())
-            isFollowing = checkIsFollowing(user.getFollowingList(), product);
+            isFollowing = checkIsFollowing(user.getFollowings(), product);
 
         detailForm.setUserAction(isLike, isWish, isFollowing);
         product.addViews();
@@ -233,8 +234,11 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return productWishList.stream().anyMatch(x -> x.getUser().getId().equals(user.getId()));
     }
 
-    public boolean checkIsFollowing(Set<Long> userFollowingList, Product product) {
-        return userFollowingList.stream().anyMatch(x -> x.equals(product.getUser().getId()));
+    public boolean checkIsFollowing(Set<Follow> followings, Product product) {
+        return followings.stream()
+                .map(Follow::getFollowingUser)
+                .map(User::getId)
+                .anyMatch(x -> x.equals(product.getUser().getId()));
     }
 
 
@@ -307,7 +311,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     private List<Product> getFollowingList(User user, List<Product> productList, int limit) {
         List<Product> followingProductList = productList.stream()
-                .filter(p -> checkIsFollowing(user.getFollowingList(), p))
+                .filter(p -> checkIsFollowing(user.getFollowings(), p))
                 .limit(limit)
                 .collect(Collectors.toList());
         return followingProductList;
