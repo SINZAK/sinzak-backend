@@ -102,7 +102,7 @@ public class OAuthController {
     @ApiOperation(value = "스프링용 애플 로그인 실행",notes =
             "배포환경 : "+AUTH_URL+"/auth/authorize?client_id=" + CLIENT_ID + "&redirect_uri=" + "https://sinzak.net/api/login/oauth2/code/apple&response_type=code&id_token&response_mode=form_post")
     @GetMapping("/test4")
-    public String appleLogin(){return "";}
+    public String appleLogin(){return "https://appleid.apple.com/auth/authorize?client_id="+CLIENT_ID+"&redirect_uri=https://sinzak.net/api/login/oauth2/code/apple&response_type=code&id_token&response_mode=form_post";}
 
     @ApiOperation(value = "스프링용 카카오 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
     @GetMapping(value = "/login/oauth2/code/kakao")
