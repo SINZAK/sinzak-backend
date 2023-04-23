@@ -35,8 +35,8 @@ jobs:
       - name: make apple Login KEY
         run: |
           cd ./src/main/resources/static/apple
-          touch ./AuthKey_37QTX3F226.p8
-          echo "${{ secrets.APPLE_KEY }}" > ./AuthKey_37QTX3F226.p8
+          touch ./AuthKey_2Q827DJQSK.p8
+          echo "${{ secrets.APPLE_KEY }}" > ./AuthKey_2Q827DJQSK.p8
         shell: bash
 
       - name: make application-db.properties
