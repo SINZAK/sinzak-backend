@@ -182,10 +182,13 @@ public class UserQueryService {
         if(loginUserId.equals(0L)){
             return false;
         }
-        if(findUser.getFollowerList().contains(loginUserId)){
-            return true;
-        }
-        return false;
+        return findUser
+                .getFollowers()
+                .stream()
+                .map(Follow::getFollowerUser)
+                .map(User::getId)
+                .peek(System.out::println)
+                .anyMatch(x -> x.equals(loginUserId));
     }
     public boolean checkIfMyProfile(Long loginUserId, User findUser){
         if(loginUserId.equals(0L)){
