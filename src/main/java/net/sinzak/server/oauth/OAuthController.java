@@ -37,7 +37,7 @@ public class OAuthController {
     private String NAVER_ID;
 
     private final static String TEAM_ID = "82J7RU93V4";
-    private final static String CLIENT_ID = "net.sinzak.ios";
+    private final static String CLIENT_ID = "net.sinzak.ios-service";
     private final static String KEY_ID = "2Q827DJQSK";
     private final static String AUTH_URL = "https://appleid.apple.com";
     private final static String KEY_PATH = "static/apple/AuthKey_2Q827DJQSK.p8";
@@ -101,7 +101,10 @@ public class OAuthController {
     @ApiOperation(value = "스프링용 애플 로그인 실행",notes =
             "배포환경 : "+AUTH_URL+"/auth/authorize?client_id=" + CLIENT_ID + "&redirect_uri=" + "https://sinzak.net/api/login/oauth2/code/apple&response_type=code&id_token&response_mode=form_post")
     @GetMapping("/test4")
-    public String appleLogin(){return "https://appleid.apple.com/auth/authorize?client_id="+CLIENT_ID+"&redirect_uri=https://sinzak.net/api/login/oauth2/code/apple&response_type=code&id_token&response_mode=form_post";}
+    public String appleLogin(){
+        log.warn(CLIENT_ID);
+        log.warn(CLIENT_ID);
+        return "https://appleid.apple.com/auth/authorize?client_id="+CLIENT_ID+"&redirect_uri=https://sinzak.net/api/login/oauth2/code/apple&response_type=code&id_token&response_mode=form_post";}
 
     @ApiOperation(value = "스프링용 카카오 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
     @GetMapping(value = "/login/oauth2/code/kakao")
@@ -131,6 +134,8 @@ public class OAuthController {
     public String oauthApple(@RequestParam(value = "code", required = false) String code) throws Exception {
         log.warn("인가코드 = {}",code);
         String client_id = CLIENT_ID;
+        log.error(client_id);
+        log.error(client_id);
         String client_secret = appleService.createClientSecret(TEAM_ID, CLIENT_ID, KEY_ID, KEY_PATH, AUTH_URL);
         String reqUrl = AUTH_URL + "/auth/token";
         Map<String, String> tokenRequest = new HashMap<>();
