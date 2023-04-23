@@ -107,7 +107,7 @@ public class UserCommandService {
     }
 
     public JSONObject removeFollow(User findUser, Long loginUserId){
-        User user = userRepository.findByIdFetchFollowingList(loginUserId).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdFetchFollowings(loginUserId).orElseThrow(UserNotFoundException::new);
         Optional<Follow> follow = followRepository.findFollowByFollowingAndFollower(findUser.getId(), loginUserId);
         followRepository.delete(follow.get());
         user.updateFollowNumber(-1);

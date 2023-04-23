@@ -136,16 +136,6 @@ public class User extends BaseTimeEntity{
     private Set<Follow> followings = new HashSet<>();
 
 
-    @ElementCollection
-    @CollectionTable(name = "FOLLOWING_LIST", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "FOLLOWING_ID")
-    private Set<Long> followingList =new HashSet<>();
-
-    @ElementCollection
-    @CollectionTable(name = "FOLLOWER_LIST", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "FOLLOWER_ID")
-    private Set<Long> followerList =new HashSet<>();
-
 
     public void setFcm(String fcmToken) {
         this.fcm = fcmToken;
