@@ -311,7 +311,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     private List<Product> getFollowingList(User user, List<Product> productList, int limit) {
         List<Product> followingProductList = productList.stream()
-                .filter(product -> checkIsFollowing(user.getFollowingList(), product))
+                .filter(product -> checkIsFollowing(user.getFollowings(), product))
                 .limit(limit)
                 .collect(Collectors.toList());
         return followingProductList;
