@@ -106,7 +106,6 @@ jobs:
           envs: GITHUB_SHA
           script: |
             cd deploy
-#            docker load -i ./sinzak-backend.tar
             docker container stop sinzak
             docker container stop redis
             docker build -t sinzak .
