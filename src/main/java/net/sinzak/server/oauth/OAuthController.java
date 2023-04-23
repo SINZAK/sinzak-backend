@@ -28,7 +28,6 @@ public class OAuthController {
     private final AppleService appleService;
 
     private static final String productURL = "https://sinzak.net/api/login/oauth2/code";
-    private static final String developURL = "http://localhost:8080";
 
     @Value("${google.client-id}")
     private String GOOGLE_ID;
@@ -38,7 +37,7 @@ public class OAuthController {
     private String NAVER_ID;
 
     private final static String TEAM_ID = "82J7RU93V4";
-    private final static String CLIENT_ID = "net.sinzak.ios-service";
+    private final static String CLIENT_ID = "net.sinzak.ios";
     private final static String KEY_ID = "2Q827DJQSK";
     private final static String AUTH_URL = "https://appleid.apple.com";
     private final static String KEY_PATH = "static/apple/AuthKey_2Q827DJQSK.p8";
