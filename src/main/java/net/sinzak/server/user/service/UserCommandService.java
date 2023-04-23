@@ -11,6 +11,7 @@ import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.firebase.FireBaseService;
 import net.sinzak.server.image.S3Service;
 import net.sinzak.server.user.domain.Report;
+import net.sinzak.server.user.domain.follow.Follow;
 import net.sinzak.server.user.domain.follow.Follower;
 import net.sinzak.server.user.domain.follow.Following;
 import net.sinzak.server.user.dto.request.CategoryDto;
@@ -29,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.NoSuchAlgorithmException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,6 +47,7 @@ public class UserCommandService {
     private final AlarmService alarmService;
     private final FollowingRepository followingRepository;
     private final FollowerRepository followerRepository;
+    private final FollowRepository followRepository;
 
     public User saveTempUser(User user){
         return userRepository.save(user);
@@ -93,7 +94,7 @@ public class UserCommandService {
         if(currentUserId.equals(findUser.getId()))
             return PropertyUtil.responseMessage("본인한테는 팔로우 불가능");
 
-        return addFollow(findUser, currentUserId);
+        return addFollow(findUser);
     }
 
     @CacheEvict(value = {"home_user"}, key = "#currentUserId", cacheManager = "testCacheManager")
@@ -106,20 +107,23 @@ public class UserCommandService {
     }
 
     public JSONObject removeFollow(User findUser, Long loginUserId){
-        User user = userRepository.findByIdFetchFollowingList(loginUserId).orElseThrow(UserNotFoundException::new);
-        user.getFollowingList().remove(findUser.getId());
-        findUser.getFollowerList().remove(loginUserId);
-        user.updateFollowNumber();
-        findUser.updateFollowNumber();
+        User user = userRepository.findByIdFetchFollowings(loginUserId).orElseThrow(UserNotFoundException::new);
+        Optional<Follow> follow = followRepository.findFollowByFollowingAndFollower(findUser.getId(), loginUserId);
+        followRepository.delete(follow.get());
+        user.updateFollowNumber(-1);
+        findUser.updateFollowNumber(-1);
         return PropertyUtil.response(true);
     }
 
-    public JSONObject addFollow(User findUser, Long loginUserId){
-        User loginUser = userRepository.findByIdFetchFollowingList(loginUserId).orElseThrow(UserNotFoundException::new);
-        loginUser.getFollowingList().add(findUser.getId());
-        findUser.getFollowerList().add(loginUserId);
-        loginUser.updateFollowNumber();
-        findUser.updateFollowNumber();
+    public JSONObject addFollow(User findUser){
+        User loginUser = userUtils.getCurrentUser();
+        Follow follow = Follow.builder()
+                .followerUser(loginUser)
+                .followingUser(findUser)
+                .build();
+        followRepository.save(follow);
+        loginUser.updateFollowNumber(1);
+        findUser.updateFollowNumber(1);
         alarmService.makeAlarm(findUser,loginUser.getPicture(),loginUser.getId().toString(), AlarmType.FOLLOW, loginUser.getNickName());
 //        fireBaseService.sendIndividualNotification(findUser,"팔로우 알림",loginUser.getNickName(),loginUser.getId().toString());
         return PropertyUtil.response(true);

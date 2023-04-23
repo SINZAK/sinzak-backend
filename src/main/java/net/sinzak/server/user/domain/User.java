@@ -11,6 +11,7 @@ import net.sinzak.server.product.domain.ProductLikes;
 import net.sinzak.server.product.domain.Product;
 import net.sinzak.server.product.domain.ProductSell;
 import net.sinzak.server.product.domain.ProductWish;
+import net.sinzak.server.user.domain.follow.Follow;
 import net.sinzak.server.user.domain.follow.Follower;
 import net.sinzak.server.user.domain.follow.Following;
 import net.sinzak.server.work.domain.Work;
@@ -128,22 +129,12 @@ public class User extends BaseTimeEntity{
     private Set<Alarm> alarms = new HashSet<>();
 
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private Set<Follower> followers = new HashSet<>();
+    @OneToMany(mappedBy = "followingUser",cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<Follow> followers = new HashSet<>();
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private Set<Following> followings = new HashSet<>();
+    @OneToMany(mappedBy = "followerUser",cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<Follow> followings = new HashSet<>();
 
-
-    @ElementCollection
-    @CollectionTable(name = "FOLLOWING_LIST", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "FOLLOWING_ID")
-    private Set<Long> followingList =new HashSet<>();
-
-    @ElementCollection
-    @CollectionTable(name = "FOLLOWER_LIST", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "FOLLOWER_ID")
-    private Set<Long> followerList =new HashSet<>();
 
 
     public void setFcm(String fcmToken) {
@@ -212,9 +203,11 @@ public class User extends BaseTimeEntity{
         this.categoryLike = categoryLike;
     }
 
-    public void updateFollowNumber(){
-        this.followerNum = followNumberTrans(this.getFollowerList().size());
-        this.followingNum = followNumberTrans(this.getFollowingList().size());
+    public void updateFollowNumber(int changeNum){
+        int newFollowerNum = Integer.parseInt(this.followerNum)+changeNum;
+        int newFollowingNum = Integer.parseInt(this.followingNum)+changeNum;
+        this.followerNum = Integer.toString(newFollowerNum);
+        this.followingNum = Integer.toString(newFollowingNum);
     }
 
     public String followNumberTrans(int number){

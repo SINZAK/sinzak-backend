@@ -3,6 +3,7 @@ package net.sinzak.server.common;
 import net.sinzak.server.common.dto.ActionForm;
 import net.sinzak.server.common.dto.SuggestDto;
 import net.sinzak.server.user.domain.User;
+import net.sinzak.server.user.domain.follow.Follow;
 import org.json.simple.JSONObject;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -20,5 +21,5 @@ public interface PostService<T,R,V,N,I> {
 
     boolean checkIsLikes(List<N> userLikesList, T t);
     boolean checkIsWish(User user, List<V> wishList);
-    boolean checkIsFollowing(Set<Long> userFollowingList, T t);
+    boolean checkIsFollowing(Set<Follow> followings, T t);
 }
