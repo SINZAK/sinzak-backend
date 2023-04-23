@@ -368,7 +368,19 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     }
 
     private ShowForm makeShowForm(Work work, boolean isLike) {
-        return new ShowForm(work.getId(), work.getTitle(), work.getContent(), work.getAuthor(), work.getPrice(), work.getThumbnail(), work.getCreatedDate().toString(), work.isSuggest(), isLike, work.getLikesCnt(), work.isComplete(), work.getPopularity());
+        return ShowForm.builder()
+                .id(work.getId())
+                .title(work.getTitle())
+                .content(work.getContent())
+                .author(work.getAuthor())
+                .price(work.getPrice())
+                .thumbnail(work.getThumbnail())
+                .date(work.getCreatedDate().toString())
+                .suggest(work.isSuggest())
+                .like(isLike)
+                .likesCnt(work.getLikesCnt())
+                .complete(work.isComplete())
+                .popularity(work.getPopularity()).build();
     }
 
 }

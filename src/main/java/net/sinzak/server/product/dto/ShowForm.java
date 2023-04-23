@@ -1,6 +1,7 @@
 package net.sinzak.server.product.dto;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -34,6 +35,7 @@ public class ShowForm implements Serializable {
 
     public ShowForm() {}
 
+    @Builder
     public ShowForm(Long id, String title, String content, String author, int price, String thumbnail, String date, boolean suggest, boolean like, int likesCnt, boolean complete, int popularity) {
         this.id = id;
         this.title = title;

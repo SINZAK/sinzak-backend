@@ -280,7 +280,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     private List<Product> getTradingList(List<Product> productList, int limit) {
         List<Product> tradingList = productList.stream()
-                .filter(p -> p.getChatCnt()>=1 && !p.isComplete())
+                .filter(product -> product.getChatCnt()>=1 && !product.isComplete())
                 .limit(limit)
                 .collect(Collectors.toList());
         return tradingList;
@@ -311,7 +311,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     private List<Product> getFollowingList(User user, List<Product> productList, int limit) {
         List<Product> followingProductList = productList.stream()
-                .filter(p -> checkIsFollowing(user.getFollowings(), p))
+                .filter(product -> checkIsFollowing(user.getFollowingList(), product))
                 .limit(limit)
                 .collect(Collectors.toList());
         return followingProductList;
@@ -349,7 +349,6 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         obj.put("isWish", isWish);
         obj.put("success",success);
         return obj;
-
     }
 
     @Transactional
@@ -409,6 +408,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         suggestRepository.save(connect);
         return PropertyUtil.response(true);
     }
+
     @Transactional
     public PageImpl<ShowForm> productListForUser(String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
         User user  = userRepository.findByIdFetchHistoryAndLikesList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
@@ -430,7 +430,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                 historyRepository.delete(history);
         }
         SearchHistory history = SearchHistory.addSearchHistory(keyword, user);
-            historyRepository.save(history);
+        historyRepository.save(history);
     }
 
     @Transactional(readOnly = true)
@@ -470,6 +470,18 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                 .collect(Collectors.toList());
     }
     private ShowForm makeShowForm(Product product, boolean isLike) {
-        return new ShowForm(product.getId(), product.getTitle(), product.getContent(), product.getAuthor(), product.getPrice(), product.getThumbnail(), product.getCreatedDate().toString(), product.isSuggest(), isLike, product.getLikesCnt(), product.isComplete(), product.getPopularity());
+        return ShowForm.builder()
+                .id(product.getId())
+                .title(product.getTitle())
+                .content(product.getContent())
+                .author(product.getAuthor())
+                .price(product.getPrice())
+                .thumbnail(product.getThumbnail())
+                .date(product.getCreatedDate().toString())
+                .suggest(product.isSuggest())
+                .like(isLike)
+                .likesCnt(product.getLikesCnt())
+                .complete(product.isComplete())
+                .popularity(product.getPopularity()).build();
     }
 }

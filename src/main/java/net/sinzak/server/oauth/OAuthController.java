@@ -28,7 +28,6 @@ public class OAuthController {
     private final AppleService appleService;
 
     private static final String productURL = "https://sinzak.net/api/login/oauth2/code";
-    private static final String developURL = "http://localhost:8080";
 
     @Value("${google.client-id}")
     private String GOOGLE_ID;
@@ -37,11 +36,11 @@ public class OAuthController {
     @Value("${naver.client-id}")
     private String NAVER_ID;
 
-    private final static String TEAM_ID = "F7B353LPM3";
-    private final static String CLIENT_ID = "net.sinzak.sinzak";
-    private final static String KEY_ID = "37QTX3F226";
+    private final static String TEAM_ID = "82J7RU93V4";
+    private final static String CLIENT_ID = "net.sinzak.ios";
+    private final static String KEY_ID = "2Q827DJQSK";
     private final static String AUTH_URL = "https://appleid.apple.com";
-    private final static String KEY_PATH = "static/apple/AuthKey_37QTX3F226.p8";
+    private final static String KEY_PATH = "static/apple/AuthKey_2Q827DJQSK.p8";
 
     @ApiOperation(value = "액세스토큰 body에 넣어주세요.", notes = "구글은 액세스토큰, idToken, origin까지 총 3개. " +
             "\n네이버, 카카오는 액세스토큰, origin 총 2개. " +
@@ -102,7 +101,7 @@ public class OAuthController {
     @ApiOperation(value = "스프링용 애플 로그인 실행",notes =
             "배포환경 : "+AUTH_URL+"/auth/authorize?client_id=" + CLIENT_ID + "&redirect_uri=" + "https://sinzak.net/api/login/oauth2/code/apple&response_type=code&id_token&response_mode=form_post")
     @GetMapping("/test4")
-    public String appleLogin(){return "";}
+    public String appleLogin(){return "https://appleid.apple.com/auth/authorize?client_id="+CLIENT_ID+"&redirect_uri=https://sinzak.net/api/login/oauth2/code/apple&response_type=code&id_token&response_mode=form_post";}
 
     @ApiOperation(value = "스프링용 카카오 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
     @GetMapping(value = "/login/oauth2/code/kakao")

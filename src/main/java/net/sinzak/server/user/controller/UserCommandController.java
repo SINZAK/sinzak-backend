@@ -29,14 +29,14 @@ public class UserCommandController {
     @ApiDocumentResponse
     @ApiOperation(value = "회원가입", notes = "카테고리는 {\"category_like\" : \"orient,painting\"} 처럼 콤마로만 구분해서 보내주세요\n 메일 인증 단계 이후에 한꺼번에 보내주세요 디스코드에 기재해놓겠습니다.")
     @PostMapping("/join")
-    public JSONObject join(@RequestBody JoinDto dto) {
+    public JSONObject join(@Valid @RequestBody JoinDto dto) {
         return securityService.join(dto);
     }
 
     @ApiDocumentResponse
-    @ApiOperation(value = "회원가입", notes = "이미 존재하는 닉네임일때 -> success : false, message : 이미 존재하는 닉네임입니다.")
+    @ApiOperation(value = "닉네임 체크", notes = "이미 존재하는 닉네임일때 -> success : false, message : 이미 존재하는 닉네임입니다.")
     @PostMapping("/check/nickname")
-    public JSONObject checkNickName(@RequestBody NickNameDto nickNameDto) {
+    public JSONObject checkNickName(@Valid @RequestBody NickNameDto nickNameDto) {
         return userCommandService.checkNickName(nickNameDto.getNickName());
     }
 
@@ -44,7 +44,7 @@ public class UserCommandController {
     @ApiOperation(value = "이메일 중복체크", notes = "이메일 중복 시 에는 하단과 같이 반환됩니다 false면 가입 불가능한 이메일인거로 생각하시면 됩니다 \n{\n" +
             "  \"success\": false,\n" +
             "  \"message\": \"이미 가입된 이메일입니다.\"\n" +
-            "}")
+            "}", hidden = true)
     @PostMapping("/check/email")
     public JSONObject checkEmail(@RequestBody EmailDto dto) {
         return securityService.checkEmail(dto);
