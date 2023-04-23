@@ -90,7 +90,7 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           source: "./sinzak-backend.tar"
           target: "/home/ec2-user/deploy"
-          strip_components: 2
+          strip_components: 0
 
 
       - name: Execute Server Init Script
