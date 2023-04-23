@@ -15,6 +15,7 @@ import net.sinzak.server.product.dto.ShowForm;
 import net.sinzak.server.user.domain.Role;
 import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.user.domain.User;
+import net.sinzak.server.user.domain.follow.Follow;
 import net.sinzak.server.user.repository.SearchHistoryRepository;
 import net.sinzak.server.user.repository.UserRepository;
 import net.sinzak.server.work.domain.*;
@@ -173,7 +174,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         boolean isWish = checkIsWish(user, work.getWorkWishList());
         boolean isFollowing  = false;
         if(work.getUser()!=null)
-            isFollowing =checkIsFollowing(user.getFollowingList(), work);
+            isFollowing =checkIsFollowing(user.getFollowings(), work);
 
         detailForm.setUserAction(isLike, isWish, isFollowing);
         work.addViews();
@@ -227,8 +228,11 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         return workWishList.stream().anyMatch(x -> x.getUser().getId().equals(user.getId()));
     }
 
-    public boolean checkIsFollowing(Set<Long> userFollowingList, Work work) {
-        return userFollowingList.stream().anyMatch(x -> x.equals(work.getUser().getId()));
+    public boolean checkIsFollowing(Set<Follow> followings, Work work) {
+        return followings.stream()
+                .map(Follow::getFollowingUser)
+                .map(User::getId)
+                .anyMatch(x -> x.equals(work.getUser().getId()));
     }
 
 

@@ -11,7 +11,7 @@ import net.sinzak.server.product.domain.ProductWish;
 import net.sinzak.server.product.repository.ProductWishRepository;
 import net.sinzak.server.user.domain.Report;
 import net.sinzak.server.user.domain.SearchHistory;
-import net.sinzak.server.user.domain.follow.Follower;
+import net.sinzak.server.user.domain.follow.Follow;
 import net.sinzak.server.user.domain.follow.Following;
 import net.sinzak.server.user.dto.respond.*;
 import net.sinzak.server.user.domain.User;
@@ -41,6 +41,7 @@ public class UserQueryService {
     private final FollowingRepository followingRepository;
     private final FollowerRepository followerRepository;
     private final UserQDSLRepositoryImpl QDSLRepository;
+    private final FollowRepository followRepository;
 
     public JSONObject getMyProfile(){
         JSONObject obj = new JSONObject();
@@ -181,10 +182,13 @@ public class UserQueryService {
         if(loginUserId.equals(0L)){
             return false;
         }
-        if(findUser.getFollowerList().contains(loginUserId)){
-            return true;
-        }
-        return false;
+        return findUser
+                .getFollowers()
+                .stream()
+                .map(Follow::getFollowerUser)
+                .map(User::getId)
+                .peek(System.out::println)
+                .anyMatch(x -> x.equals(loginUserId));
     }
     public boolean checkIfMyProfile(Long loginUserId, User findUser){
         if(loginUserId.equals(0L)){
@@ -198,18 +202,17 @@ public class UserQueryService {
 
 
     public JSONObject getFollowerDtoList(Long userId){
-        Set<Follower> followers = followerRepository.findFollowerByUserIdFetchFollowerUserIdAndNickNameAndPicture(userId);
+        Set<Follow> followers = followRepository.findByFollowingUserIdFetchFollower(userId);
         List<User> users = followers.stream()
-                .map(Follower::getFollowerUser)
+                .map(Follow::getFollowerUser)
                 .collect(Collectors.toList());
         return makeFollowDtos(users);
     }
 
-
     public JSONObject getFollowingDtoList(Long userId){
-        Set<Following> followings = followingRepository.findFollowingByUserIdFetchFollowingUserIdAndNickNameAndPicture(userId);
+        Set<Follow> followings = followRepository.findByFollowerUserIdFetchFollowings(userId);
         List<User> users = followings.stream()
-                .map(Following::getFollowingUser)
+                .map(Follow::getFollowingUser)
                 .collect(Collectors.toList());
         return makeFollowDtos(users);
     }
