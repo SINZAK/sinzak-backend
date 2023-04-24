@@ -45,8 +45,6 @@ public class UserCommandService {
     private final S3Service s3Service;
     private final FireBaseService fireBaseService;
     private final AlarmService alarmService;
-    private final FollowingRepository followingRepository;
-    private final FollowerRepository followerRepository;
     private final FollowRepository followRepository;
 
     public User saveTempUser(User user){
@@ -200,22 +198,4 @@ public class UserCommandService {
         }
     }
 
-    public JSONObject insert() throws NoSuchAlgorithmException {
-        User loginUser = userRepository.findByIdNotDeleted(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
-        List<User> users = userRepository.findAll();
-        for(User user: users){
-            if(user.getId().equals(loginUser.getId()))continue;
-            Following following = Following.builder()
-                    .user(loginUser)
-                    .followingUser(user)
-                    .build();
-            Follower follower = Follower.builder()
-                    .user(loginUser)
-                    .followerUser(user)
-                    .build();
-            followerRepository.save(follower);
-            followingRepository.save(following);
-        }
-        return PropertyUtil.response(true);
-    }
 }
