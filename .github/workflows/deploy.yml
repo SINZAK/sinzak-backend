@@ -91,7 +91,7 @@ jobs:
 #          source: "./sinzak-backend.tar"
           source: "./build/libs/*.jar"
           target: "/home/ec2-user/deploy"
-          strip_components: 0
+          strip_components: 2
 
 
       - name: Execute Server Init Script
