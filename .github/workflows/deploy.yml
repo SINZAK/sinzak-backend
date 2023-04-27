@@ -79,7 +79,7 @@ jobs:
           context: .
           outputs: type=docker,dest=./sinzak-backend.tar
           push: false
-          tags: sinzak:temp
+          tags: temp:latest
 
       - name: Deploy Prod use SCP
         uses: appleboy/scp-action@master
@@ -110,10 +110,9 @@ jobs:
             docker load -i ./sinzak-backend.tar
             docker container stop sinzak
             docker container stop redis
-#            docker build -t sinzak .
-            docker run -d --rm -p 8080:8080 --name sinzak --network redis-network --memory 512m --memory-swap 1g sinzak
+            docker run -d --rm -p 8080:8080 --name sinzak --network redis-network --memory 512m --memory-swap 1g temp:latest
             docker run -d --rm -p 6379:6379 --name redis --network redis-network --memory 256m --memory-swap 512m redis
-
+          #            docker build -t sinzak .
           
 
 
