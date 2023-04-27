@@ -134,9 +134,8 @@ public class OAuthController {
     public String oauthApple(@RequestParam(value = "code", required = false) String code) throws Exception {
         log.warn("인가코드 = {}",code);
         String client_id = CLIENT_ID;
-        log.error(client_id);
-        log.error(client_id);
         String client_secret = appleService.createClientSecret(TEAM_ID, CLIENT_ID, KEY_ID, KEY_PATH, AUTH_URL);
+        log.warn(client_secret);
         String reqUrl = AUTH_URL + "/auth/token";
         Map<String, String> tokenRequest = new HashMap<>();
         tokenRequest.put("client_id", client_id);
