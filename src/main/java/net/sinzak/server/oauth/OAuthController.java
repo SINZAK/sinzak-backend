@@ -149,7 +149,7 @@ public class OAuthController {
     @ApiOperation(value = "애플 클라이언트 시크릿 반환", notes = "")
     @GetMapping(value = "/client_secret")
     public JSONObject oauthApple() throws Exception {
-        String client_secret = appleService.createClientSecret(TEAM_ID, CLIENT_ID, KEY_ID, KEY_PATH, AUTH_URL);
+        String client_secret = appleService.createClientSecret(TEAM_ID, "net.sinzak.ios", KEY_ID, KEY_PATH, AUTH_URL);
         log.warn(client_secret);
         return PropertyUtil.response(client_secret);
     }
