@@ -67,7 +67,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "select follower_id from follower_list where user_id = :id", nativeQuery = true)
     Set<Long> findFollowers(@Param("id") Long id);
 
-    @Query("select u,fg.followingUser.id from User u left join fetch u.followings fg left join fetch u.productLikesList where u.id = :id and u.isDelete = false")
+    @Query("select u from User u left join fetch u.followings fg left join fetch u.productLikesList where u.id = :id and u.isDelete = false")
     Optional<User> findByIdFetchFollowingAndLikesList(@Param("id") Long id);
 
     @Query("select u from User u left join fetch u.reportList where u.id = :id and u.isDelete = false")
