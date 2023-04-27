@@ -52,14 +52,11 @@ public class AppleService {
         claimsSet.setSubject(clientId);
 
         SignedJWT jwt = new SignedJWT(header, claimsSet);
-        System.out.println(jwt);
-        System.out.println(jwt.getJWTClaimsSet().getAllClaims());
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(readPrivateKey(keyPath));
         KeyFactory kf = KeyFactory.getInstance("EC");
         try {
             ECPrivateKey ecPrivateKey = (ECPrivateKey) kf.generatePrivate(spec);
             JWSSigner jwsSigner = new ECDSASigner(ecPrivateKey.getS());
-            System.out.println(jwsSigner.toString());
             jwt.sign(jwsSigner);
         } catch (JOSEException | InvalidKeySpecException e) {
             log.error("애플 로그인 ClientSecret 생성 오류 {}", e.getMessage());

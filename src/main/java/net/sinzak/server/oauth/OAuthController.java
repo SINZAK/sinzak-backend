@@ -147,6 +147,14 @@ public class OAuthController {
         return apiResponse;
     }
 
+    @ApiOperation(value = "애플 클라이언트 시크릿 반환", notes = "")
+    @GetMapping(value = "/client_secret")
+    public JSONObject oauthApple() throws Exception {
+        String client_secret = appleService.createClientSecret(TEAM_ID, CLIENT_ID, KEY_ID, KEY_PATH, AUTH_URL);
+        log.warn(client_secret);
+        return PropertyUtil.response(client_secret);
+    }
+
     @ApiOperation(value = "웹용 카카오 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
     @GetMapping(value = "/web/kakao")
     public JSONObject oauthWebKakao(@RequestParam(value = "code", required = false) String code, @RequestParam(value = "redirect_uri") String redirect_uri) throws Exception {
