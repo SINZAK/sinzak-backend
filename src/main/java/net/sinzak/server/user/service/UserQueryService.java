@@ -38,8 +38,6 @@ public class UserQueryService {
     private final WorkWishRepository workWishRepository;
     private final ProductWishRepository productWishRepository;
     private final ReportRepository reportRepository;
-    private final FollowingRepository followingRepository;
-    private final FollowerRepository followerRepository;
     private final UserQDSLRepositoryImpl QDSLRepository;
     private final FollowRepository followRepository;
 
