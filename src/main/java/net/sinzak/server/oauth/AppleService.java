@@ -47,7 +47,7 @@ public class AppleService {
 
         claimsSet.setIssuer(teamId);
         claimsSet.setIssueTime(now);
-        claimsSet.setExpirationTime(new Date(now.getTime() + 3600000));
+        claimsSet.setExpirationTime(new Date(now.getTime() + (long) 30 * 24 * 60 * 60 * 1000));
         claimsSet.setAudience(authUrl);
         claimsSet.setSubject(clientId);
 
