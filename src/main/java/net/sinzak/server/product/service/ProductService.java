@@ -352,6 +352,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional
+    @CacheEvict(value = {"home_user","home_guest"}, allEntries = true)
     public JSONObject likes(@RequestBody ActionForm form){
         JSONObject obj = new JSONObject();
         User user = userRepository.findByIdFetchLikesList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
