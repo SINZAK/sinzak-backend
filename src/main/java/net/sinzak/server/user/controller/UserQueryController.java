@@ -82,5 +82,5 @@ public class UserQueryController {
     @ApiDocumentResponse
     @ApiOperation(value = "안드로이드 버전 출력", notes = "무시")
     @PostMapping(value = "/aos/version")
-    public JSONObject version(){return PropertyUtil.response(12);}
+    public JSONObject version(){return PropertyUtil.response(14);}
 }

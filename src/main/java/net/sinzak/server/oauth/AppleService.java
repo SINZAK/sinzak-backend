@@ -31,6 +31,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.ECPrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.text.ParseException;
 import java.util.*;
 
 @Slf4j
@@ -38,7 +39,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class AppleService {
 
-    public String createClientSecret(String teamId, String clientId, String keyId, String keyPath, String authUrl) throws NoSuchAlgorithmException {
+    public String createClientSecret(String teamId, String clientId, String keyId, String keyPath, String authUrl) throws NoSuchAlgorithmException, ParseException {
 
         JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.ES256).keyID(keyId).build();
         JWTClaimsSet claimsSet = new JWTClaimsSet();
@@ -46,12 +47,11 @@ public class AppleService {
 
         claimsSet.setIssuer(teamId);
         claimsSet.setIssueTime(now);
-        claimsSet.setExpirationTime(new Date(now.getTime() + 3600000));
+        claimsSet.setExpirationTime(new Date(now.getTime() + (long) 30 * 24 * 60 * 60 * 1000));
         claimsSet.setAudience(authUrl);
         claimsSet.setSubject(clientId);
 
         SignedJWT jwt = new SignedJWT(header, claimsSet);
-
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(readPrivateKey(keyPath));
         KeyFactory kf = KeyFactory.getInstance("EC");
         try {
