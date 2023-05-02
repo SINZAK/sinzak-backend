@@ -386,6 +386,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional
+    @CacheEvict(value = {"home_user","home_guest"}, allEntries = true)
     public JSONObject sell(@RequestBody SellDto dto){
         User user = userRepository.findByIdFetchProductSellList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
         Product product = productRepository.findById(dto.getPostId()).orElseThrow(PostNotFoundException::new);
