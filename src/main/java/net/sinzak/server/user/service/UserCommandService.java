@@ -187,6 +187,7 @@ public class UserCommandService {
     }
 
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = "loginUser", allEntries = true)
     public JSONObject resign(){
         try{
             User loginUser = userUtils.getCurrentUser();
