@@ -15,7 +15,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    @Cacheable(value = "loginUser", key = "#username", cacheManager = "testCacheManager")
+//    @Cacheable(value = "loginUser", key = "#username", cacheManager = "testCacheManager")
     @Override
     public CustomUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserProjection projection = userRepository.findCurrentUserInfo(Long.valueOf(username))

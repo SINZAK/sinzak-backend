@@ -58,7 +58,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     private final int HOME_OBJECTS = 10;
     private final int HOME_DETAIL_OBJECTS = 50;
 
-    @CacheEvict(value = {"home_user","home_guest"}, allEntries = true)
+//    @CacheEvict(value = {"home_user","home_guest"}, allEntries = true)
     @Transactional(rollbackFor = {Exception.class})
     public JSONObject makePost(@Valid ProductPostDto buildDto){   // 글 생성
         User user = userRepository.findByIdFetchProductPostList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
@@ -131,7 +131,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional(rollbackFor = {Exception.class})
-    @CacheEvict(value = {"home_user","home_guest"}, allEntries = true)
+//    @CacheEvict(value = {"home_user","home_guest"}, allEntries = true)
     public JSONObject editPost(Long productId, ProductEditDto editDto){
         User user = userUtils.getCurrentUser();
         Product product = productRepository.findById(productId).orElseThrow(PostNotFoundException::new);
@@ -144,7 +144,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional(rollbackFor = {Exception.class})
-    @CacheEvict(value = {"home_user","home_guest"}, allEntries = true)
+//    @CacheEvict(value = {"home_user","home_guest"}, allEntries = true)
     public JSONObject deletePost(Long productId){
         User user = userUtils.getCurrentUser();
         Product product = productRepository.findByIdFetchChatRooms(productId).orElseThrow(PostNotFoundException::new);
@@ -242,7 +242,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
 
-    @Cacheable(value ="home_user", key = "#userId", cacheManager ="testCacheManager")
+//    @Cacheable(value ="home_user", key = "#userId", cacheManager ="testCacheManager")
     @Transactional(readOnly = true)
     public JSONObject showHomeForUser(Long userId){
         JSONObject obj = new JSONObject();
@@ -261,7 +261,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         return PropertyUtil.response(obj);
     }
 
-    @Cacheable(value ="home_guest", cacheManager ="testCacheManager")
+//    @Cacheable(value ="home_guest", cacheManager ="testCacheManager")
     @Transactional(readOnly = true)
     public JSONObject showHomeForGuest(){
         JSONObject obj = new JSONObject();
@@ -352,7 +352,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional
-    @CacheEvict(value = {"home_user","home_guest"}, allEntries = true)
+//    @CacheEvict(value = {"home_user","home_guest"}, allEntries = true)
     public JSONObject likes(@RequestBody ActionForm form){
         JSONObject obj = new JSONObject();
         User user = userRepository.findByIdFetchLikesList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
@@ -386,7 +386,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional
-    @CacheEvict(value = {"home_user","home_guest"}, allEntries = true)
+//    @CacheEvict(value = {"home_user","home_guest"}, allEntries = true)
     public JSONObject sell(@RequestBody SellDto dto){
         User user = userRepository.findByIdFetchProductSellList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
         Product product = productRepository.findById(dto.getPostId()).orElseThrow(PostNotFoundException::new);

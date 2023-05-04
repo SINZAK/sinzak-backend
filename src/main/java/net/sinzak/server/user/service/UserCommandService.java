@@ -86,7 +86,7 @@ public class UserCommandService {
     }
 
 
-    @CacheEvict(value = {"home_user"}, key = "#currentUserId", cacheManager = "testCacheManager")
+//    @CacheEvict(value = {"home_user"}, key = "#currentUserId", cacheManager = "testCacheManager")
     public JSONObject follow(Long currentUserId, Long userId){
         User findUser = userRepository.findByIdNotDeleted(userId).orElseThrow(UserNotFoundException::new);
         if(currentUserId.equals(findUser.getId()))
@@ -95,7 +95,7 @@ public class UserCommandService {
         return addFollow(findUser);
     }
 
-    @CacheEvict(value = {"home_user"}, key = "#currentUserId", cacheManager = "testCacheManager")
+//    @CacheEvict(value = {"home_user"}, key = "#currentUserId", cacheManager = "testCacheManager")
     public JSONObject unFollow(Long currentUserId, Long userId){
         User findUser = userRepository.findByIdNotDeleted(userId).orElseThrow(UserNotFoundException::new);
         if(currentUserId.equals(findUser.getId()))
@@ -187,7 +187,7 @@ public class UserCommandService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    @CacheEvict(value = "loginUser", allEntries = true)
+//    @CacheEvict(value = "loginUser", allEntries = true)
     public JSONObject resign(){
         try{
             User loginUser = userUtils.getCurrentUser();
