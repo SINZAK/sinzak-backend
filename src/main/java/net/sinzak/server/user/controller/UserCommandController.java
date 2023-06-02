@@ -36,7 +36,7 @@ public class UserCommandController {
     @ApiDocumentResponse
     @ApiOperation(value = "닉네임 체크", notes = "이미 존재하는 닉네임일때 -> success : false, message : 이미 존재하는 닉네임입니다.")
     @PostMapping("/check/nickname")
-    public JSONObject checkNickName(@Valid @RequestBody NickNameDto nickNameDto) {
+    public JSONObject checkNickName(@RequestBody NickNameDto nickNameDto) {
         return userCommandService.checkNickName(nickNameDto.getNickName());
     }
 
@@ -65,7 +65,7 @@ public class UserCommandController {
     @ApiDocumentResponse
     @ApiOperation(value = "유저 정보변경", notes = "이름, 한줄 소개")
     @PostMapping(value = "/users/edit")
-    public JSONObject updateUser(@Valid @RequestBody UpdateUserDto dto) {
+    public JSONObject updateUser(@RequestBody UpdateUserDto dto) {
         return userCommandService.updateUser(dto);
     }
 
