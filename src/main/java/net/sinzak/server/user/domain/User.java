@@ -142,6 +142,7 @@ public class User extends BaseTimeEntity{
     }
     public void setDelete() {
         isDelete = true;
+        nickName = null;
     }
 
     public void setUniv(String univName) {

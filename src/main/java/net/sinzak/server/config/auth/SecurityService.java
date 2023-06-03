@@ -37,9 +37,8 @@ public class SecurityService {
         User user = userRepository.findByEmailNotDeleted(email)
                 .orElseThrow(() -> new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND));
         TokenDto tokenDto = jwtProvider.createToken(user.getId().toString(), user.getId(), user.getRole());
-        //리프레시 토큰 저장
-        log.error(user.getNickName()+" 로그인!");
-        if(user.getNickName().isEmpty())
+
+        if(user.getNickName() == null || user.getNickName().isEmpty())
             tokenDto.setIsJoined(false);
         tokenDto.setOrigin(user.getOrigin());
         RefreshToken refreshToken = RefreshToken.builder()
@@ -47,6 +46,7 @@ public class SecurityService {
                 .token(tokenDto.getRefreshToken())
                 .build();
         refreshTokenRepository.save(refreshToken);
+        log.error(user.getNickName()+" 로그인!");
         return tokenDto;
     }
 
@@ -54,7 +54,7 @@ public class SecurityService {
     public TokenDto login(User user) {
         PropertyUtil.checkHeader(user);
         TokenDto tokenDto = jwtProvider.createToken(user.getId().toString(), user.getId(), user.getRole());
-        //리프레시 토큰 저장
+
         tokenDto.setIsJoined(false);
         tokenDto.setOrigin(user.getOrigin());
         RefreshToken refreshToken = RefreshToken.builder()
