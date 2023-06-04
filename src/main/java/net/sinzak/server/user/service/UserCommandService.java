@@ -143,7 +143,7 @@ public class UserCommandService {
         if(checkReportHistory(opponentUserId, loginUser).isPresent())
             return PropertyUtil.responseMessage("이미 신고한 회원입니다.");
         User opponentUser = userRepository.findByIdNotDeleted(opponentUserId).orElseThrow(UserNotFoundException::new);
-        chatRoomCommandService.makeChatRoomBlocked(loginUser,opponentUser,true);
+//        chatRoomCommandService.makeChatRoomBlocked(loginUser,opponentUser,true);
         Report connect = Report.createConnect(loginUser, opponentUser);
         reportRepository.save(connect);
         return PropertyUtil.response(true);
