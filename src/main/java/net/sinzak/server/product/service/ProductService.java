@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.alarm.service.AlarmService;
 import net.sinzak.server.common.PostService;
 import net.sinzak.server.common.UserUtils;
+import net.sinzak.server.user.domain.Report;
 import net.sinzak.server.user.domain.Role;
 import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.common.dto.SuggestDto;
@@ -19,12 +20,11 @@ import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.domain.embed.Size;
 import net.sinzak.server.common.dto.ActionForm;
 import net.sinzak.server.user.domain.follow.Follow;
+import net.sinzak.server.user.repository.ReportRepository;
 import net.sinzak.server.user.repository.SearchHistoryRepository;
 import net.sinzak.server.user.repository.UserRepository;
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 public class ProductService implements PostService<Product,ProductPostDto,ProductWish,ProductLikes,ProductImage> {
     private final UserUtils userUtils;
     private final UserRepository userRepository;
+    private final ReportRepository reportRepository;
     private final ProductRepository productRepository;
     private final ProductSellRepository productSellRepository;
     private final ProductSuggestRepository suggestRepository;
@@ -246,10 +247,13 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     @Transactional(readOnly = true)
     public JSONObject showHomeForUser(Long userId){
         JSONObject obj = new JSONObject();
-        User user = userRepository.findByIdFetchFollowingAndLikesList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByIdFetchFollowingAndLikesList(userId).orElseThrow(UserNotFoundException::new);
         List<String> userCategories = Arrays.asList(user.getCategoryLike().split(","));
-
+        List<Report> userReports = reportRepository.findByUserId(userId);
         List<Product> productList = productRepository.findAllProductNotDeleted();
+
+        removeBlockPost(userReports, productList);
+
         obj.put("new", makeHomeShowForms(user.getProductLikesList(), productList));   /** 신작 **/
 
         List<Product> list = QDSLRepository.findCountByCategoriesDesc(userCategories, HOME_OBJECTS);
@@ -284,29 +288,6 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                 .limit(limit)
                 .collect(Collectors.toList());
         return tradingList;
-    }
-
-
-    @Transactional(readOnly = true)
-    public JSONObject showRecommendDetail(){
-        User user = userRepository.findByIdFetchLikesList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
-        List<String> userCategories = Arrays.asList(user.getCategoryLike().split(","));
-
-        List<Product> recommendList = QDSLRepository.findCountByCategoriesDesc(userCategories, HOME_DETAIL_OBJECTS);
-        List<ShowForm> data = makeDetailHomeShowForms(user.getProductLikesList(), recommendList);
-
-        return PropertyUtil.response(data);
-    }
-
-    @Transactional(readOnly = true)
-    public JSONObject showFollowingDetail(){
-        User user = userRepository.findByIdFetchFollowingAndLikesList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
-        List<Product> productList = productRepository.findAllProductNotDeleted();
-
-        List<Product> followingList = getFollowingList(user, productList, HOME_DETAIL_OBJECTS);
-        List<ShowForm> data = makeDetailHomeShowForms(user.getProductLikesList(), followingList);
-
-        return PropertyUtil.response(data);
     }
 
     private List<Product> getFollowingList(User user, List<Product> productList, int limit) {
@@ -414,12 +395,16 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     @Transactional
     public PageImpl<ShowForm> productListForUser(String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
         User user  = userRepository.findByIdFetchHistoryAndLikesList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
+        List<Report> userReports = reportRepository.findByUserId(user.getId());
         if(!keyword.isEmpty())
             saveSearchHistory(keyword, user);
         Page<Product> productList = QDSLRepository.findAllByCompleteAndCategoriesAligned(complete, keyword, categories, align, pageable);
-
-        List<ShowForm> showList = makeDetailHomeShowForms(user.getProductLikesList(), productList.getContent());
-        return new PageImpl<>(showList, pageable, productList.getTotalElements());
+        List<Product> products = new ArrayList<>(productList.getContent()); // Page의 content를 필터링 할 수 없어서 재생성.
+        log.error("{}", products.size());
+        removeBlockPost(userReports, products);
+        List<ShowForm> showList = makeDetailHomeShowForms(user.getProductLikesList(), products);
+        log.error("{}", products.size());
+        return new PageImpl<>(showList, pageable, products.size());
     }
 
 
@@ -485,5 +470,15 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                 .likesCnt(product.getLikesCnt())
                 .complete(product.isComplete())
                 .popularity(product.getPopularity()).build();
+    }
+
+    private void removeBlockPost(List<Report> userReportList, List<Product> productList) {
+        for (int i = 0; i<productList.size(); i++){
+            for (Report report : userReportList) {
+                if(productList.get(i).getUser().getId().equals(report.getOpponentUser().getId())){
+                    productList.remove(productList.get(i));
+                }
+            }
+        }
     }
 }

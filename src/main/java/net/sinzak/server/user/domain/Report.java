@@ -12,7 +12,7 @@ public class Report extends BaseTimeEntity {
     @Id
     @GeneratedValue
     @Column(name = "report_id")
-    private Long id;  //작품 번호
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")

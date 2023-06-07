@@ -13,5 +13,8 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     List<Report> findByUserIdAndOpponentUserIdBoth(@Param("userId") Long userId, @Param("opponentUserId") Long opponentUserId);
 
     @Query("select r from Report r left join fetch r.opponentUser where r.user.id = :userId")
+    List<Report> findByUserIdFetchOpponent(@Param("userId") Long userId);
+
+    @Query("select r from Report r where r.user.id = :userId")
     List<Report> findByUserId(@Param("userId") Long userId);
 }
