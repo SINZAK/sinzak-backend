@@ -29,14 +29,14 @@ public class UserCommandController {
     @ApiDocumentResponse
     @ApiOperation(value = "회원가입", notes = "카테고리는 {\"category_like\" : \"orient,painting\"} 처럼 콤마로만 구분해서 보내주세요\n 메일 인증 단계 이후에 한꺼번에 보내주세요 디스코드에 기재해놓겠습니다.")
     @PostMapping("/join")
-    public JSONObject join(@Valid @RequestBody JoinDto dto) {
+    public JSONObject join(@RequestBody JoinDto dto) {
         return securityService.join(dto);
     }
 
     @ApiDocumentResponse
     @ApiOperation(value = "닉네임 체크", notes = "이미 존재하는 닉네임일때 -> success : false, message : 이미 존재하는 닉네임입니다.")
     @PostMapping("/check/nickname")
-    public JSONObject checkNickName(@Valid @RequestBody NickNameDto nickNameDto) {
+    public JSONObject checkNickName(@RequestBody NickNameDto nickNameDto) {
         return userCommandService.checkNickName(nickNameDto.getNickName());
     }
 
@@ -65,7 +65,7 @@ public class UserCommandController {
     @ApiDocumentResponse
     @ApiOperation(value = "유저 정보변경", notes = "이름, 한줄 소개")
     @PostMapping(value = "/users/edit")
-    public JSONObject updateUser(@Valid @RequestBody UpdateUserDto dto) {
+    public JSONObject updateUser(@RequestBody UpdateUserDto dto) {
         return userCommandService.updateUser(dto);
     }
 

@@ -12,7 +12,6 @@ import net.sinzak.server.product.repository.ProductWishRepository;
 import net.sinzak.server.user.domain.Report;
 import net.sinzak.server.user.domain.SearchHistory;
 import net.sinzak.server.user.domain.follow.Follow;
-import net.sinzak.server.user.domain.follow.Following;
 import net.sinzak.server.user.dto.respond.*;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.repository.*;
@@ -231,7 +230,7 @@ public class UserQueryService {
 
     public JSONObject showReportList(){
         User loginUser = userRepository.findByIdFetchReportList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
-        List<Report> reportList = reportRepository.findByUserId(loginUser.getId());
+        List<Report> reportList = reportRepository.findByUserIdFetchOpponent(loginUser.getId());
 
         List<ReportRespondDto> reportRespondDtos = reportList.stream()
                 .filter(report -> !report.getOpponentUser().isDelete())

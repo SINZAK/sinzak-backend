@@ -86,7 +86,7 @@ public class UserCommandService {
     }
 
 
-    @CacheEvict(value = {"home_user"}, key = "#currentUserId", cacheManager = "testCacheManager")
+//    @CacheEvict(value = {"home_user"}, key = "#currentUserId", cacheManager = "testCacheManager")
     public JSONObject follow(Long currentUserId, Long userId){
         User findUser = userRepository.findByIdNotDeleted(userId).orElseThrow(UserNotFoundException::new);
         if(currentUserId.equals(findUser.getId()))
@@ -95,7 +95,7 @@ public class UserCommandService {
         return addFollow(findUser);
     }
 
-    @CacheEvict(value = {"home_user"}, key = "#currentUserId", cacheManager = "testCacheManager")
+//    @CacheEvict(value = {"home_user"}, key = "#currentUserId", cacheManager = "testCacheManager")
     public JSONObject unFollow(Long currentUserId, Long userId){
         User findUser = userRepository.findByIdNotDeleted(userId).orElseThrow(UserNotFoundException::new);
         if(currentUserId.equals(findUser.getId()))
@@ -143,7 +143,7 @@ public class UserCommandService {
         if(checkReportHistory(opponentUserId, loginUser).isPresent())
             return PropertyUtil.responseMessage("이미 신고한 회원입니다.");
         User opponentUser = userRepository.findByIdNotDeleted(opponentUserId).orElseThrow(UserNotFoundException::new);
-        chatRoomCommandService.makeChatRoomBlocked(loginUser,opponentUser,true);
+//        chatRoomCommandService.makeChatRoomBlocked(loginUser,opponentUser,true);
         Report connect = Report.createConnect(loginUser, opponentUser);
         reportRepository.save(connect);
         return PropertyUtil.response(true);
@@ -187,6 +187,7 @@ public class UserCommandService {
     }
 
     @Transactional(rollbackFor = Exception.class)
+//    @CacheEvict(value = "loginUser", allEntries = true)
     public JSONObject resign(){
         try{
             User loginUser = userUtils.getCurrentUser();
