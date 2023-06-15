@@ -54,6 +54,15 @@ public class RedisCacheConfig {
         return RedisCacheManager.RedisCacheManagerBuilder.fromConnectionFactory(cf).cacheDefaults(redisCacheConfiguration).build();
     }
 
+    @Bean
+    public CacheManager searchManager(RedisConnectionFactory cf){
+        RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))//Serializer로 저장해야함
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer(objectMapper())))
+                .entryTtl(Duration.ZERO); //ttl 무한 설정
+        return RedisCacheManager.RedisCacheManagerBuilder.fromConnectionFactory(cf).cacheDefaults(redisCacheConfiguration).build();
+    }
+
     private ObjectMapper objectMapper() {
         PolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator
                 .builder()
