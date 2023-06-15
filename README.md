@@ -1,6 +1,3 @@
-![image](https://github.com/SINZAK/sinzak-backend/assets/94730032/c5fdd3ab-9487-4e51-a75a-26cd09b6393f)![mainbanner2](https://user-images.githubusercontent.com/94730032/227761473-096957f6-9e00-4445-ac17-9d8b506c120b.png)
-
-
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=SINZAK_sinzak-backend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=SINZAK_sinzak-backend)
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=SINZAK_sinzak-backend&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=SINZAK_sinzak-backend)
 <br/>
