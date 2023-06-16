@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.alarm.service.AlarmService;
 import net.sinzak.server.common.PostService;
+import net.sinzak.server.common.RedisServcie;
 import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.user.domain.Report;
 import net.sinzak.server.user.domain.Role;
@@ -54,6 +55,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     private final ProductQDSLRepositoryImpl QDSLRepository;
     private final SearchHistoryRepository historyRepository;
     private final AlarmService alarmService;
+    private final RedisServcie redisServcie;
+
 
     private final int HistoryMaxCount = 10;
     private final int HOME_OBJECTS = 10;
@@ -396,8 +399,11 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     public PageImpl<ShowForm> productListForUser(String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
         User user  = userRepository.findByIdFetchHistoryAndLikesList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
         List<Report> userReports = reportRepository.findByUserId(user.getId());
-        if(!keyword.isEmpty())
+        if(!keyword.isEmpty()){
             saveSearchHistory(keyword, user);
+            redisServcie.addWordToRedis(keyword);
+        }
+
         Page<Product> productList = QDSLRepository.findAllByCompleteAndCategoriesAligned(complete, keyword, categories, align, pageable);
         List<Product> products = new ArrayList<>(productList.getContent()); // Page의 content를 필터링 할 수 없어서 재생성.
         log.error("{}", products.size());
@@ -422,6 +428,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     @Transactional(readOnly = true)
     public PageImpl<ShowForm> productListForGuest(String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
+        if(!keyword.isEmpty()) redisServcie.addWordToRedis(keyword);
         Page<Product> productList = QDSLRepository.findAllByCompleteAndCategoriesAligned(complete, keyword, categories, align, pageable);
         List<ShowForm> showList = makeShowFormsForGuest(productList);
         return new PageImpl<>(showList, pageable, productList.getTotalElements());
@@ -481,4 +488,5 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
             }
         }
     }
+
 }
