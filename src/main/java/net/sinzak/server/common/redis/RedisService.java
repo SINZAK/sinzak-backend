@@ -44,8 +44,8 @@ public class RedisService {
                 .collect(Collectors.toList());
         for(int i=0;i<temporaryWord.size();i++){
             if(wordsToShow.size()>=NUMBER_OF_WORD_TO_SHOW) return;
-            if(temporaryWord.get(i).equals("+")) wordsToShow.add(prefix);
-            if(!temporaryWord.get(i).equals("+")) findEndOfWord(prefix+temporaryWord.get(i),wordsToShow);
+            if(temporaryWord.get(i).equals(COMPLETE_WORD)) wordsToShow.add(prefix);
+            if(!temporaryWord.get(i).equals(COMPLETE_WORD)) findEndOfWord(prefix+temporaryWord.get(i),wordsToShow);
         }
     }
 
