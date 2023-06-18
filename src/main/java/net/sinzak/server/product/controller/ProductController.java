@@ -163,9 +163,9 @@ public class ProductController {
     }
 
 
-//    @ApiOperation(value = "검색어 자동완성")
-//    @PostMapping("/products/auto-complete")
-//    public List<String> autoCompleteSearch(@RequestParam String keyWord){
-//        return productService.autoCompleteWord(keyWord);
-//    }
+    @ApiOperation(value = "검색어 자동완성")
+    @PostMapping("/products/auto-complete")
+    public List<String> autoCompleteSearch(@RequestParam String keyWord){
+        return productService.getCompleteWord(keyWord);
+    }
 }

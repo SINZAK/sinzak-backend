@@ -489,4 +489,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         }
     }
 
+    public List<String> getCompleteWord(String keyWord) {
+        return redisService.getAutoCompleteWords(keyWord);
+    }
 }
