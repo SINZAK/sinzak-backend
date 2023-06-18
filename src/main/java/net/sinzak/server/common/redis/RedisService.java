@@ -15,20 +15,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RedisService {
 
-//    @Resource(name= "autoCompleteRedisTemplate")
     private final RedisTemplate<String,String> redisTemplate;
 
     private static final String REDIS_KEY_AUTO_COMPLETE ="autoComplete:";
     private static final String COMPLETE_WORD ="+";
-    private static final Integer NUMBER_OF_WORD_TO_BRING =6;
     private static final Integer NUMBER_OF_WORD_TO_SHOW = 5;
-    private static final Integer SUB_WORD_SCORE =0;
-    private static final Integer NEW_SEARCH_WORD_SCORE =1;
     public void addWordToRedis(String newWord){
         String key = REDIS_KEY_AUTO_COMPLETE;
         for(int i=0;i<newWord.length();i++){
-            char word = newWord.substring(i,i+1).charAt(0);
-            redisTemplate.opsForZSet().add(key,newWord.substring(i,i+1),word-'a');
+            String word = newWord.substring(i,i+1);
+            redisTemplate.opsForZSet().incrementScore(key,word,1);
             key += word;
         }
         redisTemplate.opsForZSet().add(key,COMPLETE_WORD,0);
@@ -42,16 +38,15 @@ public class RedisService {
     public void findEndOfWord(String prefix,List<String> wordsToShow){
         List<String> temporaryWord = redisTemplate
                 .opsForZSet()
-                .reverseRangeWithScores(REDIS_KEY_AUTO_COMPLETE+prefix,0,NUMBER_OF_WORD_TO_BRING)
+                .reverseRangeWithScores(REDIS_KEY_AUTO_COMPLETE+prefix,0,NUMBER_OF_WORD_TO_SHOW)
                 .stream()
                 .map(ZSetOperations.TypedTuple::getValue)
                 .collect(Collectors.toList());
         for(int i=0;i<temporaryWord.size();i++){
-            if(wordsToShow.size()>NUMBER_OF_WORD_TO_SHOW) return;
+            if(wordsToShow.size()>=NUMBER_OF_WORD_TO_SHOW) return;
             if(temporaryWord.get(i).equals("+")) wordsToShow.add(prefix);
             if(!temporaryWord.get(i).equals("+")) findEndOfWord(prefix+temporaryWord.get(i),wordsToShow);
         }
-
     }
 
 
