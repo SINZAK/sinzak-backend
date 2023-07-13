@@ -149,4 +149,8 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     public void addViews() {this.views++;this.popularity++;}
 
     public void setComplete(boolean complete) {this.complete = complete;}
+
+    public void updateUserNickName(String author) {
+        this.author = author;
+    }
 }

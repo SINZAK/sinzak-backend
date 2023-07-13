@@ -10,6 +10,7 @@ import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.firebase.FireBaseService;
 import net.sinzak.server.image.S3Service;
+import net.sinzak.server.product.domain.Product;
 import net.sinzak.server.user.domain.Report;
 import net.sinzak.server.user.domain.follow.Follow;
 import net.sinzak.server.user.domain.follow.Follower;
@@ -52,8 +53,12 @@ public class UserCommandService {
     }
 
     public JSONObject updateUser(UpdateUserDto dto){
-        User user = userUtils.getCurrentUser();
+        Long userId = userUtils.getCurrentUserId();
+        User user = userRepository.findByIdFetchProductPostList(userId).orElseThrow();
         user.updateProfile(dto.getName(),dto.getIntroduction());
+        for (Product product : user.getProductPostList()) {
+            product.updateUserNickName(dto.getName());
+        }
         return PropertyUtil.response(true);
     }
 
