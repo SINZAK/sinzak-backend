@@ -109,5 +109,4 @@ jobs:
             docker container stop sinzak
             docker container stop redis
             docker build -t sinzak .
-            docker run -d --rm -p 8080:8080 --name sinzak --network redis-network --memory 512m --memory-swap 1g sinzak
-            docker run -d --rm -p 6379:6379 --name redis --network redis-network --memory 256m --memory-swap 512m redis
+            docker-compose up -d
