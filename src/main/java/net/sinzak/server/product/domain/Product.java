@@ -5,8 +5,8 @@ import lombok.Getter;
 import net.sinzak.server.BaseTimeEntity;
 import net.sinzak.server.chatroom.domain.ChatRoom;
 import net.sinzak.server.product.dto.ProductEditDto;
-import net.sinzak.server.user.domain.embed.Size;
 import net.sinzak.server.user.domain.User;
+import net.sinzak.server.user.domain.embed.Size;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -14,9 +14,9 @@ import java.util.List;
 
 @Getter
 @Entity
-@SequenceGenerator(name = "Product_SEQ_GEN",sequenceName = "Product_SEQ")
+@SequenceGenerator(name = "Product_SEQ_GEN", sequenceName = "Product_SEQ")
 @Table(indexes = {@Index(name = "findAllIndex", columnList = "isDeleted, product_id")})
-public class Product extends BaseTimeEntity { /** 작품 **/
+public class Product extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Product_SEQ")
@@ -27,10 +27,10 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     private String title;
 
     @Column
-    private String content="";
+    private String content = "";
 
     @Column
-    private String author=""; //닉네임
+    private String author = ""; //닉네임
 
     @Column
     private int price;
@@ -39,13 +39,13 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     private boolean suggest = false;
 
     @Column(name = "isDeleted")
-    private boolean isDeleted =false;
+    private boolean isDeleted = false;
 
     @Column
-    private int topPrice=0;
+    private int topPrice = 0;
 
     @Column
-    private String univ="";
+    private String univ = "";
 
     @Column
     private String category; //분류
@@ -84,8 +84,8 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
     private List<ProductWish> productWishList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "product",cascade= CascadeType.MERGE)
-    private List<ChatRoom> chatRooms  = new ArrayList<>();
+    @OneToMany(mappedBy = "product", cascade = CascadeType.MERGE)
+    private List<ChatRoom> chatRooms = new ArrayList<>();
 
 
     @Builder
@@ -103,12 +103,14 @@ public class Product extends BaseTimeEntity { /** 작품 **/
     public void setDeleted(boolean deleted) {
         isDeleted = deleted;
     }
+
     public void setUser(User user) {
-        user.getProductPostList().add(this);
+        user.getProductPostList()
+                .add(this);
         this.user = user;
     }
 
-    public void editPost(ProductEditDto dto){
+    public void editPost(ProductEditDto dto) {
         this.title = dto.getTitle();
         this.content = dto.getContent();
         this.price = dto.getPrice();
@@ -122,33 +124,58 @@ public class Product extends BaseTimeEntity { /** 작품 **/
         this.topPrice = topPrice;
     }
 
-    public void addChatRoom(ChatRoom chatRoom){
+    public void addChatRoom(ChatRoom chatRoom) {
         chatRoom.setProduct(this);
         this.chatRooms.add(chatRoom);
         this.chatCnt++;
     }
-    public void makeChatRoomNull(){
-        for(ChatRoom chatRoom :this.getChatRooms()){
+
+    public void makeChatRoomNull() {
+        for (ChatRoom chatRoom : this.getChatRooms()) {
             chatRoom.setProduct(null);
         }
     }
+
     public void addImage(ProductImage image) {
-        this.getImages().add(image);
+        this.getImages()
+                .add(image);
     }
 
-    public void plusWishCnt() {this.wishCnt++;this.popularity+=20;}
-    public void minusWishCnt() {if(wishCnt>0) this.wishCnt--;this.popularity-=10;    }
-    public void plusLikesCnt() {this.likesCnt++;this.popularity+=10;}
-    public void minusLikesCnt() {if(likesCnt>0)this.likesCnt--;this.popularity-=10;}
-    protected Product() {}
+    public void plusWishCnt() {
+        this.wishCnt++;
+        this.popularity += 20;
+    }
+
+    public void minusWishCnt() {
+        if (wishCnt > 0) this.wishCnt--;
+        this.popularity -= 10;
+    }
+
+    public void plusLikesCnt() {
+        this.likesCnt++;
+        this.popularity += 10;
+    }
+
+    public void minusLikesCnt() {
+        if (likesCnt > 0) this.likesCnt--;
+        this.popularity -= 10;
+    }
+
+    protected Product() {
+    }
 
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
     }
 
-    public void addViews() {this.views++;this.popularity++;}
+    public void addViews() {
+        this.views++;
+        this.popularity++;
+    }
 
-    public void setComplete(boolean complete) {this.complete = complete;}
+    public void setComplete(boolean complete) {
+        this.complete = complete;
+    }
 
     public void updateUserNickName(String author) {
         this.author = author;

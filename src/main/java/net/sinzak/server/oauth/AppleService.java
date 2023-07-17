@@ -41,7 +41,8 @@ public class AppleService {
 
     public String createClientSecret(String teamId, String clientId, String keyId, String keyPath, String authUrl) throws NoSuchAlgorithmException, ParseException {
 
-        JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.ES256).keyID(keyId).build();
+        JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.ES256).keyID(keyId)
+                .build();
         JWTClaimsSet claimsSet = new JWTClaimsSet();
         Date now = new Date();
 
@@ -101,7 +102,8 @@ public class AppleService {
             UrlEncodedFormEntity formEntity = new UrlEncodedFormEntity(nvps);
             httpPost.setEntity(formEntity);
             response = httpclient.execute(httpPost);
-            statusCode = response.getStatusLine().getStatusCode();
+            statusCode = response.getStatusLine()
+                    .getStatusCode();
             HttpEntity entity = response.getEntity();
             result = EntityUtils.toString(entity, "UTF-8");
 

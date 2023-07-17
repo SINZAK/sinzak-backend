@@ -13,7 +13,7 @@ import java.util.Map;
 @ToString
 public class OAuthAttributes {
     private String email;
-    private String picture="";
+    private String picture = "";
     private String origin;
 
     @Builder

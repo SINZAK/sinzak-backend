@@ -25,18 +25,21 @@ public class BannerService {
     private final S3Service s3Service;
 
     @Transactional(rollbackFor = {Exception.class})
-    public JSONObject make(BannerDto dto){   // 배너 생성
+    public JSONObject make(BannerDto dto) {   // 배너 생성
         Banner banner = Banner.builder()
-                    .pcImageUrl("")
-                    .imageUrl("")
-                    .content(dto.getContent()).build();
-        Long id = bannerRepository.save(banner).getId();
+                .pcImageUrl("")
+                .imageUrl("")
+                .content(dto.getContent())
+                .build();
+        Long id = bannerRepository.save(banner)
+                .getId();
         return PropertyUtil.response(id);
     }
 
     @Transactional(rollbackFor = {Exception.class})
-    public JSONObject saveImage(Long id, MultipartFile file){   // 글 생성
-        Banner banner = bannerRepository.findById(id).orElseThrow(InstanceNotFoundException::new);
+    public JSONObject saveImage(Long id, MultipartFile file) {   // 글 생성
+        Banner banner = bannerRepository.findById(id)
+                .orElseThrow(InstanceNotFoundException::new);
         uploadImageAndSetThumbnail(banner, file);
         return PropertyUtil.response(true);
     }
@@ -48,12 +51,12 @@ public class BannerService {
     }
 
     @Transactional(readOnly = true)
-    public JSONObject getList(){
+    public JSONObject getList() {
         return PropertyUtil.response(bannerRepository.findAll());
     }
 
     @Transactional
-    public JSONObject pick(Long id){
+    public JSONObject pick(Long id) {
         List<Banner> banners = bannerRepository.findAuthorBanner();
         userQueryService.getUserNickName(id)
                 .ifPresent(name -> banners.forEach((banner) -> banner.setUserInfo(id, name)));

@@ -6,20 +6,20 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.common.UserUtils;
+import net.sinzak.server.common.dto.ActionForm;
 import net.sinzak.server.common.dto.SuggestDto;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.error.UserNotLoginException;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.product.dto.*;
 import net.sinzak.server.product.service.ProductService;
-import net.sinzak.server.common.dto.ActionForm;
 import org.json.simple.JSONObject;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 import org.springframework.web.multipart.MultipartFile;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ public class ProductController {
     private final ProductService productService;
 
     @ApiDocumentResponse
-    @ApiOperation(value = "작품 판매 글 생성",notes = "{\"success\":true, \"id\":52}\n해당 글의 id를 전해드리니 이 /products/{id}/image 에 넘겨주세요\n" +
+    @ApiOperation(value = "작품 판매 글 생성", notes = "{\"success\":true, \"id\":52}\n해당 글의 id를 전해드리니 이 /products/{id}/image 에 넘겨주세요\n" +
             "category = painting,orient,sculpture,print,craft,other")
     @PostMapping(value = "/products/build", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public JSONObject makePost(@RequestBody ProductPostDto buildDto) {
@@ -72,11 +72,10 @@ public class ProductController {
     @PostMapping("/products/{id}")
     @ApiOperation(value = "작품 상세 조회")
     public JSONObject showProducts(@PathVariable Long id) {
-        try{
+        try {
             Long currentUserId = UserUtils.getContextHolderId();
             return productService.showDetailForUser(currentUserId, id);
-        }
-        catch (UserNotFoundException | UserNotLoginException e){
+        } catch (UserNotFoundException | UserNotLoginException e) {
             return productService.showDetailForGuest(id); /** 비회원용 **/
         }
     }
@@ -115,11 +114,10 @@ public class ProductController {
             "비회원은 더보기 버튼 클릭 시 로그인 창으로")
     @PostMapping("/home/products")
     public JSONObject showHomeProduct() {
-        try{
+        try {
             Long currentUserId = UserUtils.getContextHolderId();
             return productService.showHomeForUser(currentUserId);
-        }
-        catch (UserNotFoundException | UserNotLoginException e){
+        } catch (UserNotFoundException | UserNotLoginException e) {
             return productService.showHomeForGuest(); /** 비회원용 **/
         }
     }
@@ -152,12 +150,11 @@ public class ProductController {
             @ApiImplicitParam(name = "search", dataType = "string", paramType = "query",
                     value = "String 값으로 주시고 최소 2글자 이상은 받아야 합니다. contain 메서드로 db에서 검색할 예정.")
     })
-    public PageImpl<ShowForm> showMarketProduct(@RequestParam(required=false, defaultValue="") String search, @RequestParam(required=false, defaultValue="") List<String> categories, @RequestParam(required=false, defaultValue="recommend") String align, @RequestParam(required=false, defaultValue="false") Boolean sale, @ApiIgnore Pageable pageable) {
-        try{
+    public PageImpl<ShowForm> showMarketProduct(@RequestParam(required = false, defaultValue = "") String search, @RequestParam(required = false, defaultValue = "") List<String> categories, @RequestParam(required = false, defaultValue = "recommend") String align, @RequestParam(required = false, defaultValue = "false") Boolean sale, @ApiIgnore Pageable pageable) {
+        try {
             UserUtils.getContextHolderId();
             return productService.productListForUser(search, categories, align, sale, pageable);
-        }
-        catch (UserNotFoundException | UserNotLoginException e){
+        } catch (UserNotFoundException | UserNotLoginException e) {
             return productService.productListForGuest(search, categories, align, sale, pageable);
         }
     }

@@ -33,7 +33,8 @@ public class JoinTerms extends BaseTimeEntity {
         this.term4 = term4;
     }
 
-    protected JoinTerms() {}
+    protected JoinTerms() {
+    }
 
     public void setUser(User user) {
         this.user = user;

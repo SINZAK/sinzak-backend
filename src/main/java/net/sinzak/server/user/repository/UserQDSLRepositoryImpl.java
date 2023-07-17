@@ -20,7 +20,8 @@ public class UserQDSLRepositoryImpl {
         return Optional.ofNullable(queryFactory
                 .select(new QGetFollowDto(user.id, user.nickName, user.picture))
                 .from(user)
-                .where(user.id.eq(userId).and(user.isDelete.eq(false)))
+                .where(user.id.eq(userId)
+                        .and(user.isDelete.eq(false)))
                 .fetchFirst());
     }
 }

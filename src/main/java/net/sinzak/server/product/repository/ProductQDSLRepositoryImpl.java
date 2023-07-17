@@ -17,7 +17,6 @@ import java.util.List;
 import static net.sinzak.server.product.domain.QProduct.product;
 
 
-
 @Repository
 @RequiredArgsConstructor
 public class ProductQDSLRepositoryImpl {
@@ -36,12 +35,12 @@ public class ProductQDSLRepositoryImpl {
                 .select(product.count())
                 .from(product)
                 .where(eqComplete(complete));
-        return PageableExecutionUtils.getPage(result, pageable, countQuery::fetchOne) ;
+        return PageableExecutionUtils.getPage(result, pageable, countQuery::fetchOne);
         //PageableExecutionUtils.getPage로 맨 첫 페이지 content 개수가 size 미달이거나, 마지막 page인 경우 count query 실행 X하여 최적화
     }
 
     private BooleanExpression eqComplete(boolean complete) { //complete 가 true면   where complete = false 로 가져온다.
-        if (!complete){
+        if (!complete) {
             return null;
         }
         return product.complete.eq(false);
@@ -64,20 +63,22 @@ public class ProductQDSLRepositoryImpl {
 
     private BooleanBuilder eqSearch(String keyword) {
         BooleanBuilder builder = new BooleanBuilder();
-        if(keyword.isEmpty())
+        if (keyword.isEmpty())
             return null;
-        return builder.or(product.title.contains(keyword)).or(product.content.contains(keyword));
+        return builder.or(product.title.contains(keyword))
+                .or(product.content.contains(keyword));
     }
 
     private BooleanBuilder eqCategories(List<String> categories) {
         BooleanBuilder builder = new BooleanBuilder();
 
         for (String category : categories) {
-            if(category != null)
+            if (category != null)
                 builder.or(product.category.contains(category));
         }
         return builder;
     }
+
     public List<Product> findCountByCategoriesDesc(List<String> categories, int count) {
         return queryFactory
                 .selectFrom(product)

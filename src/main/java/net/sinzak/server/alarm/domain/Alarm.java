@@ -23,13 +23,14 @@ public class Alarm extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name ="user_id")
+    @JoinColumn(name = "user_id")
     private User user;
 
-
     private String opponentUserName;
+
     @Enumerated(EnumType.STRING)
     private AlarmType alarmType;
+
     private String thumbnail;
     private String route;
 

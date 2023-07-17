@@ -33,28 +33,23 @@ public class SwaggerConfig {
     private static final String API_DESCRIPTION = "신작 API 명세서";
 
 
-
     @Bean
-    public Docket testApi(){
-        return getDocket("TEST",Predicates.or(
-                PathSelectors.regex("/api.*")));
+    public Docket testApi() {
+        return getDocket("TEST", Predicates.or(PathSelectors.regex("/api.*")));
     }
+
     @Bean
     public Docket AllApi() {
-        return getDocket("All", Predicates.or(
-                PathSelectors.regex("/*.*")));
+        return getDocket("All", Predicates.or(PathSelectors.regex("/*.*")));
 
     }
+
     public ApiInfo apiInfo() {  // API의 이름, 현재 버전, API에 대한 정보
-        return new ApiInfoBuilder()
-                .title(API_NAME)
-                .version(API_VERSION)
-                .description(API_DESCRIPTION)
-                .build();
+        return new ApiInfoBuilder().title(API_NAME).version(API_VERSION).description(API_DESCRIPTION).build();
     }
+
     public Docket getDocket(String groupName, Predicate<String> predicate) {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .useDefaultResponseMessages(false)
+        return new Docket(DocumentationType.SWAGGER_2).useDefaultResponseMessages(false)
                 .ignoredParameterTypes(AuthenticationPrincipal.class)
                 .groupName(groupName)
                 .select()
@@ -70,23 +65,18 @@ public class SwaggerConfig {
     //swagger ui 설정.
     @Bean
     public UiConfiguration uiConfig() {
-        return UiConfigurationBuilder.builder()
-                .displayRequestDuration(true)
-                .validatorUrl("")
-                .build();
+        return UiConfigurationBuilder.builder().displayRequestDuration(true).validatorUrl("").build();
     }
+
     private ApiKey userApiKey() {
         return new ApiKey("JWT", "Authorization", "header");
     }
 
     private SecurityContext securityContext() {
-        return springfox
-                .documentation
-                .spi.service
-                .contexts
-                .SecurityContext
-                .builder()
-                .securityReferences(defaultAuth()).forPaths(PathSelectors.any()).build();
+        return springfox.documentation.spi.service.contexts.SecurityContext.builder()
+                .securityReferences(defaultAuth())
+                .forPaths(PathSelectors.any())
+                .build();
     }
 
     List<SecurityReference> defaultAuth() {

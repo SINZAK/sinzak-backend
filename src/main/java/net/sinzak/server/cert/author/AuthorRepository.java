@@ -9,5 +9,5 @@ import java.util.Optional;
 public interface AuthorRepository extends JpaRepository<Author, Long> {
 
     @Query("select a from Author a where a.userId = :userId")
-    Optional<Author> findCertByUserId(@Param("userId")Long userId);
+    Optional<Author> findCertByUserId(@Param("userId") Long userId);
 }

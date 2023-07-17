@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Getter
 @Entity
-@SequenceGenerator(name = "Banner_SEQ_GEN",sequenceName = "Banner_SEQ")
+@SequenceGenerator(name = "Banner_SEQ_GEN", sequenceName = "Banner_SEQ")
 public class Banner {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Banner_SEQ")
@@ -30,7 +30,8 @@ public class Banner {
         this.href = "";
     }
 
-    protected Banner() {}
+    protected Banner() {
+    }
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
@@ -38,7 +39,7 @@ public class Banner {
     }
 
     public void setUserInfo(Long userId, String nickName) {
-        this.href = "/profile/"+userId.toString();
+        this.href = "/profile/" + userId.toString();
         this.content = nickName;
     }
 

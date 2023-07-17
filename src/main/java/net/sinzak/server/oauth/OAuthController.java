@@ -13,9 +13,13 @@ import net.sinzak.server.user.dto.request.OauthDto;
 import net.sinzak.server.user.service.UserCommandService;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 @Api(tags = "소셜로그인")
 @RestController
@@ -51,78 +55,78 @@ public class OAuthController {
     public JSONObject getOauthToken(@org.springframework.web.bind.annotation.RequestBody OauthDto tokenDto) throws Exception {
         JSONObject OauthInfo = oAuthService.getOauthInfo(tokenDto);
         OAuthAttributes OauthUser = OAuthAttributes.of(tokenDto.getOrigin(), OauthInfo);
-        if(OauthUser.getEmail() == null || OauthUser.getEmail().isBlank())
+        if (OauthUser.getEmail() == null || OauthUser.getEmail().isBlank())
             return PropertyUtil.responseMessage("회원가입 불가능(소셜로그인 실패)");
         TokenDto jwtToken;
-        try{
+        try {
             jwtToken = securityService.login(OauthUser.getEmail());
-        }
-        catch(UserNotFoundException e){
+        } catch (UserNotFoundException e) {
             User savedUser = userService.saveTempUser(new User(OauthUser.getEmail(), OauthUser.getPicture(), OauthUser.getOrigin()));
             jwtToken = securityService.login(savedUser);
         }
         return PropertyUtil.response(jwtToken);
     }
 
-    @ApiOperation(value = "스프링용 카카오로그인 실행(인가코드)",notes = "하단 참고")
+    @ApiOperation(value = "스프링용 카카오로그인 실행(인가코드)", notes = "하단 참고")
     @GetMapping("/test1")
     public String kakaoLogin() {
-        return "로컬환경 : https://kauth.kakao.com/oauth/authorize?client_id="+KAKAO_ID +
-                "&redirect_uri=http://localhost:8080/api/login/oauth2/code/kakao&response_type=code" +"\n"+
-                "배포환경 : https://kauth.kakao.com/oauth/authorize?client_id="+KAKAO_ID +
+        return "로컬환경 : https://kauth.kakao.com/oauth/authorize?client_id=" + KAKAO_ID +
+                "&redirect_uri=http://localhost:8080/api/login/oauth2/code/kakao&response_type=code" + "\n" +
+                "배포환경 : https://kauth.kakao.com/oauth/authorize?client_id=" + KAKAO_ID +
                 "&redirect_uri=https://sinzak.net/api/login/oauth2/code/kakao&response_type=code";
     }
 
-    @ApiOperation(value = "스프링용 구글로그인 실행",notes = "로컬환경 : https://accounts.google.com/o/oauth2/v2/auth?client_id=782966145872-6shnmrvqi0q4sihr8etu9nrvh9jv43dh.apps.googleusercontent.com" +
-            "&redirect_uri=http://localhost:8080/api/login/oauth2/code/google&response_type=code&scope=profile%20email&include_granted_scopes=true"+'\n'+
+    @ApiOperation(value = "스프링용 구글로그인 실행", notes = "로컬환경 : https://accounts.google.com/o/oauth2/v2/auth?client_id=782966145872-6shnmrvqi0q4sihr8etu9nrvh9jv43dh.apps.googleusercontent.com" +
+            "&redirect_uri=http://localhost:8080/api/login/oauth2/code/google&response_type=code&scope=profile%20email&include_granted_scopes=true" + '\n' +
             "배포환경 : https://accounts.google.com/o/oauth2/v2/auth?client_id=782966145872-6shnmrvqi0q4sihr8etu9nrvh9jv43dh.apps.googleusercontent.com" +
             "&redirect_uri=https://sinzak.net/api/login/oauth2/code/google&response_type=code&scope=profile%20email&include_granted_scopes=true")
     @GetMapping("/test2")
-    public String googleLogin(){
-        return "로컬환경 : https://accounts.google.com/o/oauth2/v2/auth?client_id="+GOOGLE_ID+
-                "&redirect_uri=http://localhost:8080/api/login/oauth2/code/google&response_type=code&scope=profile%20email&include_granted_scopes=true" +"\n"+
-                "배포환경 : https://accounts.google.com/o/oauth2/v2/auth?client_id="+GOOGLE_ID+
+    public String googleLogin() {
+        return "로컬환경 : https://accounts.google.com/o/oauth2/v2/auth?client_id=" + GOOGLE_ID +
+                "&redirect_uri=http://localhost:8080/api/login/oauth2/code/google&response_type=code&scope=profile%20email&include_granted_scopes=true" + "\n" +
+                "배포환경 : https://accounts.google.com/o/oauth2/v2/auth?client_id=" + GOOGLE_ID +
                 "&redirect_uri=https://sinzak.net/api/login/oauth2/code/google&response_type=code&scope=profile%20email&include_granted_scopes=true";
     }
 
-    @ApiOperation(value = "스프링용 네이버로그인 실행",notes =
+    @ApiOperation(value = "스프링용 네이버로그인 실행", notes =
             "로컬환경 : https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=DwXMEfKZq0tmkrsn6kLk&state=STATE_STRING" +
-                    "&redirect_uri=http://localhost:8080/api/login/oauth2/code/naver"+'\n'+
+                    "&redirect_uri=http://localhost:8080/api/login/oauth2/code/naver" + '\n' +
                     "배포환경 : https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=DwXMEfKZq0tmkrsn6kLk&state=STATE_STRING" +
                     "&redirect_uri=https://sinzak.net/api/login/oauth2/code/naver")
     @GetMapping("/test3")
-    public String naverLogin(){
-        return "로컬환경 : https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id="+NAVER_ID+"&state=9kgsGTfH4j7IyAkg"+
-                "&redirect_uri=http://localhost:8080/api/login/oauth2/code/naver"+ "\n" +
-                "배포환경 : https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id="+NAVER_ID+"&state=9kgsGTfH4j7IyAkg"+
+    public String naverLogin() {
+        return "로컬환경 : https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=" + NAVER_ID + "&state=9kgsGTfH4j7IyAkg" +
+                "&redirect_uri=http://localhost:8080/api/login/oauth2/code/naver" + "\n" +
+                "배포환경 : https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=" + NAVER_ID + "&state=9kgsGTfH4j7IyAkg" +
                 "&redirect_uri=https://sinzak.net/api/login/oauth2/code/naver";
     }
 
-    @ApiOperation(value = "스프링용 애플 로그인 실행",notes =
-            "배포환경 : "+AUTH_URL+"/auth/authorize?client_id=" + CLIENT_ID + "&redirect_uri=" + "https://sinzak.net/api/login/oauth2/code/apple&response_type=code&id_token&response_mode=form_post")
+    @ApiOperation(value = "스프링용 애플 로그인 실행", notes =
+            "배포환경 : " + AUTH_URL + "/auth/authorize?client_id=" + CLIENT_ID + "&redirect_uri=" + "https://sinzak.net/api/login/oauth2/code/apple&response_type=code&id_token&response_mode=form_post")
     @GetMapping("/test4")
-    public String appleLogin(){
-        return "https://appleid.apple.com/auth/authorize?client_id="+CLIENT_ID+"&redirect_uri=https://sinzak.net/api/login/oauth2/code/apple&response_type=code&id_token&response_mode=form_post";}
+    public String appleLogin() {
+        return "https://appleid.apple.com/auth/authorize?client_id=" + CLIENT_ID + "&redirect_uri=https://sinzak.net/api/login/oauth2/code/apple&response_type=code&id_token&response_mode=form_post";
+    }
 
     @ApiOperation(value = "스프링용 카카오 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
     @GetMapping(value = "/login/oauth2/code/kakao")
     public JSONObject oauthKakao(@RequestParam(value = "code", required = false) String code) throws Exception {
-        log.warn("인가코드 = {}",code);
-        return oAuthService.getKakaoAccessToken(productURL+"/kakao", code);
+        log.warn("인가코드 = {}", code);
+        return oAuthService.getKakaoAccessToken(productURL + "/kakao", code);
     }
 
     @ApiOperation(value = "스프링용 구글 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
     @GetMapping(value = "/login/oauth2/code/google")
     public String oauthGoogle(@RequestParam(value = "code", required = false) String code) throws Exception {
-        log.warn("인가코드 = {}",code);
-        JSONObject obj = oAuthService.getGoogleAccessToken(productURL+"/google", code);
+        log.warn("인가코드 = {}", code);
+        JSONObject obj = oAuthService.getGoogleAccessToken(productURL + "/google", code);
         return obj.toJSONString();
     }
 
     @ApiOperation(value = "스프링용 네이버 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
     @GetMapping(value = "/login/oauth2/code/naver")
     public String oauthNaver(@RequestParam(value = "code", required = false) String code) throws Exception {
-        log.warn("인가코드 = {}",code);
+        log.warn("인가코드 = {}", code);
         JSONObject obj = oAuthService.getNaverAccessToken(code);
         return obj.toJSONString();
     }
@@ -130,7 +134,7 @@ public class OAuthController {
     @ApiOperation(value = "스프링용 애플 코드 반환 로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")
     @PostMapping(value = "/login/oauth2/code/apple")
     public String oauthApple(@RequestParam(value = "code", required = false) String code) throws Exception {
-        log.warn("인가코드 = {}",code);
+        log.warn("인가코드 = {}", code);
         String client_id = CLIENT_ID;
         String client_secret = appleService.createClientSecret(TEAM_ID, CLIENT_ID, KEY_ID, KEY_PATH, AUTH_URL);
         log.warn(client_secret);

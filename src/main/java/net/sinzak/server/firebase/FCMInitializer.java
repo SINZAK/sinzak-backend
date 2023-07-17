@@ -19,7 +19,7 @@ public class FCMInitializer {
     private String credential;
 
     @PostConstruct
-    public void initialize(){
+    public void initialize() {
         ClassPathResource resource = new ClassPathResource(credential);
 
         try (InputStream stream = resource.getInputStream()) {
@@ -27,11 +27,12 @@ public class FCMInitializer {
                     .setCredentials(GoogleCredentials.fromStream(stream))
                     .build();
 
-            if (FirebaseApp.getApps().isEmpty()) {
+            if (FirebaseApp.getApps()
+                    .isEmpty()) {
                 FirebaseApp.initializeApp(options);
                 log.info("FirebaseApp initialization complete");
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("파이어베이스 이니셜라이저 오류 {}", e.getMessage());
         }
 

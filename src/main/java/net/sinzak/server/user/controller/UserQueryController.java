@@ -10,7 +10,10 @@ import net.sinzak.server.common.error.UserNotLoginException;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
 import net.sinzak.server.user.service.UserQueryService;
 import org.json.simple.JSONObject;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Api(tags = "유저-조회")
 @RestController
@@ -18,40 +21,39 @@ import org.springframework.web.bind.annotation.*;
 public class UserQueryController {
     private final UserQueryService userQueryService;
 
-    @ApiOperation(value ="내 프로필 보기")
-    @GetMapping(value ="/users/my-profile")
-    public JSONObject getMyProfile(){
+    @ApiOperation(value = "내 프로필 보기")
+    @GetMapping(value = "/users/my-profile")
+    public JSONObject getMyProfile() {
         return userQueryService.getMyProfile();
     }
 
-    @ApiOperation(value ="유저 프로필 보기")
-    @GetMapping(value ="/users/{userId}/profile")
-    public JSONObject getUserProfile(@PathVariable Long userId){
-        try{
+    @ApiOperation(value = "유저 프로필 보기")
+    @GetMapping(value = "/users/{userId}/profile")
+    public JSONObject getUserProfile(@PathVariable Long userId) {
+        try {
             Long currentUserId = UserUtils.getContextHolderId();
             return userQueryService.getUserProfileForUser(currentUserId, userId);
-        }
-        catch (UserNotFoundException | UserNotLoginException e){
+        } catch (UserNotFoundException | UserNotLoginException e) {
             return userQueryService.getUserProfileForGuest(userId); /** 비회원용 **/
         }
 
     }
 
-    @ApiOperation(value ="모든 유저 목록 보기")
-    @GetMapping(value="/users")
-    public JSONObject getAllUser(){
+    @ApiOperation(value = "모든 유저 목록 보기")
+    @GetMapping(value = "/users")
+    public JSONObject getAllUser() {
         return userQueryService.getAllUser();
     }
 
-    @ApiOperation(value ="팔로워리스트")
-    @GetMapping(value ="/users/{userId}/followers")
+    @ApiOperation(value = "팔로워리스트")
+    @GetMapping(value = "/users/{userId}/followers")
     public JSONObject getFollowerList(@PathVariable Long userId) {
         return userQueryService.getFollowerDtoList(userId);
     }
 
-    @ApiOperation(value ="팔로잉리스트")
-    @GetMapping(value ="/users/{userId}/followings")
-    public JSONObject  getFollowingList(@PathVariable Long userId) {
+    @ApiOperation(value = "팔로잉리스트")
+    @GetMapping(value = "/users/{userId}/followings")
+    public JSONObject getFollowingList(@PathVariable Long userId) {
         return userQueryService.getFollowingDtoList(userId);
     }
 
@@ -61,26 +63,29 @@ public class UserQueryController {
         return userQueryService.showSearchHistory();
     }
 
-    @ApiOperation(value ="찜 목록")
-    @GetMapping(value ="/users/wish")
-    public JSONObject showWish(){
+    @ApiOperation(value = "찜 목록")
+    @GetMapping(value = "/users/wish")
+    public JSONObject showWish() {
         return userQueryService.getWishList();
     }
-    @ApiOperation(value ="의뢰해요 목록")
-    @GetMapping(value ="/users/work-employ")
-    public JSONObject showWorkEmploy(){
+
+    @ApiOperation(value = "의뢰해요 목록")
+    @GetMapping(value = "/users/work-employ")
+    public JSONObject showWorkEmploy() {
         return userQueryService.getWorkEmploys();
     }
 
     @ApiDocumentResponse
     @ApiOperation(value = "신고 목록 출력")
     @PostMapping(value = "/users/reportlist")
-    public JSONObject reportList(){
+    public JSONObject reportList() {
         return userQueryService.showReportList();
     }
 
     @ApiDocumentResponse
     @ApiOperation(value = "안드로이드 버전 출력", notes = "무시")
     @PostMapping(value = "/aos/version")
-    public JSONObject version(){return PropertyUtil.response(14);}
+    public JSONObject version() {
+        return PropertyUtil.response(14);
+    }
 }

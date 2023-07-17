@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@SequenceGenerator(name = "Product_SELL_SEQ_GEN",sequenceName = "Product_SELL_SEQ")
+@SequenceGenerator(name = "Product_SELL_SEQ_GEN", sequenceName = "Product_SELL_SEQ")
 public class ProductSell {
 
     @Id
@@ -23,19 +23,22 @@ public class ProductSell {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    public static ProductSell createConnect(Product product, User user){  //생성메서드
+    public static ProductSell createConnect(Product product, User user) {  //생성메서드
         ProductSell connect = new ProductSell();
         connect.setProduct(product);
         connect.setUser(user);
         return connect;
     }
 
-    private void setUser(User user){
+    private void setUser(User user) {
         user.getProductSellList().add(this); //구매목록에 추가
-        this.user=user;
+        this.user = user;
     }
 
-    public void setProduct(Product product) {  this.product = product; }
+    public void setProduct(Product product) {
+        this.product = product;
+    }
 
-    protected ProductSell() {}
+    protected ProductSell() {
+    }
 }

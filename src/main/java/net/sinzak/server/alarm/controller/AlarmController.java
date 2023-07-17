@@ -10,8 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AlarmController {
     private final AlarmService alarmService;
-    @GetMapping(value ="/alarms")
-    public JSONObject getAlarms(){
+
+    @GetMapping(value = "/alarms")
+    public JSONObject getAlarms() {
         return alarmService.getAlarms();
     }
 }

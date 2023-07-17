@@ -14,8 +14,7 @@ public interface FollowRepository extends JpaRepository<Follow,Long> {
 
     @Query("select f,fg.id,fg.nickName,fg.picture from Follow f left join fetch f.followingUser fg where f.followerUser.id = :loginUserId")
     Set<Follow> findByFollowerUserIdFetchFollowings(@Param("loginUserId") Long loginUserId);
+
     @Query("select f,fr.id,fr.nickName,fr.picture from Follow f left join fetch f.followerUser fr where f.followingUser.id = :loginUserId")
     Set<Follow> findByFollowingUserIdFetchFollower(@Param("loginUserId") Long loginUserId);
-
-
 }

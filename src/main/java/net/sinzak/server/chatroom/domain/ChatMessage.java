@@ -24,27 +24,28 @@ public class ChatMessage extends BaseTimeEntity {
     private String senderName;
     private Long senderId;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name ="chat_room_id")
+    @JoinColumn(name = "chat_room_id")
     private ChatRoom chatRoom;
 
 
-
     @Setter
-    @Lob private String message; //모든 언어에 다 있는 byte[]
+    @Lob
+    private String message; //모든 언어에 다 있는 byte[]
 
 
-    public void setSenderName(String sender){
-        this.senderName =sender;
+    public void setSenderName(String sender) {
+        this.senderName = sender;
     }
 
-    public void newConnect(){
+    public void newConnect() {
         this.type = MessageType.ENTER;
     }
 
-    public void closeConnect(){
+    public void closeConnect() {
         this.type = MessageType.LEAVE;
     }
-    public void setChatRoom(ChatRoom chatRoom){
+
+    public void setChatRoom(ChatRoom chatRoom) {
         this.chatRoom = chatRoom;
     }
 }

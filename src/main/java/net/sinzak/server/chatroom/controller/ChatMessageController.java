@@ -32,15 +32,15 @@ public class ChatMessageController {
 //        log.info("메시지 구독"+chatMessageDto.getRoomId());
 //        template.convertAndSend("/sub/chat/rooms/"+chatMessage.getRoomUuid(),chatMessageDto);
 //    }
-    @MessageMapping(value ="/chat/message")
-    public void message(ChatMessageDto chatMessageDto){
-        log.info("메시지 구독"+chatMessageDto.getRoomId());
+    @MessageMapping(value = "/chat/message")
+    public void message(ChatMessageDto chatMessageDto) {
+        log.info("메시지 구독" + chatMessageDto.getRoomId());
         chatMessageService.sendChatMessage(chatMessageDto);
     }
 
     @MessageMapping(value = "/chat/leave")
-    public void leave(ChatMessageDto chatMessageDto){
-        log.info("채팅방 나가기"+chatMessageDto.getRoomId());
+    public void leave(ChatMessageDto chatMessageDto) {
+        log.info("채팅방 나가기" + chatMessageDto.getRoomId());
         chatMessageService.leaveChatRoom(chatMessageDto);
     }
 

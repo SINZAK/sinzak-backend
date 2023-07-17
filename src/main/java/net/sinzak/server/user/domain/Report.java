@@ -15,18 +15,18 @@ public class Report extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_id")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="opponent_user_id")
+    @JoinColumn(name = "opponent_user_id")
     private User opponentUser;
 
     @Lob
     private String reason;
 
 
-    public static Report createConnect(User loginUser, User opponentUser){  //생성메서드
+    public static Report createConnect(User loginUser, User opponentUser) {  //생성메서드
         Report connect = new Report();
         connect.setUser(loginUser, opponentUser);
         return connect;
@@ -34,7 +34,8 @@ public class Report extends BaseTimeEntity {
 
     public void setUser(User loginUser, User opponentUser) {
         this.user = loginUser;
-        user.getReportList().add(this);
+        user.getReportList()
+                .add(this);
         this.opponentUser = opponentUser;
     }
 }
