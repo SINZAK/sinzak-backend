@@ -3,7 +3,7 @@ package net.sinzak.server.user.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.SinzakResponse;
 import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.error.UserNotLoginException;
@@ -86,6 +86,6 @@ public class UserQueryController {
     @ApiOperation(value = "안드로이드 버전 출력", notes = "무시")
     @PostMapping(value = "/aos/version")
     public JSONObject version() {
-        return PropertyUtil.response(14);
+        return SinzakResponse.success(14);
     }
 }

@@ -2,7 +2,7 @@ package net.sinzak.server.banner;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.SinzakResponse;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.image.S3Service;
 import net.sinzak.server.user.service.UserQueryService;
@@ -33,7 +33,7 @@ public class BannerService {
                 .build();
         Long id = bannerRepository.save(banner)
                 .getId();
-        return PropertyUtil.response(id);
+        return SinzakResponse.success(id);
     }
 
     @Transactional(rollbackFor = {Exception.class})
@@ -41,7 +41,7 @@ public class BannerService {
         Banner banner = bannerRepository.findById(id)
                 .orElseThrow(InstanceNotFoundException::new);
         uploadImageAndSetThumbnail(banner, file);
-        return PropertyUtil.response(true);
+        return SinzakResponse.success(true);
     }
 
     private String uploadImageAndSetThumbnail(Banner banner, MultipartFile file) {
@@ -52,7 +52,7 @@ public class BannerService {
 
     @Transactional(readOnly = true)
     public JSONObject getList() {
-        return PropertyUtil.response(bannerRepository.findAll());
+        return SinzakResponse.success(bannerRepository.findAll());
     }
 
     @Transactional
@@ -60,7 +60,7 @@ public class BannerService {
         List<Banner> banners = bannerRepository.findAuthorBanner();
         userQueryService.getUserNickName(id)
                 .ifPresent(name -> banners.forEach((banner) -> banner.setUserInfo(id, name)));
-        return PropertyUtil.response(true);
+        return SinzakResponse.success(true);
     }
 
     @Transactional

@@ -2,7 +2,7 @@ package net.sinzak.server.config.auth;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.SinzakResponse;
 import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
@@ -54,7 +54,7 @@ public class SecurityService {
 
     @Transactional
     public TokenDto login(User user) {
-        PropertyUtil.checkHeader(user);
+        SinzakResponse.checkHeader(user);
         TokenDto tokenDto = jwtProvider.createToken(user.getId().toString(), user.getId(), user.getRole());
 
         tokenDto.setIsJoined(false);
@@ -72,7 +72,7 @@ public class SecurityService {
     public JSONObject join(@RequestBody JoinDto dto) {
         User user = userUtils.getCurrentUser();
         if (!user.getNickName().isBlank())
-            return PropertyUtil.responseMessage("이미 회원가입된 유저입니다.");
+            return SinzakResponse.error("이미 회원가입된 유저입니다.");
         JSONObject obj = new JSONObject();
         user.saveJoinInfo(dto.getNickName(), dto.getCategory_like());
         user.setRandomProfileImage();
@@ -115,8 +115,8 @@ public class SecurityService {
         if (existUser.isPresent()) {
             User user = existUser.get();
             if (!user.getNickName().isBlank())
-                return PropertyUtil.responseMessage("이미 가입된 이메일입니다.");
+                return SinzakResponse.error("이미 가입된 이메일입니다.");
         }
-        return PropertyUtil.response(true);
+        return SinzakResponse.success(true);
     }
 }

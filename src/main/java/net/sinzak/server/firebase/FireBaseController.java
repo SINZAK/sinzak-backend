@@ -3,7 +3,7 @@ package net.sinzak.server.firebase;
 
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
-import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.SinzakResponse;
 import net.sinzak.server.common.UserUtils;
 import org.json.simple.JSONObject;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +22,6 @@ public class FireBaseController {
     @PostMapping(value = "firebase/test")
     public JSONObject pushAlarm() {
         fireBaseService.sendIndividualNotification(userUtils.getCurrentUser(), "알림", "테스트", "/");
-        return PropertyUtil.response(true);
+        return SinzakResponse.success(true);
     }
 }

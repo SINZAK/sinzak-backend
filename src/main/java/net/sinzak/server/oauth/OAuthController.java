@@ -4,7 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.SinzakResponse;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.config.auth.SecurityService;
 import net.sinzak.server.config.auth.jwt.TokenDto;
@@ -56,7 +56,7 @@ public class OAuthController {
         JSONObject OauthInfo = oAuthService.getOauthInfo(tokenDto);
         OAuthAttributes OauthUser = OAuthAttributes.of(tokenDto.getOrigin(), OauthInfo);
         if (OauthUser.getEmail() == null || OauthUser.getEmail().isBlank())
-            return PropertyUtil.responseMessage("회원가입 불가능(소셜로그인 실패)");
+            return SinzakResponse.error("회원가입 불가능(소셜로그인 실패)");
         TokenDto jwtToken;
         try {
             jwtToken = securityService.login(OauthUser.getEmail());
@@ -64,7 +64,7 @@ public class OAuthController {
             User savedUser = userService.saveTempUser(new User(OauthUser.getEmail(), OauthUser.getPicture(), OauthUser.getOrigin()));
             jwtToken = securityService.login(savedUser);
         }
-        return PropertyUtil.response(jwtToken);
+        return SinzakResponse.success(jwtToken);
     }
 
     @ApiOperation(value = "스프링용 카카오로그인 실행(인가코드)", notes = "하단 참고")
@@ -155,7 +155,7 @@ public class OAuthController {
     public JSONObject oauthApple() throws Exception {
         String client_secret = appleService.createClientSecret(TEAM_ID, "net.sinzak.ios", KEY_ID, KEY_PATH, AUTH_URL);
         log.warn(client_secret);
-        return PropertyUtil.response(client_secret);
+        return SinzakResponse.success(client_secret);
     }
 
     @ApiOperation(value = "웹용 카카오 액세스토큰 추출로직", notes = "웹, 안드, ios는 이 로직말고 /oauth/get으로 바로 액세스 토큰 전달해주세요")

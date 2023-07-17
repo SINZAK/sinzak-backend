@@ -5,7 +5,7 @@ import net.sinzak.server.alarm.domain.Alarm;
 import net.sinzak.server.alarm.domain.AlarmType;
 import net.sinzak.server.alarm.dto.GetAlarmDto;
 import net.sinzak.server.alarm.repository.AlarmRepository;
-import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.SinzakResponse;
 import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
@@ -37,7 +37,7 @@ public class AlarmService {
                     .build();
             getAlarmDtos.add(getAlarmDto);
         }
-        return PropertyUtil.response(getAlarmDtos);
+        return SinzakResponse.success(getAlarmDtos);
     }
 
     @Transactional

@@ -3,7 +3,7 @@ package net.sinzak.server.work.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.common.PostService;
-import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.SinzakResponse;
 import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.common.dto.ActionForm;
 import net.sinzak.server.common.error.PostNotFoundException;
@@ -70,22 +70,22 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
                 .employment(postDto.isEmployment()).build();
         work.setUser(user);
         Long workId = workRepository.save(work).getId();
-        return PropertyUtil.response(workId);
+        return SinzakResponse.success(workId);
     }
 
     public JSONObject saveImageInS3AndWork(List<MultipartFile> multipartFiles, Long id) {
         Work work = workRepository.findByIdNotDeleted(id).orElseThrow(PostNotFoundException::new);
         if(!userUtils.getCurrentUserId().equals(work.getUser().getId()))
-            return PropertyUtil.responseMessage("작성자가 아닙니다.");
+            return SinzakResponse.error("작성자가 아닙니다.");
         for (MultipartFile img : multipartFiles) {
             try{
                 uploadImageAndSaveUrl(multipartFiles, work, img);
             }
             catch (Exception e){
-                return PropertyUtil.responseMessage("이미지 저장 실패");
+                return SinzakResponse.error("이미지 저장 실패");
             }
         }
-        return PropertyUtil.response(true);
+        return SinzakResponse.success(true);
     }
 
     private void uploadImageAndSaveUrl(List<MultipartFile> multipartFiles, Work work, MultipartFile img) {
@@ -110,9 +110,9 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     public JSONObject deleteImage(Long workId, String url){   // 글 생성
         Work work = workRepository.findByIdNotDeleted(workId).orElseThrow(PostNotFoundException::new);
         if(!userUtils.getCurrentUserId().equals(work.getUser().getId()))
-            return PropertyUtil.responseMessage("해당 작품의 작가가 아닙니다.");
+            return SinzakResponse.error("해당 작품의 작가가 아닙니다.");
         if(work.getImages().size()==1)
-            return PropertyUtil.responseMessage("최소 1개 이상의 이미지를 보유해야 합니다.");
+            return SinzakResponse.error("최소 1개 이상의 이미지를 보유해야 합니다.");
 
         for (WorkImage image : work.getImages()) {
             if(image.getImageUrl().equals(url)){
@@ -122,7 +122,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
             }
         }
         s3Service.deleteImage(url);
-        return PropertyUtil.response(workId);
+        return SinzakResponse.success(workId);
     }
 
     @Transactional(rollbackFor = {Exception.class})
@@ -130,11 +130,11 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         User user = userUtils.getCurrentUser();
         Work work = workRepository.findByIdNotDeleted(workId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(work.getUser().getId()) && user.getRole() != Role.ADMIN)
-            return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
+            return SinzakResponse.error("글 작성자가 아닙니다.");
 
         work.editPost(editDto);
         workRepository.save(work);
-        return PropertyUtil.response(true);
+        return SinzakResponse.success(true);
     }
 
     @Transactional(rollbackFor = {Exception.class})
@@ -142,10 +142,10 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         User user = userUtils.getCurrentUser();
         Work work = workRepository.findByIdFetchChatRooms(workId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(work.getUser().getId()) && user.getRole() != Role.ADMIN)
-            return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
+            return SinzakResponse.error("글 작성자가 아닙니다.");
         deleteImagesInPost(work);
         work.setDeleted(true);
-        return PropertyUtil.response(true);
+        return SinzakResponse.success(true);
     }
 
 
@@ -178,7 +178,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
 
         detailForm.setUserAction(isLike, isWish, isFollowing);
         work.addViews();
-        return PropertyUtil.response(detailForm);
+        return SinzakResponse.success(detailForm);
     }
 
     private DetailWorkForm makeWorkDetailForm(Work work, List<WorkImage> images) {
@@ -213,11 +213,11 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         }
         else{
             detailForm.setUserInfo(null, "탈퇴한 회원", null, "??", false, false, "0");
-            return PropertyUtil.response(detailForm);
+            return SinzakResponse.success(detailForm);
         }
         detailForm.setUserAction(false,false,false);
         work.addViews();
-        return PropertyUtil.response(detailForm);
+        return SinzakResponse.success(detailForm);
     }
 
     public boolean checkIsLikes(List<WorkLikes> userLikesList, Work work) {
@@ -313,23 +313,23 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
         User user = userRepository.findByIdFetchProductSellList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
         Work work = workRepository.findByIdNotDeleted(dto.getPostId()).orElseThrow(PostNotFoundException::new);
         if(work.isComplete())
-            return PropertyUtil.responseMessage("이미 판매완료된 작품입니다.");
+            return SinzakResponse.error("이미 판매완료된 작품입니다.");
         WorkSell connect = WorkSell.createConnect(work, user);
         workSellRepository.save(connect);
         work.setComplete(true);
-        return PropertyUtil.response(true);
+        return SinzakResponse.success(true);
     }
 
     @Transactional
     public JSONObject suggest(@RequestBody SuggestDto dto){
         User user = userUtils.getCurrentUser();
         if(suggestRepository.findByUserIdAndWorkId(user.getId(),dto.getId()).isPresent())
-            return PropertyUtil.responseMessage("이미 제안을 하신 작품입니다.");
+            return SinzakResponse.error("이미 제안을 하신 작품입니다.");
         Work work = workRepository.findByIdNotDeleted(dto.getId()).orElseThrow();
         WorkSuggest connect = WorkSuggest.createConnect(work, user);
         work.setTopPrice(dto.getPrice());
         suggestRepository.save(connect);
-        return PropertyUtil.response(true);
+        return SinzakResponse.success(true);
     }
 
     @Transactional

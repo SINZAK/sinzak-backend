@@ -2,7 +2,7 @@ package net.sinzak.server.user.service;
 
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.CustomJSONArray;
-import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.SinzakResponse;
 import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
@@ -50,7 +50,7 @@ public class UserQueryService {
         List<ProfileShowForm> workEmployShowForms = makeWorkShowForm(findUser.getWorkPosts(), true);
         obj.put("workEmploys", workEmployShowForms);
         obj.put("profile", makeUserDto(userUtils.getCurrentUserId(), findUser));
-        return PropertyUtil.response(obj);
+        return SinzakResponse.success(obj);
     }
 
     public JSONObject getWishes() {
@@ -62,7 +62,7 @@ public class UserQueryService {
         obj.put("workWishes", workWishShowForms);
         List<WishShowForm> productWishShowForms = makeProductWishShowForms(productWishes);
         obj.put("productWishes", productWishShowForms);
-        return PropertyUtil.response(obj);
+        return SinzakResponse.success(obj);
     }
 
     public JSONObject getWorkEmploys() {
@@ -71,7 +71,7 @@ public class UserQueryService {
                 .orElseThrow(() -> new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN));
         List<ProfileShowForm> workEmploys = makeWorkShowForm(loginUser.getWorkPosts(), true);
         obj.put("workEmploys", workEmploys);
-        return PropertyUtil.response(obj);
+        return SinzakResponse.success(obj);
     }
 
     public boolean checkReported(User postUser, User loginUser) {
@@ -149,7 +149,7 @@ public class UserQueryService {
         List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPosts(), false);
         obj.put("works", workShowForms);
         obj.put("profile", makeUserDto(currentUserId, findUser));
-        return PropertyUtil.response(obj);
+        return SinzakResponse.success(obj);
     }
 
     public JSONObject getUserProfileForGuest(Long userId) {
@@ -161,7 +161,7 @@ public class UserQueryService {
         List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPosts(), false);
         obj.put("works", workShowForms);
         obj.put("profile", makeUserDto(0L, findUser));
-        return PropertyUtil.response(obj);
+        return SinzakResponse.success(obj);
     }
 
     private UserDto makeUserDto(Long loginUserId, User findUser) {
@@ -230,7 +230,7 @@ public class UserQueryService {
                     .picture(user.getPicture())
                     .build());
         }
-        return PropertyUtil.response(getFollowDtoList);
+        return SinzakResponse.success(getFollowDtoList);
     }
 
 
@@ -247,7 +247,7 @@ public class UserQueryService {
                         .getNickName(), report.getOpponentUser()
                         .getPicture()))
                 .collect(Collectors.toList());
-        return PropertyUtil.response(reportRespondDtos);
+        return SinzakResponse.success(reportRespondDtos);
     }
 
 
@@ -259,7 +259,7 @@ public class UserQueryService {
         List<CustomJSONArray> histories = searchHistoryList.stream()
                 .map(history -> new CustomJSONArray(history.getId(), history.getWord()))
                 .collect(Collectors.toList());
-        return PropertyUtil.response(histories);
+        return SinzakResponse.success(histories);
     }
 
     private List<SearchHistory> getUserHistories(User user) {
@@ -279,7 +279,7 @@ public class UserQueryService {
             obj.add(jsonObject);
         }
 
-        return PropertyUtil.response(obj);
+        return SinzakResponse.success(obj);
     }
 
     public Optional<String> getUserNickName(Long id) {

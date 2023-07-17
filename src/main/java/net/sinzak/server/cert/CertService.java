@@ -7,7 +7,7 @@ import net.sinzak.server.cert.dto.CertDto;
 import net.sinzak.server.cert.dto.MailDto;
 import net.sinzak.server.cert.univ.UnivCard;
 import net.sinzak.server.cert.univ.UnivCardRepository;
-import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.SinzakResponse;
 import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
@@ -35,10 +35,10 @@ public class CertService {
 
     public JSONObject certifyUniv(UnivDto dto) {
         Optional<UnivCard> existUnivCard = univCardRepository.findCertByUserId(userUtils.getCurrentUserId());
-        if (existUnivCard.isPresent()) return PropertyUtil.responseMessage("처리중이거나, 이미 인증된 요청입니다.");
+        if (existUnivCard.isPresent()) return SinzakResponse.error("처리중이거나, 이미 인증된 요청입니다.");
         Long certId = univCardRepository.save(new UnivCard(dto.getUniv(), "temp", userUtils.getCurrentUserId()))
                 .getId();
-        return PropertyUtil.response(certId);
+        return SinzakResponse.success(certId);
     }
 
 
@@ -50,7 +50,7 @@ public class CertService {
         String url = s3Service.uploadImage(file);
         univCard.updateImageUrl(url);
         univCard.setStatus(Status.PROCESS);
-        return PropertyUtil.response(true);
+        return SinzakResponse.success(true);
     }
 
     public JSONObject completeUnivCard(Long id) {
@@ -60,20 +60,20 @@ public class CertService {
         User user = userRepository.findByIdNotDeleted(univCard.getUserId())
                 .orElseThrow(UserNotFoundException::new);
         user.setCertifiedUniv();
-        return PropertyUtil.response(true);
+        return SinzakResponse.success(true);
     }
 
     public JSONObject applyCertifiedAuthor(String link) {
         User user = userUtils.getCurrentUser();
         Optional<Author> existCeleb = authorRepository.findCertByUserId(user.getId());
-        if (!user.isCert_uni()) return PropertyUtil.responseMessage("아직 대학 인증이 완료되지 않았습니다.");
+        if (!user.isCert_uni()) return SinzakResponse.error("아직 대학 인증이 완료되지 않았습니다.");
 
         if (existCeleb.isPresent() || user.isCert_author())
-            return PropertyUtil.responseMessage("처리중이거나, 이미 인증된 요청입니다.");
+            return SinzakResponse.error("처리중이거나, 이미 인증된 요청입니다.");
         Author author = new Author(link, user.getId());
         author.setStatus(Status.PROCESS);
         authorRepository.save(author);
-        return PropertyUtil.response(true);
+        return SinzakResponse.success(true);
     }
 
     public JSONObject completeAuthor(Long id) {
@@ -83,7 +83,7 @@ public class CertService {
         User user = userRepository.findByIdNotDeleted(author.getUserId())
                 .orElseThrow(UserNotFoundException::new);
         user.setCertifiedAuthor();
-        return PropertyUtil.response(true);
+        return SinzakResponse.success(true);
     }
 
     public void updateCertifiedUniv(MailDto dto) {
@@ -105,7 +105,7 @@ public class CertService {
         authorRepository.findCertByUserId(user.getId())
                 .ifPresent(author -> certDto.setAuthorStatus(author.getStatus()));
 
-        return PropertyUtil.response(certDto);
+        return SinzakResponse.success(certDto);
     }
 
 
