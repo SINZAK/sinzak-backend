@@ -1,6 +1,3 @@
-![mainbanner2](https://user-images.githubusercontent.com/94730032/227761473-096957f6-9e00-4445-ac17-9d8b506c120b.png)
-
-
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=SINZAK_sinzak-backend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=SINZAK_sinzak-backend)
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=SINZAK_sinzak-backend&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=SINZAK_sinzak-backend)
 <br/>
@@ -20,9 +17,8 @@
 
 ## ✨ 서비스 관련
 - [PC 버전](https://sinzak.net)
-- [안드로이드 출시 링크](https://play.google.com/store/apps/details?id=io.sinzak.android&pli=1)
-- [서비스 소개 노션]()
-
+- [AOS](https://play.google.com/store/apps/details?id=io.sinzak.android&pli=1)
+- [IOS](https://apps.apple.com/kr/app/%EC%8B%A0%EC%9E%91/id6449455462)
 <br>
 
 ## 📚 사용 스택
