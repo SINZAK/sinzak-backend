@@ -19,36 +19,41 @@ import java.util.stream.Collectors;
 @Transactional
 public class FireBaseService {
 
-    public void sendIndividualNotification(User user, String title, String body, String route){
-        if(user.getFcm() ==null || user.getFcm().equals("")){ //로그아웃 한 상태라면
+    public void sendIndividualNotification(User user, String title, String body, String route) {
+        if (user.getFcm() == null || user.getFcm()
+                .equals("")) { //로그아웃 한 상태라면
             return;
         }
-        Notification notification = new Notification(title,body);
+        Notification notification = new Notification(title, body);
         Message message = Message.builder()
                 .setNotification(notification)
                 .setToken(user.getFcm())
-                .putData("route",route)
+                .putData("route", route)
                 .build();
-        try{
-            FirebaseMessaging.getInstance().sendAsync(message);
+        try {
+            FirebaseMessaging.getInstance()
+                    .sendAsync(message);
             log.info("알림 전송에 성공하였습니다.");
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             log.error("알림 전송에 실패하였습니다. {}", e.getMessage());
         }
     }
-    public void sendToAllNotification(List<String> tokenList,String title, String body, String route){
-        List<Message> messages = tokenList.stream().map(token->Message.builder()
-                .putData("time", LocalDateTime.now().toString())
-                .setNotification(new Notification(title,body))
-                .setToken(token)
-                .build()).collect(Collectors.toList());
+
+    public void sendToAllNotification(List<String> tokenList, String title, String body, String route) {
+        List<Message> messages = tokenList.stream()
+                .map(token -> Message.builder()
+                        .putData("time", LocalDateTime.now().toString())
+                        .setNotification(new Notification(title, body))
+                        .setToken(token)
+                        .build())
+                .collect(Collectors.toList());
 
         BatchResponse response;
         try {
 
             // 알림 발송
-            response = FirebaseMessaging.getInstance().sendAll(messages);
+            response = FirebaseMessaging.getInstance()
+                    .sendAll(messages);
 
             // 요청에 대한 응답 처리
             if (response.getFailureCount() > 0) {

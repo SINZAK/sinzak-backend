@@ -1,7 +1,7 @@
 package net.sinzak.server.config.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.Builder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +16,10 @@ public class CustomUserDetails implements UserDetails, Serializable {
     private String role;
     private String username;
     private Collection<? extends GrantedAuthority> authorities = null;
-    /** authorities는 역직렬화가 안됨. 굳이 하려면 엄청 복잡하게 해야함. 따라서 레디스에 저장은 null로 하고, 불러온 뒤에 권한 세팅 하는 방법으로 고정. **/
+
+    /**
+     * authorities는 역직렬화가 안됨. 굳이 하려면 엄청 복잡하게 해야함. 따라서 레디스에 저장은 null로 하고, 불러온 뒤에 권한 세팅 하는 방법으로 고정.
+     **/
     public String getRole() {
         return role;
     }
@@ -70,7 +73,7 @@ public class CustomUserDetails implements UserDetails, Serializable {
     @Builder
     public CustomUserDetails(Long id, String role) {
         super();
-        this.role = "ROLE_"+role;
+        this.role = "ROLE_" + role;
         this.username = String.valueOf(id);
         this.authorities = getAuthorities();
     }

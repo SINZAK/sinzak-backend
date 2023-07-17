@@ -14,13 +14,9 @@ import net.sinzak.server.chatroom.dto.respond.GetChatRoomsDto;
 import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.repository.UserChatRoomRepository;
 import net.sinzak.server.common.PostType;
-import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.SinzakResponse;
 import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.common.error.ChatRoomNotFoundException;
-import net.sinzak.server.common.error.UserNotLoginException;
-import net.sinzak.server.product.service.ProductService;
-import net.sinzak.server.user.domain.User;
-import net.sinzak.server.work.service.WorkService;
 import org.json.simple.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -70,7 +66,7 @@ public class ChatRoomQueryService {
                 }
             }
         }
-        return PropertyUtil.response(getChatRoomsDtos);
+        return SinzakResponse.success(getChatRoomsDtos);
     }
 
     private GetChatRoomsDto makeUserChatRoom(UserChatRoom userChatRoom, ChatRoom chatRoom) {
@@ -99,7 +95,7 @@ public class ChatRoomQueryService {
                                         .build()
                 )
                 .collect(Collectors.toList());
-        return PropertyUtil.response(chatRoomsDtos);
+        return SinzakResponse.success(chatRoomsDtos);
     }
     public Page<GetChatMessageDto> getChatRoomMessage(String roomUuid, Pageable pageable){
         ChatRoom findChatRoom = chatRoomRepository.findByRoomUuidFetchChatMessage(roomUuid)
@@ -141,16 +137,16 @@ public class ChatRoomQueryService {
             if(chatRoom.getProduct().isDeleted()){
                 getChatRoomDto.setPostId(null);
             }
-            return PropertyUtil.response(getChatRoomDto);
+            return SinzakResponse.success(getChatRoomDto);
         }
         if(chatRoom.getPostType().equals(PostType.WORK)){
             GetChatRoomDto getChatRoomDto = makeWorkChatRoomDto(myUserChatRoom,chatRoom,opponentUserChatRoom);
             if(chatRoom.getWork().isDeleted()){
                 getChatRoomDto.setPostId(null);
             }
-            return PropertyUtil.response(getChatRoomDto);
+            return SinzakResponse.success(getChatRoomDto);
         }
-        return PropertyUtil.responseMessage("잘못된 요청입니다");
+        return SinzakResponse.error("잘못된 요청입니다");
     }
 
     private GetChatRoomDto makeWorkChatRoomDto(UserChatRoom userChatRoom, ChatRoom chatRoom,UserChatRoom opponentUserChatRoom) {

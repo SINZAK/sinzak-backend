@@ -5,7 +5,7 @@ import net.sinzak.server.alarm.domain.Alarm;
 import net.sinzak.server.alarm.domain.AlarmType;
 import net.sinzak.server.alarm.dto.GetAlarmDto;
 import net.sinzak.server.alarm.repository.AlarmRepository;
-import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.SinzakResponse;
 import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.user.domain.User;
 import org.json.simple.JSONObject;
@@ -21,13 +21,15 @@ import java.util.Set;
 public class AlarmService {
     private final UserUtils userUtils;
     private final AlarmRepository alarmRepository;
+
     @Transactional
-    public JSONObject getAlarms(){
+    public JSONObject getAlarms() {
         List<GetAlarmDto> getAlarmDtos = new ArrayList<>();
         Set<Alarm> alarms = alarmRepository.findByUserId(userUtils.getCurrentUserId());
-        for(Alarm alarm : alarms){
+        for (Alarm alarm : alarms) {
             GetAlarmDto getAlarmDto = GetAlarmDto.builder()
-                    .date(alarm.getCreatedDate().toString())
+                    .date(alarm.getCreatedDate()
+                            .toString())
                     .alarmType(alarm.getAlarmType())
                     .thumbnail(alarm.getThumbnail())
                     .route(alarm.getRoute())
@@ -35,11 +37,11 @@ public class AlarmService {
                     .build();
             getAlarmDtos.add(getAlarmDto);
         }
-        return PropertyUtil.response(getAlarmDtos);
+        return SinzakResponse.success(getAlarmDtos);
     }
 
     @Transactional
-    public void makeAlarm(User user, String thumbnail, String route, AlarmType alarmType,String opponentUserName){
+    public void makeAlarm(User user, String thumbnail, String route, AlarmType alarmType, String opponentUserName) {
         Alarm alarm = Alarm.builder()
                 .user(user)
                 .thumbnail(thumbnail)
@@ -47,7 +49,8 @@ public class AlarmService {
                 .alarmType(alarmType)
                 .opponentUserName(opponentUserName)
                 .build();
-        user.getAlarms().add(alarm);
+        user.getAlarms()
+                .add(alarm);
         alarmRepository.save(alarm);
     }
 }

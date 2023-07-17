@@ -1,6 +1,5 @@
 package net.sinzak.server.product.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import net.sinzak.server.BaseTimeEntity;
 
@@ -26,5 +25,6 @@ public class ProductImage extends BaseTimeEntity {
         this.product = product;
     }
 
-    protected ProductImage() {}
+    protected ProductImage() {
+    }
 }

@@ -2,11 +2,14 @@ package net.sinzak.server.config.auth;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.SinzakResponse;
 import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
-import net.sinzak.server.config.auth.jwt.*;
+import net.sinzak.server.config.auth.jwt.JwtTokenProvider;
+import net.sinzak.server.config.auth.jwt.RefreshToken;
+import net.sinzak.server.config.auth.jwt.RefreshTokenRepository;
+import net.sinzak.server.config.auth.jwt.TokenDto;
 import net.sinzak.server.user.domain.JoinTerms;
 import net.sinzak.server.user.domain.User;
 import net.sinzak.server.user.dto.request.EmailDto;
@@ -37,7 +40,7 @@ public class SecurityService {
                 .orElseThrow(() -> new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND));
         TokenDto tokenDto = jwtProvider.createToken(user.getId().toString(), user.getId(), user.getRole());
 
-        if(user.getNickName() == null || user.getNickName().isEmpty())
+        if (user.getNickName() == null || user.getNickName().isEmpty())
             tokenDto.setIsJoined(false);
         tokenDto.setOrigin(user.getOrigin());
         RefreshToken refreshToken = RefreshToken.builder()
@@ -45,13 +48,13 @@ public class SecurityService {
                 .token(tokenDto.getRefreshToken())
                 .build();
         refreshTokenRepository.save(refreshToken);
-        log.error(user.getNickName()+" 로그인!");
+        log.error(user.getNickName() + " 로그인!");
         return tokenDto;
     }
 
     @Transactional
     public TokenDto login(User user) {
-        PropertyUtil.checkHeader(user);
+        SinzakResponse.checkHeader(user);
         TokenDto tokenDto = jwtProvider.createToken(user.getId().toString(), user.getId(), user.getRole());
 
         tokenDto.setIsJoined(false);
@@ -65,12 +68,11 @@ public class SecurityService {
     }
 
 
-
     @Transactional(rollbackFor = Exception.class)
     public JSONObject join(@RequestBody JoinDto dto) {
         User user = userUtils.getCurrentUser();
-        if(!user.getNickName().isBlank())
-            return PropertyUtil.responseMessage("이미 회원가입된 유저입니다.");
+        if (!user.getNickName().isBlank())
+            return SinzakResponse.error("이미 회원가입된 유저입니다.");
         JSONObject obj = new JSONObject();
         user.saveJoinInfo(dto.getNickName(), dto.getCategory_like());
         user.setRandomProfileImage();
@@ -78,7 +80,7 @@ public class SecurityService {
         terms.setUser(user);
         JoinTerms saveTerms = joinTermsRepository.save(terms);
         Long savedId = userRepository.save(user).getId();
-        if(savedId == null || saveTerms.getId() == null)
+        if (savedId == null || saveTerms.getId() == null)
             throw new InstanceNotFoundException("서버 오류로 저장되지 않았습니다.");
         TokenDto tokenDto = jwtProvider.createToken(String.valueOf(user.getId()), user.getId(), user.getRole());
         tokenDto.setIsJoined(true);
@@ -88,8 +90,8 @@ public class SecurityService {
                 .token(tokenDto.getRefreshToken())
                 .build();
         refreshTokenRepository.save(refreshToken);
-        obj.put("token",tokenDto);
-        obj.put("success",true);
+        obj.put("token", tokenDto);
+        obj.put("success", true);
         return obj;
     }
 
@@ -97,7 +99,7 @@ public class SecurityService {
     public TokenDto reissue() {
         User user = userUtils.getCurrentUser();
         List<RefreshToken> refreshTokens = refreshTokenRepository.findByKey(user.getId());
-        RefreshToken refreshToken = refreshTokens.get(refreshTokens.size()-1); //마지막꺼가 가장 최신반영된 토큰
+        RefreshToken refreshToken = refreshTokens.get(refreshTokens.size() - 1); //마지막꺼가 가장 최신반영된 토큰
 
         TokenDto newCreatedToken = jwtProvider.createToken(user.getId().toString(), user.getId(), user.getRole());
         RefreshToken updateRefreshToken = refreshToken.updateToken(newCreatedToken.getRefreshToken());
@@ -110,11 +112,11 @@ public class SecurityService {
     @Transactional(readOnly = true)
     public JSONObject checkEmail(EmailDto dto) {
         Optional<User> existUser = userRepository.findByEmailNotDeleted(dto.getEmail());
-        if (existUser.isPresent()){
+        if (existUser.isPresent()) {
             User user = existUser.get();
-            if(!user.getNickName().isBlank())
-                return PropertyUtil.responseMessage("이미 가입된 이메일입니다.");
+            if (!user.getNickName().isBlank())
+                return SinzakResponse.error("이미 가입된 이메일입니다.");
         }
-        return PropertyUtil.response(true);
+        return SinzakResponse.success(true);
     }
 }

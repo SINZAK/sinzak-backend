@@ -22,14 +22,17 @@ public class ProductSuggest {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    public static ProductSuggest createConnect(Product product, User user){  //생성메서드
-        return new ProductSuggest(user,product);
+    public static ProductSuggest createConnect(Product product, User user) {  //생성메서드
+        return new ProductSuggest(user, product);
     }
 
 
-    public void setProduct(Product product) {  this.product = product; }
+    public void setProduct(Product product) {
+        this.product = product;
+    }
 
-    protected ProductSuggest() {}
+    protected ProductSuggest() {
+    }
 
     public ProductSuggest(User user, Product product) {
         this.user = user;

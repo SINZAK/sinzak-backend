@@ -7,7 +7,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface UnivCardRepository extends JpaRepository<UnivCard, Long> {
-
     @Query("select c from UnivCard c where c.userId = :userId")
-    Optional<UnivCard> findCertByUserId(@Param("userId")Long userId);
+    Optional<UnivCard> findCertByUserId(@Param("userId") Long userId);
 }

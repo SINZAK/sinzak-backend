@@ -15,13 +15,13 @@ public class SearchHistory {
     private Long id;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name="user_id")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Column
     private String word;
 
-    public static SearchHistory addSearchHistory(String word, User user){  //생성메서드
+    public static SearchHistory addSearchHistory(String word, User user) {  //생성메서드
         SearchHistory connect = new SearchHistory();
         connect.setUser(user);
         connect.setWord(word);
@@ -30,7 +30,8 @@ public class SearchHistory {
 
     public void setUser(User user) {
         this.user = user;
-        user.getHistoryList().add(this);
+        user.getHistories()
+                .add(this);
     }
 
     public void setWord(String word) {

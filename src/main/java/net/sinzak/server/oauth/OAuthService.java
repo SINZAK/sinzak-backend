@@ -4,7 +4,7 @@ import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.SinzakResponse;
 import net.sinzak.server.user.dto.request.OauthDto;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -68,7 +68,7 @@ public class OAuthService {
         JSONObject obj = (JSONObject) parser.parse(responseHTML.body().string());
         JSONObject response = new JSONObject();
         response.put("access_token",obj.get("access_token").toString());
-        return PropertyUtil.response(response);
+        return SinzakResponse.success(response);
     }
 
     public JSONObject getGoogleAccessToken(String redirect_uri, String code) throws IOException, ParseException {
@@ -93,7 +93,7 @@ public class OAuthService {
         JSONObject response = new JSONObject();
         response.put("access_token", obj.get("access_token").toString());
         response.put("id_token", obj.get("id_token").toString());
-        return PropertyUtil.response(response);
+        return SinzakResponse.success(response);
     }
 
     public JSONObject getNaverAccessToken(String code) throws IOException, ParseException {
@@ -111,7 +111,7 @@ public class OAuthService {
         JSONObject obj = (JSONObject) parser.parse(responseHTML.body().string());
         JSONObject response = new JSONObject();
         response.put("access_token", obj.get("access_token").toString());
-        return PropertyUtil.response(response);
+        return SinzakResponse.success(response);
     }
 
     public JSONObject getGoogleInfo(OauthDto dto) throws IOException, ParseException {

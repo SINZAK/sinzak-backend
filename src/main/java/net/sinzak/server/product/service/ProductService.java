@@ -13,7 +13,7 @@ import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.error.PostNotFoundException;
 import net.sinzak.server.image.S3Service;
 import net.sinzak.server.product.domain.*;
-import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.SinzakResponse;
 import net.sinzak.server.product.dto.*;
 import net.sinzak.server.product.repository.*;
 import net.sinzak.server.user.domain.User;
@@ -75,25 +75,25 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                     .build();
         product.setUser(user);
         Long productId = productRepository.save(product).getId();// 미리 저장해야 이미지도 저장가능..
-        return PropertyUtil.response(productId);
+        return SinzakResponse.success(productId);
     }
 
     public JSONObject saveImageInS3AndProduct(List<MultipartFile> multipartFiles, Long id) {
         Product product = productRepository.findById(id).orElseThrow(PostNotFoundException::new);
         if(multipartFiles.size() == 0)
-            return PropertyUtil.responseMessage("사진 1개이상 첨부해주세요.");
+            return SinzakResponse.error("사진 1개이상 첨부해주세요.");
         if(!userUtils.getCurrentUserId().equals(product.getUser().getId()))
-            return PropertyUtil.responseMessage("잘못된 접근입니다.");
+            return SinzakResponse.error("잘못된 접근입니다.");
         for (MultipartFile img : multipartFiles) {
             try{
                 String url = uploadImageAndSetThumbnail(multipartFiles, product, img);
                 saveImageUrl(product, url);
             }
             catch (Exception e){
-                return PropertyUtil.responseMessage(multipartFiles.indexOf(img)+"번째 이미지부터 저장 실패");
+                return SinzakResponse.error(multipartFiles.indexOf(img)+"번째 이미지부터 저장 실패");
             }
         }
-        return PropertyUtil.response(true);
+        return SinzakResponse.success(true);
     }
 
 
@@ -114,13 +114,13 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     public JSONObject deleteImage(Long productId, String url){
         Product product = productRepository.findByIdFetchImages(productId).orElseThrow(PostNotFoundException::new);
         if(!userUtils.getCurrentUserId().equals(product.getUser().getId()))
-            return PropertyUtil.responseMessage("해당 작품의 작가가 아닙니다.");
+            return SinzakResponse.error("해당 작품의 작가가 아닙니다.");
         if(product.getImages().size()==1)
-            return PropertyUtil.responseMessage("최소 1개 이상의 이미지를 보유해야 합니다.");
+            return SinzakResponse.error("최소 1개 이상의 이미지를 보유해야 합니다.");
 
         for (ProductImage image : product.getImages()) {
             if(image.getImageUrl().equals(product.getThumbnail()))
-                return PropertyUtil.responseMessage("썸네일은 삭제 불가능합니다.");
+                return SinzakResponse.error("썸네일은 삭제 불가능합니다.");
             if(image.getImageUrl().equals(url)){
                 imageRepository.delete(image);
                 product.getImages().remove(image);
@@ -128,7 +128,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
             }
         }
         s3Service.deleteImage(url);
-        return PropertyUtil.response(productId);
+        return SinzakResponse.success(productId);
     }
 
     @Transactional(rollbackFor = {Exception.class})
@@ -137,11 +137,11 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         User user = userUtils.getCurrentUser();
         Product product = productRepository.findById(productId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(product.getUser().getId()) && user.getRole() != Role.ADMIN)
-            return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
+            return SinzakResponse.error("글 작성자가 아닙니다.");
 
         product.editPost(editDto);
         productRepository.save(product);
-        return PropertyUtil.response(true);
+        return SinzakResponse.success(true);
     }
 
     @Transactional(rollbackFor = {Exception.class})
@@ -150,10 +150,10 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         User user = userUtils.getCurrentUser();
         Product product = productRepository.findByIdFetchChatRooms(productId).orElseThrow(PostNotFoundException::new);
         if(!user.getId().equals(product.getUser().getId()) && user.getRole() != Role.ADMIN)
-            return PropertyUtil.responseMessage("글 작성자가 아닙니다.");
+            return SinzakResponse.error("글 작성자가 아닙니다.");
         deleteImagesInPost(product);
         product.setDeleted(true);
-        return PropertyUtil.response(true);
+        return SinzakResponse.success(true);
     }
 
     private void deleteImagesInPost(Product product) {
@@ -179,14 +179,14 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
             detailForm.setMyPost();
 
         boolean isLike = checkIsLikes(user.getProductLikesList(), product);
-        boolean isWish = checkIsWish(user, product.getProductWishList());  /**최적화를 위해 상품의 찜목록과 비교함. (대체적으로 해당 상품 찜개수 < 유저의 찜개수) **/
+        boolean isWish = checkIsWish(user, product.getProductWishes());  /**최적화를 위해 상품의 찜목록과 비교함. (대체적으로 해당 상품 찜개수 < 유저의 찜개수) **/
         boolean isFollowing = false;
         if(!product.getUser().isDelete())
             isFollowing = checkIsFollowing(user.getFollowings(), product);
 
         detailForm.setUserAction(isLike, isWish, isFollowing);
         product.addViews();
-        return PropertyUtil.response(detailForm);
+        return SinzakResponse.success(detailForm);
     }
 
     @Transactional
@@ -202,7 +202,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         }
         detailForm.setUserAction(false,false,false);
         product.addViews();
-        return PropertyUtil.response(detailForm);
+        return SinzakResponse.success(detailForm);
     }
 
     private DetailProductForm makeProductDetailForm(Product product, List<ProductImage> images) {
@@ -262,7 +262,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         List<Product> followingList = getFollowingList(user, productList, HOME_OBJECTS);
         obj.put("following", makeHomeShowForms(user.getProductLikesList(),followingList)); /** 팔로잉 **/
 
-        return PropertyUtil.response(obj);
+        return SinzakResponse.success(obj);
     }
 
 //    @Cacheable(value ="home_guest", cacheManager ="testCacheManager")
@@ -279,7 +279,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         productList.sort((o1, o2) -> o2.getLikesCnt() - o1.getLikesCnt()); /** hot : 좋아요 순 정렬!! **/
         obj.put("hot", makeHomeShowFormsForGuest(productList));
 
-        return PropertyUtil.response(obj);
+        return SinzakResponse.success(obj);
     }
 
     private List<Product> getTradingList(List<Product> productList, int limit) {
@@ -302,7 +302,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     public JSONObject wish(@RequestBody ActionForm form){
         JSONObject obj = new JSONObject();
         User user = userRepository.findByIdFetchProductWishList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new); // 작품 찜까지 페치 조인
-        List<ProductWish> wishList = user.getProductWishList(); //wishList == 유저의 찜 리스트
+        List<ProductWish> wishList = user.getProductWishes(); //wishList == 유저의 찜 리스트
         boolean success = false;
         boolean isWish=false;
         Product product = productRepository.findById(form.getId()).orElseThrow(PostNotFoundException::new);
@@ -372,28 +372,28 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         User user = userRepository.findByIdFetchProductSellList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
         Product product = productRepository.findById(dto.getPostId()).orElseThrow(PostNotFoundException::new);
         if(product.isComplete())
-            return PropertyUtil.responseMessage("이미 판매완료된 작품입니다.");
+            return SinzakResponse.error("이미 판매완료된 작품입니다.");
         ProductSell connect = ProductSell.createConnect(product, user);
         productSellRepository.save(connect);
         product.setComplete(true);
-        return PropertyUtil.response(true);
+        return SinzakResponse.success(true);
     }
 
     @Transactional
     public JSONObject suggest(@RequestBody SuggestDto dto){
         User user = userUtils.getCurrentUser();
         if(suggestRepository.findByUserIdAndProductId(user.getId(),dto.getId()).isPresent())
-            return PropertyUtil.responseMessage("이미 제안을 하신 작품입니다.");
+            return SinzakResponse.error("이미 제안을 하신 작품입니다.");
         Product product = productRepository.findByIdFetchUser(dto.getId()).orElseThrow();
         ProductSuggest connect = ProductSuggest.createConnect(product, user);
         product.setTopPrice(dto.getPrice());
 //        alarmService.makeAlarm(product.getUser(),product.getThumbnail(),product.getId().toString(),Integer.toString(dto.getPrice()));
         suggestRepository.save(connect);
-        return PropertyUtil.response(true);
+        return SinzakResponse.success(true);
     }
 
     @Transactional
-    public PageImpl<ShowForm> productListForUser(String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
+    public PageImpl<ShowForm> productsForUser(String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
         User user  = userRepository.findByIdFetchHistoryAndLikesList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
         List<Report> userReports = reportRepository.findByUserId(user.getId());
         if(!keyword.isEmpty())
@@ -409,7 +409,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
 
     private void saveSearchHistory(String keyword, User user) {
-        List<SearchHistory> historyList = new ArrayList<>(user.getHistoryList());
+        List<SearchHistory> historyList = new ArrayList<>(user.getHistories());
         if(historyList.size() >= HistoryMaxCount)
             historyRepository.delete(historyList.get(0));
         for (SearchHistory history : historyList) {
@@ -421,7 +421,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional(readOnly = true)
-    public PageImpl<ShowForm> productListForGuest(String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
+    public PageImpl<ShowForm> productsForGuest(String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
         Page<Product> productList = QDSLRepository.findAllByCompleteAndCategoriesAligned(complete, keyword, categories, align, pageable);
         List<ShowForm> showList = makeShowFormsForGuest(productList);
         return new PageImpl<>(showList, pageable, productList.getTotalElements());

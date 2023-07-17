@@ -3,7 +3,6 @@ package net.sinzak.server.user.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-
 import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.common.dto.IdDto;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
@@ -12,12 +11,11 @@ import net.sinzak.server.config.auth.jwt.TokenDto;
 import net.sinzak.server.user.dto.request.*;
 import net.sinzak.server.user.service.UserCommandService;
 import org.json.simple.JSONObject;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.validation.Valid;
-
-import java.security.NoSuchAlgorithmException;
 
 @Api(tags = "유저-명령")
 @RestController
@@ -70,16 +68,16 @@ public class UserCommandController {
     }
 
     @ApiDocumentResponse
-    @ApiOperation(value ="프로필 이미지 변경")
-    @PostMapping(value ="/users/edit/image")
-    public JSONObject updateUserImage(@RequestPart MultipartFile multipartFile){
+    @ApiOperation(value = "프로필 이미지 변경")
+    @PostMapping(value = "/users/edit/image")
+    public JSONObject updateUserImage(@RequestPart MultipartFile multipartFile) {
         return userCommandService.updateUserImage(multipartFile);
     }
 
     @ApiDocumentResponse
-    @ApiOperation(value ="관심장르 업데이트")
-    @PostMapping(value ="/users/edit/category")
-    public JSONObject updateCategoryLike(@RequestBody CategoryDto categoryDto){
+    @ApiOperation(value = "관심장르 업데이트")
+    @PostMapping(value = "/users/edit/category")
+    public JSONObject updateCategoryLike(@RequestBody CategoryDto categoryDto) {
         return userCommandService.updateCategoryLike(categoryDto);
     }
 
@@ -87,35 +85,35 @@ public class UserCommandController {
     @ApiDocumentResponse
     @ApiOperation(value = "팔로우하기")
     @PostMapping(value = "/users/follow")
-    public JSONObject followUser(@RequestBody UserIdDto userIdDto){
+    public JSONObject followUser(@RequestBody UserIdDto userIdDto) {
         return userCommandService.follow(UserUtils.getContextHolderId(), userIdDto.getUserId());
     }
 
     @ApiDocumentResponse
     @ApiOperation(value = "언팔로우하기")
     @PostMapping(value = "/users/unfollow")
-    public JSONObject unFollowUser(@RequestBody UserIdDto userIdDto){
+    public JSONObject unFollowUser(@RequestBody UserIdDto userIdDto) {
         return userCommandService.unFollow(UserUtils.getContextHolderId(), userIdDto.getUserId());
     }
 
     @ApiDocumentResponse
     @ApiOperation(value = "신고하기")
     @PostMapping(value = "/users/report")
-    public JSONObject report(@RequestBody ReportRequestDto reportRequestDto){
+    public JSONObject report(@RequestBody ReportRequestDto reportRequestDto) {
         return userCommandService.report(reportRequestDto);
     }
 
     @ApiDocumentResponse
     @ApiOperation(value = "신고 취소하기", notes = "userId만 제대로 주시면 응답합니다. (reason은 생략)")
     @PostMapping(value = "/users/report/cancel")
-    public JSONObject reportCancel(@RequestBody ReportRequestDto reportRequestDto){
+    public JSONObject reportCancel(@RequestBody ReportRequestDto reportRequestDto) {
         return userCommandService.reportCancel(reportRequestDto);
     }
 
     @ApiDocumentResponse
-    @ApiOperation(value ="fcm 토큰 저장", notes = "로그아웃할 땐 fcm토큰 빈칸")
+    @ApiOperation(value = "fcm 토큰 저장", notes = "로그아웃할 땐 fcm토큰 빈칸")
     @PostMapping(value = "/users/fcm")
-    public JSONObject setToken(FcmDto fcmDto){
+    public JSONObject setToken(FcmDto fcmDto) {
         return userCommandService.setToken(fcmDto);
     }
 
@@ -134,10 +132,9 @@ public class UserCommandController {
     @ApiDocumentResponse
     @ApiOperation(value = "유저 탈퇴하기")
     @PostMapping(value = "/users/resign")
-    public JSONObject resign(){
+    public JSONObject resign() {
         return userCommandService.resign();
     }
-
 
 
 }

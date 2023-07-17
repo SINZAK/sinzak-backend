@@ -11,7 +11,7 @@ import net.sinzak.server.chatroom.dto.respond.GetCreatedChatRoomDto;
 import net.sinzak.server.chatroom.repository.ChatRoomRepository;
 import net.sinzak.server.chatroom.repository.UserChatRoomRepository;
 import net.sinzak.server.common.PostType;
-import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.SinzakResponse;
 import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.common.error.ChatRoomNotFoundException;
 import net.sinzak.server.common.error.PostNotFoundException;
@@ -77,7 +77,7 @@ public class ChatRoomCommandService {
 
         checkUserStatus(loginUser,postUser);
         if(userQueryService.checkReported(postUser,loginUser)){
-            return PropertyUtil.responseMessage("차단된 상대입니다.");
+            return SinzakResponse.error("차단된 상대입니다.");
         }
 
         GetCreatedChatRoomDto getCreatedChatRoomDto =new GetCreatedChatRoomDto();
@@ -92,7 +92,7 @@ public class ChatRoomCommandService {
             getCreatedChatRoomDto.setNewChatRoom(false);
         }
         getCreatedChatRoomDto.setRoomUuid(chatRoom.getRoomUuid());
-        return PropertyUtil.response(getCreatedChatRoomDto);
+        return SinzakResponse.success(getCreatedChatRoomDto);
     }
     public JSONObject checkChatRoom(PostDto postDto){
         User loginUser = userUtils.getCurrentUser();
@@ -129,7 +129,7 @@ public class ChatRoomCommandService {
             getCheckChatRoomDto.setExist(true);
         }
         getCheckChatRoomDto.setRoomUuid(chatRoom.getRoomUuid());
-        return PropertyUtil.response(getCheckChatRoomDto);
+        return SinzakResponse.success(getCheckChatRoomDto);
     }
     private void addChatRoomToPost(PostDto postDto, Product product, Work work, ChatRoom chatRoom) {
         if(postDto.getPostType().equals(PostType.WORK.getName())){
@@ -151,7 +151,7 @@ public class ChatRoomCommandService {
             jsonObject.put("url",url);
             obj.add(jsonObject);
         }
-        return PropertyUtil.response(obj);
+        return SinzakResponse.success(obj);
     }
 //    public JSONObject leaveChatRoom(User user,String roomUuid){
 //        ChatRoom findChatRoom = chatRoomRepository.findByRoomId(roomUuid).orElseThrow(()->new InstanceNotFoundException("존재하지 않는 채팅방입니다."));

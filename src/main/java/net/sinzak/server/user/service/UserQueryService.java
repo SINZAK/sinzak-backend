@@ -2,7 +2,7 @@ package net.sinzak.server.user.service;
 
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.CustomJSONArray;
-import net.sinzak.server.common.PropertyUtil;
+import net.sinzak.server.common.SinzakResponse;
 import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.common.error.InstanceNotFoundException;
 import net.sinzak.server.common.error.UserNotFoundException;
@@ -37,46 +37,46 @@ public class UserQueryService {
     private final WorkWishRepository workWishRepository;
     private final ProductWishRepository productWishRepository;
     private final ReportRepository reportRepository;
-    private final UserQDSLRepositoryImpl QDSLRepository;
     private final FollowRepository followRepository;
 
-    public JSONObject getMyProfile(){
+    public JSONObject getMyProfile() {
         JSONObject obj = new JSONObject();
-        User findUser = userRepository.findByIdFetchProductPostList(userUtils.getCurrentUserId()).orElseThrow(()-> new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN));
-        List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
+        User findUser = userRepository.findByIdFetchProductPostList(userUtils.getCurrentUserId())
+                .orElseThrow(() -> new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN));
+        List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPosts());
         obj.put("products", productShowForms);
-        List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList(),false);
+        List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPosts(), false);
         obj.put("works", workShowForms);
-        List<ProfileShowForm> workEmployShowForms = makeWorkShowForm(findUser.getWorkPostList(),true);
-        obj.put("workEmploys",workEmployShowForms);
-        obj.put("profile",makeUserDto(userUtils.getCurrentUserId(), findUser));
-        return PropertyUtil.response(obj);
+        List<ProfileShowForm> workEmployShowForms = makeWorkShowForm(findUser.getWorkPosts(), true);
+        obj.put("workEmploys", workEmployShowForms);
+        obj.put("profile", makeUserDto(userUtils.getCurrentUserId(), findUser));
+        return SinzakResponse.success(obj);
     }
 
-    public JSONObject getWishList(){
-        List<WorkWish> workWishes= Optional
-                .ofNullable(workWishRepository.findByUserIdFetchWork(userUtils.getCurrentUserId()))
+    public JSONObject getWishes() {
+        List<WorkWish> workWishes = Optional.ofNullable(workWishRepository.findByUserIdFetchWork(userUtils.getCurrentUserId()))
                 .orElseThrow(() -> new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN));
         List<ProductWish> productWishes = productWishRepository.findByUserIdFetchProduct(userUtils.getCurrentUserId());
         JSONObject obj = new JSONObject();
         List<WishShowForm> workWishShowForms = makeWorkWishShowForms(workWishes);
-        obj.put("workWishes",workWishShowForms);
+        obj.put("workWishes", workWishShowForms);
         List<WishShowForm> productWishShowForms = makeProductWishShowForms(productWishes);
-        obj.put("productWishes",productWishShowForms);
-        return PropertyUtil.response(obj);
+        obj.put("productWishes", productWishShowForms);
+        return SinzakResponse.success(obj);
     }
 
-    public JSONObject getWorkEmploys(){
+    public JSONObject getWorkEmploys() {
         JSONObject obj = new JSONObject();
-        User loginUser = userRepository.findByIdFetchWorkPostList(userUtils.getCurrentUserId()).orElseThrow(()->new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN));
-        List<ProfileShowForm> workEmploys = makeWorkShowForm(loginUser.getWorkPostList(),true);
-        obj.put("workEmploys",workEmploys);
-        return PropertyUtil.response(obj);
+        User loginUser = userRepository.findByIdFetchWorkPostList(userUtils.getCurrentUserId())
+                .orElseThrow(() -> new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN));
+        List<ProfileShowForm> workEmploys = makeWorkShowForm(loginUser.getWorkPosts(), true);
+        obj.put("workEmploys", workEmploys);
+        return SinzakResponse.success(obj);
     }
 
-    public boolean checkReported(User postUser,User loginUser){
+    public boolean checkReported(User postUser, User loginUser) {
         List<Report> report = reportRepository.findByUserIdAndOpponentUserIdBoth(postUser.getId(), loginUser.getId());
-        if(report.isEmpty()){
+        if (report.isEmpty()) {
             return false;
         }
         return true;
@@ -120,7 +120,8 @@ public class UserQueryService {
                         .complete(product.isComplete())
                         .date(product.getCreatedDate())
                         .thumbnail(product.getThumbnail())
-                        .title(product.getTitle()).build())
+                        .title(product.getTitle())
+                        .build())
                 .collect(Collectors.toList());
     }
 
@@ -132,33 +133,37 @@ public class UserQueryService {
                         .complete(work.isComplete())
                         .date(work.getCreatedDate())
                         .thumbnail(work.getThumbnail())
-                        .title(work.getTitle()).build())
-                .sorted((o1, o2) -> (int) (o2.getId()-o1.getId()))
+                        .title(work.getTitle())
+                        .build())
+                .sorted((o1, o2) -> (int) (o2.getId() - o1.getId()))
                 .collect(Collectors.toList());
     }
 
 
     public JSONObject getUserProfileForUser(Long currentUserId, Long userId) {
         JSONObject obj = new JSONObject();
-        User findUser = userRepository.findByIdFetchProductPostList(userId).orElseThrow(()->new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND));
-        List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
+        User findUser = userRepository.findByIdFetchProductPostList(userId)
+                .orElseThrow(() -> new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND));
+        List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPosts());
         obj.put("products", productShowForms);
-        List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList(),false);
+        List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPosts(), false);
         obj.put("works", workShowForms);
-        obj.put("profile",makeUserDto(currentUserId, findUser));
-        return PropertyUtil.response(obj);
+        obj.put("profile", makeUserDto(currentUserId, findUser));
+        return SinzakResponse.success(obj);
     }
 
     public JSONObject getUserProfileForGuest(Long userId) {
         JSONObject obj = new JSONObject();
-        User findUser = userRepository.findByIdFetchProductPostList(userId).orElseThrow(()->new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND));
-        List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
+        User findUser = userRepository.findByIdFetchProductPostList(userId)
+                .orElseThrow(() -> new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND));
+        List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPosts());
         obj.put("products", productShowForms);
-        List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList(),false);
+        List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPosts(), false);
         obj.put("works", workShowForms);
-        obj.put("profile",makeUserDto(0L, findUser));
-        return PropertyUtil.response(obj);
+        obj.put("profile", makeUserDto(0L, findUser));
+        return SinzakResponse.success(obj);
     }
+
     private UserDto makeUserDto(Long loginUserId, User findUser) {
         return UserDto.builder()
                 .userId(findUser.getId())
@@ -166,39 +171,41 @@ public class UserQueryService {
                 .introduction(findUser.getIntroduction())
                 .followingNumber(findUser.getFollowingNum())
                 .followerNumber(findUser.getFollowerNum())
-                .myProfile(checkIfMyProfile(loginUserId,findUser))
+                .myProfile(checkIfMyProfile(loginUserId, findUser))
                 .imageUrl(findUser.getPicture())
                 .univ(findUser.getUniv())
-                .isFollow(checkIfFollowFindUser(loginUserId,findUser))
+                .isFollow(checkIfFollowFindUser(loginUserId, findUser))
                 .cert_uni(findUser.isCert_uni())
                 .cert_author(findUser.isCert_author())
                 .categoryLike(findUser.getCategoryLike())
                 .build();
     }
-    public boolean checkIfFollowFindUser(Long loginUserId,User findUser){
-        if(loginUserId.equals(0L)){
+
+    public boolean checkIfFollowFindUser(Long loginUserId, User findUser) {
+        if (loginUserId.equals(0L)) {
             return false;
         }
-        return findUser
-                .getFollowers()
+        return findUser.getFollowers()
                 .stream()
                 .map(Follow::getFollowerUser)
                 .map(User::getId)
                 .peek(System.out::println)
                 .anyMatch(x -> x.equals(loginUserId));
     }
-    public boolean checkIfMyProfile(Long loginUserId, User findUser){
-        if(loginUserId.equals(0L)){
+
+    public boolean checkIfMyProfile(Long loginUserId, User findUser) {
+        if (loginUserId.equals(0L)) {
             return false;
         }
-        if(findUser.getId().equals(loginUserId)){
+        if (findUser.getId()
+                .equals(loginUserId)) {
             return true;
         }
         return false;
     }
 
 
-    public JSONObject getFollowerDtoList(Long userId){
+    public JSONObject getFollowerDtos(Long userId) {
         Set<Follow> followers = followRepository.findByFollowingUserIdFetchFollower(userId);
         List<User> users = followers.stream()
                 .map(Follow::getFollowerUser)
@@ -206,72 +213,78 @@ public class UserQueryService {
         return makeFollowDtos(users);
     }
 
-    public JSONObject getFollowingDtoList(Long userId){
+    public JSONObject getFollowingDtos(Long userId) {
         Set<Follow> followings = followRepository.findByFollowerUserIdFetchFollowings(userId);
         List<User> users = followings.stream()
                 .map(Follow::getFollowingUser)
                 .collect(Collectors.toList());
         return makeFollowDtos(users);
     }
+
     private JSONObject makeFollowDtos(List<User> users) {
         List<GetFollowDto> getFollowDtoList = new ArrayList<>();
-        for(User user :users){
-            getFollowDtoList.add(
-                    GetFollowDto.builder()
-                            .userId(user.getId())
-                            .name(user.getNickName())
-                            .picture(user.getPicture())
-                            .build()
-            );
+        for (User user : users) {
+            getFollowDtoList.add(GetFollowDto.builder()
+                    .userId(user.getId())
+                    .name(user.getNickName())
+                    .picture(user.getPicture())
+                    .build());
         }
-        return PropertyUtil.response(getFollowDtoList);
+        return SinzakResponse.success(getFollowDtoList);
     }
 
 
-    public JSONObject showReportList(){
-        User loginUser = userRepository.findByIdFetchReportList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
+    public JSONObject showReports() {
+        User loginUser = userRepository.findByIdFetchReportList(userUtils.getCurrentUserId())
+                .orElseThrow(UserNotFoundException::new);
         List<Report> reportList = reportRepository.findByUserIdFetchOpponent(loginUser.getId());
 
         List<ReportRespondDto> reportRespondDtos = reportList.stream()
-                .filter(report -> !report.getOpponentUser().isDelete())
-                .map(report -> new ReportRespondDto(report.getOpponentUser().getId(), report.getOpponentUser().getNickName(), report.getOpponentUser().getPicture()))
+                .filter(report -> !report.getOpponentUser()
+                        .isDelete())
+                .map(report -> new ReportRespondDto(report.getOpponentUser()
+                        .getId(), report.getOpponentUser()
+                        .getNickName(), report.getOpponentUser()
+                        .getPicture()))
                 .collect(Collectors.toList());
-        return PropertyUtil.response(reportRespondDtos);
+        return SinzakResponse.success(reportRespondDtos);
     }
 
 
-    public JSONObject showSearchHistory(){
-        User user = historyRepository.findByIdFetchHistoryList(userUtils.getCurrentUserId()).orElseThrow(InstanceNotFoundException::new);
-        List<SearchHistory> searchHistoryList = getUserHistoryList(user);
+    public JSONObject showSearchHistories() {
+        User user = historyRepository.findByIdFetchHistoryList(userUtils.getCurrentUserId())
+                .orElseThrow(InstanceNotFoundException::new);
+        List<SearchHistory> searchHistoryList = getUserHistories(user);
 
         List<CustomJSONArray> histories = searchHistoryList.stream()
                 .map(history -> new CustomJSONArray(history.getId(), history.getWord()))
                 .collect(Collectors.toList());
-        return PropertyUtil.response(histories);
+        return SinzakResponse.success(histories);
     }
 
-    private List<SearchHistory> getUserHistoryList(User user) {
-        List<SearchHistory> historyList = new ArrayList<>(user.getHistoryList());
-        historyList.sort((o1, o2) -> (int) (o2.getId()-o1.getId()));
+    private List<SearchHistory> getUserHistories(User user) {
+        List<SearchHistory> historyList = new ArrayList<>(user.getHistories());
+        historyList.sort((o1, o2) -> (int) (o2.getId() - o1.getId()));
         return historyList;
     }
 
 
-    public JSONObject getAllUser(){
+    public JSONObject getAllUser() {
         List<User> users = userRepository.findAll();
         List<JSONObject> obj = new ArrayList<>();
-        for(User user : users){
-            JSONObject jsonObject =new JSONObject();
-            jsonObject.put("id",user.getId());
-            jsonObject.put("email",user.getEmail());
+        for (User user : users) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("id", user.getId());
+            jsonObject.put("email", user.getEmail());
             obj.add(jsonObject);
         }
 
-        return PropertyUtil.response(obj);
+        return SinzakResponse.success(obj);
     }
 
-    public Optional<String> getUserNickName(Long id){
-        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+    public Optional<String> getUserNickName(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
         return Optional.of(user.getNickName());
     }
 
@@ -281,8 +294,7 @@ public class UserQueryService {
         List<User> certUsers = users.stream()
                 .filter(User::isCert_author)
                 .collect(Collectors.toList());
-        if(certUsers.size() == 0)
-            return Optional.empty();
+        if (certUsers.size() == 0) return Optional.empty();
         Random random = SecureRandom.getInstanceStrong();
         int randomNumber = random.nextInt(certUsers.size());
         User randomUser = certUsers.get(randomNumber);

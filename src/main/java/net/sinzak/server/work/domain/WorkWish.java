@@ -39,7 +39,7 @@ public class WorkWish extends BaseTimeEntity {  //다대다 연결 위한 테이
     }
 
     private void setUser(User user){
-        user.getWorkWishList().add(this); //스크랩!
+        user.getWorkWishes().add(this); //스크랩!
         this.user=user;
     }
 

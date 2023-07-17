@@ -42,7 +42,6 @@ public class RedisCacheConfig {
         redisStandaloneConfiguration.setHostName(host);
         LettuceConnectionFactory lettuceConnectionFactory =
                 new LettuceConnectionFactory(redisStandaloneConfiguration);
-        log.info("redis 연결");
         return lettuceConnectionFactory;
     }
     @Bean

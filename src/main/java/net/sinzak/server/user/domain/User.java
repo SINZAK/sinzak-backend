@@ -7,13 +7,11 @@ import lombok.Setter;
 import net.sinzak.server.BaseTimeEntity;
 import net.sinzak.server.alarm.domain.Alarm;
 import net.sinzak.server.chatroom.domain.UserChatRoom;
-import net.sinzak.server.product.domain.ProductLikes;
 import net.sinzak.server.product.domain.Product;
+import net.sinzak.server.product.domain.ProductLikes;
 import net.sinzak.server.product.domain.ProductSell;
 import net.sinzak.server.product.domain.ProductWish;
 import net.sinzak.server.user.domain.follow.Follow;
-import net.sinzak.server.user.domain.follow.Follower;
-import net.sinzak.server.user.domain.follow.Following;
 import net.sinzak.server.work.domain.Work;
 import net.sinzak.server.work.domain.WorkLikes;
 import net.sinzak.server.work.domain.WorkSell;
@@ -27,12 +25,12 @@ import java.util.*;
 
 @Getter
 @Entity
-@SequenceGenerator(name = "User_SEQ_GEN",sequenceName = "User_SEQ")
+@SequenceGenerator(name = "User_SEQ_GEN", sequenceName = "User_SEQ")
 @DynamicUpdate
 @Table(indexes = {@Index(name = "CoveringIndexUser", columnList = "user_id, role")})
-public class User extends BaseTimeEntity{
+public class User extends BaseTimeEntity {
     private static final int hundredMillion = 100000000;
-    private static final int tenThousand =10000;
+    private static final int tenThousand = 10000;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "User_SEQ")
@@ -43,38 +41,38 @@ public class User extends BaseTimeEntity{
     private String email;
 
     @Column
-    private String nickName="";
+    private String nickName = "";
 
     @Column
     @Setter
-    private String picture=""; //대표 사진
+    private String picture = ""; //대표 사진
 
     @Column
-    private String introduction=""; //한 줄 소개
+    private String introduction = ""; //한 줄 소개
 
     @Column
-    private String univ="";
+    private String univ = "";
 
     @Column
-    private String followingNum="0";
+    private String followingNum = "0";
 
     @Column
-    private String followerNum="0";
+    private String followerNum = "0";
 
     @Column
     private String portFolioUrl;
 
     @Column
-    private String categoryLike="";  //관심 장르
+    private String categoryLike = "";  //관심 장르
 
     @Column
-    private boolean cert_uni =false; //대학 인증여부
+    private boolean cert_uni = false; //대학 인증여부
 
     @Column
-    private boolean cert_author =false; //인증작가 인증여부
+    private boolean cert_author = false; //인증작가 인증여부
 
     @Column
-    private int popularity=0;  //'지금 뜨는 아티스트' 때문에 만듦
+    private int popularity = 0;  //'지금 뜨는 아티스트' 때문에 만듦
 
     @Column
     private String origin;
@@ -87,59 +85,59 @@ public class User extends BaseTimeEntity{
     private Role role;
 
     @Column
-    private String fcm ="";
+    private String fcm = "";
 
     @Column
-    private boolean isDelete= false;
+    private boolean isDelete = false;
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserChatRoom> userChatRooms = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.MERGE)
-    private List<Product> productPostList = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.MERGE)
+    private List<Product> productPosts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user" ,cascade = CascadeType.MERGE)
-    private Set<Work> workPostList = new HashSet<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<ProductSell> productSellList = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.MERGE)
+    private Set<Work> workPosts = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<ProductWish> productWishList = new ArrayList<>();
+    private List<ProductSell> productSells = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<ProductWish> productWishes = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ProductLikes> productLikesList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<WorkSell> workSellList = new ArrayList<>();
+    private List<WorkSell> workSells = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<WorkWish> workWishList = new ArrayList<>();
+    private List<WorkWish> workWishes = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<WorkLikes> workLikesList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Report> reportList = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Report> reports = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private Set<SearchHistory> historyList = new HashSet<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<SearchHistory> histories = new HashSet<>();
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<Alarm> alarms = new HashSet<>();
 
 
-    @OneToMany(mappedBy = "followingUser",cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "followingUser", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<Follow> followers = new HashSet<>();
 
-    @OneToMany(mappedBy = "followerUser",cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "followerUser", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<Follow> followings = new HashSet<>();
-
 
 
     public void setFcm(String fcmToken) {
         this.fcm = fcmToken;
     }
+
     public void setDelete() {
         isDelete = true;
         nickName = null;
@@ -182,7 +180,6 @@ public class User extends BaseTimeEntity{
     }
 
 
-
     public void saveJoinInfo(String nickName, String categoryLike) {
         this.nickName = nickName;
         this.categoryLike = categoryLike;
@@ -192,45 +189,47 @@ public class User extends BaseTimeEntity{
     private Random random = SecureRandom.getInstanceStrong();
 
     public void setRandomProfileImage() {
-        int randomNumber = random.nextInt(10)+1;
-        this.picture = "https://sinzakimage.s3.ap-northeast-2.amazonaws.com/static/profile"+randomNumber+".png";
+        int randomNumber = random.nextInt(10) + 1;
+        this.picture = "https://sinzakimage.s3.ap-northeast-2.amazonaws.com/static/profile" + randomNumber + ".png";
     }
 
-    public void updateProfile(String name, String introduction){
-        this.nickName =name;
+    public void updateProfile(String name, String introduction) {
+        this.nickName = name;
         this.introduction = introduction;
     }
-    public void updateCategoryLike(String categoryLike){
+
+    public void updateCategoryLike(String categoryLike) {
         this.categoryLike = categoryLike;
     }
 
-    public void updateFollowNumber(int changeNum){
-        int newFollowerNum = Integer.parseInt(this.followerNum)+changeNum;
-        int newFollowingNum = Integer.parseInt(this.followingNum)+changeNum;
+    public void updateFollowNumber(int changeNum) {
+        int newFollowerNum = Integer.parseInt(this.followerNum) + changeNum;
+        int newFollowingNum = Integer.parseInt(this.followingNum) + changeNum;
         this.followerNum = Integer.toString(newFollowerNum);
         this.followingNum = Integer.toString(newFollowingNum);
     }
 
-    public String followNumberTrans(int number){
-        String unit =getUnit(number);
-        if(number>=hundredMillion){
+    public String followNumberTrans(int number) {
+        String unit = getUnit(number);
+        if (number >= hundredMillion) {
             number /= hundredMillion;
         }
-        if(number>=tenThousand){
+        if (number >= tenThousand) {
             number /= tenThousand;
         }
         String transNumber = Integer.toString(number);
-        if(transNumber.length()>=4){
-            transNumber = transNumber.charAt(0)+","+transNumber.substring(1);
+        if (transNumber.length() >= 4) {
+            transNumber = transNumber.charAt(0) + "," + transNumber.substring(1);
         }
-        transNumber +=unit;
+        transNumber += unit;
         return transNumber;
     }
-    public String getUnit(int number){
-        if(number>=hundredMillion){
+
+    public String getUnit(int number) {
+        if (number >= hundredMillion) {
             return "억";
         }
-        if(number>=tenThousand){
+        if (number >= tenThousand) {
             return "만";
         }
         return "";

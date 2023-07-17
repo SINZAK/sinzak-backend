@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface ProductImageRepository extends JpaRepository<ProductImage,Long> {
+public interface ProductImageRepository extends JpaRepository<ProductImage, Long> {
     @Query("select i from ProductImage i where i.product.id = :id")
-    List<ProductImage> findByProductId(@Param("id")Long id);
+    List<ProductImage> findByProductId(@Param("id") Long id);
 }

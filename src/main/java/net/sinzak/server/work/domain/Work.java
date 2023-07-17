@@ -81,7 +81,7 @@ public class Work extends BaseTimeEntity { /** 외주 **/
     private List<WorkImage> images = new ArrayList<>();  //수취인
 
     @OneToMany(mappedBy = "work", cascade = CascadeType.REMOVE)
-    private List<WorkWish> workWishList = new ArrayList<>();
+    private List<WorkWish> workWishes = new ArrayList<>();
 
     @OneToMany(mappedBy = "work")
     private List<ChatRoom> chatRooms = new ArrayList<>();
@@ -99,7 +99,7 @@ public class Work extends BaseTimeEntity { /** 외주 **/
     }
 
     public void setUser(User user) {
-        user.getWorkPostList().add(this);
+        user.getWorkPosts().add(this);
         this.user = user;
     }
 
