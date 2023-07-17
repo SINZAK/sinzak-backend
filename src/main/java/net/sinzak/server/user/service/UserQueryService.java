@@ -37,24 +37,23 @@ public class UserQueryService {
     private final WorkWishRepository workWishRepository;
     private final ProductWishRepository productWishRepository;
     private final ReportRepository reportRepository;
-    private final UserQDSLRepositoryImpl QDSLRepository;
     private final FollowRepository followRepository;
 
     public JSONObject getMyProfile() {
         JSONObject obj = new JSONObject();
         User findUser = userRepository.findByIdFetchProductPostList(userUtils.getCurrentUserId())
                 .orElseThrow(() -> new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN));
-        List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
+        List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPosts());
         obj.put("products", productShowForms);
-        List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList(), false);
+        List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPosts(), false);
         obj.put("works", workShowForms);
-        List<ProfileShowForm> workEmployShowForms = makeWorkShowForm(findUser.getWorkPostList(), true);
+        List<ProfileShowForm> workEmployShowForms = makeWorkShowForm(findUser.getWorkPosts(), true);
         obj.put("workEmploys", workEmployShowForms);
         obj.put("profile", makeUserDto(userUtils.getCurrentUserId(), findUser));
         return PropertyUtil.response(obj);
     }
 
-    public JSONObject getWishList() {
+    public JSONObject getWishes() {
         List<WorkWish> workWishes = Optional.ofNullable(workWishRepository.findByUserIdFetchWork(userUtils.getCurrentUserId()))
                 .orElseThrow(() -> new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN));
         List<ProductWish> productWishes = productWishRepository.findByUserIdFetchProduct(userUtils.getCurrentUserId());
@@ -70,7 +69,7 @@ public class UserQueryService {
         JSONObject obj = new JSONObject();
         User loginUser = userRepository.findByIdFetchWorkPostList(userUtils.getCurrentUserId())
                 .orElseThrow(() -> new UserNotFoundException(UserNotFoundException.USER_NOT_LOGIN));
-        List<ProfileShowForm> workEmploys = makeWorkShowForm(loginUser.getWorkPostList(), true);
+        List<ProfileShowForm> workEmploys = makeWorkShowForm(loginUser.getWorkPosts(), true);
         obj.put("workEmploys", workEmploys);
         return PropertyUtil.response(obj);
     }
@@ -145,9 +144,9 @@ public class UserQueryService {
         JSONObject obj = new JSONObject();
         User findUser = userRepository.findByIdFetchProductPostList(userId)
                 .orElseThrow(() -> new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND));
-        List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
+        List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPosts());
         obj.put("products", productShowForms);
-        List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList(), false);
+        List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPosts(), false);
         obj.put("works", workShowForms);
         obj.put("profile", makeUserDto(currentUserId, findUser));
         return PropertyUtil.response(obj);
@@ -157,9 +156,9 @@ public class UserQueryService {
         JSONObject obj = new JSONObject();
         User findUser = userRepository.findByIdFetchProductPostList(userId)
                 .orElseThrow(() -> new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND));
-        List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPostList());
+        List<ProfileShowForm> productShowForms = makeProductShowForm(findUser.getProductPosts());
         obj.put("products", productShowForms);
-        List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPostList(), false);
+        List<ProfileShowForm> workShowForms = makeWorkShowForm(findUser.getWorkPosts(), false);
         obj.put("works", workShowForms);
         obj.put("profile", makeUserDto(0L, findUser));
         return PropertyUtil.response(obj);
@@ -206,7 +205,7 @@ public class UserQueryService {
     }
 
 
-    public JSONObject getFollowerDtoList(Long userId) {
+    public JSONObject getFollowerDtos(Long userId) {
         Set<Follow> followers = followRepository.findByFollowingUserIdFetchFollower(userId);
         List<User> users = followers.stream()
                 .map(Follow::getFollowerUser)
@@ -214,7 +213,7 @@ public class UserQueryService {
         return makeFollowDtos(users);
     }
 
-    public JSONObject getFollowingDtoList(Long userId) {
+    public JSONObject getFollowingDtos(Long userId) {
         Set<Follow> followings = followRepository.findByFollowerUserIdFetchFollowings(userId);
         List<User> users = followings.stream()
                 .map(Follow::getFollowingUser)
@@ -235,7 +234,7 @@ public class UserQueryService {
     }
 
 
-    public JSONObject showReportList() {
+    public JSONObject showReports() {
         User loginUser = userRepository.findByIdFetchReportList(userUtils.getCurrentUserId())
                 .orElseThrow(UserNotFoundException::new);
         List<Report> reportList = reportRepository.findByUserIdFetchOpponent(loginUser.getId());
@@ -252,10 +251,10 @@ public class UserQueryService {
     }
 
 
-    public JSONObject showSearchHistory() {
+    public JSONObject showSearchHistories() {
         User user = historyRepository.findByIdFetchHistoryList(userUtils.getCurrentUserId())
                 .orElseThrow(InstanceNotFoundException::new);
-        List<SearchHistory> searchHistoryList = getUserHistoryList(user);
+        List<SearchHistory> searchHistoryList = getUserHistories(user);
 
         List<CustomJSONArray> histories = searchHistoryList.stream()
                 .map(history -> new CustomJSONArray(history.getId(), history.getWord()))
@@ -263,8 +262,8 @@ public class UserQueryService {
         return PropertyUtil.response(histories);
     }
 
-    private List<SearchHistory> getUserHistoryList(User user) {
-        List<SearchHistory> historyList = new ArrayList<>(user.getHistoryList());
+    private List<SearchHistory> getUserHistories(User user) {
+        List<SearchHistory> historyList = new ArrayList<>(user.getHistories());
         historyList.sort((o1, o2) -> (int) (o2.getId() - o1.getId()));
         return historyList;
     }

@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface WorkImageRepository extends JpaRepository<WorkImage,Long> {
+public interface WorkImageRepository extends JpaRepository<WorkImage, Long> {
     @Query("select i from WorkImage i where i.work.id = :id")
-    List<WorkImage> findByWorkId(@Param("id")Long id);
+    List<WorkImage> findByWorkId(@Param("id") Long id);
 }

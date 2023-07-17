@@ -171,7 +171,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
             detailForm.setMyPost();
 
         boolean isLike = checkIsLikes(user.getWorkLikesList(), work);
-        boolean isWish = checkIsWish(user, work.getWorkWishList());
+        boolean isWish = checkIsWish(user, work.getWorkWishes());
         boolean isFollowing  = false;
         if(work.getUser()!=null)
             isFollowing =checkIsFollowing(user.getFollowings(), work);
@@ -245,7 +245,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     public JSONObject wish(@RequestBody ActionForm form){
         JSONObject obj = new JSONObject();
         User user = userRepository.findByIdFetchWorkWishList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
-        List<WorkWish> wishList = user.getWorkWishList();
+        List<WorkWish> wishList = user.getWorkWishes();
         boolean isWish = false;
         boolean success = false;
         Work work = workRepository.findByIdNotDeleted(form.getId()).orElseThrow(PostNotFoundException::new);
@@ -333,7 +333,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     }
 
     @Transactional
-    public PageImpl<ShowForm> workListForUser(String keyword, List<String> categories, String align, boolean employment, Pageable pageable){
+    public PageImpl<ShowForm> worksForUser(String keyword, List<String> categories, String align, boolean employment, Pageable pageable){
         User user  = userRepository.findByIdFetchLikesList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
         if(!keyword.isEmpty())
             saveSearchHistory(keyword, user);
@@ -347,7 +347,7 @@ public class WorkService implements PostService<Work, WorkPostDto, WorkWish, Wor
     }
 
     @Transactional(readOnly = true)
-    public PageImpl<ShowForm> workListForGuest(String keyword, List<String> categories, String align, boolean employment, Pageable pageable){
+    public PageImpl<ShowForm> worksForGuest(String keyword, List<String> categories, String align, boolean employment, Pageable pageable){
         Page<Work> workList = QDSLRepository.findSearchingByEmploymentAndCategoriesAligned(employment, keyword, categories, align, pageable);
         List<ShowForm> showList = makeShowForms(workList);
         return new PageImpl<>(showList, pageable, workList.getTotalElements());

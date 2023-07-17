@@ -153,9 +153,9 @@ public class ProductController {
     public PageImpl<ShowForm> showMarketProduct(@RequestParam(required = false, defaultValue = "") String search, @RequestParam(required = false, defaultValue = "") List<String> categories, @RequestParam(required = false, defaultValue = "recommend") String align, @RequestParam(required = false, defaultValue = "false") Boolean sale, @ApiIgnore Pageable pageable) {
         try {
             UserUtils.getContextHolderId();
-            return productService.productListForUser(search, categories, align, sale, pageable);
+            return productService.productsForUser(search, categories, align, sale, pageable);
         } catch (UserNotFoundException | UserNotLoginException e) {
-            return productService.productListForGuest(search, categories, align, sale, pageable);
+            return productService.productsForGuest(search, categories, align, sale, pageable);
         }
     }
 

@@ -179,7 +179,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
             detailForm.setMyPost();
 
         boolean isLike = checkIsLikes(user.getProductLikesList(), product);
-        boolean isWish = checkIsWish(user, product.getProductWishList());  /**최적화를 위해 상품의 찜목록과 비교함. (대체적으로 해당 상품 찜개수 < 유저의 찜개수) **/
+        boolean isWish = checkIsWish(user, product.getProductWishes());  /**최적화를 위해 상품의 찜목록과 비교함. (대체적으로 해당 상품 찜개수 < 유저의 찜개수) **/
         boolean isFollowing = false;
         if(!product.getUser().isDelete())
             isFollowing = checkIsFollowing(user.getFollowings(), product);
@@ -302,7 +302,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     public JSONObject wish(@RequestBody ActionForm form){
         JSONObject obj = new JSONObject();
         User user = userRepository.findByIdFetchProductWishList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new); // 작품 찜까지 페치 조인
-        List<ProductWish> wishList = user.getProductWishList(); //wishList == 유저의 찜 리스트
+        List<ProductWish> wishList = user.getProductWishes(); //wishList == 유저의 찜 리스트
         boolean success = false;
         boolean isWish=false;
         Product product = productRepository.findById(form.getId()).orElseThrow(PostNotFoundException::new);
@@ -393,7 +393,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional
-    public PageImpl<ShowForm> productListForUser(String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
+    public PageImpl<ShowForm> productsForUser(String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
         User user  = userRepository.findByIdFetchHistoryAndLikesList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
         List<Report> userReports = reportRepository.findByUserId(user.getId());
         if(!keyword.isEmpty())
@@ -409,7 +409,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
 
     private void saveSearchHistory(String keyword, User user) {
-        List<SearchHistory> historyList = new ArrayList<>(user.getHistoryList());
+        List<SearchHistory> historyList = new ArrayList<>(user.getHistories());
         if(historyList.size() >= HistoryMaxCount)
             historyRepository.delete(historyList.get(0));
         for (SearchHistory history : historyList) {
@@ -421,7 +421,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     }
 
     @Transactional(readOnly = true)
-    public PageImpl<ShowForm> productListForGuest(String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
+    public PageImpl<ShowForm> productsForGuest(String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
         Page<Product> productList = QDSLRepository.findAllByCompleteAndCategoriesAligned(complete, keyword, categories, align, pageable);
         List<ShowForm> showList = makeShowFormsForGuest(productList);
         return new PageImpl<>(showList, pageable, productList.getTotalElements());

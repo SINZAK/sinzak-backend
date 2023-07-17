@@ -82,7 +82,7 @@ public class Product extends BaseTimeEntity {
     private List<ProductImage> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
-    private List<ProductWish> productWishList = new ArrayList<>();
+    private List<ProductWish> productWishes = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.MERGE)
     private List<ChatRoom> chatRooms = new ArrayList<>();
@@ -105,7 +105,7 @@ public class Product extends BaseTimeEntity {
     }
 
     public void setUser(User user) {
-        user.getProductPostList()
+        user.getProductPosts()
                 .add(this);
         this.user = user;
     }

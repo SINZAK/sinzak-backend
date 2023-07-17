@@ -47,26 +47,26 @@ public class UserQueryController {
 
     @ApiOperation(value = "팔로워리스트")
     @GetMapping(value = "/users/{userId}/followers")
-    public JSONObject getFollowerList(@PathVariable Long userId) {
-        return userQueryService.getFollowerDtoList(userId);
+    public JSONObject getFollowers(@PathVariable Long userId) {
+        return userQueryService.getFollowerDtos(userId);
     }
 
     @ApiOperation(value = "팔로잉리스트")
     @GetMapping(value = "/users/{userId}/followings")
-    public JSONObject getFollowingList(@PathVariable Long userId) {
-        return userQueryService.getFollowingDtoList(userId);
+    public JSONObject getFollowings(@PathVariable Long userId) {
+        return userQueryService.getFollowingDtos(userId);
     }
 
     @ApiOperation(value = "검색기록 출력", notes = "GetMapping에 유의 삭제는 Post로")
     @GetMapping(value = "/users/history")
     public JSONObject showHistory() {
-        return userQueryService.showSearchHistory();
+        return userQueryService.showSearchHistories();
     }
 
     @ApiOperation(value = "찜 목록")
     @GetMapping(value = "/users/wish")
     public JSONObject showWish() {
-        return userQueryService.getWishList();
+        return userQueryService.getWishes();
     }
 
     @ApiOperation(value = "의뢰해요 목록")
@@ -79,7 +79,7 @@ public class UserQueryController {
     @ApiOperation(value = "신고 목록 출력")
     @PostMapping(value = "/users/reportlist")
     public JSONObject reportList() {
-        return userQueryService.showReportList();
+        return userQueryService.showReports();
     }
 
     @ApiDocumentResponse

@@ -18,7 +18,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("select p from Product p where p.isDeleted =false order by p.id desc")
     Page<Product> findAll(Pageable pageable);
 
-    @Query("select p from Product p left join fetch p.productWishList left join fetch p.user where p.id = :id and p.isDeleted = false")
+    @Query("select p from Product p left join fetch p.productWishes left join fetch p.user where p.id = :id and p.isDeleted = false")
     Optional<Product> findByIdFetchProductWishAndUser(@Param("id") Long id);
 
     /**

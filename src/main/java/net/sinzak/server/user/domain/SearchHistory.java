@@ -30,7 +30,7 @@ public class SearchHistory {
 
     public void setUser(User user) {
         this.user = user;
-        user.getHistoryList()
+        user.getHistories()
                 .add(this);
     }
 

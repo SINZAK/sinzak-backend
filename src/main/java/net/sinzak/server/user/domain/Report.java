@@ -34,7 +34,7 @@ public class Report extends BaseTimeEntity {
 
     public void setUser(User loginUser, User opponentUser) {
         this.user = loginUser;
-        user.getReportList()
+        user.getReports()
                 .add(this);
         this.opponentUser = opponentUser;
     }

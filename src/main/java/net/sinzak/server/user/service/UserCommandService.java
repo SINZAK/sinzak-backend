@@ -13,8 +13,6 @@ import net.sinzak.server.image.S3Service;
 import net.sinzak.server.product.domain.Product;
 import net.sinzak.server.user.domain.Report;
 import net.sinzak.server.user.domain.follow.Follow;
-import net.sinzak.server.user.domain.follow.Follower;
-import net.sinzak.server.user.domain.follow.Following;
 import net.sinzak.server.user.dto.request.CategoryDto;
 import net.sinzak.server.user.dto.request.FcmDto;
 import net.sinzak.server.user.dto.request.ReportRequestDto;
@@ -25,13 +23,10 @@ import net.sinzak.server.user.repository.*;
 
 import net.sinzak.server.common.PropertyUtil;
 import org.json.simple.JSONObject;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -56,7 +51,7 @@ public class UserCommandService {
         Long userId = userUtils.getCurrentUserId();
         User user = userRepository.findByIdFetchProductPostList(userId).orElseThrow();
         user.updateProfile(dto.getName(),dto.getIntroduction());
-        for (Product product : user.getProductPostList()) {
+        for (Product product : user.getProductPosts()) {
             product.updateUserNickName(dto.getName());
         }
         return PropertyUtil.response(true);
@@ -167,7 +162,7 @@ public class UserCommandService {
     }
 
     private Optional<Report> checkReportHistory(Long id, User loginUser) {
-        for (Report report : loginUser.getReportList()) {
+        for (Report report : loginUser.getReports()) {
             if(report.getOpponentUser().getId().equals(id))
                 return Optional.of(report);
         }
@@ -178,7 +173,7 @@ public class UserCommandService {
 
     public JSONObject deleteSearchHistory(Long id){
         User user = userUtils.getCurrentUser();
-        user.getHistoryList().stream()
+        user.getHistories().stream()
                 .filter(history -> history.getId().equals(id))
                 .findFirst()
                 .ifPresent(historyRepository::delete);
@@ -187,7 +182,7 @@ public class UserCommandService {
 
     public JSONObject deleteSearchHistory(){
         User user = userUtils.getCurrentUser();
-        historyRepository.deleteAll(user.getHistoryList());
+        historyRepository.deleteAll(user.getHistories());
         return PropertyUtil.response(true);
     }
 

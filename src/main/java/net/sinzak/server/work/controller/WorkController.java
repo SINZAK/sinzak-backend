@@ -6,11 +6,11 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import net.sinzak.server.common.UserUtils;
+import net.sinzak.server.common.dto.ActionForm;
 import net.sinzak.server.common.dto.SuggestDto;
 import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.error.UserNotLoginException;
 import net.sinzak.server.common.resource.ApiDocumentResponse;
-import net.sinzak.server.common.dto.ActionForm;
 import net.sinzak.server.product.dto.ImageUrlDto;
 import net.sinzak.server.product.dto.SellDto;
 import net.sinzak.server.product.dto.ShowForm;
@@ -36,7 +36,7 @@ public class WorkController {
     private final WorkService workService;
 
     @ApiDocumentResponse
-    @ApiOperation(value = "의뢰 모집 글 생성", notes =  "{\"success\":true, \"id\":52}\n해당 글의 id를 전해드리니 이 /works/{id}/image 에 넘겨주세요\n" +
+    @ApiOperation(value = "의뢰 모집 글 생성", notes = "{\"success\":true, \"id\":52}\n해당 글의 id를 전해드리니 이 /works/{id}/image 에 넘겨주세요\n" +
             "category = portrait, illustration, logo, poster, design, editorial, label, other 주의점은 콤마로 구분하되 공백은 삽입X")
     @PostMapping(value = "/works/build", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public JSONObject makePost(@Valid @RequestBody WorkPostDto postDto) {
@@ -76,11 +76,10 @@ public class WorkController {
     @PostMapping("/works/{id}")
     @ApiOperation(value = "의뢰 상세 조회")
     public JSONObject showWorks(@PathVariable Long id) {
-        try{
+        try {
             Long currentUserId = UserUtils.getContextHolderId();
             return workService.showDetailForUser(currentUserId, id);
-        }
-        catch (UserNotFoundException | UserNotLoginException e){
+        } catch (UserNotFoundException | UserNotLoginException e) {
             return workService.showDetailForGuest(id); /** 비회원용 **/
         }
     }
@@ -122,8 +121,8 @@ public class WorkController {
             @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
                     value = "3", defaultValue = "5"),
             @ApiImplicitParam(name = "align", dataType = "string", paramType = "query",
-                    value = "정렬 기준\n" +"recent - 최신순\n"+
-                            "recommend - 신작추천순\n" , defaultValue = "recent"),
+                    value = "정렬 기준\n" + "recent - 최신순\n" +
+                            "recommend - 신작추천순\n", defaultValue = "recent"),
             @ApiImplicitParam(name = "categories", dataType = "string", paramType = "query",
                     value = "categories(최대 3개)\n" +
                             "portrait\n" +
@@ -137,13 +136,12 @@ public class WorkController {
             @ApiImplicitParam(name = "search", dataType = "string", paramType = "query",
                     value = "String 값으로 주시고 최소 2글자 이상은 받아야 합니다. contain 메서드로 db에서 검색할 예정.")
     })
-    public PageImpl<ShowForm> showWorks(@RequestParam(required=false, defaultValue="") String search, @RequestParam(required=false, defaultValue="") List<String> categories, @RequestParam(required=false, defaultValue="recommend") String align, @RequestParam(required=false, defaultValue="true") Boolean employment, @ApiIgnore Pageable pageable) {
-        try{
+    public PageImpl<ShowForm> showWorks(@RequestParam(required = false, defaultValue = "") String search, @RequestParam(required = false, defaultValue = "") List<String> categories, @RequestParam(required = false, defaultValue = "recommend") String align, @RequestParam(required = false, defaultValue = "true") Boolean employment, @ApiIgnore Pageable pageable) {
+        try {
             UserUtils.getContextHolderId();
-            return workService.workListForUser(search, categories, align, employment, pageable);
-        }
-        catch (UserNotFoundException | UserNotLoginException e) {
-            return workService.workListForGuest(search, categories, align, employment, pageable);
+            return workService.worksForUser(search, categories, align, employment, pageable);
+        } catch (UserNotFoundException | UserNotLoginException e) {
+            return workService.worksForGuest(search, categories, align, employment, pageable);
         }
     }
 

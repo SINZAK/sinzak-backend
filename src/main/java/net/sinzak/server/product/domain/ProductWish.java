@@ -34,7 +34,7 @@ public class ProductWish extends BaseTimeEntity {
     }
 
     private void setUser(User user) {
-        user.getProductWishList().add(this); //스크랩!
+        user.getProductWishes().add(this); //스크랩!
         this.user = user;
     }
 

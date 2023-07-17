@@ -94,34 +94,34 @@ public class User extends BaseTimeEntity {
     private List<UserChatRoom> userChatRooms = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.MERGE)
-    private List<Product> productPostList = new ArrayList<>();
+    private List<Product> productPosts = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.MERGE)
-    private Set<Work> workPostList = new HashSet<>();
+    private Set<Work> workPosts = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<ProductSell> productSellList = new ArrayList<>();
+    private List<ProductSell> productSells = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<ProductWish> productWishList = new ArrayList<>();
+    private List<ProductWish> productWishes = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ProductLikes> productLikesList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<WorkSell> workSellList = new ArrayList<>();
+    private List<WorkSell> workSells = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<WorkWish> workWishList = new ArrayList<>();
+    private List<WorkWish> workWishes = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<WorkLikes> workLikesList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Report> reportList = new ArrayList<>();
+    private List<Report> reports = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private Set<SearchHistory> historyList = new HashSet<>();
+    private Set<SearchHistory> histories = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<Alarm> alarms = new HashSet<>();

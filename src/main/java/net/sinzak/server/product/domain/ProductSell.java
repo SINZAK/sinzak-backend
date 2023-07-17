@@ -31,7 +31,7 @@ public class ProductSell {
     }
 
     private void setUser(User user) {
-        user.getProductSellList().add(this); //구매목록에 추가
+        user.getProductSells().add(this); //구매목록에 추가
         this.user = user;
     }
 
