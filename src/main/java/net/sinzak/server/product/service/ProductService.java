@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sinzak.server.alarm.service.AlarmService;
 import net.sinzak.server.common.PostService;
+import net.sinzak.server.common.SinzakResponse;
+import net.sinzak.server.common.redis.RedisService;
 import net.sinzak.server.common.UserUtils;
 import net.sinzak.server.user.domain.Report;
 import net.sinzak.server.user.domain.Role;
@@ -13,7 +15,6 @@ import net.sinzak.server.common.error.UserNotFoundException;
 import net.sinzak.server.common.error.PostNotFoundException;
 import net.sinzak.server.image.S3Service;
 import net.sinzak.server.product.domain.*;
-import net.sinzak.server.common.SinzakResponse;
 import net.sinzak.server.product.dto.*;
 import net.sinzak.server.product.repository.*;
 import net.sinzak.server.user.domain.User;
@@ -54,6 +55,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     private final ProductQDSLRepositoryImpl QDSLRepository;
     private final SearchHistoryRepository historyRepository;
     private final AlarmService alarmService;
+    private final RedisService redisService;
+
 
     private final int HistoryMaxCount = 10;
     private final int HOME_OBJECTS = 10;
@@ -93,7 +96,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                 return SinzakResponse.error(multipartFiles.indexOf(img)+"번째 이미지부터 저장 실패");
             }
         }
-        return SinzakResponse.success(true);
+        return SinzakResponse.success();
     }
 
 
@@ -141,7 +144,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
         product.editPost(editDto);
         productRepository.save(product);
-        return SinzakResponse.success(true);
+        return SinzakResponse.success();
     }
 
     @Transactional(rollbackFor = {Exception.class})
@@ -153,7 +156,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
             return SinzakResponse.error("글 작성자가 아닙니다.");
         deleteImagesInPost(product);
         product.setDeleted(true);
-        return SinzakResponse.success(true);
+        return SinzakResponse.success();
     }
 
     private void deleteImagesInPost(Product product) {
@@ -259,8 +262,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         List<Product> list = QDSLRepository.findCountByCategoriesDesc(userCategories, HOME_OBJECTS);
         obj.put("recommend", makeHomeShowForms(user.getProductLikesList(), list)); /** 추천목록  **/
 
-        List<Product> followingList = getFollowingList(user, productList, HOME_OBJECTS);
-        obj.put("following", makeHomeShowForms(user.getProductLikesList(),followingList)); /** 팔로잉 **/
+        List<Product> followings = getFollowingList(user, productList, HOME_OBJECTS);
+        obj.put("following", makeHomeShowForms(user.getProductLikesList(),followings)); /** 팔로잉 **/
 
         return SinzakResponse.success(obj);
     }
@@ -269,15 +272,15 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
     @Transactional(readOnly = true)
     public JSONObject showHomeForGuest(){
         JSONObject obj = new JSONObject();
-        List<Product> productList = productRepository.findAllProductNotDeleted();
+        List<Product> products = productRepository.findAllProductNotDeleted();
 
-        obj.put("new", makeHomeShowFormsForGuest(productList));
+        obj.put("new", makeHomeShowFormsForGuest(products));
 
-        List<Product> tradingList = getTradingList(productList, HOME_OBJECTS); /** Trading = 최신 목록 내림차순 중 채팅수가 1이상, 거래 완료되지 않은 것 **/
+        List<Product> tradingList = getTradingList(products, HOME_OBJECTS); /** Trading = 최신 목록 내림차순 중 채팅수가 1이상, 거래 완료되지 않은 것 **/
         obj.put("trading", makeHomeShowFormsForGuest(tradingList));
 
-        productList.sort((o1, o2) -> o2.getLikesCnt() - o1.getLikesCnt()); /** hot : 좋아요 순 정렬!! **/
-        obj.put("hot", makeHomeShowFormsForGuest(productList));
+        products.sort((o1, o2) -> o2.getLikesCnt() - o1.getLikesCnt()); /** hot : 좋아요 순 정렬!! **/
+        obj.put("hot", makeHomeShowFormsForGuest(products));
 
         return SinzakResponse.success(obj);
     }
@@ -376,7 +379,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         ProductSell connect = ProductSell.createConnect(product, user);
         productSellRepository.save(connect);
         product.setComplete(true);
-        return SinzakResponse.success(true);
+        return SinzakResponse.success();
     }
 
     @Transactional
@@ -389,15 +392,18 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
         product.setTopPrice(dto.getPrice());
 //        alarmService.makeAlarm(product.getUser(),product.getThumbnail(),product.getId().toString(),Integer.toString(dto.getPrice()));
         suggestRepository.save(connect);
-        return SinzakResponse.success(true);
+        return SinzakResponse.success();
     }
 
     @Transactional
     public PageImpl<ShowForm> productsForUser(String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
         User user  = userRepository.findByIdFetchHistoryAndLikesList(userUtils.getCurrentUserId()).orElseThrow(UserNotFoundException::new);
         List<Report> userReports = reportRepository.findByUserId(user.getId());
-        if(!keyword.isEmpty())
+        if(!keyword.isEmpty()){
             saveSearchHistory(keyword, user);
+            redisService.addWordToRedis(keyword);
+        }
+
         Page<Product> productList = QDSLRepository.findAllByCompleteAndCategoriesAligned(complete, keyword, categories, align, pageable);
         List<Product> products = new ArrayList<>(productList.getContent()); // Page의 content를 필터링 할 수 없어서 재생성.
         log.error("{}", products.size());
@@ -422,6 +428,7 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
     @Transactional(readOnly = true)
     public PageImpl<ShowForm> productsForGuest(String keyword, List<String> categories, String align, boolean complete, Pageable pageable){
+        if(!keyword.isEmpty()) redisService.addWordToRedis(keyword);
         Page<Product> productList = QDSLRepository.findAllByCompleteAndCategoriesAligned(complete, keyword, categories, align, pageable);
         List<ShowForm> showList = makeShowFormsForGuest(productList);
         return new PageImpl<>(showList, pageable, productList.getTotalElements());
@@ -480,5 +487,9 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
                 }
             }
         }
+    }
+
+    public List<String> getCompleteWord(String keyWord) {
+        return redisService.getAutoCompleteWords(keyWord);
     }
 }
