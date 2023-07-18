@@ -106,7 +106,8 @@ jobs:
           envs: GITHUB_SHA
           script: |
             cd deploy
-            docker container stop sinzak
-            docker container stop redis
+            docker container stop deploy_sinzak_1
+            docker container stop deploy_redis_1
+            docker container stop deploy_sinzak-web_1
             docker build -t sinzak .
             docker-compose up -d
