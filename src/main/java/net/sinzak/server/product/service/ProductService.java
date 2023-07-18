@@ -406,10 +406,8 @@ public class ProductService implements PostService<Product,ProductPostDto,Produc
 
         Page<Product> productList = QDSLRepository.findAllByCompleteAndCategoriesAligned(complete, keyword, categories, align, pageable);
         List<Product> products = new ArrayList<>(productList.getContent()); // Page의 content를 필터링 할 수 없어서 재생성.
-        log.error("{}", products.size());
         removeBlockPost(userReports, products);
         List<ShowForm> showList = makeDetailHomeShowForms(user.getProductLikesList(), products);
-        log.error("{}", products.size());
         return new PageImpl<>(showList, pageable, products.size());
     }
 
