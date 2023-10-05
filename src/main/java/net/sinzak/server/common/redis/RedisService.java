@@ -50,24 +50,4 @@ public class RedisService {
     }
 
 
-    // private void addWordsThroughNode(String newWord) {
-//        SearchNode parentNode = SearchNode.builder()
-//                .children(null)
-//                .score(0)
-//                .value(newWord.substring(0,1))
-//                .build();
-//        SearchNode firstNode = parentNode;
-//        for(int i = 1; i< newWord.length(); i++){
-//            SearchNode childNode = SearchNode.builder()
-//                    .children(null)
-//                    .score(0)
-//                    .value(newWord.substring(i,i+1))
-//                    .build();
-//            parentNode.setChildren(childNode);
-//            parentNode = childNode;
-//
-//        }
-//        redisTemplate.opsForValue().set(REDIS_KEY_AUTO_COMPLETE,firstNode);
-//    }
-
 }
